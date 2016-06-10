@@ -28,16 +28,16 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jTabbedPane = new javax.swing.JTabbedPane();
-        JPanelWhite = new javax.swing.JPanel();
+        JPanelWhiteT = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanelY2 = new javax.swing.JPanel();
         Y0Text2 = new javax.swing.JLabel();
         Y0UText2 = new javax.swing.JLabel();
         Y0VText2 = new javax.swing.JLabel();
-        Y0USliderW = new javax.swing.JSlider();
-        Y0VSliderW = new javax.swing.JSlider();
-        Y0USpinnerW = new javax.swing.JSpinner();
-        Y0VSpinnerW = new javax.swing.JSpinner();
+        Y0USliderWT = new javax.swing.JSlider();
+        Y0VSliderWT = new javax.swing.JSlider();
+        Y0USpinnerWT = new javax.swing.JSpinner();
+        Y0VSpinnerWT = new javax.swing.JSpinner();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
@@ -48,10 +48,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         Y255Text2 = new javax.swing.JLabel();
         Y255UText2 = new javax.swing.JLabel();
         Y255VText2 = new javax.swing.JLabel();
-        Y255USliderW = new javax.swing.JSlider();
-        Y255VSliderW = new javax.swing.JSlider();
-        Y255USpinnerW = new javax.swing.JSpinner();
-        Y255VSpinnerW = new javax.swing.JSpinner();
+        Y255USliderWT = new javax.swing.JSlider();
+        Y255VSliderWT = new javax.swing.JSlider();
+        Y255USpinnerWT = new javax.swing.JSpinner();
+        Y255VSpinnerWT = new javax.swing.JSpinner();
         Y255UMinText2 = new javax.swing.JLabel();
         Y255UMaxText2 = new javax.swing.JLabel();
         Y255UMiddleText2 = new javax.swing.JLabel();
@@ -62,10 +62,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         FuzzyText2 = new javax.swing.JLabel();
         FuzzyUText2 = new javax.swing.JLabel();
         FuzzyVText2 = new javax.swing.JLabel();
-        FuzzyUSliderW = new javax.swing.JSlider();
-        FuzzyVSliderW = new javax.swing.JSlider();
-        FuzzyUSpinnerW = new javax.swing.JSpinner();
-        FuzzyVSpinnerW = new javax.swing.JSpinner();
+        FuzzyUSliderWT = new javax.swing.JSlider();
+        FuzzyVSliderWT = new javax.swing.JSlider();
+        FuzzyUSpinnerWT = new javax.swing.JSpinner();
+        FuzzyVSpinnerWT = new javax.swing.JSpinner();
         FuzzyUMinText2 = new javax.swing.JLabel();
         FuzzyUMaxText2 = new javax.swing.JLabel();
         FuzzyUMiddleText2 = new javax.swing.JLabel();
@@ -76,16 +76,16 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         SaveButtonW = new javax.swing.JButton();
         SendButtonW = new javax.swing.JButton();
         imagePanel2 = new javax.swing.JPanel();
-        JPanelGreen = new javax.swing.JPanel();
+        JPanelGreenT = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanelY0G = new javax.swing.JPanel();
         Y0TextG = new javax.swing.JLabel();
         Y0UTextG = new javax.swing.JLabel();
         Y0VTextG = new javax.swing.JLabel();
-        Y0USliderG = new javax.swing.JSlider();
-        Y0VSliderG = new javax.swing.JSlider();
-        Y0USpinnerG = new javax.swing.JSpinner();
-        Y0VSpinnerG = new javax.swing.JSpinner();
+        Y0USliderGT = new javax.swing.JSlider();
+        Y0VSliderGT = new javax.swing.JSlider();
+        Y0USpinnerGT = new javax.swing.JSpinner();
+        Y0VSpinnerGT = new javax.swing.JSpinner();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
@@ -96,10 +96,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         Y255TextG = new javax.swing.JLabel();
         Y255UText1 = new javax.swing.JLabel();
         Y255VText1 = new javax.swing.JLabel();
-        Y255USliderG = new javax.swing.JSlider();
-        Y255VSliderG = new javax.swing.JSlider();
-        Y255USpinnerG = new javax.swing.JSpinner();
-        Y255VSpinnerG = new javax.swing.JSpinner();
+        Y255USliderGT = new javax.swing.JSlider();
+        Y255VSliderGT = new javax.swing.JSlider();
+        Y255USpinnerGT = new javax.swing.JSpinner();
+        Y255VSpinnerGT = new javax.swing.JSpinner();
         Y255UMinText1 = new javax.swing.JLabel();
         Y255UMaxText1 = new javax.swing.JLabel();
         Y255UMiddleText1 = new javax.swing.JLabel();
@@ -110,10 +110,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         FuzzyText1 = new javax.swing.JLabel();
         FuzzyUText1 = new javax.swing.JLabel();
         FuzzyVText1 = new javax.swing.JLabel();
-        FuzzyUSliderG = new javax.swing.JSlider();
-        FuzzyVSliderG = new javax.swing.JSlider();
-        FuzzyUSpinnerG = new javax.swing.JSpinner();
-        FuzzyVSpinnerG = new javax.swing.JSpinner();
+        FuzzyUSliderGT = new javax.swing.JSlider();
+        FuzzyVSliderGT = new javax.swing.JSlider();
+        FuzzyUSpinnerGT = new javax.swing.JSpinner();
+        FuzzyVSpinnerGT = new javax.swing.JSpinner();
         FuzzyUMinText1 = new javax.swing.JLabel();
         FuzzyUMaxText1 = new javax.swing.JLabel();
         FuzzyUMiddleText1 = new javax.swing.JLabel();
@@ -124,9 +124,105 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         SaveButtonG = new javax.swing.JButton();
         SendButtonG = new javax.swing.JButton();
         imagePanelG = new javax.swing.JPanel();
+        JPanelWhiteB = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanelY3 = new javax.swing.JPanel();
+        Y0Text3 = new javax.swing.JLabel();
+        Y0UText3 = new javax.swing.JLabel();
+        Y0VText3 = new javax.swing.JLabel();
+        Y0USliderWB = new javax.swing.JSlider();
+        Y0VSliderWB = new javax.swing.JSlider();
+        Y0USpinnerWB = new javax.swing.JSpinner();
+        Y0VSpinnerWB = new javax.swing.JSpinner();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        jPanelY258 = new javax.swing.JPanel();
+        Y255Text3 = new javax.swing.JLabel();
+        Y255UText3 = new javax.swing.JLabel();
+        Y255VText3 = new javax.swing.JLabel();
+        Y255USliderWB = new javax.swing.JSlider();
+        Y255VSliderWB = new javax.swing.JSlider();
+        Y255USpinnerWB = new javax.swing.JSpinner();
+        Y255VSpinnerWB = new javax.swing.JSpinner();
+        Y255UMinText3 = new javax.swing.JLabel();
+        Y255UMaxText3 = new javax.swing.JLabel();
+        Y255UMiddleText3 = new javax.swing.JLabel();
+        Y255VMinText3 = new javax.swing.JLabel();
+        Y255VMiddleText3 = new javax.swing.JLabel();
+        Y255VMaxText3 = new javax.swing.JLabel();
+        jPanelFuzzy3 = new javax.swing.JPanel();
+        FuzzyText3 = new javax.swing.JLabel();
+        FuzzyUText3 = new javax.swing.JLabel();
+        FuzzyVText3 = new javax.swing.JLabel();
+        FuzzyUSliderWB = new javax.swing.JSlider();
+        FuzzyVSliderWB = new javax.swing.JSlider();
+        FuzzyUSpinnerWB = new javax.swing.JSpinner();
+        FuzzyVSpinnerWB = new javax.swing.JSpinner();
+        FuzzyUMinText3 = new javax.swing.JLabel();
+        FuzzyUMaxText3 = new javax.swing.JLabel();
+        FuzzyUMiddleText3 = new javax.swing.JLabel();
+        FuzzyVMinText3 = new javax.swing.JLabel();
+        FuzzyVMiddleText3 = new javax.swing.JLabel();
+        FuzzyVMaxText3 = new javax.swing.JLabel();
+        UndoButtonW1 = new javax.swing.JButton();
+        SaveButtonW1 = new javax.swing.JButton();
+        SendButtonW1 = new javax.swing.JButton();
+        imagePanel3 = new javax.swing.JPanel();
+        JPanelGreenB = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanelY0G1 = new javax.swing.JPanel();
+        Y0TextG1 = new javax.swing.JLabel();
+        Y0UTextG1 = new javax.swing.JLabel();
+        Y0VTextG1 = new javax.swing.JLabel();
+        Y0USliderGB = new javax.swing.JSlider();
+        Y0VSliderGB = new javax.swing.JSlider();
+        Y0USpinnerGB = new javax.swing.JSpinner();
+        Y0VSpinnerGB = new javax.swing.JSpinner();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
+        jPanelY255G1 = new javax.swing.JPanel();
+        Y255TextG1 = new javax.swing.JLabel();
+        Y255UText4 = new javax.swing.JLabel();
+        Y255VText4 = new javax.swing.JLabel();
+        Y255USliderGB = new javax.swing.JSlider();
+        Y255VSliderGB = new javax.swing.JSlider();
+        Y255USpinnerGB = new javax.swing.JSpinner();
+        Y255VSpinnerGB = new javax.swing.JSpinner();
+        Y255UMinText4 = new javax.swing.JLabel();
+        Y255UMaxText4 = new javax.swing.JLabel();
+        Y255UMiddleText4 = new javax.swing.JLabel();
+        Y255VMinText4 = new javax.swing.JLabel();
+        Y255VMiddleText4 = new javax.swing.JLabel();
+        Y255VMaxText4 = new javax.swing.JLabel();
+        jPanelFuzzyG1 = new javax.swing.JPanel();
+        FuzzyText4 = new javax.swing.JLabel();
+        FuzzyUText4 = new javax.swing.JLabel();
+        FuzzyVText4 = new javax.swing.JLabel();
+        FuzzyUSliderGB = new javax.swing.JSlider();
+        FuzzyVSliderGB = new javax.swing.JSlider();
+        FuzzyUSpinnerGB = new javax.swing.JSpinner();
+        FuzzyVSpinnerGB = new javax.swing.JSpinner();
+        FuzzyUMinText4 = new javax.swing.JLabel();
+        FuzzyUMaxText4 = new javax.swing.JLabel();
+        FuzzyUMiddleText4 = new javax.swing.JLabel();
+        FuzzyVMinText4 = new javax.swing.JLabel();
+        FuzzyVMiddleText4 = new javax.swing.JLabel();
+        FuzzyVMaxText4 = new javax.swing.JLabel();
+        UndoButtonG1 = new javax.swing.JButton();
+        SaveButtonG1 = new javax.swing.JButton();
+        SendButtonG1 = new javax.swing.JButton();
+        imagePanelG1 = new javax.swing.JPanel();
 
-        JPanelWhite.setBackground(new java.awt.Color(242, 242, 242));
-        JPanelWhite.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "camera color calibration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("PT Serif", 1, 14))); // NOI18N
+        JPanelWhiteT.setBackground(new java.awt.Color(242, 242, 242));
+        JPanelWhiteT.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "camera color calibration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("PT Serif", 1, 14))); // NOI18N
 
         jPanelY2.setBackground(new java.awt.Color(232, 238, 238));
 
@@ -137,9 +233,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
 
         Y0VText2.setText("V");
 
-        Y0USpinnerW.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        Y0USpinnerWT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
-        Y0VSpinnerW.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        Y0VSpinnerWT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
         jLabel13.setText("0");
 
@@ -165,7 +261,7 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                         .addGroup(jPanelY2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelY2Layout.createSequentialGroup()
-                                .addComponent(Y0USliderW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Y0USliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE))
                             .addGroup(jPanelY2Layout.createSequentialGroup()
                                 .addComponent(jLabel13)
@@ -189,11 +285,11 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(jLabel17)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jLabel18))
-                                    .addComponent(Y0VSliderW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(Y0VSliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(6, 6, 6)))
                 .addGroup(jPanelY2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Y0VSpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Y0USpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(Y0VSpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Y0USpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
         jPanelY2Layout.setVerticalGroup(
@@ -206,7 +302,7 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                     .addGroup(jPanelY2Layout.createSequentialGroup()
                         .addGroup(jPanelY2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(Y0UText2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(Y0USliderW, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(Y0USliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addGap(2, 2, 2)
                         .addGroup(jPanelY2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanelY2Layout.createSequentialGroup()
@@ -215,12 +311,12 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                     .addComponent(jLabel14)
                                     .addComponent(jLabel15))
                                 .addGap(10, 10, 10)
-                                .addComponent(Y0VSliderW, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(Y0VSliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(Y0VText2)))
                     .addGroup(jPanelY2Layout.createSequentialGroup()
-                        .addComponent(Y0USpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(Y0USpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(Y0VSpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(Y0VSpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelY2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel16)
@@ -238,9 +334,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
 
         Y255VText2.setText("V");
 
-        Y255USpinnerW.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        Y255USpinnerWT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
-        Y255VSpinnerW.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        Y255VSpinnerWT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
         Y255UMinText2.setText("0");
 
@@ -275,9 +371,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(Y255UMiddleText2)
                                         .addGap(56, 56, 56)
                                         .addComponent(Y255UMaxText2))
-                                    .addComponent(Y255USliderW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(Y255USliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(Y255USpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Y255USpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(53, 53, 53))
                             .addGroup(jPanelY257Layout.createSequentialGroup()
                                 .addGroup(jPanelY257Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -287,9 +383,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(Y255VMiddleText2)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(Y255VMaxText2))
-                                    .addComponent(Y255VSliderW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(Y255VSliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(Y255VSpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Y255VSpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(jPanelY257Layout.createSequentialGroup()
                         .addComponent(Y255Text2)
@@ -303,13 +399,13 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelY257Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelY257Layout.createSequentialGroup()
-                        .addComponent(Y255USpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(Y255USpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(16, 16, 16)
-                        .addComponent(Y255VSpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(Y255VSpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanelY257Layout.createSequentialGroup()
                         .addGroup(jPanelY257Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(Y255UText2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(Y255USliderW, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(Y255USliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addGap(2, 2, 2)
                         .addGroup(jPanelY257Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(Y255UMinText2)
@@ -317,7 +413,7 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                             .addComponent(Y255UMiddleText2))
                         .addGap(14, 14, 14)
                         .addGroup(jPanelY257Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(Y255VSliderW, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Y255VSliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(Y255VText2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelY257Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -336,9 +432,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
 
         FuzzyVText2.setText("V");
 
-        FuzzyUSpinnerW.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        FuzzyUSpinnerWT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
-        FuzzyVSpinnerW.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        FuzzyVSpinnerWT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
         FuzzyUMinText2.setText("0");
 
@@ -373,9 +469,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(FuzzyUMiddleText2)
                                         .addGap(56, 56, 56)
                                         .addComponent(FuzzyUMaxText2))
-                                    .addComponent(FuzzyUSliderW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(FuzzyUSliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(FuzzyUSpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(FuzzyUSpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(53, 53, 53))
                             .addGroup(jPanelFuzzy2Layout.createSequentialGroup()
                                 .addGroup(jPanelFuzzy2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -385,9 +481,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(FuzzyVMiddleText2)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(FuzzyVMaxText2))
-                                    .addComponent(FuzzyVSliderW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(FuzzyVSliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(FuzzyVSpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(FuzzyVSpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(jPanelFuzzy2Layout.createSequentialGroup()
                         .addComponent(FuzzyText2)
@@ -401,13 +497,13 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelFuzzy2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelFuzzy2Layout.createSequentialGroup()
-                        .addComponent(FuzzyUSpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(FuzzyUSpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(16, 16, 16)
-                        .addComponent(FuzzyVSpinnerW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(FuzzyVSpinnerWT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanelFuzzy2Layout.createSequentialGroup()
                         .addGroup(jPanelFuzzy2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(FuzzyUText2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(FuzzyUSliderW, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(FuzzyUSliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addGap(2, 2, 2)
                         .addGroup(jPanelFuzzy2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(FuzzyUMinText2)
@@ -415,7 +511,7 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                             .addComponent(FuzzyUMiddleText2))
                         .addGap(14, 14, 14)
                         .addGroup(jPanelFuzzy2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(FuzzyVSliderW, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(FuzzyVSliderWT, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(FuzzyVText2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelFuzzy2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -478,45 +574,45 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         );
         imagePanel2Layout.setVerticalGroup(
             imagePanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 322, Short.MAX_VALUE)
+            .addGap(0, 376, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout JPanelWhiteLayout = new javax.swing.GroupLayout(JPanelWhite);
-        JPanelWhite.setLayout(JPanelWhiteLayout);
-        JPanelWhiteLayout.setHorizontalGroup(
-            JPanelWhiteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(JPanelWhiteLayout.createSequentialGroup()
+        javax.swing.GroupLayout JPanelWhiteTLayout = new javax.swing.GroupLayout(JPanelWhiteT);
+        JPanelWhiteT.setLayout(JPanelWhiteTLayout);
+        JPanelWhiteTLayout.setHorizontalGroup(
+            JPanelWhiteTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(JPanelWhiteTLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(JPanelWhiteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(JPanelWhiteTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(imagePanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelWhiteLayout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelWhiteTLayout.createSequentialGroup()
                         .addComponent(UndoButtonW, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 648, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 672, Short.MAX_VALUE)
                         .addComponent(SendButtonW, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(SaveButtonW, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
-        JPanelWhiteLayout.setVerticalGroup(
-            JPanelWhiteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(JPanelWhiteLayout.createSequentialGroup()
+        JPanelWhiteTLayout.setVerticalGroup(
+            JPanelWhiteTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(JPanelWhiteTLayout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(imagePanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(JPanelWhiteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(JPanelWhiteTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SaveButtonW, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SendButtonW)
                     .addComponent(UndoButtonW))
                 .addContainerGap())
         );
 
-        jTabbedPane.addTab("white", JPanelWhite);
+        jTabbedPane.addTab("white top", JPanelWhiteT);
 
-        JPanelGreen.setBackground(new java.awt.Color(242, 242, 242));
-        JPanelGreen.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "camera color calibration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("PT Serif", 1, 14))); // NOI18N
+        JPanelGreenT.setBackground(new java.awt.Color(242, 242, 242));
+        JPanelGreenT.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "camera color calibration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("PT Serif", 1, 14))); // NOI18N
 
         jPanelY0G.setBackground(new java.awt.Color(232, 238, 238));
 
@@ -527,9 +623,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
 
         Y0VTextG.setText("V");
 
-        Y0USpinnerG.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        Y0USpinnerGT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
-        Y0VSpinnerG.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        Y0VSpinnerGT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
         jLabel7.setText("0");
 
@@ -555,7 +651,7 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                         .addGroup(jPanelY0GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelY0GLayout.createSequentialGroup()
-                                .addComponent(Y0USliderG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Y0USliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE))
                             .addGroup(jPanelY0GLayout.createSequentialGroup()
                                 .addComponent(jLabel7)
@@ -579,11 +675,11 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(jLabel11)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jLabel12))
-                                    .addComponent(Y0VSliderG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(Y0VSliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(6, 6, 6)))
                 .addGroup(jPanelY0GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Y0VSpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Y0USpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(Y0VSpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Y0USpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
         jPanelY0GLayout.setVerticalGroup(
@@ -596,7 +692,7 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                     .addGroup(jPanelY0GLayout.createSequentialGroup()
                         .addGroup(jPanelY0GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(Y0UTextG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(Y0USliderG, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(Y0USliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addGap(2, 2, 2)
                         .addGroup(jPanelY0GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanelY0GLayout.createSequentialGroup()
@@ -605,12 +701,12 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                     .addComponent(jLabel8)
                                     .addComponent(jLabel9))
                                 .addGap(10, 10, 10)
-                                .addComponent(Y0VSliderG, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(Y0VSliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(Y0VTextG)))
                     .addGroup(jPanelY0GLayout.createSequentialGroup()
-                        .addComponent(Y0USpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(Y0USpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(Y0VSpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(Y0VSpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelY0GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
@@ -628,9 +724,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
 
         Y255VText1.setText("V");
 
-        Y255USpinnerG.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        Y255USpinnerGT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
-        Y255VSpinnerG.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        Y255VSpinnerGT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
         Y255UMinText1.setText("0");
 
@@ -665,9 +761,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(Y255UMiddleText1)
                                         .addGap(56, 56, 56)
                                         .addComponent(Y255UMaxText1))
-                                    .addComponent(Y255USliderG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(Y255USliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(Y255USpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Y255USpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(53, 53, 53))
                             .addGroup(jPanelY255GLayout.createSequentialGroup()
                                 .addGroup(jPanelY255GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -677,9 +773,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(Y255VMiddleText1)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(Y255VMaxText1))
-                                    .addComponent(Y255VSliderG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(Y255VSliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(Y255VSpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Y255VSpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(jPanelY255GLayout.createSequentialGroup()
                         .addComponent(Y255TextG)
@@ -693,13 +789,13 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelY255GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelY255GLayout.createSequentialGroup()
-                        .addComponent(Y255USpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(Y255USpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(16, 16, 16)
-                        .addComponent(Y255VSpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(Y255VSpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanelY255GLayout.createSequentialGroup()
                         .addGroup(jPanelY255GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(Y255UText1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(Y255USliderG, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(Y255USliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addGap(2, 2, 2)
                         .addGroup(jPanelY255GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(Y255UMinText1)
@@ -707,7 +803,7 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                             .addComponent(Y255UMiddleText1))
                         .addGap(14, 14, 14)
                         .addGroup(jPanelY255GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(Y255VSliderG, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Y255VSliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(Y255VText1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelY255GLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -726,9 +822,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
 
         FuzzyVText1.setText("V");
 
-        FuzzyUSpinnerG.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        FuzzyUSpinnerGT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
-        FuzzyVSpinnerG.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        FuzzyVSpinnerGT.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
 
         FuzzyUMinText1.setText("0");
 
@@ -763,9 +859,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(FuzzyUMiddleText1)
                                         .addGap(56, 56, 56)
                                         .addComponent(FuzzyUMaxText1))
-                                    .addComponent(FuzzyUSliderG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(FuzzyUSliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(FuzzyUSpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(FuzzyUSpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(53, 53, 53))
                             .addGroup(jPanelFuzzyGLayout.createSequentialGroup()
                                 .addGroup(jPanelFuzzyGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -775,9 +871,9 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                                         .addComponent(FuzzyVMiddleText1)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(FuzzyVMaxText1))
-                                    .addComponent(FuzzyVSliderG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(FuzzyVSliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(FuzzyVSpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(FuzzyVSpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(jPanelFuzzyGLayout.createSequentialGroup()
                         .addComponent(FuzzyText1)
@@ -791,13 +887,13 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelFuzzyGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelFuzzyGLayout.createSequentialGroup()
-                        .addComponent(FuzzyUSpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(FuzzyUSpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(16, 16, 16)
-                        .addComponent(FuzzyVSpinnerG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(FuzzyVSpinnerGT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanelFuzzyGLayout.createSequentialGroup()
                         .addGroup(jPanelFuzzyGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(FuzzyUText1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(FuzzyUSliderG, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(FuzzyUSliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addGap(2, 2, 2)
                         .addGroup(jPanelFuzzyGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(FuzzyUMinText1)
@@ -805,7 +901,7 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                             .addComponent(FuzzyUMiddleText1))
                         .addGap(14, 14, 14)
                         .addGroup(jPanelFuzzyGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(FuzzyVSliderG, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(FuzzyVSliderGT, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(FuzzyVText1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelFuzzyGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -868,42 +964,822 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         );
         imagePanelGLayout.setVerticalGroup(
             imagePanelGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 322, Short.MAX_VALUE)
+            .addGap(0, 376, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout JPanelGreenLayout = new javax.swing.GroupLayout(JPanelGreen);
-        JPanelGreen.setLayout(JPanelGreenLayout);
-        JPanelGreenLayout.setHorizontalGroup(
-            JPanelGreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(JPanelGreenLayout.createSequentialGroup()
+        javax.swing.GroupLayout JPanelGreenTLayout = new javax.swing.GroupLayout(JPanelGreenT);
+        JPanelGreenT.setLayout(JPanelGreenTLayout);
+        JPanelGreenTLayout.setHorizontalGroup(
+            JPanelGreenTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(JPanelGreenTLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(JPanelGreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(JPanelGreenTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(imagePanelG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelGreenLayout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelGreenTLayout.createSequentialGroup()
                         .addComponent(UndoButtonG, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 660, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 672, Short.MAX_VALUE)
                         .addComponent(SendButtonG, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(SaveButtonG, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
-        JPanelGreenLayout.setVerticalGroup(
-            JPanelGreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(JPanelGreenLayout.createSequentialGroup()
+        JPanelGreenTLayout.setVerticalGroup(
+            JPanelGreenTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(JPanelGreenTLayout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(imagePanelG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(JPanelGreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(JPanelGreenTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SaveButtonG, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SendButtonG)
                     .addComponent(UndoButtonG))
                 .addContainerGap())
         );
 
-        jTabbedPane.addTab("green", JPanelGreen);
+        jTabbedPane.addTab("green top", JPanelGreenT);
+
+        JPanelWhiteB.setBackground(new java.awt.Color(242, 242, 242));
+        JPanelWhiteB.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "camera color calibration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("PT Serif", 1, 14))); // NOI18N
+
+        jPanelY3.setBackground(new java.awt.Color(232, 238, 238));
+
+        Y0Text3.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        Y0Text3.setText("Y = 0");
+
+        Y0UText3.setText("U");
+
+        Y0VText3.setText("V");
+
+        Y0USpinnerWB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        Y0VSpinnerWB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        jLabel19.setText("0");
+
+        jLabel20.setText("255");
+
+        jLabel21.setText("127");
+
+        jLabel22.setText("0");
+
+        jLabel23.setText("127");
+
+        jLabel24.setText("255");
+
+        javax.swing.GroupLayout jPanelY3Layout = new javax.swing.GroupLayout(jPanelY3);
+        jPanelY3.setLayout(jPanelY3Layout);
+        jPanelY3Layout.setHorizontalGroup(
+            jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelY3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelY3Layout.createSequentialGroup()
+                        .addComponent(Y0UText3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                        .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelY3Layout.createSequentialGroup()
+                                .addComponent(Y0USliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE))
+                            .addGroup(jPanelY3Layout.createSequentialGroup()
+                                .addComponent(jLabel19)
+                                .addGap(78, 78, 78)
+                                .addComponent(jLabel21)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel20)
+                                .addGap(10, 10, 10))))
+                    .addGroup(jPanelY3Layout.createSequentialGroup()
+                        .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanelY3Layout.createSequentialGroup()
+                                .addComponent(Y0Text3)
+                                .addGap(174, 174, 174))
+                            .addGroup(jPanelY3Layout.createSequentialGroup()
+                                .addComponent(Y0VText3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanelY3Layout.createSequentialGroup()
+                                        .addComponent(jLabel22)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(jLabel23)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel24))
+                                    .addComponent(Y0VSliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(6, 6, 6)))
+                .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Y0VSpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Y0USpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(34, Short.MAX_VALUE))
+        );
+        jPanelY3Layout.setVerticalGroup(
+            jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelY3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Y0Text3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelY3Layout.createSequentialGroup()
+                        .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(Y0UText3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(Y0USliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanelY3Layout.createSequentialGroup()
+                                .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel19)
+                                    .addComponent(jLabel20)
+                                    .addComponent(jLabel21))
+                                .addGap(10, 10, 10)
+                                .addComponent(Y0VSliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(Y0VText3)))
+                    .addGroup(jPanelY3Layout.createSequentialGroup()
+                        .addComponent(Y0USpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(Y0VSpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelY3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel22)
+                    .addComponent(jLabel23)
+                    .addComponent(jLabel24))
+                .addContainerGap(45, Short.MAX_VALUE))
+        );
+
+        jPanelY258.setBackground(new java.awt.Color(232, 238, 238));
+
+        Y255Text3.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        Y255Text3.setText("Y = 255");
+
+        Y255UText3.setText("U");
+
+        Y255VText3.setText("V");
+
+        Y255USpinnerWB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        Y255VSpinnerWB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        Y255UMinText3.setText("0");
+
+        Y255UMaxText3.setText("255");
+
+        Y255UMiddleText3.setText("127");
+
+        Y255VMinText3.setText("0");
+
+        Y255VMiddleText3.setText("127");
+
+        Y255VMaxText3.setText("255");
+
+        javax.swing.GroupLayout jPanelY258Layout = new javax.swing.GroupLayout(jPanelY258);
+        jPanelY258.setLayout(jPanelY258Layout);
+        jPanelY258Layout.setHorizontalGroup(
+            jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelY258Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelY258Layout.createSequentialGroup()
+                        .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Y255UText3)
+                            .addComponent(Y255VText3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelY258Layout.createSequentialGroup()
+                                .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanelY258Layout.createSequentialGroup()
+                                        .addComponent(Y255UMinText3)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(Y255UMiddleText3)
+                                        .addGap(56, 56, 56)
+                                        .addComponent(Y255UMaxText3))
+                                    .addComponent(Y255USliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(Y255USpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(53, 53, 53))
+                            .addGroup(jPanelY258Layout.createSequentialGroup()
+                                .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanelY258Layout.createSequentialGroup()
+                                        .addComponent(Y255VMinText3)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(Y255VMiddleText3)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(Y255VMaxText3))
+                                    .addComponent(Y255VSliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Y255VSpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(jPanelY258Layout.createSequentialGroup()
+                        .addComponent(Y255Text3)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jPanelY258Layout.setVerticalGroup(
+            jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelY258Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Y255Text3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelY258Layout.createSequentialGroup()
+                        .addComponent(Y255USpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(Y255VSpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelY258Layout.createSequentialGroup()
+                        .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(Y255UText3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(Y255USliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(Y255UMinText3)
+                            .addComponent(Y255UMaxText3)
+                            .addComponent(Y255UMiddleText3))
+                        .addGap(14, 14, 14)
+                        .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Y255VSliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Y255VText3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelY258Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Y255VMinText3)
+                            .addComponent(Y255VMaxText3)
+                            .addComponent(Y255VMiddleText3))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanelFuzzy3.setBackground(new java.awt.Color(232, 238, 238));
+
+        FuzzyText3.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        FuzzyText3.setText("Width of Fuzzy Threshold");
+
+        FuzzyUText3.setText("U");
+
+        FuzzyVText3.setText("V");
+
+        FuzzyUSpinnerWB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        FuzzyVSpinnerWB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        FuzzyUMinText3.setText("0");
+
+        FuzzyUMaxText3.setText("255");
+
+        FuzzyUMiddleText3.setText("127");
+
+        FuzzyVMinText3.setText("0");
+
+        FuzzyVMiddleText3.setText("127");
+
+        FuzzyVMaxText3.setText("255");
+
+        javax.swing.GroupLayout jPanelFuzzy3Layout = new javax.swing.GroupLayout(jPanelFuzzy3);
+        jPanelFuzzy3.setLayout(jPanelFuzzy3Layout);
+        jPanelFuzzy3Layout.setHorizontalGroup(
+            jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                        .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(FuzzyUText3)
+                            .addComponent(FuzzyVText3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                                .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                                        .addComponent(FuzzyUMinText3)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(FuzzyUMiddleText3)
+                                        .addGap(56, 56, 56)
+                                        .addComponent(FuzzyUMaxText3))
+                                    .addComponent(FuzzyUSliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(FuzzyUSpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(53, 53, 53))
+                            .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                                .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                                        .addComponent(FuzzyVMinText3)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(FuzzyVMiddleText3)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(FuzzyVMaxText3))
+                                    .addComponent(FuzzyVSliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(FuzzyVSpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                        .addComponent(FuzzyText3)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jPanelFuzzy3Layout.setVerticalGroup(
+            jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(FuzzyText3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                        .addComponent(FuzzyUSpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(FuzzyVSpinnerWB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelFuzzy3Layout.createSequentialGroup()
+                        .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(FuzzyUText3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(FuzzyUSliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(FuzzyUMinText3)
+                            .addComponent(FuzzyUMaxText3)
+                            .addComponent(FuzzyUMiddleText3))
+                        .addGap(14, 14, 14)
+                        .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(FuzzyVSliderWB, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(FuzzyVText3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelFuzzy3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(FuzzyVMinText3)
+                            .addComponent(FuzzyVMaxText3)
+                            .addComponent(FuzzyVMiddleText3))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanelY3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(jPanelY258, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(jPanelFuzzy3, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelFuzzy3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelY258, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelY3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        UndoButtonW1.setText("Undo");
+        UndoButtonW1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                UndoButtonW1ActionPerformed(evt);
+            }
+        });
+
+        SaveButtonW1.setText("Save");
+        SaveButtonW1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveButtonW1ActionPerformed(evt);
+            }
+        });
+
+        SendButtonW1.setText("Send");
+        SendButtonW1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SendButtonW1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout imagePanel3Layout = new javax.swing.GroupLayout(imagePanel3);
+        imagePanel3.setLayout(imagePanel3Layout);
+        imagePanel3Layout.setHorizontalGroup(
+            imagePanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        imagePanel3Layout.setVerticalGroup(
+            imagePanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 376, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout JPanelWhiteBLayout = new javax.swing.GroupLayout(JPanelWhiteB);
+        JPanelWhiteB.setLayout(JPanelWhiteBLayout);
+        JPanelWhiteBLayout.setHorizontalGroup(
+            JPanelWhiteBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(JPanelWhiteBLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(JPanelWhiteBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(imagePanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelWhiteBLayout.createSequentialGroup()
+                        .addComponent(UndoButtonW1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 672, Short.MAX_VALUE)
+                        .addComponent(SendButtonW1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(SaveButtonW1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        JPanelWhiteBLayout.setVerticalGroup(
+            JPanelWhiteBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(JPanelWhiteBLayout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(imagePanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(JPanelWhiteBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(SaveButtonW1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SendButtonW1)
+                    .addComponent(UndoButtonW1))
+                .addContainerGap())
+        );
+
+        jTabbedPane.addTab("white bottom", JPanelWhiteB);
+
+        JPanelGreenB.setBackground(new java.awt.Color(242, 242, 242));
+        JPanelGreenB.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "camera color calibration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("PT Serif", 1, 14))); // NOI18N
+
+        jPanelY0G1.setBackground(new java.awt.Color(232, 238, 238));
+
+        Y0TextG1.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        Y0TextG1.setText("Y = 0");
+
+        Y0UTextG1.setText("U");
+
+        Y0VTextG1.setText("V");
+
+        Y0USpinnerGB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        Y0VSpinnerGB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        jLabel25.setText("0");
+
+        jLabel26.setText("255");
+
+        jLabel27.setText("127");
+
+        jLabel28.setText("0");
+
+        jLabel29.setText("127");
+
+        jLabel30.setText("255");
+
+        javax.swing.GroupLayout jPanelY0G1Layout = new javax.swing.GroupLayout(jPanelY0G1);
+        jPanelY0G1.setLayout(jPanelY0G1Layout);
+        jPanelY0G1Layout.setHorizontalGroup(
+            jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelY0G1Layout.createSequentialGroup()
+                        .addComponent(Y0UTextG1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                        .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                                .addComponent(Y0USliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE))
+                            .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                                .addComponent(jLabel25)
+                                .addGap(78, 78, 78)
+                                .addComponent(jLabel27)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel26)
+                                .addGap(10, 10, 10))))
+                    .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                        .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                                .addComponent(Y0TextG1)
+                                .addGap(174, 174, 174))
+                            .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                                .addComponent(Y0VTextG1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                                        .addComponent(jLabel28)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(jLabel29)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel30))
+                                    .addComponent(Y0VSliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(6, 6, 6)))
+                .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Y0VSpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Y0USpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(34, Short.MAX_VALUE))
+        );
+        jPanelY0G1Layout.setVerticalGroup(
+            jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Y0TextG1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                        .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(Y0UTextG1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(Y0USliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                                .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel25)
+                                    .addComponent(jLabel26)
+                                    .addComponent(jLabel27))
+                                .addGap(10, 10, 10)
+                                .addComponent(Y0VSliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(Y0VTextG1)))
+                    .addGroup(jPanelY0G1Layout.createSequentialGroup()
+                        .addComponent(Y0USpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(Y0VSpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelY0G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel28)
+                    .addComponent(jLabel29)
+                    .addComponent(jLabel30))
+                .addContainerGap(45, Short.MAX_VALUE))
+        );
+
+        jPanelY255G1.setBackground(new java.awt.Color(232, 238, 238));
+
+        Y255TextG1.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        Y255TextG1.setText("Y = 255");
+
+        Y255UText4.setText("U");
+
+        Y255VText4.setText("V");
+
+        Y255USpinnerGB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        Y255VSpinnerGB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        Y255UMinText4.setText("0");
+
+        Y255UMaxText4.setText("255");
+
+        Y255UMiddleText4.setText("127");
+
+        Y255VMinText4.setText("0");
+
+        Y255VMiddleText4.setText("127");
+
+        Y255VMaxText4.setText("255");
+
+        javax.swing.GroupLayout jPanelY255G1Layout = new javax.swing.GroupLayout(jPanelY255G1);
+        jPanelY255G1.setLayout(jPanelY255G1Layout);
+        jPanelY255G1Layout.setHorizontalGroup(
+            jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                        .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Y255UText4)
+                            .addComponent(Y255VText4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                                .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                                        .addComponent(Y255UMinText4)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(Y255UMiddleText4)
+                                        .addGap(56, 56, 56)
+                                        .addComponent(Y255UMaxText4))
+                                    .addComponent(Y255USliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(Y255USpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(53, 53, 53))
+                            .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                                .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                                        .addComponent(Y255VMinText4)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(Y255VMiddleText4)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(Y255VMaxText4))
+                                    .addComponent(Y255VSliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Y255VSpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                        .addComponent(Y255TextG1)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jPanelY255G1Layout.setVerticalGroup(
+            jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Y255TextG1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                        .addComponent(Y255USpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(Y255VSpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelY255G1Layout.createSequentialGroup()
+                        .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(Y255UText4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(Y255USliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(Y255UMinText4)
+                            .addComponent(Y255UMaxText4)
+                            .addComponent(Y255UMiddleText4))
+                        .addGap(14, 14, 14)
+                        .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Y255VSliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Y255VText4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelY255G1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Y255VMinText4)
+                            .addComponent(Y255VMaxText4)
+                            .addComponent(Y255VMiddleText4))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanelFuzzyG1.setBackground(new java.awt.Color(232, 238, 238));
+
+        FuzzyText4.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        FuzzyText4.setText("Width of Fuzzy Threshold");
+
+        FuzzyUText4.setText("U");
+
+        FuzzyVText4.setText("V");
+
+        FuzzyUSpinnerGB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        FuzzyVSpinnerGB.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+
+        FuzzyUMinText4.setText("0");
+
+        FuzzyUMaxText4.setText("255");
+
+        FuzzyUMiddleText4.setText("127");
+
+        FuzzyVMinText4.setText("0");
+
+        FuzzyVMiddleText4.setText("127");
+
+        FuzzyVMaxText4.setText("255");
+
+        javax.swing.GroupLayout jPanelFuzzyG1Layout = new javax.swing.GroupLayout(jPanelFuzzyG1);
+        jPanelFuzzyG1.setLayout(jPanelFuzzyG1Layout);
+        jPanelFuzzyG1Layout.setHorizontalGroup(
+            jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                        .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(FuzzyUText4)
+                            .addComponent(FuzzyVText4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                                .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                                        .addComponent(FuzzyUMinText4)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(FuzzyUMiddleText4)
+                                        .addGap(56, 56, 56)
+                                        .addComponent(FuzzyUMaxText4))
+                                    .addComponent(FuzzyUSliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(FuzzyUSpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(53, 53, 53))
+                            .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                                .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                                        .addComponent(FuzzyVMinText4)
+                                        .addGap(78, 78, 78)
+                                        .addComponent(FuzzyVMiddleText4)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(FuzzyVMaxText4))
+                                    .addComponent(FuzzyVSliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(FuzzyVSpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                        .addComponent(FuzzyText4)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jPanelFuzzyG1Layout.setVerticalGroup(
+            jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(FuzzyText4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                        .addComponent(FuzzyUSpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(FuzzyVSpinnerGB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelFuzzyG1Layout.createSequentialGroup()
+                        .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(FuzzyUText4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(FuzzyUSliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(FuzzyUMinText4)
+                            .addComponent(FuzzyUMaxText4)
+                            .addComponent(FuzzyUMiddleText4))
+                        .addGap(14, 14, 14)
+                        .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(FuzzyVSliderGB, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(FuzzyVText4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelFuzzyG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(FuzzyVMinText4)
+                            .addComponent(FuzzyVMaxText4)
+                            .addComponent(FuzzyVMiddleText4))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanelY0G1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(jPanelY255G1, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(jPanelFuzzyG1, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelFuzzyG1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelY255G1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelY0G1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        UndoButtonG1.setText("Undo");
+        UndoButtonG1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                UndoButtonG1ActionPerformed(evt);
+            }
+        });
+
+        SaveButtonG1.setText("Save");
+        SaveButtonG1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveButtonG1ActionPerformed(evt);
+            }
+        });
+
+        SendButtonG1.setText("Send");
+        SendButtonG1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SendButtonG1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout imagePanelG1Layout = new javax.swing.GroupLayout(imagePanelG1);
+        imagePanelG1.setLayout(imagePanelG1Layout);
+        imagePanelG1Layout.setHorizontalGroup(
+            imagePanelG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        imagePanelG1Layout.setVerticalGroup(
+            imagePanelG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 376, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout JPanelGreenBLayout = new javax.swing.GroupLayout(JPanelGreenB);
+        JPanelGreenB.setLayout(JPanelGreenBLayout);
+        JPanelGreenBLayout.setHorizontalGroup(
+            JPanelGreenBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(JPanelGreenBLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(JPanelGreenBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(imagePanelG1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelGreenBLayout.createSequentialGroup()
+                        .addComponent(UndoButtonG1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 672, Short.MAX_VALUE)
+                        .addComponent(SendButtonG1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(SaveButtonG1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        JPanelGreenBLayout.setVerticalGroup(
+            JPanelGreenBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(JPanelGreenBLayout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(imagePanelG1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(JPanelGreenBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(SaveButtonG1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SendButtonG1)
+                    .addComponent(UndoButtonG1))
+                .addContainerGap())
+        );
+
+        jTabbedPane.addTab("green bottom", JPanelGreenB);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -941,84 +1817,184 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }                                           
 
+    private void UndoButtonW1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void SaveButtonW1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void SendButtonW1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void UndoButtonG1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void SaveButtonG1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void SendButtonG1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
 
     // Variables declaration - do not modify                     
     protected javax.swing.JLabel FuzzyText1;
     protected javax.swing.JLabel FuzzyText2;
+    protected javax.swing.JLabel FuzzyText3;
+    protected javax.swing.JLabel FuzzyText4;
     protected javax.swing.JLabel FuzzyUMaxText1;
     protected javax.swing.JLabel FuzzyUMaxText2;
+    protected javax.swing.JLabel FuzzyUMaxText3;
+    protected javax.swing.JLabel FuzzyUMaxText4;
     protected javax.swing.JLabel FuzzyUMiddleText1;
     protected javax.swing.JLabel FuzzyUMiddleText2;
+    protected javax.swing.JLabel FuzzyUMiddleText3;
+    protected javax.swing.JLabel FuzzyUMiddleText4;
     protected javax.swing.JLabel FuzzyUMinText1;
     protected javax.swing.JLabel FuzzyUMinText2;
-    protected javax.swing.JSlider FuzzyUSliderG;
-    protected javax.swing.JSlider FuzzyUSliderW;
-    protected javax.swing.JSpinner FuzzyUSpinnerG;
-    protected javax.swing.JSpinner FuzzyUSpinnerW;
+    protected javax.swing.JLabel FuzzyUMinText3;
+    protected javax.swing.JLabel FuzzyUMinText4;
+    protected javax.swing.JSlider FuzzyUSliderGB;
+    protected javax.swing.JSlider FuzzyUSliderGT;
+    protected javax.swing.JSlider FuzzyUSliderWB;
+    protected javax.swing.JSlider FuzzyUSliderWT;
+    protected javax.swing.JSpinner FuzzyUSpinnerGB;
+    protected javax.swing.JSpinner FuzzyUSpinnerGT;
+    protected javax.swing.JSpinner FuzzyUSpinnerWB;
+    protected javax.swing.JSpinner FuzzyUSpinnerWT;
     protected javax.swing.JLabel FuzzyUText1;
     protected javax.swing.JLabel FuzzyUText2;
+    protected javax.swing.JLabel FuzzyUText3;
+    protected javax.swing.JLabel FuzzyUText4;
     protected javax.swing.JLabel FuzzyVMaxText1;
     protected javax.swing.JLabel FuzzyVMaxText2;
+    protected javax.swing.JLabel FuzzyVMaxText3;
+    protected javax.swing.JLabel FuzzyVMaxText4;
     protected javax.swing.JLabel FuzzyVMiddleText1;
     protected javax.swing.JLabel FuzzyVMiddleText2;
+    protected javax.swing.JLabel FuzzyVMiddleText3;
+    protected javax.swing.JLabel FuzzyVMiddleText4;
     protected javax.swing.JLabel FuzzyVMinText1;
     protected javax.swing.JLabel FuzzyVMinText2;
-    protected javax.swing.JSlider FuzzyVSliderG;
-    protected javax.swing.JSlider FuzzyVSliderW;
-    protected javax.swing.JSpinner FuzzyVSpinnerG;
-    protected javax.swing.JSpinner FuzzyVSpinnerW;
+    protected javax.swing.JLabel FuzzyVMinText3;
+    protected javax.swing.JLabel FuzzyVMinText4;
+    protected javax.swing.JSlider FuzzyVSliderGB;
+    protected javax.swing.JSlider FuzzyVSliderGT;
+    protected javax.swing.JSlider FuzzyVSliderWB;
+    protected javax.swing.JSlider FuzzyVSliderWT;
+    protected javax.swing.JSpinner FuzzyVSpinnerGB;
+    protected javax.swing.JSpinner FuzzyVSpinnerGT;
+    protected javax.swing.JSpinner FuzzyVSpinnerWB;
+    protected javax.swing.JSpinner FuzzyVSpinnerWT;
     protected javax.swing.JLabel FuzzyVText1;
     protected javax.swing.JLabel FuzzyVText2;
-    protected javax.swing.JPanel JPanelGreen;
-    protected javax.swing.JPanel JPanelWhite;
+    protected javax.swing.JLabel FuzzyVText3;
+    protected javax.swing.JLabel FuzzyVText4;
+    protected javax.swing.JPanel JPanelGreenB;
+    protected javax.swing.JPanel JPanelGreenT;
+    protected javax.swing.JPanel JPanelWhiteB;
+    protected javax.swing.JPanel JPanelWhiteT;
     protected javax.swing.JButton SaveButtonG;
+    protected javax.swing.JButton SaveButtonG1;
     protected javax.swing.JButton SaveButtonW;
+    protected javax.swing.JButton SaveButtonW1;
     protected javax.swing.JButton SendButtonG;
+    protected javax.swing.JButton SendButtonG1;
     protected javax.swing.JButton SendButtonW;
+    protected javax.swing.JButton SendButtonW1;
     protected javax.swing.JButton UndoButtonG;
+    protected javax.swing.JButton UndoButtonG1;
     protected javax.swing.JButton UndoButtonW;
+    protected javax.swing.JButton UndoButtonW1;
     protected javax.swing.JLabel Y0Text2;
+    protected javax.swing.JLabel Y0Text3;
     protected javax.swing.JLabel Y0TextG;
-    protected javax.swing.JSlider Y0USliderG;
-    protected javax.swing.JSlider Y0USliderW;
-    protected javax.swing.JSpinner Y0USpinnerG;
-    protected javax.swing.JSpinner Y0USpinnerW;
+    protected javax.swing.JLabel Y0TextG1;
+    protected javax.swing.JSlider Y0USliderGB;
+    protected javax.swing.JSlider Y0USliderGT;
+    protected javax.swing.JSlider Y0USliderWB;
+    protected javax.swing.JSlider Y0USliderWT;
+    protected javax.swing.JSpinner Y0USpinnerGB;
+    protected javax.swing.JSpinner Y0USpinnerGT;
+    protected javax.swing.JSpinner Y0USpinnerWB;
+    protected javax.swing.JSpinner Y0USpinnerWT;
     protected javax.swing.JLabel Y0UText2;
+    protected javax.swing.JLabel Y0UText3;
     protected javax.swing.JLabel Y0UTextG;
-    protected javax.swing.JSlider Y0VSliderG;
-    protected javax.swing.JSlider Y0VSliderW;
-    protected javax.swing.JSpinner Y0VSpinnerG;
-    protected javax.swing.JSpinner Y0VSpinnerW;
+    protected javax.swing.JLabel Y0UTextG1;
+    protected javax.swing.JSlider Y0VSliderGB;
+    protected javax.swing.JSlider Y0VSliderGT;
+    protected javax.swing.JSlider Y0VSliderWB;
+    protected javax.swing.JSlider Y0VSliderWT;
+    protected javax.swing.JSpinner Y0VSpinnerGB;
+    protected javax.swing.JSpinner Y0VSpinnerGT;
+    protected javax.swing.JSpinner Y0VSpinnerWB;
+    protected javax.swing.JSpinner Y0VSpinnerWT;
     protected javax.swing.JLabel Y0VText2;
+    protected javax.swing.JLabel Y0VText3;
     protected javax.swing.JLabel Y0VTextG;
+    protected javax.swing.JLabel Y0VTextG1;
     protected javax.swing.JLabel Y255Text2;
+    protected javax.swing.JLabel Y255Text3;
     protected javax.swing.JLabel Y255TextG;
+    protected javax.swing.JLabel Y255TextG1;
     protected javax.swing.JLabel Y255UMaxText1;
     protected javax.swing.JLabel Y255UMaxText2;
+    protected javax.swing.JLabel Y255UMaxText3;
+    protected javax.swing.JLabel Y255UMaxText4;
     protected javax.swing.JLabel Y255UMiddleText1;
     protected javax.swing.JLabel Y255UMiddleText2;
+    protected javax.swing.JLabel Y255UMiddleText3;
+    protected javax.swing.JLabel Y255UMiddleText4;
     protected javax.swing.JLabel Y255UMinText1;
     protected javax.swing.JLabel Y255UMinText2;
-    protected javax.swing.JSlider Y255USliderG;
-    protected javax.swing.JSlider Y255USliderW;
-    protected javax.swing.JSpinner Y255USpinnerG;
-    protected javax.swing.JSpinner Y255USpinnerW;
+    protected javax.swing.JLabel Y255UMinText3;
+    protected javax.swing.JLabel Y255UMinText4;
+    protected javax.swing.JSlider Y255USliderGB;
+    protected javax.swing.JSlider Y255USliderGT;
+    protected javax.swing.JSlider Y255USliderWB;
+    protected javax.swing.JSlider Y255USliderWT;
+    protected javax.swing.JSpinner Y255USpinnerGB;
+    protected javax.swing.JSpinner Y255USpinnerGT;
+    protected javax.swing.JSpinner Y255USpinnerWB;
+    protected javax.swing.JSpinner Y255USpinnerWT;
     protected javax.swing.JLabel Y255UText1;
     protected javax.swing.JLabel Y255UText2;
+    protected javax.swing.JLabel Y255UText3;
+    protected javax.swing.JLabel Y255UText4;
     protected javax.swing.JLabel Y255VMaxText1;
     protected javax.swing.JLabel Y255VMaxText2;
+    protected javax.swing.JLabel Y255VMaxText3;
+    protected javax.swing.JLabel Y255VMaxText4;
     protected javax.swing.JLabel Y255VMiddleText1;
     protected javax.swing.JLabel Y255VMiddleText2;
+    protected javax.swing.JLabel Y255VMiddleText3;
+    protected javax.swing.JLabel Y255VMiddleText4;
     protected javax.swing.JLabel Y255VMinText1;
     protected javax.swing.JLabel Y255VMinText2;
-    protected javax.swing.JSlider Y255VSliderG;
-    protected javax.swing.JSlider Y255VSliderW;
-    protected javax.swing.JSpinner Y255VSpinnerG;
-    protected javax.swing.JSpinner Y255VSpinnerW;
+    protected javax.swing.JLabel Y255VMinText3;
+    protected javax.swing.JLabel Y255VMinText4;
+    protected javax.swing.JSlider Y255VSliderGB;
+    protected javax.swing.JSlider Y255VSliderGT;
+    protected javax.swing.JSlider Y255VSliderWB;
+    protected javax.swing.JSlider Y255VSliderWT;
+    protected javax.swing.JSpinner Y255VSpinnerGB;
+    protected javax.swing.JSpinner Y255VSpinnerGT;
+    protected javax.swing.JSpinner Y255VSpinnerWB;
+    protected javax.swing.JSpinner Y255VSpinnerWT;
     protected javax.swing.JLabel Y255VText1;
     protected javax.swing.JLabel Y255VText2;
+    protected javax.swing.JLabel Y255VText3;
+    protected javax.swing.JLabel Y255VText4;
     protected javax.swing.JPanel imagePanel2;
+    protected javax.swing.JPanel imagePanel3;
     protected javax.swing.JPanel imagePanelG;
+    protected javax.swing.JPanel imagePanelG1;
     protected javax.swing.JLabel jLabel10;
     protected javax.swing.JLabel jLabel11;
     protected javax.swing.JLabel jLabel12;
@@ -1028,17 +2004,37 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
     protected javax.swing.JLabel jLabel16;
     protected javax.swing.JLabel jLabel17;
     protected javax.swing.JLabel jLabel18;
+    protected javax.swing.JLabel jLabel19;
+    protected javax.swing.JLabel jLabel20;
+    protected javax.swing.JLabel jLabel21;
+    protected javax.swing.JLabel jLabel22;
+    protected javax.swing.JLabel jLabel23;
+    protected javax.swing.JLabel jLabel24;
+    protected javax.swing.JLabel jLabel25;
+    protected javax.swing.JLabel jLabel26;
+    protected javax.swing.JLabel jLabel27;
+    protected javax.swing.JLabel jLabel28;
+    protected javax.swing.JLabel jLabel29;
+    protected javax.swing.JLabel jLabel30;
     protected javax.swing.JLabel jLabel7;
     protected javax.swing.JLabel jLabel8;
     protected javax.swing.JLabel jLabel9;
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JPanel jPanel3;
+    protected javax.swing.JPanel jPanel4;
+    protected javax.swing.JPanel jPanel5;
     protected javax.swing.JPanel jPanelFuzzy2;
+    protected javax.swing.JPanel jPanelFuzzy3;
     protected javax.swing.JPanel jPanelFuzzyG;
+    protected javax.swing.JPanel jPanelFuzzyG1;
     protected javax.swing.JPanel jPanelY0G;
+    protected javax.swing.JPanel jPanelY0G1;
     protected javax.swing.JPanel jPanelY2;
     protected javax.swing.JPanel jPanelY255G;
+    protected javax.swing.JPanel jPanelY255G1;
     protected javax.swing.JPanel jPanelY257;
-    private javax.swing.JTabbedPane jTabbedPane;
+    protected javax.swing.JPanel jPanelY258;
+    protected javax.swing.JPanel jPanelY3;
+    protected javax.swing.JTabbedPane jTabbedPane;
     // End of variables declaration                   
 }
