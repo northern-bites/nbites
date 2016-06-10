@@ -5,35 +5,35 @@
 #include "Man.h"
 #include "SharedData.h"
 
-
 #include <sys/file.h>
 #include <errno.h>
+#include <unistd.h>
 
 int lockFD = 0;
 man::Man* instance;
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
-
-void cleanup() {
-    instance->preClose();
-    flock(lockFD, LOCK_UN);
-
-    printf("Man closing output streams...\n");
-    fflush(stderr);
-    fflush(stdout);
-    fclose(stdout);
-
-    if (instance) delete instance;
-}
+pid_t whistlePID = 0;
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
 
 void handler(int signal)
 {
     if (signal == SIGTERM)
     {
+        if (whistlePID > 0) {
+            kill(whistlePID, SIGTERM);
+        }
 
         // Give man a chance to clean up behind it
         // I.e. close camera driver gracefully
-        cleanup();
+        instance->preClose();
+        flock(lockFD, LOCK_UN);
+        
+        printf("Man closing output streams...\n");
+        fflush(stderr);
+        fflush(stdout);
+        
+        fclose(stdout);
+        
+        delete instance;
         exit(0);
     }
 }
@@ -48,8 +48,7 @@ void error_signal_handler(int signal) {
     fflush(stdout);
     fflush(stderr);
 
-    cleanup();
-
+    printf("error_signal_handler() done.\n");
     exit(-1);
 }
 
@@ -78,6 +77,12 @@ int main() {
 
     signal(SIGSEGV, error_signal_handler);
 
+    printf("forking for whistle...\n");
+    whistlePID = fork();
+    if (whistlePID == 0) {
+         execl("/home/nao/whistle", "", NULL);
+    }
+
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     
     //it is somewhat important that we write to the old file descriptors before reopening.
@@ -86,8 +91,7 @@ int main() {
     fprintf(stderr, "Man re-opening stderr...\n");
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
-//    freopen(MAN_LOG_PATH, "w", stdout);
-     freopen(MAN_LOG_PATH, "wa", stdout);
+    freopen(MAN_LOG_PATH, "w", stdout);
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     

@@ -1,9 +1,11 @@
-#pragma once
+ #pragma once
 
 #include "RoboGrams.h"
 #include "Toggle.pb.h"
 #include "GameState.pb.h"
 #include "GCResponse.pb.h"
+
+#include "SharedData.h"
 
 namespace man{
 namespace gamestate{
@@ -42,9 +44,6 @@ private:
     void switchTeam();
     void switchKickOff();
 
-    void flag_setPenalized(bool p);
-    void flag_setPlaying();
-
     messages::GameState latest_data;
     unsigned int team_number;
     unsigned int player_number;
@@ -57,6 +56,13 @@ private:
 
     bool keep_time;
     long long start_time;
+
+    int shared_memory_fd;
+    volatile SharedData * shared_memory;
+
+    typedef int game_state_t;
+
+    void whistleHandler(game_state_t lastState, game_state_t& nextState);
 };
 
 }
