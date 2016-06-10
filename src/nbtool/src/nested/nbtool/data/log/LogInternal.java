@@ -21,6 +21,7 @@ import messages.InertialState;
 import messages.JointAngles;
 import nbtool.data.json.Json.JsonValue;
 import nbtool.data.SExpr;
+import nbtool.data.calibration.CameraOffset;
 import nbtool.data.group.Group;
 import nbtool.data.json.Json;
 import nbtool.data.json.JsonArray;
@@ -233,7 +234,7 @@ public class LogInternal extends Log {
 		
 		return null;
 	}
-	
+		
 	public static Log parseFromParts(byte[] json, byte[] data) {
 		
 		String desc = new String(json);
@@ -324,6 +325,62 @@ public class LogInternal extends Log {
 			debug.error("required key '%s' not found in Log JsonObject", key);
 			return null;
 		}
+	}
+	
+	protected static LogReference quickParse(Path path) throws IOException {
+		DataInputStream data = new DataInputStream(Files.newInputStream(path));
+		int dlen = data.readInt();
+		byte[] d = new byte[dlen];
+		data.readFully(d);
+		
+		String desc = new String(d);
+		data.close();
+		
+		if (LogInternal.isLegacyDesc(desc)) {
+			debug.warn("quickParse(): converting legacy log to JSON format, cannot lazy load!");
+			return LogReference.referenceFromFile(path);
+		}
+		
+		if (!desc.contains(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY())) {
+			debug.error("parsed log does not contain magic key: %s !in $s", SharedConstants.LOG_TOPLEVEL_MAGIC_KEY(),
+					desc);
+			throw new RuntimeException("parsed log does not contain magic key!");
+		}
+		
+		JsonObject object = null;
+		try {
+			object = Json.parseAndRequireEnd(desc).asObject();
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+		int vers = object.get(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY()).asNumber().asInt();
+		if (vers != ToolSettings.VERSION) {
+			debug.warn("parsing log of different version to compiled tool! tool:%d log:%d",
+					ToolSettings.VERSION, vers);
+		}
+		
+		String logClass = valueRemove(SharedConstants.LOG_TOPLEVEL_LOGCLASS(), object).asString().value;
+		long cwhen = valueRemove(SharedConstants.LOG_TOPLEVEL_CREATED_WHEN(), object).asNumber().asLong();
+		String host_addr = null;
+		String host_name = null;
+		String host_type = null;
+		
+		if (object.containsKey(SharedConstants.LOG_TOPLEVEL_HOST_ADDR())) {
+			host_addr = stringRemove(SharedConstants.LOG_TOPLEVEL_HOST_ADDR(), object);
+		}
+		
+		if (object.containsKey(SharedConstants.LOG_TOPLEVEL_HOST_NAME())) {
+			host_name = stringRemove(SharedConstants.LOG_TOPLEVEL_HOST_NAME(), object);
+		}
+		
+		if (object.containsKey(SharedConstants.LOG_TOPLEVEL_HOST_TYPE())) {
+			host_type = stringRemove(SharedConstants.LOG_TOPLEVEL_HOST_TYPE(), object);
+		}
+		
+		return new LogReference(cwhen, logClass, host_type, host_name, host_addr, desc,
+			path);
 	}
 	
 //	@Override
@@ -471,14 +528,49 @@ public class LogInternal extends Log {
 				slog.bytesForContentItem(2), new JsonObject(),
 				"JointAngles", slog.primaryFrom(), 0, 0
 				));
-
+		
+		
+		CameraOffset co = null;
+		boolean calParamsFound = false;
+		Vector<SExpr>[] found = null;
+		found = slog.tree().recursiveFindAll("camera_TOP");
+		
+		for (Vector<SExpr> vec : found) {
+			if (vec.lastElement().count() == 3) {
+				debug.info("found %s", vec.lastElement());
+				calParamsFound = true;
+				co = CameraOffset.fromLisp(vec.lastElement());
+				break;
+			}
+		}
+		
+		if (!calParamsFound) {
+			found = slog.tree().recursiveFindAll("camera_BOT");
+			
+			for (Vector<SExpr> vec : found) {
+				if (vec.lastElement().count() == 3) {
+					debug.info("found %s", vec.lastElement());
+					calParamsFound = true;
+					co = CameraOffset.fromLisp(vec.lastElement());
+					break;
+				}
+			}
+		}
+		
+		assert(calParamsFound);
 		JsonObject top = Json.object();
+
+
 		top.put(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY(), 7);
+		top.put("OriginalCameraOffsets",
+				co.toObject());
 		
 		Log ret = Log.explicitLog(blocks, top, SharedConstants.LogClass_Tripoint(), 0L);
 		ret.host_addr =  slog.tree().firstValueOf(SExprLog.LOG_FROM_ADDR_S).value();
 		ret.host_name = ret.host_addr;
 		ret.host_type = slog.tree().firstValueOf(SExprLog.LOG_HOST_TYPE_S).value();
+		
+		
 		
 		return ret;		
 	}
@@ -569,6 +661,8 @@ public class LogInternal extends Log {
 				YUYV8888Image img = test.blocks.get(0).parseAsYUVImage();
 				Message m1 = test.blocks.get(1).parseAsProtobufOfClass(InertialState.class);
 				Message m2 = test.blocks.get(2).parseAsProtobufOfClass(JointAngles.class);
+				
+				debug.info("json: %s", test.getFullDescription());
 				
 				return true;
 			}
