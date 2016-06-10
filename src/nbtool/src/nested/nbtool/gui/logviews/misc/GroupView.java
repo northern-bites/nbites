@@ -112,7 +112,7 @@ public class GroupView extends JPanel implements ActionListener {
 				
 				if (dir != null) {
 					try {
-						finalThis.group.add(FileIO.readAllRefsFromPath(dir));
+						finalThis.group.add(FileIO.readAllRefsFromPath(dir, false));
 					} catch (IOException e1) {
 						ToolMessage.displayError("failed to read refs from %s (%s)", 
 								dir, e1.getMessage());
