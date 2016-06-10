@@ -11,7 +11,7 @@ from objects import RelRobotLocation
 from ..navigator import Navigator
 from ..util import *
 
-DEBUG_PENALTY_STATES = False
+DEBUG_PENALTY_STATES = True
 angle = 80
 
 # So this entire state is cobbled together in the rush of China 2015.
@@ -24,18 +24,24 @@ angle = 80
 @superState('gameControllerResponder')
 def afterPenalty(player):
 
+    ## TODO TEST VALUES: NUMBER OF FRAMES AND RIGHT/LEFT DIFFS
+
     if player.firstFrame():
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state."
 
-        # Hackity Hackity Hack. Determine if we've been manually positioned or are actually coming out of penalty
-        if player.brain.penalizedHack:
-            closeRatio = player.brain.penalizedEdgeClose / float(player.brain.penalizedCount)
-            print "Close ratio is: ", closeRatio
-            if closeRatio < .5:
-                player.brain.resetLocToCross()
-                return player.goLater(player.gameState)
+        afterPenalty.decidedSide = False
+        afterPenalty.lookRight = True
 
+        # count the number of times we see the goalbox and C-Corner on the right
+        afterPenalty.cCornerRight = 0
+        afterPenalty.goalboxRight = 0
+
+        # count the number of times we see the CC and T-Corner on the left
+        afterPenalty.tCornerLeft = 0
+        afterPenalty.CenterCircleLeft = 0
+
+        ## VARS FROM 2015 AFTERPENALTY ##
         afterPenalty.right = True
         afterPenalty.decidedSide = False
         player.brain.tracker.lookToAngle(-1 * angle)
@@ -46,15 +52,68 @@ def afterPenalty(player):
         afterPenalty.cornerCOn = 0
         afterPenalty.cornerTOn = 0
 
+        # number of times we see the horizon on either side - if corner check fails, try using this.
         afterPenalty.leftHorizSum = 0
         afterPenalty.rightHorizSum = 0
-        afterPenalty.stateCount = 0
 
-    afterPenalty.stateCount += 1
+        # Keep track of frames since player was penalized
+        afterPenalty.frameCount = 0
+
+    # Update number of frames since player entered
+    afterPenalty.frameCount += 1
     vis = player.brain.vision
 
-    # Alternate between looking right and left
-    if afterPenalty.stateCount % 70 == 0:
+    # Alternate looking left and right every several frames
+        # Increment/Decrement all the counters
+    # Check final values of corner counters after a certain number of frames in afterpenalty
+    # Need to define threshold for this ^ 
+    # If counters are too close to 0, use horizon counters instead
+
+    if afterPenalty.frameCount % 50 == 0:
+
+        ## LOOK RIGHT
+        if afterPenalty.lookRight:
+            player.brain.tracker.lookToAngle(angle)
+            if DEBUG_PENALTY_STATES:
+                print "Looking to my right!"
+        else:
+            player.brain.tracker.lookToAngle(-1 * angle)
+            if DEBUG_PENALTY_STATES:
+                print "Looking to my left!"
+
+
+    if player.brain.tracker.isStopped() and afterPenalty.lookRight:
+        # Increment horizon distance
+        afterPenalty.rightHorizSum += vis.horizon_dist
+        # Count corners
+
+        if DEBUG_PENALTY_STATES:
+            print "Looking to the right!"
+            print "I've seen the C-Corner", afterPenalty.cCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
+            print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
+            print "Cumulative horizon distance on this side is", afterPenalty.rightHorizSum
+
+    elif player.brain.tracker.isStopped() and not afterPenalty.lookRight:
+        afterPenalty.leftHorizSum += vis.horizon_dist
+
+        if DEBUG_PENALTY_STATES:
+            print "Looking to the left and counting!"
+            print "I've seen the C-Corner", afterPenalty.cCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
+            print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
+            print "Cumulative horizon distance on this side is", afterPenalty.leftHorizSum
+
+    afterPenalty.lookRight = not afterPenalty.lookRight
+
+    if afterPenalty.frameCount > 110:
+        print "Done checking horizons!"
+        return player.stay()
+
+    ## ALTERNATE SOLUTION: LEAVE PENALTY AFTER COUNTERS REACH A CERTAIN NUMBER? --> not with negative counters
+
+    """
+    # Alternate between looking right and left every 70 frames
+    if afterPenalty.frameCount % 70 == 0:
+        # LOOK RIGHT
         if afterPenalty.right:
             afterPenalty.rightDiff += afterPenalty.cornerCOn - afterPenalty.cornerTOn
             if DEBUG_PENALTY_STATES:
@@ -62,26 +121,31 @@ def afterPenalty(player):
                 print "Right sum: ", afterPenalty.rightHorizSum
                 #print "     right close: ", player.brain
             player.brain.tracker.lookToAngle(angle)
+
         else:
-            player.brain.tracker.lookToAngle(-1* angle)
+            player.brain.tracker.lookToAngle(-1 * angle)
             afterPenalty.leftDiff += afterPenalty.cornerCOn - afterPenalty.cornerTOn
             if DEBUG_PENALTY_STATES:
                 print "After Penalty left Diff: ", afterPenalty.leftDiff, " cOn: ", afterPenalty.cornerCOn, " tOn: ", afterPenalty.cornerTOn
                 print "Left sum: ", afterPenalty.leftHorizSum
+
+        # SWAP TO LOOK LEFT AT NEXT ITERATION
         afterPenalty.right = not afterPenalty.right
+
         # Reset counters
         afterPenalty.cornerCOn = 0
         afterPenalty.cornerTOn = 0
 
-    foundCorner = False
-
     # Only count if we're looking right/left. Don't want to count anything while panning
     if player.brain.tracker.isStopped():
+
+        ## increment where we see the horizons ## 
         if afterPenalty.right:
             afterPenalty.rightHorizSum += player.brain.vision.horizon_dist
         else:
             afterPenalty.leftHorizSum += player.brain.vision.horizon_dist
 
+        ## THIS IS WHERE WE LOOK FOR CORNERS ##
         for i in range(0, vis.corner_size()):
             corner = vis.corner(i)
             if corner.id == 2:
@@ -92,7 +156,7 @@ def afterPenalty(player):
     # China hack 2015. Please make this better. Fairly arbitrary thresholds.
     # The idea is if we're flip-flopping between T and C classifications we
     # have bigger vision problems going on.
-    if afterPenalty.stateCount > 140:
+    if afterPenalty.frameCount > 140:
         if afterPenalty.rightDiff > 5 and afterPenalty.leftDiff <= 0:
             afterPenalty.decidedSide = True
             afterPenalty.right = True
@@ -106,7 +170,7 @@ def afterPenalty(player):
             afterPenalty.decidedSide = True
             afterPenalty.right = True
 
-    if afterPenalty.decidedSide or afterPenalty.stateCount > 300:
+    if afterPenalty.decidedSide or afterPenalty.frameCount > 300:
         if afterPenalty.decidedSide:
             player.brain.resetLocalizationFromPenalty(afterPenalty.right)
         else:
@@ -115,7 +179,7 @@ def afterPenalty(player):
             player.brain.resetLocalizationFromPenalty(afterPenalty.rightHorizSum < afterPenalty.leftHorizSum)
         if DEBUG_PENALTY_STATES:
             print "We've decided! ", afterPenalty.right, " LeftDiff: ", afterPenalty.leftDiff, \
-                " Right Diff: ", afterPenalty.rightDiff, " StateCount: ", afterPenalty.stateCount
+                " Right Diff: ", afterPenalty.rightDiff, " frameCount: ", afterPenalty.frameCount
             print "RSUM: ", afterPenalty.rightHorizSum, " LSUM: ", afterPenalty.leftHorizSum
 
         player.brain.tracker.repeatWidePan()
@@ -123,6 +187,29 @@ def afterPenalty(player):
         if not roleConstants.isGoalie(player.role):
             return player.goNow('walkOut')
         return player.goLater(player.gameState)
+
+    """
+
+    if afterPenalty.decidedSide:
+        # TODO see if the goalie role affects this
+        return player.goNow('walkOut')
+
+    return player.stay()
+
+@superState('gameControllerResponder')
+def manualPlacement(player):
+    """
+    TODO / OPTIONAL for now: state in which a robot can still localize after being manually placed.
+    We shouldn't go into after penalty in this case, but the GameController can still penalize us in
+    GameReady, so this could be useful.
+
+    """
+
+    if player.firstFrame() and (player.lastDiffState == 'GameReady' or player.lastDiffState == 'GameSet'):
+        print "Going into after penalty from ready or set; am I being manually placed?"
+        player.wasPenalized = False
+        return player.goLater(player.gameState)
+
 
     return player.stay()
 

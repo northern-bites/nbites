@@ -53,16 +53,16 @@ def gameReady(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
-            # US OPEN 16 Turns of going into after penalty in ready
-            # return player.goNow('afterPenalty')
+            player.goNow('manualPlacement')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
 
     # CHINA HACK player 5 walking off field so start by walking forward
+    # TODO FIX INITIAL PLACEMENT INSTEAD
     if player.brain.playerNumber == 5 and player.stateTime <= 4:
-        player.setWalk(0.6, 0, 0)
+        player.setWalk(0.6, 0, 0) ## this line might be useful for dropin --> have it walk into goalbox w/out bumping into posts
         return player.stay()
 
     return player.goNow('positionReady')
@@ -82,6 +82,7 @@ def gameSet(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
+            player.goNow('manualPlacement')
 
     elif player.brain.tracker.isStopped():
         player.brain.tracker.trackBall()
