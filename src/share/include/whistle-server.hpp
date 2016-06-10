@@ -12,7 +12,7 @@ namespace whistle {
 
     extern void whistle_cleanup();
 
-    static inline void * server_loop(void * unused) {
+    static inline void server_loop() {
 
         if (nbl::io::create_pipe(whs_socket, PORT)) {
             NBL_ERROR("could not create pipe in whistle!");
@@ -61,16 +61,8 @@ namespace whistle {
 //            if (time(NULL) % 10 == 0) { close(whs_socket); close(man_socket); return NULL;}
         }
 
-        return NULL;
+        return;
     }
-
-    static inline void create_server() {
-        NBL_WARN("whistle::create_server()");
-        pthread_t server_thread;
-        pthread_create(&server_thread, NULL, server_loop, NULL);
-        pthread_detach(server_thread);
-    }
-    
 }
 
 #endif

@@ -28,6 +28,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "whistle.hpp"
+
 namespace man{
     namespace gamestate{
 
@@ -254,23 +256,30 @@ namespace man{
             latest_data.set_kick_off_team(latest_data.kick_off_team() ? team_number : team_number+1);
         }
 
+        whistle::status connect_wrap(whistle::request req) {
+            whistle::status stt = whistle::connect(req);
+            if (!stt) {
+                NBL_ERROR("GameStateModule could not connect to whistle!");
+            }
+
+            return stt;
+        }
+
         void GameStateModule::whistleHandler(game_state_t last, game_state_t& next) {
 
             switch(last) {
                 case STATE_READY: {
                     switch(next) {
                         case STATE_READY: {
-                            //NOP
+                            connect_wrap(whistle::STOP);
                         } break;
 
                         case STATE_SET: {
-                            shared_memory->whistle_listen = true;
-                            shared_memory->whistle_heard = false;
+                            connect_wrap(whistle::START);
                         } break;
                             
                         case STATE_PLAYING: {
-                            shared_memory->whistle_listen = false;
-                            shared_memory->whistle_heard = false;
+                            connect_wrap(whistle::STOP);
                         } break;
                     }
                 } break;
@@ -278,22 +287,20 @@ namespace man{
                 case STATE_SET: {
                     switch(next) {
                         case STATE_READY: {
-                            shared_memory->whistle_listen = false;
-                            shared_memory->whistle_heard = false;
+                            connect_wrap(whistle::STOP);
                         } break;
 
                         case STATE_SET: {
-                            shared_memory->whistle_listen = true;
-                            if (shared_memory->whistle_heard) {
+                            whistle::status stt = connect_wrap(whistle::QUERY);
+                            if (stt == whistle::HEARD) {
                                 printf(":::: WHISTLE OVERRIDE :::: (FIRST)\n");
                                 next = STATE_PLAYING;
                             }
                         } break;
                             
                         case STATE_PLAYING: {
-                            printf(":::: WHISTLE MISSED ::::\n");
-                            shared_memory->whistle_listen = false;
-                            shared_memory->whistle_heard = false;
+                            NBL_ERROR(":::: WHISTLE MISSED ::::\n");
+                            connect_wrap(whistle::STOP);
                         } break;
                     }
                 } break;
@@ -301,13 +308,12 @@ namespace man{
                 case STATE_PLAYING: {
                     switch(next) {
                         case STATE_READY: {
-                            shared_memory->whistle_listen = false;
-                            shared_memory->whistle_heard = false;
+                            connect_wrap(whistle::STOP);
                         } break;
 
                         case STATE_SET: {
-                            shared_memory->whistle_listen = true;
-                            if (shared_memory->whistle_heard) {
+                            whistle::status stt = connect_wrap(whistle::QUERY);
+                            if (stt == whistle::HEARD) {
 //                                printf(":::: WHISTLE OVERRIDE :::: (RE)\n");
                                 next = STATE_PLAYING;
                             }
@@ -315,7 +321,7 @@ namespace man{
                         } break;
                             
                         case STATE_PLAYING: {
-                            shared_memory->whistle_listen = false;
+                            connect_wrap(whistle::STOP);
                         } break;
                     }
                 } break;
