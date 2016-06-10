@@ -107,35 +107,35 @@ public class RobotView extends VisionView
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        int vB = height + 20;  // verticle buffer
-        int hB = width + 20; // horizontal buffer
+        int vB = height/2 + 20;  // verticle buffer
+        int hB = width/2 + 20; // horizontal buffer
         int sH = 15; // slider height
         int tB = 20; // text buffer
         int lB = 5;  // little buffer
 
         if (original != null) {
-            g.drawImage(original, lB, lB, width, height, null);
+            g.drawImage(original, lB, lB, width/2, height/2, null);
         }
 
         if (whiteImage != null) {
-            g.drawImage(whiteImage, hB, lB, width, height, null);
+            g.drawImage(whiteImage, hB, lB, width/2, height/2, null);
         } else {
             System.out.println("[ROBOT VIEW] white image was null");
         }
 
         if (wgradientImage != null) {
             drawRobots();
-            g.drawImage(wgradientImage, lB, vB, width, height, null);
+            g.drawImage(wgradientImage, lB, vB, width/2, height/2, null);
         } else {
             System.out.printf("[ROBOT VIEW] gradient image was null\n");
         }
 
-        gFuzzyU.setBounds(hB*1 + lB, vB + sH*2 + tB*3, width, sH);
-        gFuzzyV.setBounds(hB*1 + lB, vB + sH*4 + tB*3, width, sH);
+        gFuzzyU.setBounds(hB*1 + lB, vB + sH*2 + tB*3, width/2, sH);
+        gFuzzyV.setBounds(hB*1 + lB, vB + sH*4 + tB*3, width/2, sH);
         g.drawString("width of fuzzy threshold for gradient", hB*1 + lB, vB + sH + tB*3);
 
         // Draw button
-        saveButton.setBounds(hB*1 + lB,  vB + sH*6 + tB*3, width, tB*3);
+        saveButton.setBounds(hB*1 + lB,  vB + sH*6 + tB*3, width/2, tB*3);
     }
 
     public void drawRobots() {
