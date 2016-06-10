@@ -19,9 +19,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -722,6 +724,9 @@ public class ToolDisplayHandler implements
 		}
 		
 		protected void deleteCurrent() {
+			int num_logs_deleted = 0;
+			Set<Group> groups_changed = new HashSet<>();
+			
 			for (TreePath tp : display.logTree.getSelectionPaths()) {
 				if (tp.getPathCount() == 3) {
 					Group group = (Group) tp.getPath()[1];
@@ -730,16 +735,22 @@ public class ToolDisplayHandler implements
 					Debug.warn("deleting {%s} from {%s}", reference, group);
 					group.remove(reference);
 					
-					TreeModelEvent removeEvent = new TreeModelEvent(this, 
-							new Object[]{this, group});
-					
-					for (TreeModelListener listener : listeners)
-						listener.treeStructureChanged(removeEvent);
-					
+					++num_logs_deleted;
+					groups_changed.add(group);
 				} else {
 					Debug.warn("cannot delete {%s}", tp.getLastPathComponent());
 				}
 			}
+			
+			for (Group group : groups_changed) {
+				TreeModelEvent removeEvent = new TreeModelEvent(this, 
+						new Object[]{this, group});
+				
+				for (TreeModelListener listener : listeners)
+					listener.treeStructureChanged(removeEvent);
+			}
+			
+			ToolMessage.displayAndPrint("deleted %d logs", num_logs_deleted);
 		}
 		
 		protected void showGroupAdded(Group group) {
