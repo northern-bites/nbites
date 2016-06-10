@@ -65,6 +65,44 @@ public  final class Behaviors extends
             }
             break;
           }
+          case 18: {
+            bitField0_ |= 0x00000002;
+            robotName_ = input.readBytes();
+            break;
+          }
+          case 24: {
+            bitField0_ |= 0x00000004;
+            team_ = input.readInt32();
+            break;
+          }
+          case 32: {
+            bitField0_ |= 0x00000008;
+            player_ = input.readInt32();
+            break;
+          }
+          case 40: {
+            bitField0_ |= 0x00000010;
+            role_ = input.readInt32();
+            break;
+          }
+          case 50: {
+            bitField0_ |= 0x00000020;
+            kickLLStrategy_ = input.readBytes();
+            break;
+          }
+          case 58: {
+            bitField0_ |= 0x00000040;
+            kickHLStrategy_ = input.readBytes();
+            break;
+          }
+          case 66: {
+            if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+              fsas_ = new com.google.protobuf.LazyStringArrayList();
+              mutable_bitField0_ |= 0x00000080;
+            }
+            fsas_.add(input.readBytes());
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -73,6 +111,9 @@ public  final class Behaviors extends
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e.getMessage()).setUnfinishedMessage(this);
     } finally {
+      if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+        fsas_ = new com.google.protobuf.UnmodifiableLazyStringList(fsas_);
+      }
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
@@ -239,8 +280,234 @@ public  final class Behaviors extends
     return gCState_;
   }
 
+  // optional string robotName = 2;
+  public static final int ROBOTNAME_FIELD_NUMBER = 2;
+  private java.lang.Object robotName_;
+  /**
+   * <code>optional string robotName = 2;</code>
+   */
+  public boolean hasRobotName() {
+    return ((bitField0_ & 0x00000002) == 0x00000002);
+  }
+  /**
+   * <code>optional string robotName = 2;</code>
+   */
+  public java.lang.String getRobotName() {
+    java.lang.Object ref = robotName_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      if (bs.isValidUtf8()) {
+        robotName_ = s;
+      }
+      return s;
+    }
+  }
+  /**
+   * <code>optional string robotName = 2;</code>
+   */
+  public com.google.protobuf.ByteString
+      getRobotNameBytes() {
+    java.lang.Object ref = robotName_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      robotName_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  // optional int32 team = 3;
+  public static final int TEAM_FIELD_NUMBER = 3;
+  private int team_;
+  /**
+   * <code>optional int32 team = 3;</code>
+   */
+  public boolean hasTeam() {
+    return ((bitField0_ & 0x00000004) == 0x00000004);
+  }
+  /**
+   * <code>optional int32 team = 3;</code>
+   */
+  public int getTeam() {
+    return team_;
+  }
+
+  // optional int32 player = 4;
+  public static final int PLAYER_FIELD_NUMBER = 4;
+  private int player_;
+  /**
+   * <code>optional int32 player = 4;</code>
+   */
+  public boolean hasPlayer() {
+    return ((bitField0_ & 0x00000008) == 0x00000008);
+  }
+  /**
+   * <code>optional int32 player = 4;</code>
+   */
+  public int getPlayer() {
+    return player_;
+  }
+
+  // optional int32 role = 5;
+  public static final int ROLE_FIELD_NUMBER = 5;
+  private int role_;
+  /**
+   * <code>optional int32 role = 5;</code>
+   */
+  public boolean hasRole() {
+    return ((bitField0_ & 0x00000010) == 0x00000010);
+  }
+  /**
+   * <code>optional int32 role = 5;</code>
+   */
+  public int getRole() {
+    return role_;
+  }
+
+  // optional string KickLLStrategy = 6;
+  public static final int KICKLLSTRATEGY_FIELD_NUMBER = 6;
+  private java.lang.Object kickLLStrategy_;
+  /**
+   * <code>optional string KickLLStrategy = 6;</code>
+   *
+   * <pre>
+   * Kick Stuff
+   * </pre>
+   */
+  public boolean hasKickLLStrategy() {
+    return ((bitField0_ & 0x00000020) == 0x00000020);
+  }
+  /**
+   * <code>optional string KickLLStrategy = 6;</code>
+   *
+   * <pre>
+   * Kick Stuff
+   * </pre>
+   */
+  public java.lang.String getKickLLStrategy() {
+    java.lang.Object ref = kickLLStrategy_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      if (bs.isValidUtf8()) {
+        kickLLStrategy_ = s;
+      }
+      return s;
+    }
+  }
+  /**
+   * <code>optional string KickLLStrategy = 6;</code>
+   *
+   * <pre>
+   * Kick Stuff
+   * </pre>
+   */
+  public com.google.protobuf.ByteString
+      getKickLLStrategyBytes() {
+    java.lang.Object ref = kickLLStrategy_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      kickLLStrategy_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  // optional string KickHLStrategy = 7;
+  public static final int KICKHLSTRATEGY_FIELD_NUMBER = 7;
+  private java.lang.Object kickHLStrategy_;
+  /**
+   * <code>optional string KickHLStrategy = 7;</code>
+   */
+  public boolean hasKickHLStrategy() {
+    return ((bitField0_ & 0x00000040) == 0x00000040);
+  }
+  /**
+   * <code>optional string KickHLStrategy = 7;</code>
+   */
+  public java.lang.String getKickHLStrategy() {
+    java.lang.Object ref = kickHLStrategy_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      if (bs.isValidUtf8()) {
+        kickHLStrategy_ = s;
+      }
+      return s;
+    }
+  }
+  /**
+   * <code>optional string KickHLStrategy = 7;</code>
+   */
+  public com.google.protobuf.ByteString
+      getKickHLStrategyBytes() {
+    java.lang.Object ref = kickHLStrategy_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      kickHLStrategy_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  // repeated string fsas = 8;
+  public static final int FSAS_FIELD_NUMBER = 8;
+  private com.google.protobuf.LazyStringList fsas_;
+  /**
+   * <code>repeated string fsas = 8;</code>
+   */
+  public java.util.List<java.lang.String>
+      getFsasList() {
+    return fsas_;
+  }
+  /**
+   * <code>repeated string fsas = 8;</code>
+   */
+  public int getFsasCount() {
+    return fsas_.size();
+  }
+  /**
+   * <code>repeated string fsas = 8;</code>
+   */
+  public java.lang.String getFsas(int index) {
+    return fsas_.get(index);
+  }
+  /**
+   * <code>repeated string fsas = 8;</code>
+   */
+  public com.google.protobuf.ByteString
+      getFsasBytes(int index) {
+    return fsas_.getByteString(index);
+  }
+
   private void initFields() {
     gCState_ = messages.Behaviors.GameControllerState.GAMEINITIAL;
+    robotName_ = "";
+    team_ = 0;
+    player_ = 0;
+    role_ = 0;
+    kickLLStrategy_ = "";
+    kickHLStrategy_ = "";
+    fsas_ = com.google.protobuf.LazyStringArrayList.EMPTY;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -257,6 +524,27 @@ public  final class Behaviors extends
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeEnum(1, gCState_.getNumber());
     }
+    if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      output.writeBytes(2, getRobotNameBytes());
+    }
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      output.writeInt32(3, team_);
+    }
+    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      output.writeInt32(4, player_);
+    }
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      output.writeInt32(5, role_);
+    }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      output.writeBytes(6, getKickLLStrategyBytes());
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      output.writeBytes(7, getKickHLStrategyBytes());
+    }
+    for (int i = 0; i < fsas_.size(); i++) {
+      output.writeBytes(8, fsas_.getByteString(i));
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -269,6 +557,39 @@ public  final class Behaviors extends
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(1, gCState_.getNumber());
+    }
+    if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(2, getRobotNameBytes());
+    }
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(3, team_);
+    }
+    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(4, player_);
+    }
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(5, role_);
+    }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(6, getKickLLStrategyBytes());
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(7, getKickHLStrategyBytes());
+    }
+    {
+      int dataSize = 0;
+      for (int i = 0; i < fsas_.size(); i++) {
+        dataSize += com.google.protobuf.CodedOutputStream
+          .computeBytesSizeNoTag(fsas_.getByteString(i));
+      }
+      size += dataSize;
+      size += 1 * getFsasList().size();
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -388,6 +709,20 @@ public  final class Behaviors extends
       super.clear();
       gCState_ = messages.Behaviors.GameControllerState.GAMEINITIAL;
       bitField0_ = (bitField0_ & ~0x00000001);
+      robotName_ = "";
+      bitField0_ = (bitField0_ & ~0x00000002);
+      team_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000004);
+      player_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000008);
+      role_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000010);
+      kickLLStrategy_ = "";
+      bitField0_ = (bitField0_ & ~0x00000020);
+      kickHLStrategy_ = "";
+      bitField0_ = (bitField0_ & ~0x00000040);
+      fsas_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      bitField0_ = (bitField0_ & ~0x00000080);
       return this;
     }
 
@@ -420,6 +755,36 @@ public  final class Behaviors extends
         to_bitField0_ |= 0x00000001;
       }
       result.gCState_ = gCState_;
+      if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+        to_bitField0_ |= 0x00000002;
+      }
+      result.robotName_ = robotName_;
+      if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+        to_bitField0_ |= 0x00000004;
+      }
+      result.team_ = team_;
+      if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+        to_bitField0_ |= 0x00000008;
+      }
+      result.player_ = player_;
+      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        to_bitField0_ |= 0x00000010;
+      }
+      result.role_ = role_;
+      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+        to_bitField0_ |= 0x00000020;
+      }
+      result.kickLLStrategy_ = kickLLStrategy_;
+      if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+        to_bitField0_ |= 0x00000040;
+      }
+      result.kickHLStrategy_ = kickHLStrategy_;
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        fsas_ = new com.google.protobuf.UnmodifiableLazyStringList(
+            fsas_);
+        bitField0_ = (bitField0_ & ~0x00000080);
+      }
+      result.fsas_ = fsas_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -438,6 +803,40 @@ public  final class Behaviors extends
       if (other == messages.Behaviors.getDefaultInstance()) return this;
       if (other.hasGCState()) {
         setGCState(other.getGCState());
+      }
+      if (other.hasRobotName()) {
+        bitField0_ |= 0x00000002;
+        robotName_ = other.robotName_;
+        onChanged();
+      }
+      if (other.hasTeam()) {
+        setTeam(other.getTeam());
+      }
+      if (other.hasPlayer()) {
+        setPlayer(other.getPlayer());
+      }
+      if (other.hasRole()) {
+        setRole(other.getRole());
+      }
+      if (other.hasKickLLStrategy()) {
+        bitField0_ |= 0x00000020;
+        kickLLStrategy_ = other.kickLLStrategy_;
+        onChanged();
+      }
+      if (other.hasKickHLStrategy()) {
+        bitField0_ |= 0x00000040;
+        kickHLStrategy_ = other.kickHLStrategy_;
+        onChanged();
+      }
+      if (!other.fsas_.isEmpty()) {
+        if (fsas_.isEmpty()) {
+          fsas_ = other.fsas_;
+          bitField0_ = (bitField0_ & ~0x00000080);
+        } else {
+          ensureFsasIsMutable();
+          fsas_.addAll(other.fsas_);
+        }
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -498,6 +897,444 @@ public  final class Behaviors extends
     public Builder clearGCState() {
       bitField0_ = (bitField0_ & ~0x00000001);
       gCState_ = messages.Behaviors.GameControllerState.GAMEINITIAL;
+      onChanged();
+      return this;
+    }
+
+    // optional string robotName = 2;
+    private java.lang.Object robotName_ = "";
+    /**
+     * <code>optional string robotName = 2;</code>
+     */
+    public boolean hasRobotName() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional string robotName = 2;</code>
+     */
+    public java.lang.String getRobotName() {
+      java.lang.Object ref = robotName_;
+      if (!(ref instanceof java.lang.String)) {
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        robotName_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>optional string robotName = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getRobotNameBytes() {
+      java.lang.Object ref = robotName_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        robotName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>optional string robotName = 2;</code>
+     */
+    public Builder setRobotName(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+      robotName_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string robotName = 2;</code>
+     */
+    public Builder clearRobotName() {
+      bitField0_ = (bitField0_ & ~0x00000002);
+      robotName_ = getDefaultInstance().getRobotName();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string robotName = 2;</code>
+     */
+    public Builder setRobotNameBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+      robotName_ = value;
+      onChanged();
+      return this;
+    }
+
+    // optional int32 team = 3;
+    private int team_ ;
+    /**
+     * <code>optional int32 team = 3;</code>
+     */
+    public boolean hasTeam() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional int32 team = 3;</code>
+     */
+    public int getTeam() {
+      return team_;
+    }
+    /**
+     * <code>optional int32 team = 3;</code>
+     */
+    public Builder setTeam(int value) {
+      bitField0_ |= 0x00000004;
+      team_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 team = 3;</code>
+     */
+    public Builder clearTeam() {
+      bitField0_ = (bitField0_ & ~0x00000004);
+      team_ = 0;
+      onChanged();
+      return this;
+    }
+
+    // optional int32 player = 4;
+    private int player_ ;
+    /**
+     * <code>optional int32 player = 4;</code>
+     */
+    public boolean hasPlayer() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 player = 4;</code>
+     */
+    public int getPlayer() {
+      return player_;
+    }
+    /**
+     * <code>optional int32 player = 4;</code>
+     */
+    public Builder setPlayer(int value) {
+      bitField0_ |= 0x00000008;
+      player_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 player = 4;</code>
+     */
+    public Builder clearPlayer() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      player_ = 0;
+      onChanged();
+      return this;
+    }
+
+    // optional int32 role = 5;
+    private int role_ ;
+    /**
+     * <code>optional int32 role = 5;</code>
+     */
+    public boolean hasRole() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional int32 role = 5;</code>
+     */
+    public int getRole() {
+      return role_;
+    }
+    /**
+     * <code>optional int32 role = 5;</code>
+     */
+    public Builder setRole(int value) {
+      bitField0_ |= 0x00000010;
+      role_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 role = 5;</code>
+     */
+    public Builder clearRole() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      role_ = 0;
+      onChanged();
+      return this;
+    }
+
+    // optional string KickLLStrategy = 6;
+    private java.lang.Object kickLLStrategy_ = "";
+    /**
+     * <code>optional string KickLLStrategy = 6;</code>
+     *
+     * <pre>
+     * Kick Stuff
+     * </pre>
+     */
+    public boolean hasKickLLStrategy() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional string KickLLStrategy = 6;</code>
+     *
+     * <pre>
+     * Kick Stuff
+     * </pre>
+     */
+    public java.lang.String getKickLLStrategy() {
+      java.lang.Object ref = kickLLStrategy_;
+      if (!(ref instanceof java.lang.String)) {
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        kickLLStrategy_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>optional string KickLLStrategy = 6;</code>
+     *
+     * <pre>
+     * Kick Stuff
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getKickLLStrategyBytes() {
+      java.lang.Object ref = kickLLStrategy_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        kickLLStrategy_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>optional string KickLLStrategy = 6;</code>
+     *
+     * <pre>
+     * Kick Stuff
+     * </pre>
+     */
+    public Builder setKickLLStrategy(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+      kickLLStrategy_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string KickLLStrategy = 6;</code>
+     *
+     * <pre>
+     * Kick Stuff
+     * </pre>
+     */
+    public Builder clearKickLLStrategy() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      kickLLStrategy_ = getDefaultInstance().getKickLLStrategy();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string KickLLStrategy = 6;</code>
+     *
+     * <pre>
+     * Kick Stuff
+     * </pre>
+     */
+    public Builder setKickLLStrategyBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+      kickLLStrategy_ = value;
+      onChanged();
+      return this;
+    }
+
+    // optional string KickHLStrategy = 7;
+    private java.lang.Object kickHLStrategy_ = "";
+    /**
+     * <code>optional string KickHLStrategy = 7;</code>
+     */
+    public boolean hasKickHLStrategy() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional string KickHLStrategy = 7;</code>
+     */
+    public java.lang.String getKickHLStrategy() {
+      java.lang.Object ref = kickHLStrategy_;
+      if (!(ref instanceof java.lang.String)) {
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        kickHLStrategy_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>optional string KickHLStrategy = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getKickHLStrategyBytes() {
+      java.lang.Object ref = kickHLStrategy_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        kickHLStrategy_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>optional string KickHLStrategy = 7;</code>
+     */
+    public Builder setKickHLStrategy(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+      kickHLStrategy_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string KickHLStrategy = 7;</code>
+     */
+    public Builder clearKickHLStrategy() {
+      bitField0_ = (bitField0_ & ~0x00000040);
+      kickHLStrategy_ = getDefaultInstance().getKickHLStrategy();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string KickHLStrategy = 7;</code>
+     */
+    public Builder setKickHLStrategyBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+      kickHLStrategy_ = value;
+      onChanged();
+      return this;
+    }
+
+    // repeated string fsas = 8;
+    private com.google.protobuf.LazyStringList fsas_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    private void ensureFsasIsMutable() {
+      if (!((bitField0_ & 0x00000080) == 0x00000080)) {
+        fsas_ = new com.google.protobuf.LazyStringArrayList(fsas_);
+        bitField0_ |= 0x00000080;
+       }
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public java.util.List<java.lang.String>
+        getFsasList() {
+      return java.util.Collections.unmodifiableList(fsas_);
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public int getFsasCount() {
+      return fsas_.size();
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public java.lang.String getFsas(int index) {
+      return fsas_.get(index);
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFsasBytes(int index) {
+      return fsas_.getByteString(index);
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public Builder setFsas(
+        int index, java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureFsasIsMutable();
+      fsas_.set(index, value);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public Builder addFsas(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureFsasIsMutable();
+      fsas_.add(value);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public Builder addAllFsas(
+        java.lang.Iterable<java.lang.String> values) {
+      ensureFsasIsMutable();
+      super.addAll(values, fsas_);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public Builder clearFsas() {
+      fsas_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      bitField0_ = (bitField0_ & ~0x00000080);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string fsas = 8;</code>
+     */
+    public Builder addFsasBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureFsasIsMutable();
+      fsas_.add(value);
       onChanged();
       return this;
     }

@@ -214,7 +214,13 @@ class Brain(object):
         for i in range(self.BALL_MEM_SIZE):
             count += self.ballMem[i]
 
-        self.ballMemRatio = (count / self.BALL_MEM_SIZE) 
+        self.ballMemRatio = (count / self.BALL_MEM_SIZE)
+
+        # Behaviors Protobuf
+        self.interface.behaviors.robotName = self.CoA.name
+        self.interface.behaviors.team = self.teamNumber
+        self.interface.behaviors.player = self.playerNumber
+        self.interface.behaviors.role = self.teamMembers[self.playerNumber - 1].role
 
 
 

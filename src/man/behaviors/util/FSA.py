@@ -2,6 +2,8 @@
 This file contains an implementation of a finite state automaton.
 """
 import time
+import interface
+import Behaviors_proto
 
 DEBUG = False
 COUNT_FPS = False
@@ -62,6 +64,11 @@ class FSA:
         #debug switches
         self.stateChangeColor = ''
         self.printStateChanges = False
+
+        # Behaviors View
+        self.interface = interface.interface
+        self.interface.behaviors.fsas.addString(str(self.owner))
+
 
     def addStates(self,module):
         # gives a list of all methods and attributes of a module

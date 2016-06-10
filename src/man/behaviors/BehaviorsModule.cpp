@@ -187,8 +187,8 @@ void BehaviorsModule::run_ ()
     }
 
     // Latch incoming messages and prepare outgoing messages
+    // 
     prepareMessages();
-    std::cout << behaviors.get()->gcstate() << std::endl;
 
     PROF_ENTER(P_PYTHON);
 
@@ -213,6 +213,7 @@ void BehaviorsModule::run_ ()
     PROF_EXIT(P_PYTHON);
 
     // Send outgoing messages
+    std::cout << behaviors.get()->fsas_size() << std::endl;
     sendMessages();
 
     PROF_EXIT(P_BEHAVIORS);

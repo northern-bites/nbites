@@ -56,8 +56,6 @@ public class BehaviorsView extends ViewParent {
 
 		int pageWidth = 800;
 
-
-
 		// http://clrs.cc
 		Color red = new Color(255, 65, 54);
 		Color blue = new Color(0, 116, 217);
@@ -65,19 +63,35 @@ public class BehaviorsView extends ViewParent {
 		Color green = new Color(46, 204, 64);
 		Color black = new Color(17, 17, 17);
 		Color yellow = new Color(255, 220, 0);
+		Color orange = new Color(255, 133, 27);
 		Color purple = new Color(177, 13, 201);
-		Color gray = new Color(128, 128, 128);
+		Color gray = new Color(96, 96, 96);
 
-
+		// Row 1
 		g.setFont(body);
 		g.setColor(navy);
 		g.drawString("BehaviorsView 0.1", 20, 20);
 		g.setFont(info);
 		g.setColor(black);
 		g.drawString("Last updated by James Little on June 8, 2016", 20, 35);
-		g.fillRect(20, 40, pageWidth, 1);
+		g.drawLine(20, 40, pageWidth, 40);
 		g.setFont(body);
+		
+		g.drawLine(350, 5, 350, 35);
+
+		g.drawString(be.getRobotName(), 375, 20);
+		g.drawString(be.getTeam() + "", 500, 20);
+		g.drawString(be.getPlayer() + "", 600, 20);
+		g.drawString(be.getRole() + "", 700, 20);
+		g.setFont(info);
+		g.drawString("Name", 375, 35);
+		g.drawString("Team", 500, 35);
+		g.drawString("Player", 600, 35);
+		g.drawString("Role", 700, 35);
+
+		// Row 2 -- Game Controller States
 		fm = g.getFontMetrics();
+		g.setFont(body);
 		g.setColor(gray);
 
 		String[] gcStateStrs = {
@@ -90,11 +104,9 @@ public class BehaviorsView extends ViewParent {
 			Behaviors.GameControllerState.GAMEPLAYING,
 			Behaviors.GameControllerState.GAMEPENALTY,
 			Behaviors.GameControllerState.GAMEFINISHED,
-			// Behaviors.GameControllerState.GAMEPENALTY,
-			// Behaviors.GameControllerState.GAMEFINISHED
 		};
 
-		Color[] gcStrColors = {black, blue, yellow, green, red, black};
+		Color[] gcStrColors = {blue, blue, orange, green, red, blue};
 
 		int gcStateWidth = pageWidth / gcStateStrs.length;
 
@@ -107,26 +119,12 @@ public class BehaviorsView extends ViewParent {
 			g.setColor(gray);
 		}
 
-		// g.drawString("Initial", 20, 70);
-		// g.setColor(gray);
+		g.setFont(info);
+		g.setColor(black);
+		g.drawString("Game Controller State", 20, 85);
+		g.drawLine(20, 90, pageWidth, 90);
 
-		// if (be.getGCState() == Behaviors.GameControllerState.GAMEREADY) {
-		// 	g.setColor(blue);
-		// }
-
-		// g.drawString("Ready", 150, 70);
-		// g.setColor(gray);
-
-		// g.drawString("Set", 270, 70);
-		// g.setColor(gray);
-		// g.drawString("Playing", 370, 70);
-		// g.setColor(gray);
-		// g.drawString("Penalty", 500, 70);
-		// g.setColor(gray);
-		// g.drawString("Finished", 600, 70);
-		// g.setFont(info);
-		// g.setColor(black);
-		// g.drawString("GAME CONTROLLER STATE", 20, 85);
+		g.drawString(be.getKickHLStrategy(), 150, 150);
 
 	}
 

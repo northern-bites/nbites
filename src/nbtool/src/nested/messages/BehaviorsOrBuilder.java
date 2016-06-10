@@ -15,4 +15,111 @@ public interface BehaviorsOrBuilder
    * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
    */
   messages.Behaviors.GameControllerState getGCState();
+
+  // optional string robotName = 2;
+  /**
+   * <code>optional string robotName = 2;</code>
+   */
+  boolean hasRobotName();
+  /**
+   * <code>optional string robotName = 2;</code>
+   */
+  java.lang.String getRobotName();
+  /**
+   * <code>optional string robotName = 2;</code>
+   */
+  com.google.protobuf.ByteString
+      getRobotNameBytes();
+
+  // optional int32 team = 3;
+  /**
+   * <code>optional int32 team = 3;</code>
+   */
+  boolean hasTeam();
+  /**
+   * <code>optional int32 team = 3;</code>
+   */
+  int getTeam();
+
+  // optional int32 player = 4;
+  /**
+   * <code>optional int32 player = 4;</code>
+   */
+  boolean hasPlayer();
+  /**
+   * <code>optional int32 player = 4;</code>
+   */
+  int getPlayer();
+
+  // optional int32 role = 5;
+  /**
+   * <code>optional int32 role = 5;</code>
+   */
+  boolean hasRole();
+  /**
+   * <code>optional int32 role = 5;</code>
+   */
+  int getRole();
+
+  // optional string KickLLStrategy = 6;
+  /**
+   * <code>optional string KickLLStrategy = 6;</code>
+   *
+   * <pre>
+   * Kick Stuff
+   * </pre>
+   */
+  boolean hasKickLLStrategy();
+  /**
+   * <code>optional string KickLLStrategy = 6;</code>
+   *
+   * <pre>
+   * Kick Stuff
+   * </pre>
+   */
+  java.lang.String getKickLLStrategy();
+  /**
+   * <code>optional string KickLLStrategy = 6;</code>
+   *
+   * <pre>
+   * Kick Stuff
+   * </pre>
+   */
+  com.google.protobuf.ByteString
+      getKickLLStrategyBytes();
+
+  // optional string KickHLStrategy = 7;
+  /**
+   * <code>optional string KickHLStrategy = 7;</code>
+   */
+  boolean hasKickHLStrategy();
+  /**
+   * <code>optional string KickHLStrategy = 7;</code>
+   */
+  java.lang.String getKickHLStrategy();
+  /**
+   * <code>optional string KickHLStrategy = 7;</code>
+   */
+  com.google.protobuf.ByteString
+      getKickHLStrategyBytes();
+
+  // repeated string fsas = 8;
+  /**
+   * <code>repeated string fsas = 8;</code>
+   */
+  java.util.List<java.lang.String>
+  getFsasList();
+  /**
+   * <code>repeated string fsas = 8;</code>
+   */
+  int getFsasCount();
+  /**
+   * <code>repeated string fsas = 8;</code>
+   */
+  java.lang.String getFsas(int index);
+  /**
+   * <code>repeated string fsas = 8;</code>
+   */
+  com.google.protobuf.ByteString
+      getFsasBytes(int index);
 }

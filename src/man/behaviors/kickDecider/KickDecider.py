@@ -577,6 +577,7 @@ class KickDecider(object):
     ### HIGH LEVEL PLANNERS ###
     ###########################
     def decidingStrategy(self):
+        self.brain.behaviors.kickhlstrategy = "decidingStrategy"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
             return closeGoalShot
@@ -592,6 +593,7 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def usOpen2016StraightKickStrategy(self): #USOPEN2016 . TODO: REMOVE
+        self.brain.behaviors.kickhlstrategy = "usOpen2016StraightKickStrategy"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
             # print("ONEusOpen2016StraightKickStrategy")
@@ -607,6 +609,7 @@ class KickDecider(object):
 
 
     def usOpenStrategy2016(self): # TODO REMOVE UNDO POOP
+        self.brain.behaviors.kickhlstrategy = "usOpenStrategy2016"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
             return closeGoalShot

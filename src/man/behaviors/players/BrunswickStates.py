@@ -124,7 +124,7 @@ def gamePlaying(player):
     if player.wasPenalized:
         player.wasPenalized = False
         if player.lastDiffState != 'gameSet': 
-            proto.gcstate = proto.GameControllerState.GAMEPLAYING
+            proto.gcstate = proto.GameControllerState.GAMEPENALTY
             return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
