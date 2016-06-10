@@ -93,18 +93,13 @@ public class BallTestView extends ViewParent {
 				if(drawing) {
 					Point where = pointOnImage(e.getPoint());
 					if(where != null) {
-						int px = (int)pressed_point.x;
-						int py = (int)pressed_point.y;
-
-						int rx = (int)where.x;
-						int ry = (int)where.y;
-
 						Point origin = new Point();
-						origin.x = Math.min(px,rx);
-						origin.y = Math.min(py,ry);
+						
+						origin.x = Math.min(pressed_point.x,where.x);
+						origin.y = Math.min(pressed_point.y,where.y);
 
-						double ball_width = Math.max(px,rx) - Math.min(px,rx);
-						double ball_height = Math.max(py,ry) - Math.min(py,ry);
+						double ball_width = Math.max(pressed_point.x,where.x) - Math.min(pressed_point.x,where.x);
+						double ball_height = Math.max(pressed_point.y,where.y) - Math.min(pressed_point.y,where.y);
 
 						JsonArray balls = new JsonArray();
 						JsonObject ball = new JsonObject();
