@@ -6,7 +6,7 @@
 # *                                                             *
 # ***************************************************************
 
-	.globl	__columnMove16
+	.globl	_columnMove16
 
 # The size of the column sums array must be rounded up to a multiple
 # of 16 ints (64 bytes). There are no alignment restrictions.
@@ -28,7 +28,7 @@ words:   .skip 4           # number of columns
 
 .section .text
 
-__columnMove16:
+_columnMove16:
         push	  ebx
         push    edi
 
@@ -79,6 +79,6 @@ loop16:
 
 # Restore saved registers and return
         pop     edi
-	      pop	    ebx
+	pop	ebx
 
-	      ret
+	ret
