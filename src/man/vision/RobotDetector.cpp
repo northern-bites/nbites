@@ -168,13 +168,14 @@ void RobotDetector::removeHoughLines(EdgeList& edges)
 
 void RobotDetector::findCandidates(bool is_top)
 {
-    int boxW = 100;
-    int boxH = 160;
+    int boxW = 90;
+    int boxH = 140;
+    unsigned long brightness_thresh = 120;
     if (!is_top) {
         boxW = 50;
         boxH = 60;
+        brightness_thresh = 150;
     }
-    unsigned long brightness_thresh = 120;
 
     // Just for me to see what size box I'm using
     // Robot testRobot(0, boxW, 0, boxH);
