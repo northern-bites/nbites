@@ -422,6 +422,8 @@ bool BallDetector::findCorrelatedBlackSpots
                     return true;
 #endif
                 }
+            } else {
+                break;
             }
         }
     }
@@ -809,6 +811,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			if (debugBall) {
 				debugBlackSpots.push_back((*i));
 			}
+        }
+    }
+
+    if(debugBall) {
+        for(int z = 0; z < blackSpots.size(); z++) {
+            std::pair<int, int> spot = blackSpots[z];
+            std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "<<spot.second<<std::endl; 
         }
     }
 	// run blobber on parts of the image where spot detector won't work
