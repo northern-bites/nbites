@@ -482,6 +482,11 @@ bool BallDetector::findCorrelatedBlackSpots
 					}
                     foundBall = true;
                     makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
+#ifdef OFFLINE
+                    return foundBall;
+#else
+                    return true;
+#endif
                 }
             } else if(correlatedSpots.size() == 3) {
                 Spot s1 = correlatedSpots[0];
