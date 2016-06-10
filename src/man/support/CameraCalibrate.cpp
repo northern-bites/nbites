@@ -81,7 +81,7 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsTop[PITCH] = 0.10f;
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = 0.09f;
-    } else if (name == "groot") {
+    } else if (name == "blt") {
         paramsTop[ROLL] = 0.01f;
         paramsTop[PITCH] = 0.08f;
         paramsBottom[ROLL] = -0.03f;
@@ -91,7 +91,7 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsTop[PITCH] = 0.05f;
         paramsBottom[ROLL] = -0.02f;
         paramsBottom[PITCH] = -0.00f;
-    } else if (name == "blt") {
+    } else if (name == "buzz") {
         paramsTop[ROLL] = 0.02f;
         paramsTop[PITCH] = 0.08f;
         paramsBottom[ROLL] = 0.00f;

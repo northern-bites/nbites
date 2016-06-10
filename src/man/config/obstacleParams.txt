@@ -12,7 +12,7 @@
     (left_sonar 0)
     (right_sonar 0)
   )
-  (blt
+  (buzz
     (left_sonar 0)
     (right_sonar 0)
   )
@@ -24,11 +24,7 @@
     (left_sonar 0)
     (right_sonar 0)
   )
-  (groot
-    (left_sonar 0)
-    (right_sonar 0)
-  )
-  (ringo
+  (blt
     (left_sonar 0)
     (right_sonar 0)
   )

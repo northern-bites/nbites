@@ -41,13 +41,13 @@ elif [ "$HOSTNAME" = mal ]; then
     sed -i 's/ROBOT/16/g' /etc/init.d/nbwired
 elif [ "$HOSTNAME" = zoe ]; then
     sed -i 's/ROBOT/17/g' /etc/init.d/nbwired
-elif [ "$HOSTNAME" = groot ]; then
+elif [ "$HOSTNAME" = blt ]; then
     sed -i 's/ROBOT/18/g' /etc/init.d/nbwired
 elif [ "$HOSTNAME" = elektra ]; then
     sed -i 's/ROBOT/19/g' /etc/init.d/nbwired
 elif [ "$HOSTNAME" = wasp ]; then
     sed -i 's/ROBOT/20/g' /etc/init.d/nbwired
-elif [ "$HOSTNAME" = blt ]; then
+elif [ "$HOSTNAME" = buzz ]; then
     sed -i 's/ROBOT/21/g' /etc/init.d/nbwired
 elif [ "$HOSTNAME" = batman ]; then
     sed -i 's/ROBOT/22/g' /etc/init.d/nbwired
@@ -77,13 +77,13 @@ elif [ "$HOSTNAME" = mal ]; then
     sed -i 's/ROBOT/16/g' /etc/init.d/nbwireless
 elif [ "$HOSTNAME" = zoe ]; then
     sed -i 's/ROBOT/17/g' /etc/init.d/nbwireless
-elif [ "$HOSTNAME" = groot ]; then
+elif [ "$HOSTNAME" = blt ]; then
     sed -i 's/ROBOT/18/g' /etc/init.d/nbwireless
 elif [ "$HOSTNAME" = elektra ]; then
     sed -i 's/ROBOT/19/g' /etc/init.d/nbwireless
 elif [ "$HOSTNAME" = wasp ]; then
     sed -i 's/ROBOT/20/g' /etc/init.d/nbwireless
-elif [ "$HOSTNAME" = blt ]; then
+elif [ "$HOSTNAME" = buzz ]; then
     sed -i 's/ROBOT/21/g' /etc/init.d/nbwireless
 elif [ "$HOSTNAME" = batman ]; then
     sed -i 's/ROBOT/22/g' /etc/init.d/nbwireless

@@ -28,10 +28,10 @@ if [[ $DOALL -eq 1 ]]; then
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@vera.local:
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@mal.local:
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@zoe.local:
-    scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@groot.local:
+    scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@blt.local:
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@elektra.local:
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@wasp.local:
-    scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@blt.local:
+    scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@buzz.local:
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@batman.local:
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@shehulk.local:
 else

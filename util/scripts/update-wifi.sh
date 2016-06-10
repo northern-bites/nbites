@@ -25,10 +25,10 @@ if [[ $DOALL -eq 1 ]]; then
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@vera.local:/etc/wpa_supplicant
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@mal.local:/etc/wpa_supplicant
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@zoe.local:/etc/wpa_supplicant
-    scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@groot.local:/etc/wpa_supplicant
+    scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@blt.local:/etc/wpa_supplicant
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@elektra.local:/etc/wpa_supplicant
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@wasp.local:/etc/wpa_supplicant
-    scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@blt.local:/etc/wpa_supplicant
+    scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@buzz.local:/etc/wpa_supplicant
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@batman.local:/etc/wpa_supplicant
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@shehulk.local:/etc/wpa_supplicant
 else
