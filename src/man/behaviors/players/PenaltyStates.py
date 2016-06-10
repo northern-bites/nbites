@@ -34,8 +34,9 @@ def afterPenalty(player):
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
 
-        # count the number of times we see the goalbox and C-Corner on the right
-        afterPenalty.lCornerRight = 0
+        # count the number of times we see the goalbox and L-Corners on the right
+        afterPenalty.innerLCornerRight = 0
+        afterPenalty.outerLCornerRight = 0
         afterPenalty.goalboxRight = 0
 
         # count the number of times we see the CC and T-Corner on the left
@@ -74,7 +75,7 @@ def afterPenalty(player):
             player.brain.tracker.lookToAngle(angle)
             if DEBUG_PENALTY_STATES and CHECK_VALS_EACH_PAN:
                 print "Looking to my right! Angle:", angle
-                print "I've seen the C-Corner", afterPenalty.lCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
+                print "I've seen an inside L-Corner", afterPenalty.innerLCornerRight, "outer L-Corner", afterPenalty.outerLCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
                 print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
                 print "Cumulative horizon distance on this side is", afterPenalty.leftHorizSum
 
@@ -84,7 +85,7 @@ def afterPenalty(player):
             player.brain.tracker.lookToAngle(-1 * angle)
             if DEBUG_PENALTY_STATES and CHECK_VALS_EACH_PAN:
                 print "Looking to my left! Angle:", otherAngle
-                print "I've seen the C-Corner", afterPenalty.lCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
+                print "I've seen an inside L-Corner", afterPenalty.innerLCornerRight, "outer L-Corner", afterPenalty.outerLCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
                 print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
                 print "Cumulative horizon distance on this side is", afterPenalty.rightHorizSum
 
@@ -100,6 +101,8 @@ def afterPenalty(player):
     ## 2: T-Corner
     ## 3: Center Circle Corner
 
+    # Can I use the goalbox "shape" from the protobuf here?
+
     # TODO see if this could work for "Blue" corners; can we identify our own side in this state?
 
     if player.brain.tracker.isStopped():
@@ -112,11 +115,11 @@ def afterPenalty(player):
             for i in range(0, vis.corner_size()):  
                 corner = vis.corner(i)
                 if corner.id == 0:
-                    afterPenalty.lCornerRight += 1
+                    afterPenalty.innerLCornerRight += 1
                 if corner.id == 1:
-                    afterPenalty.goalboxRight += 1
+                    afterPenalty.outerLCornerRight += 1
                 if corner.id == 2:
-                    afterPenalty.afterPenalty.tCornerLeft -= 1
+                    afterPenalty.tCornerLeft -= 1
                 if corner.id == 3: 
                     afterPenalty.CenterCircleLeft -= 1
 
@@ -125,9 +128,9 @@ def afterPenalty(player):
             for i in range(0, vis.corner_size()):
                 corner = vis.corner(i)
                 if corner.id == 0:
-                    afterPenalty.lCornerRight -= 1
+                    afterPenalty.innerLCornerRight -= 1
                 if corner.id == 1:
-                    afterPenalty.goalboxRight -=1
+                    afterPenalty.outerLCornerRight -=1
                 if corner.id == 2:
                     afterPenalty.tCornerLeft += 1
                 if corner.id == 3:
@@ -139,10 +142,13 @@ def afterPenalty(player):
     if afterPenalty.frameCount > 300 or afterPenalty.decidedSide:
         # TODO see if the goalie role affects this
         if DEBUG_PENALTY_STATES:
-            print ("-------------------------------------------------------------")
+            print ("\n-------------------------------------------------------------")
             print("COUNTER TOTALS: ")
-            print ("lCornerRight:", afterPenalty.lCornerRight, "goalboxRight:", afterPenalty.goalboxRight, "tCornerLeft:", afterPenalty.tCornerLeft, "CenterCircleLeft:", afterPenalty.CenterCircleLeft)
-            print ("-------------------------------------------------------------")
+            print ("innerLCornerRight:", afterPenalty.innerLCornerRight, "outerLCornerRight:", afterPenalty.outerLCornerRight, "goalboxRight:", \
+                afterPenalty.goalboxRight, "tCornerLeft:", afterPenalty.tCornerLeft, "CenterCircleLeft:", afterPenalty.CenterCircleLeft)
+            print("HORIZON DISTANCE TOTALS:")
+            print ("left horizon:", afterPenalty.leftHorizSum, "right horizon", afterPenalty.rightHorizSum)
+            print ("-------------------------------------------------------------\n")
             return player.goNow('gamePenalized')
 
         return player.goNow('walkOut')
