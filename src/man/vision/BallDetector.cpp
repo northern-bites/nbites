@@ -454,8 +454,8 @@ bool BallDetector::findCorrelatedBlackSpots
                     lower = 9.5;
                     upper = 17.2; //change from 14
                 } else {
-                    lower = 16.4; //change from 19.0
-                    upper = 21.4;
+                    lower = 15.4; //change from 19.0
+                    upper = 22.1;
                 }
 
                 distance = sqrt(pow((s2.ix() - s1.ix()),2) + pow((s2.iy() - s1.iy()),2));
