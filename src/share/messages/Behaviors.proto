@@ -14,15 +14,13 @@ message Behaviors
 		GAMEFINISHED = 6;
 	}
 
-    optional GameControllerState GCState = 1 [default = GAMEINITIAL];
+    optional GameControllerState GCState = 1;
     optional string robotName = 2;
     optional int32 team = 3;
     optional int32 player = 4;
     optional int32 role = 5;
 
-    // Kick Stuff
-    optional string KickLLStrategy = 6;
-    optional string KickHLStrategy = 7;
-
-    repeated string fsas = 8;
+    optional string gcstatestr = 6;
+    optional string headtrackerstr = 7;
+    optional string navigatorstr = 8;
 }

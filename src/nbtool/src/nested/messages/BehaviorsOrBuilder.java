@@ -6,13 +6,13 @@ package messages;
 public interface BehaviorsOrBuilder
     extends com.google.protobuf.MessageOrBuilder {
 
-  // optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];
+  // optional .messages.Behaviors.GameControllerState GCState = 1;
   /**
-   * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
+   * <code>optional .messages.Behaviors.GameControllerState GCState = 1;</code>
    */
   boolean hasGCState();
   /**
-   * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
+   * <code>optional .messages.Behaviors.GameControllerState GCState = 1;</code>
    */
   messages.Behaviors.GameControllerState getGCState();
 
@@ -61,65 +61,48 @@ public interface BehaviorsOrBuilder
    */
   int getRole();
 
-  // optional string KickLLStrategy = 6;
+  // optional string gcstatestr = 6;
   /**
-   * <code>optional string KickLLStrategy = 6;</code>
-   *
-   * <pre>
-   * Kick Stuff
-   * </pre>
+   * <code>optional string gcstatestr = 6;</code>
    */
-  boolean hasKickLLStrategy();
+  boolean hasGcstatestr();
   /**
-   * <code>optional string KickLLStrategy = 6;</code>
-   *
-   * <pre>
-   * Kick Stuff
-   * </pre>
+   * <code>optional string gcstatestr = 6;</code>
    */
-  java.lang.String getKickLLStrategy();
+  java.lang.String getGcstatestr();
   /**
-   * <code>optional string KickLLStrategy = 6;</code>
-   *
-   * <pre>
-   * Kick Stuff
-   * </pre>
+   * <code>optional string gcstatestr = 6;</code>
    */
   com.google.protobuf.ByteString
-      getKickLLStrategyBytes();
+      getGcstatestrBytes();
 
-  // optional string KickHLStrategy = 7;
+  // optional string headtrackerstr = 7;
   /**
-   * <code>optional string KickHLStrategy = 7;</code>
+   * <code>optional string headtrackerstr = 7;</code>
    */
-  boolean hasKickHLStrategy();
+  boolean hasHeadtrackerstr();
   /**
-   * <code>optional string KickHLStrategy = 7;</code>
+   * <code>optional string headtrackerstr = 7;</code>
    */
-  java.lang.String getKickHLStrategy();
+  java.lang.String getHeadtrackerstr();
   /**
-   * <code>optional string KickHLStrategy = 7;</code>
+   * <code>optional string headtrackerstr = 7;</code>
    */
   com.google.protobuf.ByteString
-      getKickHLStrategyBytes();
+      getHeadtrackerstrBytes();
 
-  // repeated string fsas = 8;
+  // optional string navigatorstr = 8;
   /**
-   * <code>repeated string fsas = 8;</code>
+   * <code>optional string navigatorstr = 8;</code>
    */
-  java.util.List<java.lang.String>
-  getFsasList();
+  boolean hasNavigatorstr();
   /**
-   * <code>repeated string fsas = 8;</code>
+   * <code>optional string navigatorstr = 8;</code>
    */
-  int getFsasCount();
+  java.lang.String getNavigatorstr();
   /**
-   * <code>repeated string fsas = 8;</code>
-   */
-  java.lang.String getFsas(int index);
-  /**
-   * <code>repeated string fsas = 8;</code>
+   * <code>optional string navigatorstr = 8;</code>
    */
   com.google.protobuf.ByteString
-      getFsasBytes(int index);
+      getNavigatorstrBytes();
 }

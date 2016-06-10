@@ -87,20 +87,17 @@ public  final class Behaviors extends
           }
           case 50: {
             bitField0_ |= 0x00000020;
-            kickLLStrategy_ = input.readBytes();
+            gcstatestr_ = input.readBytes();
             break;
           }
           case 58: {
             bitField0_ |= 0x00000040;
-            kickHLStrategy_ = input.readBytes();
+            headtrackerstr_ = input.readBytes();
             break;
           }
           case 66: {
-            if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
-              fsas_ = new com.google.protobuf.LazyStringArrayList();
-              mutable_bitField0_ |= 0x00000080;
-            }
-            fsas_.add(input.readBytes());
+            bitField0_ |= 0x00000080;
+            navigatorstr_ = input.readBytes();
             break;
           }
         }
@@ -111,9 +108,6 @@ public  final class Behaviors extends
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e.getMessage()).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
-        fsas_ = new com.google.protobuf.UnmodifiableLazyStringList(fsas_);
-      }
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
@@ -264,17 +258,17 @@ public  final class Behaviors extends
   }
 
   private int bitField0_;
-  // optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];
+  // optional .messages.Behaviors.GameControllerState GCState = 1;
   public static final int GCSTATE_FIELD_NUMBER = 1;
   private messages.Behaviors.GameControllerState gCState_;
   /**
-   * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
+   * <code>optional .messages.Behaviors.GameControllerState GCState = 1;</code>
    */
   public boolean hasGCState() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
-   * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
+   * <code>optional .messages.Behaviors.GameControllerState GCState = 1;</code>
    */
   public messages.Behaviors.GameControllerState getGCState() {
     return gCState_;
@@ -371,28 +365,20 @@ public  final class Behaviors extends
     return role_;
   }
 
-  // optional string KickLLStrategy = 6;
-  public static final int KICKLLSTRATEGY_FIELD_NUMBER = 6;
-  private java.lang.Object kickLLStrategy_;
+  // optional string gcstatestr = 6;
+  public static final int GCSTATESTR_FIELD_NUMBER = 6;
+  private java.lang.Object gcstatestr_;
   /**
-   * <code>optional string KickLLStrategy = 6;</code>
-   *
-   * <pre>
-   * Kick Stuff
-   * </pre>
+   * <code>optional string gcstatestr = 6;</code>
    */
-  public boolean hasKickLLStrategy() {
+  public boolean hasGcstatestr() {
     return ((bitField0_ & 0x00000020) == 0x00000020);
   }
   /**
-   * <code>optional string KickLLStrategy = 6;</code>
-   *
-   * <pre>
-   * Kick Stuff
-   * </pre>
+   * <code>optional string gcstatestr = 6;</code>
    */
-  public java.lang.String getKickLLStrategy() {
-    java.lang.Object ref = kickLLStrategy_;
+  public java.lang.String getGcstatestr() {
+    java.lang.Object ref = gcstatestr_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
@@ -400,46 +386,42 @@ public  final class Behaviors extends
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       if (bs.isValidUtf8()) {
-        kickLLStrategy_ = s;
+        gcstatestr_ = s;
       }
       return s;
     }
   }
   /**
-   * <code>optional string KickLLStrategy = 6;</code>
-   *
-   * <pre>
-   * Kick Stuff
-   * </pre>
+   * <code>optional string gcstatestr = 6;</code>
    */
   public com.google.protobuf.ByteString
-      getKickLLStrategyBytes() {
-    java.lang.Object ref = kickLLStrategy_;
+      getGcstatestrBytes() {
+    java.lang.Object ref = gcstatestr_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      kickLLStrategy_ = b;
+      gcstatestr_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
   }
 
-  // optional string KickHLStrategy = 7;
-  public static final int KICKHLSTRATEGY_FIELD_NUMBER = 7;
-  private java.lang.Object kickHLStrategy_;
+  // optional string headtrackerstr = 7;
+  public static final int HEADTRACKERSTR_FIELD_NUMBER = 7;
+  private java.lang.Object headtrackerstr_;
   /**
-   * <code>optional string KickHLStrategy = 7;</code>
+   * <code>optional string headtrackerstr = 7;</code>
    */
-  public boolean hasKickHLStrategy() {
+  public boolean hasHeadtrackerstr() {
     return ((bitField0_ & 0x00000040) == 0x00000040);
   }
   /**
-   * <code>optional string KickHLStrategy = 7;</code>
+   * <code>optional string headtrackerstr = 7;</code>
    */
-  public java.lang.String getKickHLStrategy() {
-    java.lang.Object ref = kickHLStrategy_;
+  public java.lang.String getHeadtrackerstr() {
+    java.lang.Object ref = headtrackerstr_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
@@ -447,56 +429,69 @@ public  final class Behaviors extends
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       if (bs.isValidUtf8()) {
-        kickHLStrategy_ = s;
+        headtrackerstr_ = s;
       }
       return s;
     }
   }
   /**
-   * <code>optional string KickHLStrategy = 7;</code>
+   * <code>optional string headtrackerstr = 7;</code>
    */
   public com.google.protobuf.ByteString
-      getKickHLStrategyBytes() {
-    java.lang.Object ref = kickHLStrategy_;
+      getHeadtrackerstrBytes() {
+    java.lang.Object ref = headtrackerstr_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      kickHLStrategy_ = b;
+      headtrackerstr_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
   }
 
-  // repeated string fsas = 8;
-  public static final int FSAS_FIELD_NUMBER = 8;
-  private com.google.protobuf.LazyStringList fsas_;
+  // optional string navigatorstr = 8;
+  public static final int NAVIGATORSTR_FIELD_NUMBER = 8;
+  private java.lang.Object navigatorstr_;
   /**
-   * <code>repeated string fsas = 8;</code>
+   * <code>optional string navigatorstr = 8;</code>
    */
-  public java.util.List<java.lang.String>
-      getFsasList() {
-    return fsas_;
+  public boolean hasNavigatorstr() {
+    return ((bitField0_ & 0x00000080) == 0x00000080);
   }
   /**
-   * <code>repeated string fsas = 8;</code>
+   * <code>optional string navigatorstr = 8;</code>
    */
-  public int getFsasCount() {
-    return fsas_.size();
+  public java.lang.String getNavigatorstr() {
+    java.lang.Object ref = navigatorstr_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      if (bs.isValidUtf8()) {
+        navigatorstr_ = s;
+      }
+      return s;
+    }
   }
   /**
-   * <code>repeated string fsas = 8;</code>
-   */
-  public java.lang.String getFsas(int index) {
-    return fsas_.get(index);
-  }
-  /**
-   * <code>repeated string fsas = 8;</code>
+   * <code>optional string navigatorstr = 8;</code>
    */
   public com.google.protobuf.ByteString
-      getFsasBytes(int index) {
-    return fsas_.getByteString(index);
+      getNavigatorstrBytes() {
+    java.lang.Object ref = navigatorstr_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      navigatorstr_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
   }
 
   private void initFields() {
@@ -505,9 +500,9 @@ public  final class Behaviors extends
     team_ = 0;
     player_ = 0;
     role_ = 0;
-    kickLLStrategy_ = "";
-    kickHLStrategy_ = "";
-    fsas_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    gcstatestr_ = "";
+    headtrackerstr_ = "";
+    navigatorstr_ = "";
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -537,13 +532,13 @@ public  final class Behaviors extends
       output.writeInt32(5, role_);
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      output.writeBytes(6, getKickLLStrategyBytes());
+      output.writeBytes(6, getGcstatestrBytes());
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
-      output.writeBytes(7, getKickHLStrategyBytes());
+      output.writeBytes(7, getHeadtrackerstrBytes());
     }
-    for (int i = 0; i < fsas_.size(); i++) {
-      output.writeBytes(8, fsas_.getByteString(i));
+    if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      output.writeBytes(8, getNavigatorstrBytes());
     }
     getUnknownFields().writeTo(output);
   }
@@ -576,20 +571,15 @@ public  final class Behaviors extends
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBytesSize(6, getKickLLStrategyBytes());
+        .computeBytesSize(6, getGcstatestrBytes());
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBytesSize(7, getKickHLStrategyBytes());
+        .computeBytesSize(7, getHeadtrackerstrBytes());
     }
-    {
-      int dataSize = 0;
-      for (int i = 0; i < fsas_.size(); i++) {
-        dataSize += com.google.protobuf.CodedOutputStream
-          .computeBytesSizeNoTag(fsas_.getByteString(i));
-      }
-      size += dataSize;
-      size += 1 * getFsasList().size();
+    if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(8, getNavigatorstrBytes());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -717,11 +707,11 @@ public  final class Behaviors extends
       bitField0_ = (bitField0_ & ~0x00000008);
       role_ = 0;
       bitField0_ = (bitField0_ & ~0x00000010);
-      kickLLStrategy_ = "";
+      gcstatestr_ = "";
       bitField0_ = (bitField0_ & ~0x00000020);
-      kickHLStrategy_ = "";
+      headtrackerstr_ = "";
       bitField0_ = (bitField0_ & ~0x00000040);
-      fsas_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      navigatorstr_ = "";
       bitField0_ = (bitField0_ & ~0x00000080);
       return this;
     }
@@ -774,17 +764,15 @@ public  final class Behaviors extends
       if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
         to_bitField0_ |= 0x00000020;
       }
-      result.kickLLStrategy_ = kickLLStrategy_;
+      result.gcstatestr_ = gcstatestr_;
       if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
         to_bitField0_ |= 0x00000040;
       }
-      result.kickHLStrategy_ = kickHLStrategy_;
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        fsas_ = new com.google.protobuf.UnmodifiableLazyStringList(
-            fsas_);
-        bitField0_ = (bitField0_ & ~0x00000080);
+      result.headtrackerstr_ = headtrackerstr_;
+      if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+        to_bitField0_ |= 0x00000080;
       }
-      result.fsas_ = fsas_;
+      result.navigatorstr_ = navigatorstr_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -818,24 +806,19 @@ public  final class Behaviors extends
       if (other.hasRole()) {
         setRole(other.getRole());
       }
-      if (other.hasKickLLStrategy()) {
+      if (other.hasGcstatestr()) {
         bitField0_ |= 0x00000020;
-        kickLLStrategy_ = other.kickLLStrategy_;
+        gcstatestr_ = other.gcstatestr_;
         onChanged();
       }
-      if (other.hasKickHLStrategy()) {
+      if (other.hasHeadtrackerstr()) {
         bitField0_ |= 0x00000040;
-        kickHLStrategy_ = other.kickHLStrategy_;
+        headtrackerstr_ = other.headtrackerstr_;
         onChanged();
       }
-      if (!other.fsas_.isEmpty()) {
-        if (fsas_.isEmpty()) {
-          fsas_ = other.fsas_;
-          bitField0_ = (bitField0_ & ~0x00000080);
-        } else {
-          ensureFsasIsMutable();
-          fsas_.addAll(other.fsas_);
-        }
+      if (other.hasNavigatorstr()) {
+        bitField0_ |= 0x00000080;
+        navigatorstr_ = other.navigatorstr_;
         onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
@@ -865,22 +848,22 @@ public  final class Behaviors extends
     }
     private int bitField0_;
 
-    // optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];
+    // optional .messages.Behaviors.GameControllerState GCState = 1;
     private messages.Behaviors.GameControllerState gCState_ = messages.Behaviors.GameControllerState.GAMEINITIAL;
     /**
-     * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
+     * <code>optional .messages.Behaviors.GameControllerState GCState = 1;</code>
      */
     public boolean hasGCState() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
+     * <code>optional .messages.Behaviors.GameControllerState GCState = 1;</code>
      */
     public messages.Behaviors.GameControllerState getGCState() {
       return gCState_;
     }
     /**
-     * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
+     * <code>optional .messages.Behaviors.GameControllerState GCState = 1;</code>
      */
     public Builder setGCState(messages.Behaviors.GameControllerState value) {
       if (value == null) {
@@ -892,7 +875,7 @@ public  final class Behaviors extends
       return this;
     }
     /**
-     * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
+     * <code>optional .messages.Behaviors.GameControllerState GCState = 1;</code>
      */
     public Builder clearGCState() {
       bitField0_ = (bitField0_ & ~0x00000001);
@@ -1074,267 +1057,224 @@ public  final class Behaviors extends
       return this;
     }
 
-    // optional string KickLLStrategy = 6;
-    private java.lang.Object kickLLStrategy_ = "";
+    // optional string gcstatestr = 6;
+    private java.lang.Object gcstatestr_ = "";
     /**
-     * <code>optional string KickLLStrategy = 6;</code>
-     *
-     * <pre>
-     * Kick Stuff
-     * </pre>
+     * <code>optional string gcstatestr = 6;</code>
      */
-    public boolean hasKickLLStrategy() {
+    public boolean hasGcstatestr() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional string KickLLStrategy = 6;</code>
-     *
-     * <pre>
-     * Kick Stuff
-     * </pre>
+     * <code>optional string gcstatestr = 6;</code>
      */
-    public java.lang.String getKickLLStrategy() {
-      java.lang.Object ref = kickLLStrategy_;
+    public java.lang.String getGcstatestr() {
+      java.lang.Object ref = gcstatestr_;
       if (!(ref instanceof java.lang.String)) {
         java.lang.String s = ((com.google.protobuf.ByteString) ref)
             .toStringUtf8();
-        kickLLStrategy_ = s;
+        gcstatestr_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>optional string KickLLStrategy = 6;</code>
-     *
-     * <pre>
-     * Kick Stuff
-     * </pre>
+     * <code>optional string gcstatestr = 6;</code>
      */
     public com.google.protobuf.ByteString
-        getKickLLStrategyBytes() {
-      java.lang.Object ref = kickLLStrategy_;
+        getGcstatestrBytes() {
+      java.lang.Object ref = gcstatestr_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        kickLLStrategy_ = b;
+        gcstatestr_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>optional string KickLLStrategy = 6;</code>
-     *
-     * <pre>
-     * Kick Stuff
-     * </pre>
+     * <code>optional string gcstatestr = 6;</code>
      */
-    public Builder setKickLLStrategy(
+    public Builder setGcstatestr(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000020;
-      kickLLStrategy_ = value;
+      gcstatestr_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>optional string KickLLStrategy = 6;</code>
-     *
-     * <pre>
-     * Kick Stuff
-     * </pre>
+     * <code>optional string gcstatestr = 6;</code>
      */
-    public Builder clearKickLLStrategy() {
+    public Builder clearGcstatestr() {
       bitField0_ = (bitField0_ & ~0x00000020);
-      kickLLStrategy_ = getDefaultInstance().getKickLLStrategy();
+      gcstatestr_ = getDefaultInstance().getGcstatestr();
       onChanged();
       return this;
     }
     /**
-     * <code>optional string KickLLStrategy = 6;</code>
-     *
-     * <pre>
-     * Kick Stuff
-     * </pre>
+     * <code>optional string gcstatestr = 6;</code>
      */
-    public Builder setKickLLStrategyBytes(
+    public Builder setGcstatestrBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000020;
-      kickLLStrategy_ = value;
+      gcstatestr_ = value;
       onChanged();
       return this;
     }
 
-    // optional string KickHLStrategy = 7;
-    private java.lang.Object kickHLStrategy_ = "";
+    // optional string headtrackerstr = 7;
+    private java.lang.Object headtrackerstr_ = "";
     /**
-     * <code>optional string KickHLStrategy = 7;</code>
+     * <code>optional string headtrackerstr = 7;</code>
      */
-    public boolean hasKickHLStrategy() {
+    public boolean hasHeadtrackerstr() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional string KickHLStrategy = 7;</code>
+     * <code>optional string headtrackerstr = 7;</code>
      */
-    public java.lang.String getKickHLStrategy() {
-      java.lang.Object ref = kickHLStrategy_;
+    public java.lang.String getHeadtrackerstr() {
+      java.lang.Object ref = headtrackerstr_;
       if (!(ref instanceof java.lang.String)) {
         java.lang.String s = ((com.google.protobuf.ByteString) ref)
             .toStringUtf8();
-        kickHLStrategy_ = s;
+        headtrackerstr_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>optional string KickHLStrategy = 7;</code>
+     * <code>optional string headtrackerstr = 7;</code>
      */
     public com.google.protobuf.ByteString
-        getKickHLStrategyBytes() {
-      java.lang.Object ref = kickHLStrategy_;
+        getHeadtrackerstrBytes() {
+      java.lang.Object ref = headtrackerstr_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        kickHLStrategy_ = b;
+        headtrackerstr_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>optional string KickHLStrategy = 7;</code>
+     * <code>optional string headtrackerstr = 7;</code>
      */
-    public Builder setKickHLStrategy(
+    public Builder setHeadtrackerstr(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000040;
-      kickHLStrategy_ = value;
+      headtrackerstr_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>optional string KickHLStrategy = 7;</code>
+     * <code>optional string headtrackerstr = 7;</code>
      */
-    public Builder clearKickHLStrategy() {
+    public Builder clearHeadtrackerstr() {
       bitField0_ = (bitField0_ & ~0x00000040);
-      kickHLStrategy_ = getDefaultInstance().getKickHLStrategy();
+      headtrackerstr_ = getDefaultInstance().getHeadtrackerstr();
       onChanged();
       return this;
     }
     /**
-     * <code>optional string KickHLStrategy = 7;</code>
+     * <code>optional string headtrackerstr = 7;</code>
      */
-    public Builder setKickHLStrategyBytes(
+    public Builder setHeadtrackerstrBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000040;
-      kickHLStrategy_ = value;
+      headtrackerstr_ = value;
       onChanged();
       return this;
     }
 
-    // repeated string fsas = 8;
-    private com.google.protobuf.LazyStringList fsas_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-    private void ensureFsasIsMutable() {
-      if (!((bitField0_ & 0x00000080) == 0x00000080)) {
-        fsas_ = new com.google.protobuf.LazyStringArrayList(fsas_);
-        bitField0_ |= 0x00000080;
-       }
-    }
+    // optional string navigatorstr = 8;
+    private java.lang.Object navigatorstr_ = "";
     /**
-     * <code>repeated string fsas = 8;</code>
+     * <code>optional string navigatorstr = 8;</code>
      */
-    public java.util.List<java.lang.String>
-        getFsasList() {
-      return java.util.Collections.unmodifiableList(fsas_);
+    public boolean hasNavigatorstr() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>repeated string fsas = 8;</code>
+     * <code>optional string navigatorstr = 8;</code>
      */
-    public int getFsasCount() {
-      return fsas_.size();
+    public java.lang.String getNavigatorstr() {
+      java.lang.Object ref = navigatorstr_;
+      if (!(ref instanceof java.lang.String)) {
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        navigatorstr_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
     }
     /**
-     * <code>repeated string fsas = 8;</code>
-     */
-    public java.lang.String getFsas(int index) {
-      return fsas_.get(index);
-    }
-    /**
-     * <code>repeated string fsas = 8;</code>
+     * <code>optional string navigatorstr = 8;</code>
      */
     public com.google.protobuf.ByteString
-        getFsasBytes(int index) {
-      return fsas_.getByteString(index);
+        getNavigatorstrBytes() {
+      java.lang.Object ref = navigatorstr_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        navigatorstr_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
     /**
-     * <code>repeated string fsas = 8;</code>
+     * <code>optional string navigatorstr = 8;</code>
      */
-    public Builder setFsas(
-        int index, java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureFsasIsMutable();
-      fsas_.set(index, value);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>repeated string fsas = 8;</code>
-     */
-    public Builder addFsas(
+    public Builder setNavigatorstr(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  ensureFsasIsMutable();
-      fsas_.add(value);
+  bitField0_ |= 0x00000080;
+      navigatorstr_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>repeated string fsas = 8;</code>
+     * <code>optional string navigatorstr = 8;</code>
      */
-    public Builder addAllFsas(
-        java.lang.Iterable<java.lang.String> values) {
-      ensureFsasIsMutable();
-      super.addAll(values, fsas_);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>repeated string fsas = 8;</code>
-     */
-    public Builder clearFsas() {
-      fsas_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    public Builder clearNavigatorstr() {
       bitField0_ = (bitField0_ & ~0x00000080);
+      navigatorstr_ = getDefaultInstance().getNavigatorstr();
       onChanged();
       return this;
     }
     /**
-     * <code>repeated string fsas = 8;</code>
+     * <code>optional string navigatorstr = 8;</code>
      */
-    public Builder addFsasBytes(
+    public Builder setNavigatorstrBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  ensureFsasIsMutable();
-      fsas_.add(value);
+  bitField0_ |= 0x00000080;
+      navigatorstr_ = value;
       onChanged();
       return this;
     }

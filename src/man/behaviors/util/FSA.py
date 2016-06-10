@@ -2,10 +2,8 @@
 This file contains an implementation of a finite state automaton.
 """
 import time
-import interface
-import Behaviors_proto
 
-DEBUG = False
+DEBUG = True
 COUNT_FPS = False
 
 # Should I stay? Or should I go?
@@ -41,7 +39,7 @@ class FSA:
 
     """
     def __init__(self, owner):
-        self.owner = owner
+        self.owner = owner # instance of brain
         self.currentState = ""
         self.lastState = ""
         self.lastDiffState = ""
@@ -64,10 +62,6 @@ class FSA:
         #debug switches
         self.stateChangeColor = ''
         self.printStateChanges = False
-
-        # Behaviors View
-        self.interface = interface.interface
-        self.interface.behaviors.fsas.addString(str(self.owner))
 
 
     def addStates(self,module):
@@ -124,8 +118,15 @@ class FSA:
                             self.currentState + "\"!")
                 raise
 
+
             self.lastState = self.currentState
             self.currentState = nextState
+            if self.name == "pBrunswick":
+                self.owner.interface.behaviors.gcstatestr = self.currentState
+            if self.name == "headTracker":
+                self.owner.interface.behaviors.headtrackerstr = self.currentState
+            if self.name == "Navigator":
+                self.owner.interface.behaviors.navigatorstr = self.currentState
             self.updateStateInfo()
 
     def stay(self):

@@ -22,7 +22,6 @@ import nbtool.util.SharedConstants;
 
 public class BehaviorsView extends ViewParent {
 	
-	// private static final Debug.DebugSettings debug = Debug.createSettings(true, true, true, null, null);
 	Behaviors be;
 
 	@Override
@@ -65,7 +64,7 @@ public class BehaviorsView extends ViewParent {
 		Color yellow = new Color(255, 220, 0);
 		Color orange = new Color(255, 133, 27);
 		Color purple = new Color(177, 13, 201);
-		Color gray = new Color(96, 96, 96);
+		Color gray = new Color(144, 144, 144);
 
 		// Row 1
 		g.setFont(body);
@@ -79,7 +78,9 @@ public class BehaviorsView extends ViewParent {
 		
 		g.drawLine(350, 5, 350, 35);
 
-		g.drawString(be.getRobotName(), 375, 20);
+		String lowerCaseName = be.getRobotName();
+		lowerCaseName = lowerCaseName.substring(0, 1).toUpperCase() + lowerCaseName.substring(1);
+		g.drawString(lowerCaseName + "", 375, 20);
 		g.drawString(be.getTeam() + "", 500, 20);
 		g.drawString(be.getPlayer() + "", 600, 20);
 		g.drawString(be.getRole() + "", 700, 20);
@@ -97,13 +98,9 @@ public class BehaviorsView extends ViewParent {
 		String[] gcStateStrs = {
 			"Initial", "Ready", "Set", "Playing", "Penalty", "Finished"};
 
-		Behaviors.GameControllerState[] gcStates = {
-			Behaviors.GameControllerState.GAMEINITIAL,
-			Behaviors.GameControllerState.GAMEREADY,
-			Behaviors.GameControllerState.GAMESET,
-			Behaviors.GameControllerState.GAMEPLAYING,
-			Behaviors.GameControllerState.GAMEPENALTY,
-			Behaviors.GameControllerState.GAMEFINISHED,
+		String[] gcStates = {
+			"gameInitial", "gameReady", "gameSet", "gamePlaying", 
+			"gamePenalized", "gameFinished"
 		};
 
 		Color[] gcStrColors = {blue, blue, orange, green, red, blue};
@@ -111,7 +108,8 @@ public class BehaviorsView extends ViewParent {
 		int gcStateWidth = pageWidth / gcStateStrs.length;
 
 		for (int i=0; i<gcStateStrs.length; i++) {
-			if(be.getGCState() == gcStates[i]) {
+			if(be.getGcstatestr() == "gameInitial") {
+				g.drawString("YES", 100, 100);
 				g.setColor(gcStrColors[i]);
 			}
 
@@ -124,7 +122,10 @@ public class BehaviorsView extends ViewParent {
 		g.drawString("Game Controller State", 20, 85);
 		g.drawLine(20, 90, pageWidth, 90);
 
-		g.drawString(be.getKickHLStrategy(), 150, 150);
+		g.setFont(body);
+		g.drawString(be.getGcstatestr(), 150, 150);
+		g.drawString(be.getHeadtrackerstr(), 150, 170);
+		g.drawString(be.getNavigatorstr(), 150, 190);
 
 	}
 

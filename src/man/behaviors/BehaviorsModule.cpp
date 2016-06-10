@@ -212,8 +212,8 @@ void BehaviorsModule::run_ ()
     }
     PROF_EXIT(P_PYTHON);
 
+    std::cout << behaviors.get()->gcstatestr() << std::endl;
     // Send outgoing messages
-    std::cout << behaviors.get()->fsas_size() << std::endl;
     sendMessages();
 
     PROF_EXIT(P_BEHAVIORS);

@@ -161,6 +161,7 @@ def positionAsSupporter(player):
 @ifSwitchNow(transitions.shouldFindFlippedSharedBall, 'searchFieldForFlippedSharedBall')
 @ifSwitchNow(transitions.shouldStopLookingForSharedBall, 'searchFieldByQuad') #was: positionAtHome USOPEN2016
 def searchFieldForSharedBall(player):
+    player.brain.interface.behaviors.searchStrategy = "searchFieldForSharedBall"
     """
     Searches the field for the shared ball.
     """
@@ -191,6 +192,7 @@ def searchFieldForSharedBall(player):
 @stay
 @ifSwitchNow(transitions.shouldStopLookingForFlippedSharedBall, 'searchFieldByQuad') #was: positionAtHome USOPEN2016
 def searchFieldForFlippedSharedBall(player):
+    player.brain.interface.behaviors.searchStrategy = "searchFieldForFlippedSharedBall"
     """
     Flips the shared ball and searches for it.
     """
@@ -220,6 +222,7 @@ def searchFieldForFlippedSharedBall(player):
 @superState('playOffBall')
 @stay
 def searchFieldByQuad(player):
+    player.brain.interface.behaviors.searchStrategy = "searchFieldByQuad"
     """
     Search the field quadrant by quadrant. Choose first quadrant by loc heading.
     """

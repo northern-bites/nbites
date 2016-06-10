@@ -577,39 +577,46 @@ class KickDecider(object):
     ### HIGH LEVEL PLANNERS ###
     ###########################
     def decidingStrategy(self):
-        self.brain.behaviors.kickhlstrategy = "decidingStrategy"
+        self.brain.interface.behaviors.kickhlstrategy = "decidingStrategy"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
+            self.brain.interface.behaviors.kickllstrategy = "closeGoalShot"
             return closeGoalShot
 
         goalShot = self.forwardKickOnGoal()
         if goalShot:
+            self.brain.interface.behaviors.kickllstrategy = "GoalShot"
             return goalShot
 
         asap = self.motionKicksAsap()
         if asap:
+            self.brain.interface.behaviors.kickllstrategy = "asap"
             return asap
         
+        self.brain.interface.behaviors.kickllstrategy = "frontKickCrosses"
         return self.frontKickCrosses()
 
     def usOpen2016StraightKickStrategy(self): #USOPEN2016 . TODO: REMOVE
-        self.brain.behaviors.kickhlstrategy = "usOpen2016StraightKickStrategy"
+        self.brain.interface.behaviors.kickhlstrategy = "usOpen2016StraightKickStrategy"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
             # print("ONEusOpen2016StraightKickStrategy")
+            self.brain.interface.behaviors.kickllstrategy = "closeGoalShot"
             return closeGoalShot
 
         straight = self.usOpen2016motionKickStraight()
         if straight:
             # print("TWOusOpen2016StraightKickStrategy")
+            self.brain.interface.behaviors.kickllstrategy = "straight"
             return straight
 
         # print("THREEusOpen2016StraightKickStrategy")
+        self.brain.interface.behaviors.kickllstrategy = "frontKickCrosses"
         return self.frontKickCrosses()
 
 
     def usOpenStrategy2016(self): # TODO REMOVE UNDO POOP
-        self.brain.behaviors.kickhlstrategy = "usOpenStrategy2016"
+        self.brain.interface.behaviors.kickhlstrategy = "usOpenStrategy2016"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
             return closeGoalShot
