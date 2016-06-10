@@ -45,7 +45,7 @@ public class BehaviorsView extends ViewParent {
 		Font calFont = f.deriveFont( (float) f.getSize() * 1.5f);
 		g.setFont(calFont);
 		g.setColor(new Color(26, 44, 116));
-		g.drawString("BehaviorsView 1.0.0", 20, 20);
+		g.drawString("BehaviorsView 0.1", 20, 20);
 		g.setFont(calFont.deriveFont((float)calFont.getSize() * 0.66f));
 		g.setColor(new Color(56, 56, 56));
 		g.drawString("Last updated by James Little on June 8, 2016", 20, 35);
@@ -53,9 +53,26 @@ public class BehaviorsView extends ViewParent {
 		g.setFont(calFont);
 		g.setColor(new Color(128, 128, 128));
 
-		System.out.println(be);
+		if (be.getGCState() == Behaviors.GameControllerState.GAMEINITIAL) {
+			g.setColor(new Color(51, 83, 209));
+		}
+
 		g.drawString("GameInitial", 20, 70);
+
+		g.setColor(new Color(128, 128, 128));
+
+		if (be.getGCState() == Behaviors.GameControllerState.GAMEREADY) {
+			g.setColor(new Color(51, 83, 209));
+		}
+
 		g.drawString("GameReady", 150, 70);
+
+		g.setColor(new Color(128, 128, 128));
+
+		if (be.getOn()) {
+			g.setColor(new Color(209, 51, 51));
+		}
+
 		g.drawString("GameSet", 270, 70);
 		g.drawString("GamePlaying", 370, 70);
 		g.drawString("GamePenalty", 500, 70);

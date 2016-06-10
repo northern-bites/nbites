@@ -188,6 +188,7 @@ void BehaviorsModule::run_ ()
 
     // Latch incoming messages and prepare outgoing messages
     prepareMessages();
+    std::cout << behaviors.get()->gcstate() << std::endl;
 
     PROF_ENTER(P_PYTHON);
 
@@ -302,7 +303,6 @@ void BehaviorsModule::prepareMessages()
 
 void BehaviorsModule::sendMessages()
 {
-    std::cout << "Stuff" << std::endl;
     ledCommandOut.setMessage(ledCommand);
 
     if (resetLocRequest.get()->timestamp() != 0)
@@ -325,13 +325,16 @@ void BehaviorsModule::sendMessages()
         myWorldModelOut.setMessage(myWorldModel);
     }
 
+    // std::cout << behaviors.get()->mutable_GCState() << std::endl;
+
     nbl::logptr theLog = nbl::Log::explicitLog(
                                    std::vector<nbl::Block>{},
                                    json::Object{},
                                    "behaviors", time(NULL));
 
-    // messages::Behaviors be_pb = behaviorsIn.message();
-    messages::Behaviors be_pb;
+    messages::Behaviors be_pb = *(behaviors.get());
+
+    // messages::Behaviors be_pb;
     theLog->addBlockFromProtobuf(be_pb, "behaviors", 0, clock());
     nbl::NBLog(theLog);
 }
