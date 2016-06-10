@@ -38,11 +38,9 @@ public class BallTestView extends ViewParent {
 	public static final String BALL_IMG_WIDTH_KEY = "img_width";
 	public static final String BALL_IMG_HEIGHT_KEY = "img_height";
 	
-	// private static final int BALL_DISPLAY_WIDTH = 10;
-	// private static final int BALL_DISPLAY_HEIGHT = 10;
 	private static final int IMAGE_BUFFER = 100;
 
-	private Ellipse2D current_ball = null;
+	private Point pressed_point = null;
 	private boolean drawing = false;
 	
 	private Point pointOnImage(Point clicked) {
@@ -78,80 +76,41 @@ public class BallTestView extends ViewParent {
 		this.display = this.displayedLog.blocks.get(0).parseAsYUVImage().toBufferedImage();
 		
 		this.addMouseListener(new MouseAdapter(){
-			// @Override
-			// public void mouseClicked(MouseEvent e) {
-			// 	Point where = pointOnImage(e.getPoint());
-			// 	if (where != null) {
-			// 		JsonArray balls = new JsonArray();
-			// 		JsonObject ball = new JsonObject();
-					
-			// 		ball.put(BALL_IMG_X_KEY, where.x);
-			// 		ball.put(BALL_IMG_Y_KEY, where.y);
-			// 		balls.add(ball);
-					
-			// 		displayedLog.topLevelDictionary.put(BALLS_KEY, balls);
-			// 		repaint();
-			// 	}
-			// }
-
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if(!drawing) {
 					Point where = pointOnImage(e.getPoint());
 					if(where != null) {	
-						System.out.println("Pressed: "+where.x+", "+where.y);
-
-						current_ball = new Ellipse2D.Double(where.x, where.y, 0, 0);
+						pressed_point = where;
 						drawing = true;
 						repaint();
 					}
 				}
-			} 
-
-			// @Override
-			// public void mouseDragged(MouseEvent e) {
-			// 	if(drawing) {
-			// 		Point where = pointOnImage(e.getPoint());
-			// 		if(where != null) {
-			// 			double ball_width = where.x - current_ball.getX();
-			// 			double ball_height = where.y - current_ball.getY();
-
-			// 			current_ball.setFrame(current_ball.getX(), current_ball.getY(), ball_width, ball_height);
-			// 			repaint();
-			// 		}
-			// 	}
-			// }
+			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(drawing) {
 					Point where = pointOnImage(e.getPoint());
 					if(where != null) {
-						System.out.println("Released: "+where.x+", "+where.y);
-
-						int px = (int)current_ball.getX();
-						int py = (int)current_ball.getY();
+						int px = (int)pressed_point.x;
+						int py = (int)pressed_point.y;
 
 						int rx = (int)where.x;
 						int ry = (int)where.y;
 
 						Point origin = new Point();
-						origin.x = Math.min(px,rx)-5;
-						origin.y = Math.min(py,ry)-5;
+						origin.x = Math.min(px,rx);
+						origin.y = Math.min(py,ry);
 
-						System.out.println("Origin: "+origin.x+", "+origin.y);
-
-						double ball_width = Math.max(px,rx) - Math.min(px,rx) + 5;
-						double ball_height = Math.max(py,ry) - Math.min(py,ry) + 5;
-
-						current_ball = new Ellipse2D.Double(origin.x, origin.y, ball_width, ball_height);
+						double ball_width = Math.max(px,rx) - Math.min(px,rx);
+						double ball_height = Math.max(py,ry) - Math.min(py,ry);
 
 						JsonArray balls = new JsonArray();
 						JsonObject ball = new JsonObject();
 
 						double ball_center_x = origin.x + ball_width/2;
 						double ball_center_y = origin.y + ball_height/2;
-						//double ball_radius   = current_ball.getX() 
 
 						ball.put(BALL_IMG_X_COORD_KEY, (int)origin.x);
 						ball.put(BALL_IMG_Y_COORD_KEY, (int)origin.y);
@@ -161,10 +120,11 @@ public class BallTestView extends ViewParent {
 
 						ball.put(BALL_IMG_WIDTH_KEY, (int)ball_width);
 						ball.put(BALL_IMG_HEIGHT_KEY, (int)ball_height);
-						balls.add(ball);
 
+						balls.add(ball);
 						displayedLog.topLevelDictionary.put(BALLS_KEY, balls);
-						current_ball = null;
+
+						pressed_point = null;
 						drawing = false;
 						repaint();
 					}
