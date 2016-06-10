@@ -57,6 +57,8 @@ namespace whistle {
                     was_heard = false;
                 default:;
             }
+
+//            if (time(NULL) % 10 == 0) { close(whs_socket); close(man_socket); return NULL;}
         }
 
         return NULL;
@@ -64,7 +66,7 @@ namespace whistle {
 
     static inline void create_server() {
         NBL_WARN("whistle::create_server()");
-        pthread_t server_thread
+        pthread_t server_thread;
         pthread_create(&server_thread, NULL, server_loop, NULL);
         pthread_detach(server_thread);
     }

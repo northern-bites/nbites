@@ -100,8 +100,10 @@ namespace nbl {
         extern ioret connect_pipe( client_socket_t& sock, int port);
         extern ioret create_pipe(server_socket_t& server, int port);
 
-#ifdef OFFLINE
+#if defined(OFFLINE)
     #define NETIO_FLAGS 0
+#elif defined(NBL_STANDALONE)
+    #define NETIO_FLAGS (MSG_NOSIGNAL)
 #else
     #ifdef __APPLE__
         #define NETIO_FLAGS (MSG_DONTWAIT)

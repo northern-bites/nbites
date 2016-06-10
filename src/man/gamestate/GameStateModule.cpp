@@ -46,30 +46,11 @@ namespace man{
         start_time(0)
         {
             reset();
-
-            shared_memory_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
-            if (shared_memory_fd < 0) {
-                std::cout << "GameStateModule couldn't open shared fd!" << std::endl;
-                exit(0);
-            }
-
-            shared_memory = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
-                                                 PROT_READ | PROT_WRITE,
-                                                 MAP_SHARED, shared_memory_fd, 0);
-
-            if (shared_memory == MAP_FAILED) {
-                std::cout << "GameStateModule couldn't map to pointer!" << std::endl;
-                exit(0);
-            }
-
-            shared_memory->whistle_heard = false;
-            shared_memory->whistle_listen = false;
         }
 
         GameStateModule::~GameStateModule()
         {
-            munmap((void *)shared_memory, sizeof(SharedData));
-            close(shared_memory_fd);
+
         }
 
         void GameStateModule::run_()
