@@ -59,6 +59,9 @@ def afterPenalty(player):
         # Keep track of frames since player was penalized
         afterPenalty.frameCount = 0
 
+        # For debugging: keep track of the number of head pans.
+        afterPenalty.numOfPans = 0
+
     # Update number of frames since player entered
     afterPenalty.frameCount += 1
     vis = player.brain.vision
@@ -71,42 +74,40 @@ def afterPenalty(player):
 
     if afterPenalty.frameCount % 50 == 0:
 
-        ## LOOK RIGHT
+        # LOOK RIGHT
         if afterPenalty.lookRight:
             player.brain.tracker.lookToAngle(angle)
             if DEBUG_PENALTY_STATES:
-                print "Looking to my right!"
+                print "Looking to my right! Angle:", angle
+                print "I've seen the C-Corner", afterPenalty.cCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
+                print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
+                print "Cumulative horizon distance on this side is", afterPenalty.leftHorizSum
+
+        # LOOK LEFT
         else:
+            otherAngle = -1 * angle
             player.brain.tracker.lookToAngle(-1 * angle)
             if DEBUG_PENALTY_STATES:
-                print "Looking to my left!"
+                print "Looking to my left! Angle:", otherAngle
+                print "I've seen the C-Corner", afterPenalty.cCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
+                print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
+                print "Cumulative horizon distance on this side is", afterPenalty.rightHorizSum
 
-
-    if player.brain.tracker.isStopped() and afterPenalty.lookRight:
-        # Increment horizon distance
-        afterPenalty.rightHorizSum += vis.horizon_dist
-        # Count corners
-
-        if DEBUG_PENALTY_STATES:
-            print "Looking to the right!"
-            print "I've seen the C-Corner", afterPenalty.cCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
-            print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
-            print "Cumulative horizon distance on this side is", afterPenalty.rightHorizSum
-
-    elif player.brain.tracker.isStopped() and not afterPenalty.lookRight:
-        afterPenalty.leftHorizSum += vis.horizon_dist
+        afterPenalty.lookRight = not afterPenalty.lookRight
 
         if DEBUG_PENALTY_STATES:
-            print "Looking to the left and counting!"
-            print "I've seen the C-Corner", afterPenalty.cCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
-            print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
-            print "Cumulative horizon distance on this side is", afterPenalty.leftHorizSum
+            afterPenalty.numOfPans += 1
 
-    afterPenalty.lookRight = not afterPenalty.lookRight
+    if player.brain.tracker.isStopped():
+        if afterPenalty.lookRight:
+            afterPenalty.rightHorizSum += vis.horizon_dist
+        else:
+            afterPenalty.leftHorizSum += vis.horizon_dist
 
-    if afterPenalty.frameCount > 110:
+
+    if afterPenalty.frameCount > 300:
         print "Done checking horizons!"
-        return player.stay()
+        return player.goNow('walkout')
 
     ## ALTERNATE SOLUTION: LEAVE PENALTY AFTER COUNTERS REACH A CERTAIN NUMBER? --> not with negative counters
 
@@ -193,8 +194,7 @@ def afterPenalty(player):
     if afterPenalty.decidedSide:
         # TODO see if the goalie role affects this
         return player.goNow('walkOut')
-
-    return player.stay()
+    return player.goLater(player.gameState)
 
 @superState('gameControllerResponder')
 def manualPlacement(player):
