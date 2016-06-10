@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import nbtool.data.SExpr;
 import nbtool.data.group.AllGroups;
@@ -16,6 +17,7 @@ import nbtool.data.json.JsonArray;
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
 import nbtool.data.log.LogReference;
+import nbtool.gui.ToolMessage;
 import nbtool.gui.logviews.images.BallTestView;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
@@ -51,9 +53,25 @@ public class BallTestUtility extends UtilityParent {
 	}
 
 	private static Group topFalsePos = null;
+	private static Group requestTopFalsePos() { 
+		return (topFalsePos == null) ? (topFalsePos = Group.groupNamed("TOP False Positives:")) : topFalsePos;
+	}
+	
 	private static Group topFalseNeg = null;
+	private static Group requestTopFalseNeg() { 
+		return (topFalseNeg == null) ? (topFalseNeg = Group.groupNamed("TOP False Negatives:")) : topFalseNeg;
+	}
+	
 	private static Group botFalsePos = null;
+	private static Group requestBotFalsePos() { 
+		return (botFalsePos == null) ? (botFalsePos = Group.groupNamed("BOT False Positives:")) : botFalsePos;
+	}
+	
 	private static Group botFalseNeg = null;
+	private static Group requestBotFalseNeg() { 
+		return (botFalseNeg == null) ? (botFalseNeg = Group.groupNamed("TOP False Negatives:")) : botFalseNeg;
+	}
+	
 
 	private static int outstanding = 0;
 	
@@ -62,7 +80,7 @@ public class BallTestUtility extends UtilityParent {
 		ImageBall(int _x, int _y) {this.x = _x; this.y = _y;}
 	}
 
-	private static void analyze(Log out, boolean top) {
+	private static void analyze(LogReference from, boolean top, Log out) {
 		assert(out.logClass.equals("VisionReturn"));
 		assert(out.blocks.size() > 3);
 
@@ -89,11 +107,29 @@ public class BallTestUtility extends UtilityParent {
 		}
 		
 		if (actual.size() > found.size()) {
-			Debug.warn("false negative in %s!", top ? "top" : "bot");
+			Debug.warn("false NEGATIVE in %s! r%d found %d when annotations say %d", top ? "top" : "bot",
+					from.thisID, found.size(), actual.size());
+			
+			if (top) {
+				requestTopFalseNeg().logs.add(from);
+			} else {
+				requestBotFalseNeg().logs.add(from);
+			}
 		}
 		
 		if (actual.size() < found.size()) {
-			Debug.warn("false positive in %s!", top ? "top" : "bot");
+			Debug.warn("false POSITIVE in %s! r%d found %d when annotations say %d", top ? "top" : "bot",
+					from.thisID, found.size(), actual.size());
+			
+			if (top) {
+				requestTopFalsePos().logs.add(from);
+			} else {
+				requestTopFalsePos().logs.add(from);
+			}
+		}
+		
+		if (actual.size() == found.size()) {
+			//...
 		}
 	}
 	
@@ -102,36 +138,45 @@ public class BallTestUtility extends UtilityParent {
 	}
 
 	private static void finished() {
-		if (display == null) {
-			Debug.error("test finished but no display!");
-			return;
-		}
 		
-		if (topFalsePos != null) {
-			display.panel.topFalsePosLabel.setText(textFrom(topFalsePos));
-			Events.GGroupAdded.generate(display, topFalsePos);
-		}
+		SwingUtilities.invokeLater(new Runnable(){
 
-		if (topFalseNeg != null) {
-			display.panel.topFalseNegLabel.setText(textFrom(topFalseNeg));
-			Events.GGroupAdded.generate(display, topFalseNeg);
-		}
+			@Override
+			public void run() {
+				if (display == null) {
+					Debug.error("test finished but no display!");
+					return;
+				}
+				
+				if (topFalsePos != null) {
+					display.panel.topFalsePosLabel.setText(textFrom(topFalsePos));
+					Events.GGroupAdded.generate(display, topFalsePos);
+				}
 
-		if (botFalsePos != null) {
-			display.panel.botFalsePosLabel.setText(textFrom(botFalsePos));
-			Events.GGroupAdded.generate(display, botFalsePos);
-		}
+				if (topFalseNeg != null) {
+					display.panel.topFalseNegLabel.setText(textFrom(topFalseNeg));
+					Events.GGroupAdded.generate(display, topFalseNeg);
+				}
 
-		if (botFalseNeg != null) {
-			display.panel.botFalseNegLabel.setText(textFrom(botFalseNeg));
-			Events.GGroupAdded.generate(display, botFalseNeg);
-		}
+				if (botFalsePos != null) {
+					display.panel.botFalsePosLabel.setText(textFrom(botFalsePos));
+					Events.GGroupAdded.generate(display, botFalsePos);
+				}
+
+				if (botFalseNeg != null) {
+					display.panel.botFalseNegLabel.setText(textFrom(botFalseNeg));
+					Events.GGroupAdded.generate(display, botFalseNeg);
+				}
+			}
+		});
 	}
 
 	private static class TestResponder implements IOFirstResponder {
 
-		boolean top;
-		TestResponder(boolean t) { this.top = t; }
+		boolean top; LogReference from;
+		TestResponder(boolean t, LogReference from) {
+			this.top = t; this.from = from;
+		}
 
 		@Override
 		public void ioFinished(IOInstance instance) {}
@@ -139,7 +184,7 @@ public class BallTestUtility extends UtilityParent {
 		@Override
 		public void ioReceived(IOInstance inst, int ret, Log... out) {
 			--outstanding;
-			analyze(out[0], top);
+			analyze(from, top, out[0]);
 
 			if (outstanding == 0) finished();
 		}
@@ -149,10 +194,10 @@ public class BallTestUtility extends UtilityParent {
 			return false;
 		}
 
-		static TestResponder get(boolean top) { return new TestResponder(top); }
+		static TestResponder get(boolean top, LogReference from) { return new TestResponder(top, from); }
 	}
 
-	private static void runTest(Log log, boolean top) {
+	private static void runTest(LogReference ref, boolean top) {
 		CrossInstance ci = CrossServer.instanceByIndex(0);
 		if (ci == null) {
 			Debug.error("nbcross crashed during ball test!");
@@ -160,29 +205,35 @@ public class BallTestUtility extends UtilityParent {
 		}
 
 		++outstanding;
-		ci.tryAddCall(TestResponder.get(top), "Vision", log);
+		ci.tryAddCall(TestResponder.get(top, ref), "Vision", ref.get());
 	}
 
 	private static void runTests() {
 		List<LogReference> found_top = new LinkedList<>();
 		List<LogReference> found_bot = new LinkedList<>();
-		int tripoint = 0;
+		int tp_top = 0, tp_bot = 0;
 
 		for (Group group : AllGroups.allGroups) {
 			for (LogReference ref : group.logs) {
 
 				if (ref.logClass.equals(
 						SharedConstants.LogClass_Tripoint()) ) {
-					++tripoint;
+					
+					boolean top = ref.description.contains("camera_TOP");
+					
+					if (top) {
+						++tp_top;
+					} else {
+						++tp_bot;
+					}
 					
 					if (ref.description.contains(BallTestView.BALLS_KEY)) 
 					{	
-						if (ref.description.contains("camera_TOP")) {
+						if (top) {
 							found_top.add(ref);
 						} else {
 							found_bot.add(ref);
 						}
-
 					}
 				}
 			}
@@ -194,18 +245,18 @@ public class BallTestUtility extends UtilityParent {
 
 		if (display != null)
 			display.panel.usedLabel.setText(
-					String.format("used %d top, %d bot logs of %d total tripoint", 
-							found_top.size(), found_bot.size(), tripoint)
+					String.format("used %d of %d top, %d of %d bot logs of %d total tripoint", 
+							found_top.size(), tp_top, found_bot.size(), tp_bot, tp_top + tp_bot)
 					);
 
 		if (ci == null) {
-			Debug.error("cannot test ball detection without nbcross.");
+			ToolMessage.displayError("cannot test ball detection without nbcross.");
 			return;
 		}
 
 		assert(outstanding == 0);
-		for (LogReference ref : found_top) runTest(ref.get(), true);
-		for (LogReference ref : found_bot) runTest(ref.get(), false);
+		for (LogReference ref : found_top) runTest(ref, true);
+		for (LogReference ref : found_bot) runTest(ref, false);
 	}
 
 	private static class Display extends JFrame {
