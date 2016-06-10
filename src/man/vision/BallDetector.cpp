@@ -451,11 +451,11 @@ bool BallDetector::findCorrelatedBlackSpots
                 double distance, upper, lower;
                 //IDEA: account for area and distance thresholds based on the camera?
                 if(topCamera) {
-                    lower = 9.5;
+                    lower = 9.5; //change from 9.5
                     upper = 17.2; //change from 14
                 } else {
-                    lower = 15.4; //change from 19.0
-                    upper = 23.0;
+                    lower = 9.4; //change from 19.0 //lower threshold because distance is smaller
+                    upper = 23.0; //when ball is in motion
                 }
 
                 distance = sqrt(pow((s2.ix() - s1.ix()),2) + pow((s2.iy() - s1.iy()),2));
@@ -463,7 +463,7 @@ bool BallDetector::findCorrelatedBlackSpots
 					std::cout<<"Distance: "<<distance<<std::endl;
 				}
 
-                if(distance > lower && distance < upper) {
+                if(distance >= lower && distance <= upper) {
 					if (debugBall) {
 						std::cout<<"Distance is in the right range"<<std::endl;
 					}
@@ -496,19 +496,24 @@ bool BallDetector::findCorrelatedBlackSpots
                 double area, upper, lower;
                 if(topCamera) {
                     upper = 181.1;
-                    lower = 70;
+                    lower = 70.0;
                 } else {
-                    upper = 210;
-                    lower = 55;
+                    upper = 210.0;
+                    lower = 22.0;
                 }
 
                 area = abs((s1.ix()*(s2.iy()-s3.iy()) + s2.ix()*(s3.iy()-s1.iy()) + s3.ix()*(s1.iy()-s2.iy()))/2);
-                if(area > lower && area < upper) {
+
+                if(debugBall) {
+                    std::cout<<"Area: "<<area<<std::endl;
+                }
+
+                if(area >= lower && area <= upper) {
                     ballSpotX = (s1.ix()+s2.ix()+s3.ix())/3;
                     ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
 
                     if (debugBall) {
-                        std::cout<<"Area: "<<area<<std::endl;
+                        std::cout<<"Area is in the right range"<<area<<std::endl;
                         debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
                     }
                     debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
