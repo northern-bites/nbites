@@ -18,7 +18,7 @@
 #include "utils/basic_maths.hpp"
 #include "utils/speech.hpp"
 #include "touch/FilteredTouch.hpp"
-
+// #include 
 
 namespace man 
 {
@@ -263,9 +263,9 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     sensors.sensors[Sensors::InertialSensor_GyrY] = sensorInertials.gyr_y();
  //    sensors.sensors[Sensors::InertialSensor_GyrZ] = sensorInertials.gyr_z(); // they don't use this
 
-    sensors.sensors[Sensors::InertialSensor_AccX] = sensorInertials.acc_x();
-    sensors.sensors[Sensors::InertialSensor_AccY] = sensorInertials.acc_y();
-    sensors.sensors[Sensors::InertialSensor_AccZ] = sensorInertials.acc_z();
+    sensors.sensors[Sensors::InertialSensor_AccX] = sensorInertials.acc_x() * 0.01;
+    sensors.sensors[Sensors::InertialSensor_AccY] = sensorInertials.acc_y() * 0.01;
+    sensors.sensors[Sensors::InertialSensor_AccZ] = sensorInertials.acc_z() * 0.01;
 
     // sensors.sensors[Sensors::InertialSensor_AngleX] = -RAD2DEG(sensorInertials.angle_x());
     // sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensorInertials.angle_y());
@@ -298,6 +298,45 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     	sensors.joints.angles[nb_joint_order[i]] = sensorAngles[i];
     }
 
+    // Ughhhh idk
+
+    // sensors.joints.angles[Joints::LShoulderPitch] = sensorAngles[];
+    // sensors.joints.angles[Joints::LShoulderRoll] = 0.0;
+    // sensors.joints.angles[Joints::LElbowYaw] = 0.0;
+    // sensors.joints.angles[Joints::LElbowRoll] = 0.0;
+    // sensors.joints.angles[Joints::LWristYaw] = 0.0;
+    // sensors.joints.angles[Joints::LHand] = 0.0;
+    
+    // sensors.joints.angles[Joints::LHipYawPitch] = 0.0;
+    // sensors.joints.angles[Joints::LHipRoll] = 0.0;
+    // sensors.joints.angles[Joints::LHipPitch] = 0.0;
+    // sensors.joints.angles[Joints::LKneePitch] = 0.0;
+    // sensors.joints.angles[Joints::LAnklePitch] = 0.0;
+    // sensors.joints.angles[Joints::LAnkleRoll] = 0.0;
+    
+    // sensors.joints.angles[Joints::RHipRoll] = 0.0;
+    // sensors.joints.angles[Joints::RHipPitch] = 0.0;
+    // sensors.joints.angles[Joints::RKneePitch] = 0.0;
+    // sensors.joints.angles[Joints::RAnklePitch] = 0.0;
+    // sensors.joints.angles[Joints::RAnkleRoll] = 0.0;
+
+    // sensors.joints.angles[Joints::RShoulderPitch] = 0.0;
+    // sensors.joints.angles[Joints::RShoulderRoll] = 0.0;
+    // sensors.joints.angles[Joints::RElbowYaw] = 0.0;
+    // sensors.joints.angles[Joints::RElbowRoll] = 0.0;
+    // sensors.joints.angles[Joints::RWristYaw] = 0.0;
+    // sensors.joints.angles[Joints::RHand] = 0.0;
+
+
+
+
+
+
+
+
+
+    // ughhh
+
     // ((FilteredTouch*)touch)->NBSetOptions();
 
     UNSWSensorValues filteredSensors = ((FilteredTouch*)touch)->getSensors(kinematics, sensors);
@@ -307,8 +346,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// sensors.sensors[Sensors::InertialSensor_GyrX] = filteredSensors.sensors[Sensors::InertialSensor_GyrX] * 0.01;
  //    sensors.sensors[Sensors::InertialSensor_GyrY] = filteredSensors.sensors[Sensors::InertialSensor_GyrY] * 0.01;
 
-	sensors.sensors[Sensors::InertialSensor_GyrX] = adjGyrX;
-    sensors.sensors[Sensors::InertialSensor_GyrY] = adjGyrY;
+	sensors.sensors[Sensors::InertialSensor_GyrX] = adjGyrX * 0.01;
+    sensors.sensors[Sensors::InertialSensor_GyrY] = adjGyrY * 0.01;
 
 
 	// TODO investigate calibrating sensors. . .
@@ -369,6 +408,11 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
     // THIS IS WHERE WE ACTUALLY SET THE NEXT JOINTS AND STIFFNESSES
     // Ignore the first chain bc it's the head
+
+    const float NOD_GYRO_RATIO = 0.04f;
+    // THIS is better off.... do not turn this adjustment thing on... makes it worse
+    float adjAngleX = 0.0; //adjGyrX * 0.01 * NOD_GYRO_RATIO;
+    float adjAngleY = 0.0; //adjGyrY * 0.01 * NOD_GYRO_RATIO;
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
     	std::vector<float> chain_angles;
     	std::vector<float> chain_hardness;
@@ -379,6 +423,32 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     			chain_angles.push_back(joints.angles[nb_joint_order[6]]);
     			// logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
     		} 
+    		// else if (nb_joint_order[j] == Joints::LHipPitch) {
+    		// 	logMsg("Special case! used nod gyro ratio for: " + Joints::jointNames[nb_joint_order[j]]);
+    		// 	std::cout << "adjAngleX: " << adjAngleX << " adjAngleY: " << adjAngleY << std::endl;
+    		// 	std::cout << "LHipPitch: " << joints.angles[nb_joint_order[j]] << std::endl;
+	    	// 	chain_angles.push_back(joints.angles[nb_joint_order[j]] + adjAngleX); // TODO I think this should be a lot more complicated than it seems right now...
+
+    		// }
+    		// else if (nb_joint_order[j] == Joints::RHipPitch) {
+    		// 	logMsg("Special case! used nod gyro ratio for: " + Joints::jointNames[nb_joint_order[j]]);
+	    	// 	chain_angles.push_back(joints.angles[nb_joint_order[j]] + adjAngleX);
+    		// 	std::cout << "RHipPitch: " << joints.angles[nb_joint_order[j]] << std::endl;
+    			
+    		// } 
+    		// else if (nb_joint_order[j] == Joints::LAnklePitch) {
+    		// 	logMsg("Special case! used nod gyro ratio for: " + Joints::jointNames[nb_joint_order[j]]);
+    		// 	std::cout << "adjAngleX: " << adjAngleX << " adjAngleY: " << adjAngleY << std::endl;
+    		// 	std::cout << "LAnklePitch: " << joints.angles[nb_joint_order[j]] << std::endl;
+	    	// 	chain_angles.push_back(joints.angles[nb_joint_order[j]] - adjAngleX); // TODO I think this should be a lot more complicated than it seems right now...
+
+    		// }
+    		// else if (nb_joint_order[j] == Joints::RAnklePitch) {
+    		// 	logMsg("Special case! used nod gyro ratio for: " + Joints::jointNames[nb_joint_order[j]]);
+	    	// 	chain_angles.push_back(joints.angles[nb_joint_order[j]] - adjAngleX);
+    		// 	std::cout << "RAnklePitch: " << joints.angles[nb_joint_order[j]] << std::endl;
+    			
+    		// }
     		else {
 	    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); // TODO I think this should be a lot more complicated than it seems right now...
     		}

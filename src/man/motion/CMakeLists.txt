@@ -28,6 +28,6 @@ target_link_libraries(motion
   portals
   messages
   support
-  #bhwalk
+#  bhwalk
   unswalk
 )

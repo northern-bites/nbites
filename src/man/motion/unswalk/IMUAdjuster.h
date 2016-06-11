@@ -1,3 +1,6 @@
+#include "utils/Kalman.h"
+#include "utils/RingBufferWithSum.h"
+// #include "utils/Vector3.h"
 
 namespace man
 {
@@ -10,7 +13,47 @@ public:
 	IMUAdjuster();
 	~IMUAdjuster();
 
-	static const int DONE = 300;
+	static const int DONE = 400;
+
+	typedef struct Vec3 {
+		float x;
+		float y;
+		float z;
+
+		Vec3(float _x, float _y, float _z) {
+			x = _x;
+			y = _y;
+			z = _z;
+		}
+
+		Vec3() { }
+	};
+
+	typedef struct Vec2 {
+		float x;
+		float y;
+
+		Vec2(float _x, float _y) {
+			x = _x;
+			y = _y;
+		}
+
+		Vec2() { }
+	};
+
+	Vec2 gyroBiasProcessNoise;
+	Vec2 gyroBiasStandMeasurementNoise;
+	Vec2 gyroBiasWalkMeasurementNoise;
+	Vec3 accBiasProcessNoise;
+	Vec3 accBiasStandMeasurementNoise;
+	Vec3 accBiasWalkMeasurementNoise;
+
+		
+	  Kalman<float> accXBias; /**< The calibration bias of accX. */
+	  Kalman<float> accYBias; /**< The calibration bias of accY. */
+	  Kalman<float> accZBias; /**< The calibration bias of accZ. */
+	  Kalman<float> gyroXBias; /**< The calibration bias of gyroX. */
+	  Kalman<float> gyroYBias; /**< The calibration bias of gyroY. */
 
 	float adjustGyrX(float gyro_value);
 	float adjustGyrY(float gyro_value);
@@ -41,6 +84,10 @@ public:
 
 	float getGyrXZero() { return old_gyro_zero_x; }
 	float getGyrYZero() { return old_gyro_zero_y; }
+
+
+    // RingBufferWithSumBH<Vector3BH<>, 300> accValues; *< Ringbuffer for collecting the acceleration sensor values of one walking phase or 1 secBH. 
+    // RingBufferWithSumBH<Vector2BH<>, 300> gyroValues; /**< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. */
 
 
 };
