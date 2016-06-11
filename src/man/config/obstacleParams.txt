@@ -12,23 +12,19 @@
     (left_sonar 0)
     (right_sonar 0)
   )
-  (avril
+  (buzz
     (left_sonar 0)
     (right_sonar 0)
   )
-  (ozzy
+  (wasp
     (left_sonar 0)
     (right_sonar 0)
   )
-  (beyonce
+  (elektra
     (left_sonar 0)
     (right_sonar 0)
   )
-  (ringo
-    (left_sonar 0)
-    (right_sonar 0)
-  )
-  (ringo
+  (blt
     (left_sonar 0)
     (right_sonar 0)
   )
