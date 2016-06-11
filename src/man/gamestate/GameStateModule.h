@@ -5,7 +5,7 @@
 #include "GameState.pb.h"
 #include "GCResponse.pb.h"
 
-#include "SharedData.h"
+#include "whistle.hpp"
 
 namespace man{
 namespace gamestate{
@@ -57,8 +57,7 @@ private:
     bool keep_time;
     long long start_time;
 
-    int shared_memory_fd;
-    volatile SharedData * shared_memory;
+    whistle::SharedMemory sharedMemory;
 
     typedef int game_state_t;
 

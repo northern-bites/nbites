@@ -102,8 +102,6 @@ namespace nbl {
 
 #if defined(OFFLINE)
     #define NETIO_FLAGS 0
-#elif defined(NBL_STANDALONE)
-    #define NETIO_FLAGS (MSG_NOSIGNAL)
 #else
     #ifdef __APPLE__
         #define NETIO_FLAGS (MSG_DONTWAIT)

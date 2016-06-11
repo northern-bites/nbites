@@ -5,7 +5,6 @@
 #include "RoboCupGameControlData.h"
 #include "Common.h"
 
-#include "exactio.h"
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -47,29 +46,19 @@ namespace man{
         {
             reset();
 
-            shared_memory_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
-            if (shared_memory_fd < 0) {
-                std::cout << "GameStateModule couldn't open shared fd!" << std::endl;
-                exit(0);
+            if (!sharedMemory.open()) {
+                NBL_ERROR("GameStateModule could not open shared memory!");
+                man::tts::say(IN_GAME, "game state module could not open shared memory");
             }
 
-            shared_memory = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
-                                                 PROT_READ | PROT_WRITE,
-                                                 MAP_SHARED, shared_memory_fd, 0);
-
-            if (shared_memory == MAP_FAILED) {
-                std::cout << "GameStateModule couldn't map to pointer!" << std::endl;
-                exit(0);
-            }
-
-            shared_memory->whistle_heard = false;
-            shared_memory->whistle_listen = false;
+            //Don't use stop because whistle might not be running.
+            sharedMemory.whistle_listening() = false;
+            sharedMemory.whistle_heard() = false;
         }
 
         GameStateModule::~GameStateModule()
         {
-            munmap((void *)shared_memory, sizeof(SharedData));
-            close(shared_memory_fd);
+            if (sharedMemory.isOpen()) sharedMemory.close();
         }
 
         void GameStateModule::run_()
@@ -279,16 +268,15 @@ namespace man{
                 case STATE_READY: {
                     switch(next) {
                         case STATE_READY: {
-                            //NOP
+                            sharedMemory.gamestate_do_stop();
                         } break;
 
                         case STATE_SET: {
-                            shared_memory->whistle_listen = true;
+                            sharedMemory.gamestate_do_start();
                         } break;
                             
                         case STATE_PLAYING: {
-                            shared_memory->whistle_listen = false;
-                            shared_memory->whistle_heard = false;
+                            sharedMemory.gamestate_do_stop();
                         } break;
                     }
                 } break;
@@ -296,22 +284,22 @@ namespace man{
                 case STATE_SET: {
                     switch(next) {
                         case STATE_READY: {
-                            shared_memory->whistle_listen = false;
-                            shared_memory->whistle_heard = false;
+                            sharedMemory.gamestate_do_stop();
                         } break;
 
                         case STATE_SET: {
-                            shared_memory->whistle_listen = true;
-                            if (shared_memory->whistle_heard) {
-                                printf(":::: WHISTLE OVERRIDE ::::\n");
+                            bool heard = sharedMemory.gamestate_do_query();
+
+                            if (heard) {
+                                NBL_WARN("\n:::: WHISTLE OVERRIDE ::::\n\n");
+                                man::tts::say(IN_SCRIMMAGE, "whistle heard!");
                                 next = STATE_PLAYING;
                             }
                         } break;
                             
                         case STATE_PLAYING: {
-                            printf(":::: WHISTLE MISSED ::::\n");
-                            shared_memory->whistle_listen = false;
-                            shared_memory->whistle_heard = false;
+                            sharedMemory.gamestate_do_stop();
+                            man::tts::say(IN_SCRIMMAGE, "whistle missed!");
                         } break;
                     }
                 } break;
@@ -319,21 +307,19 @@ namespace man{
                 case STATE_PLAYING: {
                     switch(next) {
                         case STATE_READY: {
-                            shared_memory->whistle_listen = false;
-                            shared_memory->whistle_heard = false;
+                            sharedMemory.gamestate_do_stop();
                         } break;
 
                         case STATE_SET: {
-                            shared_memory->whistle_listen = true;
-                            if (shared_memory->whistle_heard) {
-                                printf(":::: WHISTLE OVERRIDE ::::\n");
+                            bool heard = sharedMemory.gamestate_do_query();
+                            if (heard) {
                                 next = STATE_PLAYING;
                             }
 
                         } break;
                             
                         case STATE_PLAYING: {
-                            shared_memory->whistle_listen = false;
+                            sharedMemory.gamestate_do_stop();
                         } break;
                     }
                 } break;

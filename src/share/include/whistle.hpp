@@ -1,38 +1,130 @@
 #ifndef WHISTLE_SHARE_H
 #define WHISTLE_SHARE_H
 
+#include <iostream>
+#include <cmath>
+#include <signal.h>
+
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/file.h>
+
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+
 #include "../logshare/utilities-pp.hpp"
-#include "../logshare/nblogio.h"
+#include "SharedData.h"
+#include "TextToSpeech.h"
 
 namespace whistle {
 
-    NBL_MAKE_ENUM_FULL(whistle_status, NOT_RUNNING, LISTENING, NOT_LISTENING, HEARD)
-    NBL_MAKE_ENUM_FULL(whistle_request, STOP, QUERY, START);
-
-    static inline const char * string_status(whistle_status status) {
-        return whistle_statusStrings[status];
-    }
-
-    static inline const char * string_request(whistle_request request) {
-        return whistle_requestStrings[request];
-    }
-
-    static const int PORT = 30005;
-
-    static inline whistle_status connect(whistle_request request) {
-        nbl::io::client_socket_t socket;
-        if ( nbl::io::connect_pipe(socket, PORT) ) {
-            return NOT_RUNNING;
+    class SharedMemory {
+        int shared_fd;
+        SharedData * shared;
+    public:
+        SharedMemory() {
+            shared_fd = 0;
+            shared = NULL;
         }
 
-        whistle_status from;
-        if (nbl::io::recv_exact(socket, 1, &from, 0)) NBL_ERROR("error recving from whistle");
-        if (nbl::io::send_exact(socket, 1, &request, 0)) NBL_ERROR("error sending to whistle");
+        bool open() {
+            shared_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
+            if (shared_fd < 0) {
+                NBL_ERROR("could not open shared memory file!")
+                return false;
+            }
 
-        printf("sent %s, got %s\n", string_request(request), string_status(from));
+            shared = (SharedData*) mmap(NULL, sizeof(SharedData),
+                                                 PROT_READ | PROT_WRITE,
+                                                 MAP_SHARED, shared_fd, 0);
 
-        return from;
-    }
+            if (shared == MAP_FAILED) {
+                NBL_ERROR("could not mmap shared memory file!")
+                return false;
+            }
+
+            return true;
+        }
+
+        bool isOpen() {
+            return (shared_fd > 0 && (shared != MAP_FAILED && shared));
+        }
+
+        void close() {
+            if (shared != MAP_FAILED && shared)
+                munmap((void *)shared, sizeof(SharedData));
+            if (shared_fd > 0)
+                ::close(shared_fd);
+        }
+
+        bool& whistle_listening() {
+            return shared->whistle_listen;
+        }
+
+        bool& whistle_heard() {
+            return shared->whistle_heard;
+        }
+
+        time_t& whistle_heartbeat() {
+            return shared->whistle_heartbeat;
+        }
+
+        void whistle_alive() {
+            shared->whistle_heartbeat = time(NULL);
+        }
+
+        bool gamestate_check_running() {
+            static time_t last_complain = 0;
+
+            double dt = difftime(time(NULL), whistle_heartbeat() );
+            if (dt > 5) {
+                NBL_WARN("gamestate hasn't heard from whistle for %lf seconds!", dt);
+
+                if (difftime(time(NULL), last_complain) > 10) {
+                    last_complain = time(NULL);
+                    man::tts::say(IN_SCRIMMAGE, "whistle is not running!");
+                }
+
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        bool gamestate_do_start() {
+            NBL_ASSERT(isOpen())
+            if (!gamestate_check_running()) {
+                return false;
+            }
+
+            whistle_heard() = false;
+            whistle_listening() = true;
+            return true;
+        }
+
+        bool gamestate_do_query() {
+            NBL_ASSERT(isOpen())
+            if (!gamestate_check_running()) {
+                return false;
+            }
+
+            bool heard = whistle_heard();
+            if (!heard) whistle_listening() = true;
+            return whistle_heard();
+        }
+
+        bool gamestate_do_stop() {
+            NBL_ASSERT(isOpen())
+            if (!gamestate_check_running()) {
+                return false;
+            }
+
+            whistle_heard() = false;
+            whistle_listening() = false;
+            return true;
+        }
+    };
 }
 
 #endif //WHISTLE_SHARE_H

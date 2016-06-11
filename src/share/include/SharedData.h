@@ -71,9 +71,11 @@ struct SharedData {
     uint8_t sit;
 
     char buffer[128];   //prevent c/c++ allowed copy of all structure fields when setting sit
-    uint8_t whistle_heard;
-    uint8_t whistle_listen;
-    int64_t whistle_heartbeat;
+    
+    bool whistle_heard;
+    bool whistle_listen;
+
+    time_t whistle_heartbeat;
 };
 
 
