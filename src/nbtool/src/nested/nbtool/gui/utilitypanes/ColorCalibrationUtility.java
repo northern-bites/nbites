@@ -1,6 +1,8 @@
 package nbtool.gui.utilitypanes;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -45,12 +47,7 @@ public class ColorCalibrationUtility extends UtilityParent {
 	public char preferredMemnonic() {
 		return 'c';
 	}
-
-	/* actual color code */
-	/***************************/
-	
-	
-	
+ 
 	/* GUI code */
 	/****************************/
 	
@@ -113,7 +110,7 @@ public class ColorCalibrationUtility extends UtilityParent {
 				panel.FuzzyVSpinnerGB
 		};
 		
-		private void updateNB() {
+		private void updateNB(ChangeEvent e) {
 			
 			ColorParam.Set set = new ColorParam.Set();
 			
@@ -142,32 +139,32 @@ public class ColorCalibrationUtility extends UtilityParent {
 			set.getBot().green.u_fuzzy_range = (double) panel.FuzzyUSliderGB.getValue();
 			set.getBot().green.v_fuzzy_range = (double) panel.FuzzyVSliderGB.getValue();
 	
-			set.getTop().white.uAtY0 = (double) panel.Y0USpinnerWT.getValue();
-			set.getTop().white.vAtY0 = (double) panel.Y0VSpinnerWT.getValue();
-			set.getTop().white.uAtY255 = (double) panel.Y255USpinnerWT.getValue();
-			set.getTop().white.vAtY255 = (double) panel.Y255VSpinnerWT.getValue();
-			set.getTop().white.u_fuzzy_range = (double) panel.FuzzyUSpinnerWT.getValue();
-			set.getTop().white.v_fuzzy_range = (double) panel.FuzzyVSpinnerWT.getValue();
-			set.getBot().white.uAtY0 = (double) panel.Y0USpinnerWB.getValue();
-			set.getBot().white.vAtY0 = (double) panel.Y0VSpinnerWB.getValue();
-			set.getBot().white.uAtY255 = (double) panel.Y255USpinnerWB.getValue();
-			set.getBot().white.vAtY255 = (double) panel.Y255VSpinnerWB.getValue();
-			set.getBot().white.u_fuzzy_range = (double) panel.FuzzyUSpinnerWB.getValue();
-			set.getBot().white.v_fuzzy_range = (double) panel.FuzzyVSpinnerWB.getValue();
-			set.getTop().green.uAtY0 = (double) panel.Y0USpinnerGT.getValue();
-			set.getTop().green.vAtY0 =  (double) panel.Y0VSpinnerGT.getValue();
-			set.getTop().green.uAtY255 = (double) panel.Y255USpinnerGT.getValue();
-			set.getTop().green.vAtY255 = (double) panel.Y255VSpinnerGT.getValue();
-			set.getTop().green.u_fuzzy_range = (double) panel.FuzzyUSpinnerGT.getValue();
-			set.getTop().green.v_fuzzy_range = (double) panel.FuzzyVSpinnerGT.getValue();
-			set.getBot().green.uAtY0 = (double) panel.Y0USpinnerGB.getValue();
-			set.getBot().green.vAtY0 = (double) panel.Y0VSpinnerGB.getValue();
-			set.getBot().green.uAtY255 = (double) panel.Y255USpinnerGB.getValue();
-			set.getBot().green.vAtY255 = (double) panel.Y255VSpinnerGB.getValue();
-			set.getBot().green.u_fuzzy_range = (double) panel.FuzzyUSpinnerGB.getValue();
-			set.getBot().green.v_fuzzy_range = (double) panel.FuzzyVSpinnerGB.getValue();
+			set.getTop().white.uAtY0 = (Integer) panel.Y0USpinnerWT.getValue();
+			set.getTop().white.vAtY0 = (Integer) panel.Y0VSpinnerWT.getValue();
+			set.getTop().white.uAtY255 = (Integer) panel.Y255USpinnerWT.getValue();
+			set.getTop().white.vAtY255 = (Integer) panel.Y255VSpinnerWT.getValue();
+			set.getTop().white.u_fuzzy_range = (Integer) panel.FuzzyUSpinnerWT.getValue();
+			set.getTop().white.v_fuzzy_range = (Integer) panel.FuzzyVSpinnerWT.getValue();
+			set.getBot().white.uAtY0 = (Integer) panel.Y0USpinnerWB.getValue();
+			set.getBot().white.vAtY0 = (Integer) panel.Y0VSpinnerWB.getValue();
+			set.getBot().white.uAtY255 = (Integer) panel.Y255USpinnerWB.getValue();
+			set.getBot().white.vAtY255 = (Integer) panel.Y255VSpinnerWB.getValue();
+			set.getBot().white.u_fuzzy_range = (Integer) panel.FuzzyUSpinnerWB.getValue();
+			set.getBot().white.v_fuzzy_range = (Integer) panel.FuzzyVSpinnerWB.getValue();
+			set.getTop().green.uAtY0 = (Integer) panel.Y0USpinnerGT.getValue();
+			set.getTop().green.vAtY0 =  (Integer) panel.Y0VSpinnerGT.getValue();
+			set.getTop().green.uAtY255 = (Integer) panel.Y255USpinnerGT.getValue();
+			set.getTop().green.vAtY255 = (Integer) panel.Y255VSpinnerGT.getValue();
+			set.getTop().green.u_fuzzy_range = (Integer) panel.FuzzyUSpinnerGT.getValue();
+			set.getTop().green.v_fuzzy_range = (Integer) panel.FuzzyVSpinnerGT.getValue();
+			set.getBot().green.uAtY0 = (Integer) panel.Y0USpinnerGB.getValue();
+			set.getBot().green.vAtY0 = (Integer) panel.Y0VSpinnerGB.getValue();
+			set.getBot().green.uAtY255 = (Integer) panel.Y255USpinnerGB.getValue();
+			set.getBot().green.vAtY255 = (Integer) panel.Y255VSpinnerGB.getValue();
+			set.getBot().green.u_fuzzy_range = (Integer) panel.FuzzyUSpinnerGB.getValue();
+			set.getBot().green.v_fuzzy_range = (Integer) panel.FuzzyVSpinnerGB.getValue();
 	
-			
+			Debug.print("Changing parameter: %s",e);
 		}
 		
 		private ChangeListener slideListener = new ChangeListener() {
@@ -177,7 +174,7 @@ public class ColorCalibrationUtility extends UtilityParent {
 				for (int i = 0; i < spinners.length; ++i) {
 					spinners[i].setValue( (Integer) sliders[i].getValue());
 				}
-				updateNB();
+				updateNB(e);
 			}
 		};
 		
@@ -188,7 +185,7 @@ public class ColorCalibrationUtility extends UtilityParent {
 				for (int i = 0; i < sliders.length; ++i) {
 					sliders[i].setValue( (Integer) spinners[i].getValue());
 				}
-				updateNB();
+				updateNB(e);
 			}
 			
 		};
@@ -277,6 +274,21 @@ public class ColorCalibrationUtility extends UtilityParent {
 			this.setContentPane(panel);
 			
 			this.setMinimumSize(new Dimension(600,200));
+			
+			this.panel.SendButtonGB = new JButton("Send")
+			this.panel.SendButtonGB.addActionListener("Send");
+			
+					
+					
+					new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					//TODO do
+					Debug.notRefactored();
+				}
+				
+			});
 			
 			for (JSlider slider : sliders) {
 				slider.setMaximum(255);

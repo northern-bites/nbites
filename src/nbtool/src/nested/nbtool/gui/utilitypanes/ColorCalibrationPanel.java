@@ -7,7 +7,7 @@ package nbtool.gui.utilitypanes;
 
 /**
  *
- * @author calini
+ * @author Cory Alini
  */
 public class ColorCalibrationPanel extends javax.swing.JPanel {
 
@@ -72,10 +72,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         FuzzyVMinText2 = new javax.swing.JLabel();
         FuzzyVMiddleText2 = new javax.swing.JLabel();
         FuzzyVMaxText2 = new javax.swing.JLabel();
-        UndoButtonW = new javax.swing.JButton();
-        SaveButtonW = new javax.swing.JButton();
-        SendButtonW = new javax.swing.JButton();
-        imagePanel2 = new javax.swing.JPanel();
+        UndoButtonWT = new javax.swing.JButton();
+        SaveButtonWT = new javax.swing.JButton();
+        SendButtonWT = new javax.swing.JButton();
+        imagePanelWT = new javax.swing.JPanel();
         JPanelGreenT = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanelY0G = new javax.swing.JPanel();
@@ -120,10 +120,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         FuzzyVMinText1 = new javax.swing.JLabel();
         FuzzyVMiddleText1 = new javax.swing.JLabel();
         FuzzyVMaxText1 = new javax.swing.JLabel();
-        UndoButtonG = new javax.swing.JButton();
-        SaveButtonG = new javax.swing.JButton();
-        SendButtonG = new javax.swing.JButton();
-        imagePanelG = new javax.swing.JPanel();
+        UndoButtonGT = new javax.swing.JButton();
+        SaveButtonGT = new javax.swing.JButton();
+        SendButtonGT = new javax.swing.JButton();
+        imagePanelGT = new javax.swing.JPanel();
         JPanelWhiteB = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanelY3 = new javax.swing.JPanel();
@@ -168,10 +168,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         FuzzyVMinText3 = new javax.swing.JLabel();
         FuzzyVMiddleText3 = new javax.swing.JLabel();
         FuzzyVMaxText3 = new javax.swing.JLabel();
-        UndoButtonW1 = new javax.swing.JButton();
-        SaveButtonW1 = new javax.swing.JButton();
-        SendButtonW1 = new javax.swing.JButton();
-        imagePanel3 = new javax.swing.JPanel();
+        UndoButtonWB = new javax.swing.JButton();
+        SaveButtonWB = new javax.swing.JButton();
+        SendButtonWB = new javax.swing.JButton();
+        imagePanelWB = new javax.swing.JPanel();
         JPanelGreenB = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanelY0G1 = new javax.swing.JPanel();
@@ -216,10 +216,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         FuzzyVMinText4 = new javax.swing.JLabel();
         FuzzyVMiddleText4 = new javax.swing.JLabel();
         FuzzyVMaxText4 = new javax.swing.JLabel();
-        UndoButtonG1 = new javax.swing.JButton();
-        SaveButtonG1 = new javax.swing.JButton();
-        SendButtonG1 = new javax.swing.JButton();
-        imagePanelG1 = new javax.swing.JPanel();
+        UndoButtonGB = new javax.swing.JButton();
+        SaveButtonGB = new javax.swing.JButton();
+        SendButtonGB = new javax.swing.JButton();
+        imagePanelGB = new javax.swing.JPanel();
 
         JPanelWhiteT.setBackground(new java.awt.Color(242, 242, 242));
         JPanelWhiteT.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "camera color calibration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("PT Serif", 1, 14))); // NOI18N
@@ -545,35 +545,35 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        UndoButtonW.setText("Undo");
-        UndoButtonW.addActionListener(new java.awt.event.ActionListener() {
+        UndoButtonWT.setText("Undo");
+        UndoButtonWT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                UndoButtonWActionPerformed(evt);
+                UndoButtonWTActionPerformed(evt);
             }
         });
 
-        SaveButtonW.setText("Save");
-        SaveButtonW.addActionListener(new java.awt.event.ActionListener() {
+        SaveButtonWT.setText("Save");
+        SaveButtonWT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SaveButtonWActionPerformed(evt);
+                SaveButtonWTActionPerformed(evt);
             }
         });
 
-        SendButtonW.setText("Send");
-        SendButtonW.addActionListener(new java.awt.event.ActionListener() {
+        SendButtonWT.setText("Send");
+        SendButtonWT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SendButtonWActionPerformed(evt);
+                SendButtonWTActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout imagePanel2Layout = new javax.swing.GroupLayout(imagePanel2);
-        imagePanel2.setLayout(imagePanel2Layout);
-        imagePanel2Layout.setHorizontalGroup(
-            imagePanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout imagePanelWTLayout = new javax.swing.GroupLayout(imagePanelWT);
+        imagePanelWT.setLayout(imagePanelWTLayout);
+        imagePanelWTLayout.setHorizontalGroup(
+            imagePanelWTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        imagePanel2Layout.setVerticalGroup(
-            imagePanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        imagePanelWTLayout.setVerticalGroup(
+            imagePanelWTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 376, Short.MAX_VALUE)
         );
 
@@ -585,13 +585,13 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(JPanelWhiteTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(imagePanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(imagePanelWT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelWhiteTLayout.createSequentialGroup()
-                        .addComponent(UndoButtonW, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(UndoButtonWT, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 672, Short.MAX_VALUE)
-                        .addComponent(SendButtonW, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(SendButtonWT, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SaveButtonW, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(SaveButtonWT, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         JPanelWhiteTLayout.setVerticalGroup(
@@ -600,12 +600,12 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addGap(19, 19, 19)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(imagePanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(imagePanelWT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(JPanelWhiteTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(SaveButtonW, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SendButtonW)
-                    .addComponent(UndoButtonW))
+                    .addComponent(SaveButtonWT, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SendButtonWT)
+                    .addComponent(UndoButtonWT))
                 .addContainerGap())
         );
 
@@ -935,35 +935,35 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        UndoButtonG.setText("Undo");
-        UndoButtonG.addActionListener(new java.awt.event.ActionListener() {
+        UndoButtonGT.setText("Undo");
+        UndoButtonGT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                UndoButtonGActionPerformed(evt);
+                UndoButtonGTActionPerformed(evt);
             }
         });
 
-        SaveButtonG.setText("Save");
-        SaveButtonG.addActionListener(new java.awt.event.ActionListener() {
+        SaveButtonGT.setText("Save");
+        SaveButtonGT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SaveButtonGActionPerformed(evt);
+                SaveButtonGTActionPerformed(evt);
             }
         });
 
-        SendButtonG.setText("Send");
-        SendButtonG.addActionListener(new java.awt.event.ActionListener() {
+        SendButtonGT.setText("Send");
+        SendButtonGT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SendButtonGActionPerformed(evt);
+                SendButtonGTActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout imagePanelGLayout = new javax.swing.GroupLayout(imagePanelG);
-        imagePanelG.setLayout(imagePanelGLayout);
-        imagePanelGLayout.setHorizontalGroup(
-            imagePanelGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout imagePanelGTLayout = new javax.swing.GroupLayout(imagePanelGT);
+        imagePanelGT.setLayout(imagePanelGTLayout);
+        imagePanelGTLayout.setHorizontalGroup(
+            imagePanelGTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        imagePanelGLayout.setVerticalGroup(
-            imagePanelGLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        imagePanelGTLayout.setVerticalGroup(
+            imagePanelGTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 376, Short.MAX_VALUE)
         );
 
@@ -975,13 +975,13 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(JPanelGreenTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(imagePanelG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(imagePanelGT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelGreenTLayout.createSequentialGroup()
-                        .addComponent(UndoButtonG, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(UndoButtonGT, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 672, Short.MAX_VALUE)
-                        .addComponent(SendButtonG, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(SendButtonGT, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SaveButtonG, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(SaveButtonGT, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         JPanelGreenTLayout.setVerticalGroup(
@@ -990,12 +990,12 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addGap(19, 19, 19)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(imagePanelG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(imagePanelGT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(JPanelGreenTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(SaveButtonG, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SendButtonG)
-                    .addComponent(UndoButtonG))
+                    .addComponent(SaveButtonGT, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SendButtonGT)
+                    .addComponent(UndoButtonGT))
                 .addContainerGap())
         );
 
@@ -1325,35 +1325,35 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        UndoButtonW1.setText("Undo");
-        UndoButtonW1.addActionListener(new java.awt.event.ActionListener() {
+        UndoButtonWB.setText("Undo");
+        UndoButtonWB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                UndoButtonW1ActionPerformed(evt);
+                UndoButtonWBActionPerformed(evt);
             }
         });
 
-        SaveButtonW1.setText("Save");
-        SaveButtonW1.addActionListener(new java.awt.event.ActionListener() {
+        SaveButtonWB.setText("Save");
+        SaveButtonWB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SaveButtonW1ActionPerformed(evt);
+                SaveButtonWBActionPerformed(evt);
             }
         });
 
-        SendButtonW1.setText("Send");
-        SendButtonW1.addActionListener(new java.awt.event.ActionListener() {
+        SendButtonWB.setText("Send");
+        SendButtonWB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SendButtonW1ActionPerformed(evt);
+                SendButtonWBActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout imagePanel3Layout = new javax.swing.GroupLayout(imagePanel3);
-        imagePanel3.setLayout(imagePanel3Layout);
-        imagePanel3Layout.setHorizontalGroup(
-            imagePanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout imagePanelWBLayout = new javax.swing.GroupLayout(imagePanelWB);
+        imagePanelWB.setLayout(imagePanelWBLayout);
+        imagePanelWBLayout.setHorizontalGroup(
+            imagePanelWBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        imagePanel3Layout.setVerticalGroup(
-            imagePanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        imagePanelWBLayout.setVerticalGroup(
+            imagePanelWBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 376, Short.MAX_VALUE)
         );
 
@@ -1365,13 +1365,13 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(JPanelWhiteBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(imagePanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(imagePanelWB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelWhiteBLayout.createSequentialGroup()
-                        .addComponent(UndoButtonW1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(UndoButtonWB, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 672, Short.MAX_VALUE)
-                        .addComponent(SendButtonW1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(SendButtonWB, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SaveButtonW1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(SaveButtonWB, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         JPanelWhiteBLayout.setVerticalGroup(
@@ -1380,12 +1380,12 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addGap(19, 19, 19)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(imagePanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(imagePanelWB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(JPanelWhiteBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(SaveButtonW1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SendButtonW1)
-                    .addComponent(UndoButtonW1))
+                    .addComponent(SaveButtonWB, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SendButtonWB)
+                    .addComponent(UndoButtonWB))
                 .addContainerGap())
         );
 
@@ -1715,35 +1715,35 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        UndoButtonG1.setText("Undo");
-        UndoButtonG1.addActionListener(new java.awt.event.ActionListener() {
+        UndoButtonGB.setText("Undo");
+        UndoButtonGB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                UndoButtonG1ActionPerformed(evt);
+                UndoButtonGBActionPerformed(evt);
             }
         });
 
-        SaveButtonG1.setText("Save");
-        SaveButtonG1.addActionListener(new java.awt.event.ActionListener() {
+        SaveButtonGB.setText("Save");
+        SaveButtonGB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SaveButtonG1ActionPerformed(evt);
+                SaveButtonGBActionPerformed(evt);
             }
         });
 
-        SendButtonG1.setText("Send");
-        SendButtonG1.addActionListener(new java.awt.event.ActionListener() {
+        SendButtonGB.setText("Send");
+        SendButtonGB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SendButtonG1ActionPerformed(evt);
+                SendButtonGBActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout imagePanelG1Layout = new javax.swing.GroupLayout(imagePanelG1);
-        imagePanelG1.setLayout(imagePanelG1Layout);
-        imagePanelG1Layout.setHorizontalGroup(
-            imagePanelG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout imagePanelGBLayout = new javax.swing.GroupLayout(imagePanelGB);
+        imagePanelGB.setLayout(imagePanelGBLayout);
+        imagePanelGBLayout.setHorizontalGroup(
+            imagePanelGBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        imagePanelG1Layout.setVerticalGroup(
-            imagePanelG1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        imagePanelGBLayout.setVerticalGroup(
+            imagePanelGBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 376, Short.MAX_VALUE)
         );
 
@@ -1755,13 +1755,13 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(JPanelGreenBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(imagePanelG1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(imagePanelGB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelGreenBLayout.createSequentialGroup()
-                        .addComponent(UndoButtonG1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(UndoButtonGB, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 672, Short.MAX_VALUE)
-                        .addComponent(SendButtonG1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(SendButtonGB, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SaveButtonG1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(SaveButtonGB, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         JPanelGreenBLayout.setVerticalGroup(
@@ -1770,12 +1770,12 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
                 .addGap(19, 19, 19)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(imagePanelG1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(imagePanelGB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(JPanelGreenBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(SaveButtonG1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SendButtonG1)
-                    .addComponent(UndoButtonG1))
+                    .addComponent(SaveButtonGB, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SendButtonGB)
+                    .addComponent(UndoButtonGB))
                 .addContainerGap())
         );
 
@@ -1793,51 +1793,51 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>                        
 
-    private void UndoButtonGActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
-    }                                           
-
-    private void SaveButtonGActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
-    }                                           
-
-    private void SendButtonGActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
-    }                                           
-
-    private void UndoButtonWActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
-    }                                           
-
-    private void SaveButtonWActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
-    }                                           
-
-    private void SendButtonWActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
-    }                                           
-
-    private void UndoButtonW1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void UndoButtonGTActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
     }                                            
 
-    private void SaveButtonW1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void SaveButtonGTActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
     }                                            
 
-    private void SendButtonW1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void SendButtonGTActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
     }                                            
 
-    private void UndoButtonG1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void UndoButtonWTActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
     }                                            
 
-    private void SaveButtonG1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void SaveButtonWTActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
     }                                            
 
-    private void SendButtonG1ActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void SendButtonWTActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void UndoButtonWBActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void SaveButtonWBActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void SendButtonWBActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void UndoButtonGBActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void SaveButtonGBActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
+
+    private void SendButtonGBActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
     }                                            
 
@@ -1899,18 +1899,18 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
     protected javax.swing.JPanel JPanelGreenT;
     protected javax.swing.JPanel JPanelWhiteB;
     protected javax.swing.JPanel JPanelWhiteT;
-    protected javax.swing.JButton SaveButtonG;
-    protected javax.swing.JButton SaveButtonG1;
-    protected javax.swing.JButton SaveButtonW;
-    protected javax.swing.JButton SaveButtonW1;
-    protected javax.swing.JButton SendButtonG;
-    protected javax.swing.JButton SendButtonG1;
-    protected javax.swing.JButton SendButtonW;
-    protected javax.swing.JButton SendButtonW1;
-    protected javax.swing.JButton UndoButtonG;
-    protected javax.swing.JButton UndoButtonG1;
-    protected javax.swing.JButton UndoButtonW;
-    protected javax.swing.JButton UndoButtonW1;
+    protected javax.swing.JButton SaveButtonGB;
+    protected javax.swing.JButton SaveButtonGT;
+    protected javax.swing.JButton SaveButtonWB;
+    protected javax.swing.JButton SaveButtonWT;
+    protected javax.swing.JButton SendButtonGB;
+    protected javax.swing.JButton SendButtonGT;
+    protected javax.swing.JButton SendButtonWB;
+    protected javax.swing.JButton SendButtonWT;
+    protected javax.swing.JButton UndoButtonGB;
+    protected javax.swing.JButton UndoButtonGT;
+    protected javax.swing.JButton UndoButtonWB;
+    protected javax.swing.JButton UndoButtonWT;
     protected javax.swing.JLabel Y0Text2;
     protected javax.swing.JLabel Y0Text3;
     protected javax.swing.JLabel Y0TextG;
@@ -1991,10 +1991,10 @@ public class ColorCalibrationPanel extends javax.swing.JPanel {
     protected javax.swing.JLabel Y255VText2;
     protected javax.swing.JLabel Y255VText3;
     protected javax.swing.JLabel Y255VText4;
-    protected javax.swing.JPanel imagePanel2;
-    protected javax.swing.JPanel imagePanel3;
-    protected javax.swing.JPanel imagePanelG;
-    protected javax.swing.JPanel imagePanelG1;
+    protected javax.swing.JPanel imagePanelGB;
+    protected javax.swing.JPanel imagePanelGT;
+    protected javax.swing.JPanel imagePanelWB;
+    protected javax.swing.JPanel imagePanelWT;
     protected javax.swing.JLabel jLabel10;
     protected javax.swing.JLabel jLabel11;
     protected javax.swing.JLabel jLabel12;

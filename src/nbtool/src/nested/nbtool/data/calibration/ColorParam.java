@@ -55,6 +55,13 @@ public class ColorParam {
 		public ColorParam white;
 		public ColorParam black;
 		
+		public Camera () {
+			super();
+			this.green = new ColorParam();
+			this.white = new ColorParam();
+			this.black = new ColorParam();
+		}
+		
 		public static Camera parse(JsonObject params) {
 			Camera camera = new Camera();
 			camera.green = ColorParam.parse(params.get("green").asObject(), "green");
@@ -74,7 +81,13 @@ public class ColorParam {
 	
 	public static class Set {
 		public Camera[] cameras = new Camera[2];
-		
+
+		public Set () {
+			super();
+			cameras[0] = new Camera();
+			cameras[1] = new Camera();
+			
+		}
 		public Camera getTop() {return cameras[0];}
 		public Camera getBot() {return cameras[1];}
 		
