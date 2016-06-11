@@ -358,7 +358,7 @@ bool BallDetector::findCorrelatedBlackSpots
     int correlatedTo[blackSpots.size()][blackSpots.size()];
     bool foundThree = false;
     // loop through filtered black blobs
-    for (int i = 0; i < blackSpots.size(); i++) {
+    for (int i = 0; i < blackSpots.size()-1; i++) {
         std::pair<int,int> p = blackSpots[i];
         // initialize the correlations for this blob
         correlations[i] = 0;
@@ -366,7 +366,7 @@ bool BallDetector::findCorrelatedBlackSpots
             correlatedTo[i][k] = 0;
         }
         // we're going to check against all other black blobs
-        for (int j = 0; j < blackSpots.size(); j++) {
+        for (int j = i+1; j < blackSpots.size(); j++) {
             std::pair<int,int> q = blackSpots[j];
             if (blobsAreClose(p, q)) {
                 correlations[i] += 1;
