@@ -6,6 +6,7 @@
 #error "Boss must be able to share mutexes between processes"
 #endif
 
+#ifndef WHISTLE_COMPILE
 #include "PMotion.pb.h"
 #include "ButtonState.pb.h"
 #include "InertialState.pb.h"
@@ -17,13 +18,15 @@
 #include "LedCommand.pb.h"
 
 #include "serializer.h"
+#endif
 
 static const char * NBITES_MEM = "/nbites-memory";
 static const int COMMAND_SIZE = (1 << 11);
 static const int SENSOR_SIZE = (1 << 10);
 
-static const int BOSS_VERSION = 11;
+static const int BOSS_VERSION = 12;
 
+#ifndef WHISTLE_COMPILE
 struct JointCommand {
     int64_t writeIndex;
     messages::JointAngles jointsCommand;
@@ -43,6 +46,8 @@ struct SensorValues {
     messages::BatteryState battery;
     messages::StiffStatus stiffStatus;
 };
+
+#endif
 
 struct SharedData {
     uint8_t sensors[SENSOR_SIZE];
@@ -64,6 +69,11 @@ struct SharedData {
     int64_t latestCommandRead;
     
     uint8_t sit;
+
+    char buffer[128];   //prevent c/c++ allowed copy of all structure fields when setting sit
+    uint8_t whistle_heard;
+    uint8_t whistle_listen;
+    int64_t whistle_heartbeat;
 };
 
 

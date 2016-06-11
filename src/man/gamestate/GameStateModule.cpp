@@ -5,6 +5,7 @@
 #include "RoboCupGameControlData.h"
 #include "Common.h"
 
+#include "exactio.h"
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -27,9 +28,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "whistle.hpp"
-#include "TextToSpeech.h"
-
 namespace man{
     namespace gamestate{
 
@@ -48,11 +46,30 @@ namespace man{
         start_time(0)
         {
             reset();
+
+            shared_memory_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
+            if (shared_memory_fd < 0) {
+                std::cout << "GameStateModule couldn't open shared fd!" << std::endl;
+                exit(0);
+            }
+
+            shared_memory = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
+                                                 PROT_READ | PROT_WRITE,
+                                                 MAP_SHARED, shared_memory_fd, 0);
+
+            if (shared_memory == MAP_FAILED) {
+                std::cout << "GameStateModule couldn't map to pointer!" << std::endl;
+                exit(0);
+            }
+
+            shared_memory->whistle_heard = false;
+            shared_memory->whistle_listen = false;
         }
 
         GameStateModule::~GameStateModule()
         {
-
+            munmap((void *)shared_memory, sizeof(SharedData));
+            close(shared_memory_fd);
         }
 
         void GameStateModule::run_()
@@ -256,33 +273,22 @@ namespace man{
             latest_data.set_kick_off_team(latest_data.kick_off_team() ? team_number : team_number+1);
         }
 
-        whistle::whistle_status connect_wrap(whistle::whistle_request req) {
-            whistle::whistle_status stt = whistle::connect(req);
-            if (!stt) {
-                NBL_ERROR("GameStateModule could not connect to whistle!");
-                man::tts::say(IN_SCRIMMAGE, "game state could not connect to whistle");
-            }
-
-            return stt;
-        }
-
         void GameStateModule::whistleHandler(game_state_t last, game_state_t& next) {
-
-            latest_data.set_whistle_override(false);
 
             switch(last) {
                 case STATE_READY: {
                     switch(next) {
                         case STATE_READY: {
-                            connect_wrap(whistle::STOP);
+                            //NOP
                         } break;
 
                         case STATE_SET: {
-                            connect_wrap(whistle::START);
+                            shared_memory->whistle_listen = true;
                         } break;
                             
                         case STATE_PLAYING: {
-                            connect_wrap(whistle::STOP);
+                            shared_memory->whistle_listen = false;
+                            shared_memory->whistle_heard = false;
                         } break;
                     }
                 } break;
@@ -290,23 +296,22 @@ namespace man{
                 case STATE_SET: {
                     switch(next) {
                         case STATE_READY: {
-                            connect_wrap(whistle::STOP);
+                            shared_memory->whistle_listen = false;
+                            shared_memory->whistle_heard = false;
                         } break;
 
                         case STATE_SET: {
-                            whistle::whistle_status stt = connect_wrap(whistle::QUERY);
-                            if (stt == whistle::HEARD) {
-                                printf(":::: WHISTLE OVERRIDE :::: (FIRST)\n");
-                                latest_data.set_whistle_override(true);
+                            shared_memory->whistle_listen = true;
+                            if (shared_memory->whistle_heard) {
+                                printf(":::: WHISTLE OVERRIDE ::::\n");
                                 next = STATE_PLAYING;
-                                man::tts::say(IN_SCRIMMAGE, "whistle heard");
                             }
                         } break;
                             
                         case STATE_PLAYING: {
-                            NBL_ERROR(":::: WHISTLE MISSED ::::\n");
-                            connect_wrap(whistle::STOP);
-                            man::tts::say(IN_SCRIMMAGE, "whistle missed");
+                            printf(":::: WHISTLE MISSED ::::\n");
+                            shared_memory->whistle_listen = false;
+                            shared_memory->whistle_heard = false;
                         } break;
                     }
                 } break;
@@ -314,21 +319,21 @@ namespace man{
                 case STATE_PLAYING: {
                     switch(next) {
                         case STATE_READY: {
-                            connect_wrap(whistle::STOP);
+                            shared_memory->whistle_listen = false;
+                            shared_memory->whistle_heard = false;
                         } break;
 
                         case STATE_SET: {
-                            whistle::whistle_status stt = connect_wrap(whistle::QUERY);
-                            if (stt == whistle::HEARD) {
-//                                printf(":::: WHISTLE OVERRIDE :::: (RE)\n");
-                                latest_data.set_whistle_override(true);
+                            shared_memory->whistle_listen = true;
+                            if (shared_memory->whistle_heard) {
+                                printf(":::: WHISTLE OVERRIDE ::::\n");
                                 next = STATE_PLAYING;
                             }
 
                         } break;
                             
                         case STATE_PLAYING: {
-                            connect_wrap(whistle::STOP);
+                            shared_memory->whistle_listen = false;
                         } break;
                     }
                 } break;
