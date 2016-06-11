@@ -28,6 +28,7 @@
 #include <fcntl.h>
 
 #include "whistle.hpp"
+#include "TextToSpeech.h"
 
 namespace man{
     namespace gamestate{
@@ -259,6 +260,7 @@ namespace man{
             whistle::whistle_status stt = whistle::connect(req);
             if (!stt) {
                 NBL_ERROR("GameStateModule could not connect to whistle!");
+                man::tts::say(IN_SCRIMMAGE, "game state could not connect to whistle");
             }
 
             return stt;
@@ -297,12 +299,14 @@ namespace man{
                                 printf(":::: WHISTLE OVERRIDE :::: (FIRST)\n");
                                 latest_data.set_whistle_override(true);
                                 next = STATE_PLAYING;
+                                man::tts::say(IN_SCRIMMAGE, "whistle heard");
                             }
                         } break;
                             
                         case STATE_PLAYING: {
                             NBL_ERROR(":::: WHISTLE MISSED ::::\n");
                             connect_wrap(whistle::STOP);
+                            man::tts::say(IN_SCRIMMAGE, "whistle missed");
                         } break;
                     }
                 } break;
