@@ -770,14 +770,14 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	debugBlackSpots.clear();
 	debugWhiteSpots.clear();
 
-	int horiz = 0;
-	if (topCamera) {
-		horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
-	}
-	ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
-							 height - horiz);
-	ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
-							 height - horiz);
+	// int horiz = 0;
+	// if (topCamera) {
+	// 	horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
+	// }
+	// ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
+	// 						 height - horiz);
+	// ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
+	// 						 height - horiz);
 
     SpotDetector spots;
     spots.darkSpot(true);
@@ -788,7 +788,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     spots.filterThreshold(150);
     spots.greenThreshold(60);
     spots.filterGain(0.5);
-    spots.spotDetect(smallerY, homography, &smallerGreen);
+    // spots.spotDetect(smallerY, homography, &smallerGreen);
+    spots.spotDetect(yImage, homography, &greenImage);
     SpotList spotter = spots.spots();
     for (auto i = spotter.begin(); i != spotter.end(); i++) {
         // convert back to raw coordinates
@@ -874,7 +875,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     whitespots.filterThreshold(140);
     whitespots.greenThreshold(70);
     whitespots.filterGain(0.5);
-    whitespots.spotDetect(smallerY, homography, &smallerGreen);
+    // whitespots.spotDetect(smallerY, homography, &smallerGreen);
+    whitespots.spotDetect(yImage, homography, &greenImage);
     SpotList whitespotter = whitespots.spots();
     for (auto i = whitespotter.begin(); i != whitespotter.end(); i++) {
         int midX = (*i).ix() + width / 2;
