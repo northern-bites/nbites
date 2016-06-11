@@ -23,6 +23,10 @@ import nbtool.util.SharedConstants;
 public class BehaviorsView extends ViewParent {
 	
 	Behaviors be;
+	static ArrayList<String> brunswickHistory = new ArrayList<String>();
+	static ArrayList<String> headTrackerHistory = new ArrayList<String>();
+	static ArrayList<String> navigatorHistory = new ArrayList<String>();
+	
 
 	@Override
 	public void setupDisplay() {
@@ -35,12 +39,40 @@ public class BehaviorsView extends ViewParent {
 	}
 
 	public void paintComponent(Graphics g) {
+
 		super.paintComponent(g);
 
 		try{
 			be = Behaviors.parseFrom(displayedLog.blocks.get(0).data);
 		} catch(Exception e) {
 			e.printStackTrace();
+		}
+
+		if (this.brunswickHistory.size() == 0 || !this.brunswickHistory.get(0).equals(be.getGcstatestr())) {
+			this.brunswickHistory.add(0, be.getGcstatestr());
+		}
+
+		if (this.headTrackerHistory.size() == 0 || !this.headTrackerHistory.get(0).equals(be.getHeadtrackerstr())) {
+			this.headTrackerHistory.add(0, be.getHeadtrackerstr());
+		}
+
+		if (this.navigatorHistory.size() == 0 || !this.navigatorHistory.get(0).equals(be.getNavigatorstr())) {
+			this.navigatorHistory.add(0, be.getNavigatorstr());
+		}
+
+		// This part assumes we're only going to be adding one thing to any
+		// arraylist per frame, which is a hella dangerous assumption to make.
+		// But I don't want to change it rn.
+		if (brunswickHistory.size() > 20) {
+			brunswickHistory.remove(20);
+		}
+
+		if (headTrackerHistory.size() > 20) {
+			headTrackerHistory.remove(20);
+		}
+
+		if (navigatorHistory.size() > 20) {
+			navigatorHistory.remove(20);
 		}
 
 		Graphics2D g2d = (Graphics2D) g;
@@ -108,8 +140,7 @@ public class BehaviorsView extends ViewParent {
 		int gcStateWidth = pageWidth / gcStateStrs.length;
 
 		for (int i=0; i<gcStateStrs.length; i++) {
-			if(be.getGcstatestr() == "gameInitial") {
-				g.drawString("YES", 100, 100);
+			if(be.getGcstatestr().equals(gcStates[i])) {
 				g.setColor(gcStrColors[i]);
 			}
 
@@ -127,6 +158,26 @@ public class BehaviorsView extends ViewParent {
 		g.drawString(be.getHeadtrackerstr(), 150, 170);
 		g.drawString(be.getNavigatorstr(), 150, 190);
 
+		
+
+		g.drawString("brunswickHistory (" + brunswickHistory.size() + ")", 300, 140);
+		g.drawString("headTrackerHistory (" + headTrackerHistory.size() + ")", 500, 140);
+		g.drawString("navigatorHistory (" + navigatorHistory.size() + ")", 700, 140);
+
+		g.setFont(info);
+
+		for (int i=0; i<this.brunswickHistory.size(); i++) {
+			g.drawString(this.brunswickHistory.get(i), 300, 150 + 10*i);
+		}
+
+		for(int i=0; i<this.headTrackerHistory.size(); i++) {
+			g.drawString(this.headTrackerHistory.get(i), 500, 150 + 10*i);
+		}
+
+		for (int i=0; i<this.navigatorHistory.size(); i++) {
+			g.drawString(this.navigatorHistory.get(i), 700, 150 + 10*i);
+		}
+			
 	}
 
 	public BehaviorsView() {
