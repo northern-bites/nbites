@@ -248,7 +248,7 @@ JointValues WalkEnginePreProcessor::makeJoints(ActionCommand::All* request,
       request->body.speed = 0;   // reverted overloaded param for turn threshold
    }
 
-   std::cout << "[PREPROCESS DEBUG] calling make joints from the walk engine" << std::endl;
+   // std::cout << "[PREPROCESS DEBUG] calling make joints from the walk engine" << std::endl;
    request->body.speed = 0;
    JointValues joints = walkEngine->makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
    

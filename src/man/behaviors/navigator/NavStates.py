@@ -66,6 +66,9 @@ def goToPosition(nav):
             goToPosition.fast = True
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
+    # Why would you move like this? This should be refactored,
+    # in the mean time never go fast and also never dodge
+    goToPosition.fast = False
     if goToPosition.fast:
         # So that fast mode works for objects of type RobotLocation also
         if isinstance(goToPosition.dest, RobotLocation) and not goToPosition.close:
@@ -136,8 +139,8 @@ def goToPosition(nav):
 
         helper.setDestination(nav, relDest, speed)
 
-    if navTrans.shouldDodge(nav):
-        return nav.goNow('dodge')
+    # if navTrans.shouldDodge(nav):
+    #     return nav.goNow('dodge')
         
     return Transition.getNextState(nav, goToPosition)
 
@@ -152,6 +155,8 @@ goToPosition.close = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
+    # return
+    #I'm making an executive decision and TURNING OFF DODGING 
     if nav.firstFrame():
         nav.dodging = True
 
@@ -286,10 +291,11 @@ def walking(nav):
     """
     State to be used for velocity walking.
     """
+    print("Walking!")
     helper.setSpeed(nav, walking.speeds)
 
-    if navTrans.shouldDodge(nav):
-        return nav.goNow('dodge')
+    # if navTrans.shouldDodge(nav):
+    #     return nav.goNow('dodge')
 
     return Transition.getNextState(nav, walking)
 

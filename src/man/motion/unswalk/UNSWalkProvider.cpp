@@ -87,6 +87,8 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
 	imuAdjuster = new IMUAdjuster();
 	// Touch* nullTouch = (Touch*) new NullTouch();
 	touch = (Touch*) new FilteredTouch();
+    ((FilteredTouch*)touch)->NBSetOptions();
+	
 	resetAll();
 }
 
@@ -108,7 +110,14 @@ void UNSWalkProvider::resetAll() {
 }
 
 bool UNSWalkProvider::calibrated() const {
-	return true;
+	// std::cout << "not calibrated!!" << std::endl;
+	// imuAdjuster->findAvgOffset(sensorInertials.gyr_x(), sensorInertials.gyr_y());
+	return imuAdjuster->isDone();
+	// return false;
+}
+
+void UNSWalkProvider::adjustIMU(const ::messages::InertialState&	sensorInertials) {
+	imuAdjuster->findAvgOffset(sensorInertials.gyr_x(), sensorInertials.gyr_y());
 }
 
 bool UNSWalkProvider::upright() const {
@@ -151,16 +160,19 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	) 
 {
 	PROF_ENTER(P_WALK);
-	logMsg("\n");
+	// logMsg("\n");
 
 	ActionCommand::All* request = new ActionCommand::All();
 	request->body.actionType = ActionCommand::Body::WALK;
 
+
+	// if (!calibrated()) { logMsg("not calibrated");} 
+	// else {logMsg("calibrated!!!"); }
+
+
 	if (standby) {
-		logMsg("In standby");
 		tryingToWalk = false;
 	} else {
-		logMsg("NOT in standby");
 		if (requestedToStop || !isActive()) {
 			tryingToWalk = false;
 			logMsg("requested to stop or is not active");
@@ -194,7 +206,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 			std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
-			request->body.forward = 6.0; //command->x_percent ;
+			request->body.forward = 00.0; //command->x_percent ;
 			request->body.left = 0.0; //command->y_percent ;
 			request->body.turn = 0.0; //command->theta_percent ;
 			request->body.speed = 0.0f;
@@ -205,9 +217,9 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
 			request->body.forward = command->x_mm;
-			request->body.left = command->y_mm;
+			request->body.left = 0.0; //command->y_mm;
 			request->body.turn = command->theta_rads;
-
+			std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
 			// TODO incorporate motion kicks
 
 
@@ -225,6 +237,13 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 		// TODO handle kick
 	}
 	request->body.speed = 0.0f;
+	adjustIMU(sensorInertials);
+
+	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
+	// request->body.forward = 600.0; //command->x_percent ;
+	// request->body.left = 00.0; //command->y_percent ;
+	// request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
+	// request->body.speed = 0.0f;
 
 	// For testing stand action
 	// logMsg("Can't get current command! Requesting stand");
@@ -255,10 +274,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     sensors.sensors[Sensors::InertialSensor_AngleY] = sensorInertials.angle_y();
 
     // std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
-    std::cout << "InertialSensor_GyrX: " << sensorInertials.gyr_x() << ", InertialSensor_GyrY: " << sensorInertials.gyr_y() << std::endl;
+    // std::cout << "InertialSensor_GyrX: " << sensorInertials.gyr_x() << ", InertialSensor_GyrY: " << sensorInertials.gyr_y() << std::endl;
     float adjGyrX = imuAdjuster->adjustGyrX(sensorInertials.gyr_x());
     float adjGyrY = imuAdjuster->adjustGyrY(sensorInertials.gyr_y());
-    std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
+    // std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
 
     // std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << std::endl;
     
@@ -279,13 +298,17 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     	sensors.joints.angles[nb_joint_order[i]] = sensorAngles[i];
     }
 
-    ((FilteredTouch*)touch)->NBSetOptions();
+    // ((FilteredTouch*)touch)->NBSetOptions();
+
     UNSWSensorValues filteredSensors = ((FilteredTouch*)touch)->getSensors(kinematics, sensors);
-    std::cout << "FILTERED InertialSensor_GyrX: " << filteredSensors.sensors[Sensors::InertialSensor_GyrX] << ", InertialSensor_GyrY: " << filteredSensors.sensors[Sensors::InertialSensor_GyrX] << std::endl;
+    // std::cout << "FILTERED InertialSensor_GyrX: " << filteredSensors.sensors[Sensors::InertialSensor_GyrX] << ", InertialSensor_GyrY: " << filteredSensors.sensors[Sensors::InertialSensor_GyrX] << std::endl;
 
     sensors = filteredSensors;
-	sensors.sensors[Sensors::InertialSensor_GyrX] = -filteredSensors.sensors[Sensors::InertialSensor_GyrX] * 0.01;
-    sensors.sensors[Sensors::InertialSensor_GyrY] = -filteredSensors.sensors[Sensors::InertialSensor_GyrY] * 0.01;
+	// sensors.sensors[Sensors::InertialSensor_GyrX] = filteredSensors.sensors[Sensors::InertialSensor_GyrX] * 0.01;
+ //    sensors.sensors[Sensors::InertialSensor_GyrY] = filteredSensors.sensors[Sensors::InertialSensor_GyrY] * 0.01;
+
+	sensors.sensors[Sensors::InertialSensor_GyrX] = adjGyrX;
+    sensors.sensors[Sensors::InertialSensor_GyrY] = adjGyrY;
 
 
 	// TODO investigate calibrating sensors. . .
@@ -335,16 +358,6 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     const float* hardness = NULL;
 
     joints = generator->makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
-    // (ActionCommand::All* request,
-    //                       Odometry* odometry,
-    //                       const UNSWSensorValues &sensors,
-    //                       BodyModel &bodyModel,
-    //                       float ballX,
-    //                       float ballY);
-
-    // for (unsigned int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
-    // 	std::cout << Joints::jointNames[i] << " : " << joints.angles[i] << "\n";
-    // }
 
     angles = joints.angles;
     hardness = joints.stiffnesses;
@@ -353,13 +366,6 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	   //    std::cout << "WALK PROVIDER: Joint " << Joints::jointNames[i] << " angle: " << angles[i] << " stiffness: " << joints.stiffnesses[i] << std::endl;
     // }
-
-	// generator->makeJoints(ActionCommand::All* request,
- //                                          Odometry* odometry,
- //                                          const UNSWSensorValues &sensors,
- //                                          BodyModel &bodyModel,
- //                                          float ballX,
- //                                          float ballY);
 
     // THIS IS WHERE WE ACTUALLY SET THE NEXT JOINTS AND STIFFNESSES
     // Ignore the first chain bc it's the head
@@ -373,29 +379,23 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     			chain_angles.push_back(joints.angles[nb_joint_order[6]]);
     			// logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
     		} 
-    		// else if ((Kinematics::ChainID)i == Kinematics::LLEG_CHAIN && j == 8) {
-    		// 	chain_angles.push_back(UNSWDEG2RAD(-57.3));
-    		// 	logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[8]]);
-    		// } else if ((Kinematics::ChainID)i == Kinematics::RLEG_CHAIN && j == 13) {
-    		// 	chain_angles.push_back(UNSWDEG2RAD(-56.9));
-    		// 	logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[13]]);
-    		// }
     		else {
 	    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); // TODO I think this should be a lot more complicated than it seems right now...
     		}
 
     		
-    		// logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
+   //  		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
 			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
-			// std::cout << (joints.angles[nb_joint_order[j]]);
+			// // std::cout << (joints.angles[nb_joint_order[j]]);
+
 
 
     		if (hardness[nb_joint_order[j]] == 0) {
-    			// logMsg("NO STIFFNESS in " + Joints::jointNames[nb_joint_order[j]]);
-    			chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
+				// JUST PUSH BACK 1 so arms move
+				chain_hardness.push_back(1.0);
+    			// chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
     		} else {
     			chain_hardness.push_back(joints.stiffnesses[nb_joint_order[j]]);
-    			// TODO Double check this...
     		}
     		// std::cout << " STIFFNESS: " << joints.stiffnesses[nb_joint_order[j]] << std::endl;
     	}
@@ -457,9 +457,9 @@ void UNSWalkProvider::setCommand(const KickCommand::ptr command) {
 
 void UNSWalkProvider::getOdometryUpdate(portals::OutPortal< ::messages::RobotLocation>& out) const {
 	portals::Message< ::messages::RobotLocation> odometryData(0);
-	//odometryData.get()->set_x();
-	//odometryData.get()->set_y();
-	//odometryData.get()->set_h();
+	odometryData.get()->set_x(odometry->forward);
+	odometryData.get()->set_y(odometry->left);
+	odometryData.get()->set_h(odometry->turn);
 	out.setMessage(odometryData);
 }
 

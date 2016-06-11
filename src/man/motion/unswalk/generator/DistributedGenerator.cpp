@@ -262,7 +262,7 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    //       isStopping = true;
    //    }
    // }
-  std::cout << "active " << bodyGenerators[current_generator]->isActive() << " " << current_generator << std::endl;
+  // std::cout << "active " << bodyGenerators[current_generator]->isActive() << " " << current_generator << std::endl;
 
    // if(current_generator == requestedDive){
    //    requestedDive = Body::NONE;

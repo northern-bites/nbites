@@ -78,15 +78,16 @@ void MotionModule::run_()
     sensorCurrents = Kinematics::toJointAngles(currentsInput_.message());
 
     newInputJoints = false;
-    if (curProvider != &walkProvider) {
-        std::cout << "Curprovider is NOT the walk provider!\n";
-        if (curProvider == &nullBodyProvider) {
-            std::cout << "Curprovider is NULL PROVIDER!\n";
-        }
-        if (curProvider == &scriptedProvider) {
-            std::cout << "Curprovider is scriptedProvider!\n";
-        }
-    }
+
+    // if (curProvider != &walkProvider) {
+    //     std::cout << "Curprovider is NOT the walk provider!\n";
+    //     if (curProvider == &nullBodyProvider) {
+    //         std::cout << "Curprovider is NULL PROVIDER!\n";
+    //     }
+    //     if (curProvider == &scriptedProvider) {
+    //         std::cout << "Curprovider is scriptedProvider!\n";
+    //     }
+    // }
 
     // (2) If motion is enabled, perform a single iteration
     //     of the main motion loop.
@@ -117,9 +118,18 @@ void MotionModule::run_()
 
         newInputJoints = false;
         frameCount++;
+
+        if (!walkProvider.calibrated()) { adjustIMU(); }
     }
 
     PROF_EXIT(P_MOTION);
+}
+
+void MotionModule::adjustIMU() {
+    if (!walkProvider.calibrated()) {
+        // std::cout << "Walkprovider not calibrated!!" << std::endl;
+        walkProvider.adjustIMU(inertialsInput_.message());
+    }
 }
 
 void MotionModule::resetOdometry()
@@ -275,6 +285,9 @@ void MotionModule::processBodyJoints()
 
         for(unsigned int i = 0; i < Kinematics::ARM_JOINTS; i ++)
         {
+
+            // std::cout << "FROM CHAIN: " << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << RAD2DEG(rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << RAD2DEG(llegJoints.at(i)) << std::endl;
+            
             nextJoints[Kinematics::L_SHOULDER_PITCH + i] =
                 NBMath::clip(larmJoints.at(i),
                              Kinematics::LEFT_ARM_BOUNDS[i][0],

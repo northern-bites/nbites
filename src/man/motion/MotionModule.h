@@ -249,6 +249,7 @@ private:
     void swapBodyProvider();
     void swapHeadProvider();
     int realityCheckJoints();
+    void adjustIMU();
 
     void processMotionInput();
 

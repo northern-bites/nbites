@@ -142,6 +142,10 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       }
       // 1.0 For backwards compatibility with old interface (can be deleted when behaviours are updated)
       if(forward==0 and left==0 and turn==0 and power==0) bend=0;
+      speed = 0.0;
+      bend = 1.0;
+      // if(forward>MAX_FORWARD) { std::cout << "[WALK GEN DEBUG] max forward too great" << std::endl; }
+
       // 1.1 Scale back values to try to ensure stability. Just clipped for now (see wiki)
       if(forward>MAX_FORWARD) forward = MAX_FORWARD; if(forward<-MAX_FORWARD) forward = -MAX_FORWARD;
       if(left>MAX_LEFT) left = MAX_LEFT; if(left<-MAX_LEFT) left = -MAX_LEFT;

@@ -88,6 +88,8 @@ public:
                                   INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
     }
 
+    void adjustIMU(const ::messages::InertialState&	sensorInertials);
+
     bool isStanding() const;
     bool isWalkActive() const;
 

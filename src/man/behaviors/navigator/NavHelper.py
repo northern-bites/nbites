@@ -1,4 +1,4 @@
-from math import fabs, sqrt
+from math import fabs, sqrt, degrees, radians
 from ..util import MyMath
 from ..kickDecider import kicks
 import NavConstants as constants
@@ -71,9 +71,16 @@ def setDestination(nav, dest, gain = 1.0, kick = None):
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK
 
-    command.dest.rel_x = dest.relX
-    command.dest.rel_y = dest.relY
-    command.dest.rel_h = dest.relH
+    if MyMath.fabs(dest.relH) > radians(90):
+        # print("NavDebug - heading was too great, I'm turning!")
+        command.dest.rel_x = 0.0
+        command.dest.rel_y = 0.0
+        command.dest.rel_h = dest.relH
+    else:
+        # print("NavDebug - heading was not too great I won't turn")
+        command.dest.rel_x = dest.relX
+        command.dest.rel_y = dest.relY
+        command.dest.rel_h = dest.relH
 
     command.dest.gain = gain
 
@@ -122,6 +129,8 @@ def setSpeed(nav, speeds):
     if speeds == constants.ZERO_SPEEDS:
         nav.printf("!!!!!! USE player.stopWalking() NOT walk(0,0,0)!!!!!")
         return
+
+    print("STOP TRYING TO CREATE AND SEND WALK VECTORS!")
 
     createAndSendWalkVector(nav, *speeds)
 
