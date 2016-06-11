@@ -496,7 +496,7 @@ bool BallDetector::findCorrelatedBlackSpots
 
                 double area, upper, lower;
                 if(topCamera) {
-                    upper = 181.1;
+                    upper = 181.1; //289 seen in the log
                     lower = 70.0;
                 } else {
                     upper = 210.0;
@@ -721,7 +721,7 @@ bool BallDetector::filterWhiteSpot(Spot spot,
             getColor(i, j);
             if (isGreen()) {
 				green++;
-				if (green > 2) {
+				if (green > 2) { //2 should be a constant and increase this a little bit
 					if (debugBall) {
 						std::cout << "Rejecting spot because of green" << std::endl;
 					}
