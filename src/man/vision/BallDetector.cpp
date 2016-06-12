@@ -797,20 +797,12 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	// ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
 	// 						 height - horiz);
 
-    SpotDetector spots;
-    initializeSpotterSettings(spots, true, 3.0f, 3.0f, topCamera, 150, 60, 0.5);
-    // spots.darkSpot(true);
-    // spots.innerDiamCm(3.0f);
-    // if (!topCamera) {
-    //     spots.innerDiamCm(3.0f);
-    // }
-    // spots.filterThreshold(150);
-    // spots.greenThreshold(60);
-    // spots.filterGain(0.5);
-    // spots.spotDetect(smallerY, homography, &smallerGreen);
-    spots.spotDetect(yImage, homography, &greenImage);
-    SpotList spotter = spots.spots();
-    for (auto i = spotter.begin(); i != spotter.end(); i++) {
+    SpotDetector darkSpotDetector;
+    initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera, 150, 60, 0.5);
+    darkSpotDetector.spotDetect(yImage, homography, &greenImage);
+    SpotList darkSpots = darkSpotDetector.spots();
+
+    for (auto i = darkSpots.begin(); i != darkSpots.end(); i++) {
         // convert back to raw coordinates
         int midX = (*i).ix() + width / 2;
         int midY = -(*i).iy() + height / 2;
@@ -885,20 +877,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			}
 		}
 	}
-    SpotDetector whitespots;
-    initializeSpotterSettings(whitespots, false, 13.0f, 25.0f, topCamera, 140, 70, 0.5);
-    // whitespots.darkSpot(false);
-    // whitespots.innerDiamCm(13.0f);
-    // if (!topCamera) {
-    //     whitespots.innerDiamCm(25.0f);
-    // }
-    // whitespots.filterThreshold(140);
-    // whitespots.greenThreshold(70);
-    // whitespots.filterGain(0.5);
-    // whitespots.spotDetect(smallerY, homography, &smallerGreen);
-    whitespots.spotDetect(yImage, homography, &greenImage);
-    SpotList whitespotter = whitespots.spots();
-    for (auto i = whitespotter.begin(); i != whitespotter.end(); i++) {
+
+    SpotDetector whiteSpotDetector;
+    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f, topCamera, 140, 70, 0.5);
+    whiteSpotDetector.spotDetect(yImage, homography, &greenImage);
+    SpotList whiteSpots = whiteSpotDetector.spots();
+
+    for (auto i = whiteSpots.begin(); i != whiteSpots.end(); i++) {
         int midX = (*i).ix() + width / 2;
         int midY = -(*i).iy() + height / 2;
 		(*i).rawX = midX;
