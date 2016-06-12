@@ -118,7 +118,8 @@ bool UNSWalkProvider::calibrated() const {
 }
 
 void UNSWalkProvider::adjustIMU(const ::messages::InertialState&	sensorInertials) {
-	imuAdjuster->findAvgOffset(sensorInertials.gyr_x(), sensorInertials.gyr_y());
+	imuAdjuster->findAvgOffset(sensorInertials.gyr_x(), sensorInertials.gyr_y(), 
+		sensorInertials.acc_x(), sensorInertials.acc_y(), sensorInertials.acc_z());
 }
 
 bool UNSWalkProvider::upright() const {
@@ -240,6 +241,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	request->body.speed = 0.0f;
 	adjustIMU(sensorInertials);
 
+	request->body.forward = 350;
+	request->body.left = 0.0; 
+	request->body.turn = 0.0; 
+
 	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
 	// request->body.forward = 600.0; //command->x_percent ;
 	// request->body.left = 00.0; //command->y_percent ;
@@ -275,10 +280,20 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     sensors.sensors[Sensors::InertialSensor_AngleY] = sensorInertials.angle_y();
 
     // std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
-    std::cout << "InertialSensor_GyrX: " << sensorInertials.gyr_x() << ", InertialSensor_GyrY: " << sensorInertials.gyr_y() << std::endl;
-    float adjGyrX = imuAdjuster->adjustGyrX(sensorInertials.gyr_x());
-    float adjGyrY = imuAdjuster->adjustGyrY(sensorInertials.gyr_y());
-    std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
+    // std::cout << "InertialSensor_GyrX: " << sensorInertials.gyr_x() << ", InertialSensor_GyrY: " << sensorInertials.gyr_y() << std::endl;
+    // std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << ", InertialSensor_AccZ: " << sensorInertials.acc_z() << std::endl;
+    
+    imuAdjuster->adjustIMUs(sensorInertials.gyr_x(), sensorInertials.gyr_y(), sensorInertials.acc_x(),
+    	sensorInertials.acc_y(), sensorInertials.acc_z());
+    float adjGyrX = imuAdjuster->getGyrX();
+    float adjGyrY = imuAdjuster->getGyrY();
+
+    float adjAccX = imuAdjuster->getAccX();
+    float adjAccY = imuAdjuster->getAccY();
+    float adjAccZ = imuAdjuster->getAccZ();
+
+    // std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
+    // std::cout << "ADJUSTED InertialSensor_AccX: " << adjAccX << ", InertialSensor_AccY: " << adjAccY << ", InertialSensor_AccZ: " << adjAccZ << std::endl;
 
     // std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << std::endl;
     
@@ -349,6 +364,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	sensors.sensors[Sensors::InertialSensor_GyrX] = adjGyrX * 0.01;
     sensors.sensors[Sensors::InertialSensor_GyrY] = adjGyrY * 0.01;
+
+    // sensors.sensors[Sensors::InertialSensor_AccX] = adjAccX * 0.01;
+    // sensors.sensors[Sensors::InertialSensor_AccY] = adjAccY * 0.01;
+
 
 
 	// TODO investigate calibrating sensors. . .

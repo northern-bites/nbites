@@ -55,17 +55,20 @@ public:
 	  Kalman<float> gyroXBias; /**< The calibration bias of gyroX. */
 	  Kalman<float> gyroYBias; /**< The calibration bias of gyroY. */
 
-	float adjustGyrX(float gyro_value);
-	float adjustGyrY(float gyro_value);
+	void adjustIMUs(float gyr_x, float gyr_y, float acc_x, float acc_y, float acc_z);
 
-	void findAvgOffset(float gyX, float gyY);
-	bool isDone() { return counter > DONE; };
+	void findAvgOffset(float gyX, float gyY, float acc_x, float acc_y, float acc_z);
+	bool isDone() { return counter >= DONE; };
 
 	// Take a long running average of the gyroscope's values,  making the assumption
 	// that if the robot does not perform any complete revolutions, accurate readings should
 	// average to exactly zero
-	float old_gyro_zero_x;
-	float old_gyro_zero_y;
+	float gyr_zero_x;
+	float gyr_zero_y;
+
+	float acc_zero_x;
+	float acc_zero_y;
+	float acc_zero_z;
 
 	int counter;
 	bool initted;
@@ -73,8 +76,12 @@ public:
 	// Value of the gyroscope reading itself should also be averaged over time,
 	// in order to remove sharp changes in the gyroscope's values, which could 
 	// cause undesirable feedback loops
-	float old_filtered_gyro_x;
-	float old_filtered_gyro_y;
+	float adj_gyr_x;
+	float adj_gyr_y;
+
+	float adj_acc_x;
+	float adj_acc_y;
+	float adj_acc_z;
 
 	// The filtered reading is multipled by an experimentally determined constant,
 	// the nod_gyro_ratio, to give an adjustment angle
@@ -83,8 +90,15 @@ public:
 	// angle is added to particular joint angles in the robot to give an 
 	// adjusted pose
 
-	float getGyrXZero() { return old_gyro_zero_x; }
-	float getGyrYZero() { return old_gyro_zero_y; }
+	float getGyrXZero() { return gyr_zero_x; }
+	float getGyrYZero() { return gyr_zero_y; }
+
+	float getGyrX() { return adj_gyr_x; }
+	float getGyrY() { return adj_gyr_y; }
+
+	float getAccX() { return adj_acc_x; }
+	float getAccY() { return adj_acc_y; }
+	float getAccZ() { return adj_acc_z; }
 
 
     // RingBufferWithSumBH<Vector3BH<>, 300> accValues; *< Ringbuffer for collecting the acceleration sensor values of one walking phase or 1 secBH. 

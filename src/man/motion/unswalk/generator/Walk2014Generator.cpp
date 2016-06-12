@@ -38,15 +38,17 @@ using namespace Sensors;
 const float MM_PER_M  = 1000.0;                            // number of millimeters in one meter
 const float CROUCH_STAND_PERIOD = 0.5;                     // time in seconds to crouch
 const float COM_OFFSET = 0.01;                             // center of mass offset in x direction in meters
-const float FORWARD_CHANGE = 0.2;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
+// const float FORWARD_CHANGE = 0.2;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
+// TODO nikki changed this..
+const float FORWARD_CHANGE = 0.08;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
 const float STAND_HIP_HEIGHT = 0.248;                      // for tall power saving stand
 const float KNEE_PITCH_RANGE = UNSWDEG2RAD(60);                // the knee pitch range from standing to crouching
 const float BASE_WALK_PERIOD = .23; //.25;                 // seconds to walk one step, ie 1/2 walk cycle
 const float WALK_HIP_HEIGHT = .23;                         // Walk hip height - seems to work from .2 to .235
-const float MAX_FORWARD = .3;                              // meters
+const float MAX_FORWARD = .2; //.3;                              // meters
 const float MAX_LEFT = .2;                                 // meters
 const float MAX_TURN = .87;                                // radians
-const float BASE_LEG_LIFT = 0.010;                         // meters
+const float BASE_LEG_LIFT = 0.03; //0.010;                         // meters
 
 void checkNaN(float n, string s){
    if(n != n){
@@ -143,8 +145,6 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       // 1.0 For backwards compatibility with old interface (can be deleted when behaviours are updated)
       if(forward==0 and left==0 and turn==0 and power==0) bend=0;
       speed = 0.0;
-      bend = 1.0;
-      // if(forward>MAX_FORWARD) { std::cout << "[WALK GEN DEBUG] max forward too great" << std::endl; }
 
       // 1.1 Scale back values to try to ensure stability. Just clipped for now (see wiki)
       if(forward>MAX_FORWARD) forward = MAX_FORWARD; if(forward<-MAX_FORWARD) forward = -MAX_FORWARD;
@@ -159,10 +159,14 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       // 1.4 walkKick - removed
 
       // 1.5 ratchet forward by FORWARD_CHANGE (uncomment to limit absolute change in "forward" to FORWARD_CHANGE)
-      //		else if (!exactStepsRequested && abs(forward-lastForward)>FORWARD_CHANGE) {                // ie greater than a FORWARD_CHANGE / sec change
-      //			forward = lastForward + (forward-lastForward)/abs(forward-lastForward)*FORWARD_CHANGE;
-      //		}
-      //		lastForward   = forward;                           // back up old value in m/s
+      		 if (!exactStepsRequested && abs(forward-lastForward)>FORWARD_CHANGE) {                // ie greater than a FORWARD_CHANGE / sec change
+      			std::cout << "LIMITING FORWARD CHANGE\n\n";
+               forward = lastForward + (forward-lastForward)/abs(forward-lastForward)*FORWARD_CHANGE;
+      		}
+      		lastForward   = forward;                           // back up old value in m/s
+
+      // forward = lastForward + (forward-lastForward)/abs(forward-lastForward)*FORWARD_CHANGE;
+      // lastForward   = forward; 
 
       // 1.6 Walk Calibration
       // The definition of forward, left and turn is the actual distance/angle traveled in one second
