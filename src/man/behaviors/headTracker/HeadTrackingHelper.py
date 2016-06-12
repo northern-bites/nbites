@@ -253,6 +253,15 @@ class HeadTrackingHelper(object):
         else:
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
+    def lookToAngleWithTime(self, yaw, time):
+        if yaw > 55 or yaw < -55:
+            pitch = 11.0
+        else:
+            pitch = 17.0
+
+        return (((yaw, pitch),
+                 .5, time, StiffnessModes.LOW_HEAD_STIFFNESSES),)
+
     def lookToAngle(self, yaw):
         """
         Returns a headmove that will make the robot
@@ -267,8 +276,6 @@ class HeadTrackingHelper(object):
 
         return (((yaw, pitch),
                  .5, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
-
-
 
         # TODO: use constants above
 

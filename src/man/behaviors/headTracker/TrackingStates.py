@@ -46,6 +46,7 @@ def gameSetTracking(tracker):
 
     tracker.target = tracker.brain.ball
 
+    # if not tracker.brain.motion.head_is_active:
     tracker.helper.trackObject()
 
     if not tracker.target.vis.on and tracker.counter > 15:
@@ -209,8 +210,8 @@ def fullPan(tracker):
 
         print "FULL PAN: FISRT FRAME SNAP PAN"
 
-        tracker.helper.startingPan(HeadMoves.WIDE_SNAP_PAN)
-        # tracker.helper.lookToAngleWithTime(-75, 0.75)
+        # tracker.helper.startingPan(HeadMoves.WIDE_SNAP_PAN)
+        tracker.helper.lookToAngleWithTime(-75, 0.75)
         # tracker.lookToAngleWithTime(-75,1)
         # tracker.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
@@ -234,7 +235,7 @@ def gameSetFullPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
 
-        tracker.helper.startingPan(HeadMoves.GAME_SET_WIDE_SNAP_PAN)
+        tracker.helper.lookToAngleWithTime(-75, 0.3)
 
     if not tracker.brain.motion.head_is_active:
         tracker.performHeadMove(HeadMoves.GAME_SET_WIDE_SNAP_PAN)

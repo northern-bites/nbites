@@ -45,7 +45,7 @@ def gameReady(player):
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.repeatWideSnapPan()
 
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
@@ -81,7 +81,7 @@ def gameSet(player):
         player.stand()
         player.brain.nav.stand()
 
-        player.brain.tracker.lookToAngleWithTime(-75, 0.75)
+        player.brain.tracker.lookToAngleWithTime(-75, 1)
 
         if player.wasPenalized:
             player.wasPenalized = False

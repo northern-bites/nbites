@@ -276,12 +276,8 @@ def returnUsingLoc(player):
     if (player.counter % 90 == 0):
         print("Switching headtracker")
         if not returnUsingLoc.panning:
-<<<<<<< Updated upstream
-            player.brain.tracker.repeatBasicPan()
-=======
             # @SNAPPAN-CHANGE
             player.brain.tracker.repeatGoalieWideSnapPan()
->>>>>>> Stashed changes
         else:
             player.brain.tracker.trackBall
 
@@ -335,7 +331,7 @@ def watch(player):
     if player.firstFrame():
         player.brain.fallController.enabled = True
         player.brain.tracker.trackBall()
-        # player.brain.tracker.repeatBasicPan()
+        # player.brain.tracker.repeatWideSnapPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
         if (player.lastState is not 'shiftPosition'

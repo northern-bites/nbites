@@ -81,9 +81,6 @@ class HeadTracker(FSA.FSA):
     def repeatBasicPan(self):
         '''Repeat the basic fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
-<<<<<<< Updated upstream
-    
-=======
 
     def performSnapPan(self):
         self.performHeadMove(HeadMoves.SNAP_PAN)
@@ -133,7 +130,6 @@ class HeadTracker(FSA.FSA):
     def repeatGoalieWideSnapPan(self):
         self.repeatHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
 
->>>>>>> Stashed changes
     def performWidePan(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
@@ -213,6 +209,10 @@ class HeadTracker(FSA.FSA):
         Look to the given yaw at an appropriate (fixed) pitch.
         """
         self.performHeadMove(self.helper.lookToAngle(yaw))
+
+    def lookToAngleWithTime(self, yaw, time):
+
+        self.performHeadMove(self.helper.lookToAngleWithTime(yaw, time))
 
     def trackSharedBall(self):
         self.switchTo('trackSharedBall')
