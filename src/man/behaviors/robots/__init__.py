@@ -106,6 +106,55 @@ the ship's crew, which makes me the ideal ambassador to open certain doors
 that might otherwise be closed.'''
            )
 
+blt = BirthCertificate.BirthCertificate(
+           name = 'blt',
+           long_name = 'Brave Little Toaster (BLT)',
+           tts_name = 'blt',
+           doc = '''\
+BLT BLT BLT BLT BLT'''
+           )
+
+elektra = BirthCertificate.BirthCertificate(
+           name = 'elektra',
+           long_name = 'Elektra',
+           tts_name = 'elektra',
+           doc = '''\
+I said ooh girl, shock me like an ELEKTRA eel... Ooh girl, turn me on with
+your ELEKTRA feel.'''
+           )
+
+wasp = BirthCertificate.BirthCertificate(
+           name = 'wasp',
+           long_name = 'Wasp',
+           tts_name = 'wasp',
+           doc = '''\
+Ouch.'''
+           )
+
+buzz = BirthCertificate.BirthCertificate(
+           name = 'buzz',
+           long_name = 'Buzz Lightyear',
+           tts_name = 'buzz',
+           doc = '''\
+To infinity... and beyond!'''
+           )
+
+batman = BirthCertificate.BirthCertificate(
+           name = 'batman',
+           long_name = 'Batman',
+           tts_name = 'batman',
+           doc = '''\
+Na na na na na na na na na na na na na na na na BATMAN!!'''
+           )
+
+shehulk = BirthCertificate.BirthCertificate(
+           name = 'shehulk',
+           long_name = 'She-Hulk',
+           tts_name = 'shehulk',
+           doc = '''\
+The biggest and the baddest girl in town.'''
+           )
+
 robot_map = { mal.name    : mal,
               river.name  : river,
               zoe.name    : zoe,
@@ -115,6 +164,12 @@ robot_map = { mal.name    : mal,
               kaylee.name : kaylee,
               simon.name  : simon,
               inara.name  : inara,
+              blt.name    : blt,
+              elektra.name: elektra,
+              wasp.name   : wasp,
+              buzz.name   : buzz,
+              batman.name : batman,
+              shehulk.name: shehulk,
               }
 
 unknown = BirthCertificate.BirthCertificate(

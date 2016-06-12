@@ -9,6 +9,7 @@ import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.Map;
 
 import com.google.protobuf.Message;
 import messages.*;
@@ -50,6 +51,9 @@ public class BehaviorsView extends ViewParent {
 
 		if (this.brunswickHistory.size() == 0 || !this.brunswickHistory.get(0).equals(be.getGcstatestr())) {
 			this.brunswickHistory.add(0, be.getGcstatestr());
+			if (this.brunswickHistory.get(0) == "") {
+				
+			}
 		}
 
 		if (this.headTrackerHistory.size() == 0 || !this.headTrackerHistory.get(0).equals(be.getHeadtrackerstr())) {

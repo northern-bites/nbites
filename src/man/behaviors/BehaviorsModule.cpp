@@ -212,7 +212,7 @@ void BehaviorsModule::run_ ()
     }
     PROF_EXIT(P_PYTHON);
 
-    std::cout << behaviors.get()->gcstatestr() << std::endl;
+    // std::cout << behaviors.get()->gcstatestr() << std::endl;
     // Send outgoing messages
     sendMessages();
 

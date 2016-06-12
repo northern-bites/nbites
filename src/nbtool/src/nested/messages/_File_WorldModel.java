@@ -54,6 +54,12 @@ public final class _File_WorldModel {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_messages_WorldModel_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_messages_WorldModel_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_WorldModel_descriptor,
+        new java.lang.String[] { "Timestamp", "MyX", "MyY", "MyH", "MyUncert", "WalkingToX", "WalkingToY", "BallOn", "BallAge", "BallDist", "BallBearing", "BallVelX", "BallVelY", "BallUncert", "Role", "InKickingState", "KickingToX", "KickingToY", "Fallen", "Active", "ClaimedBall", "Intention", "Alive", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

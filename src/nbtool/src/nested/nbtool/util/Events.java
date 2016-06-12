@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 
 import nbtool.data.group.Group;
 import nbtool.data.log.Log;
+import nbtool.data.log.LogReference;
 import nbtool.nio.CrossServer.CrossInstance;
 import nbtool.nio.RobotConnection;
 import nbtool.util.Center.ToolEvent;
@@ -154,6 +155,52 @@ public class Events {
 		}
 	}
 	
+	public static interface LogRefsFound extends EventListener {
+		public void logRefsFound(Object source, LogReference ... found);
+	}
+	
+	public static final class GLogRefsFound {
+		public static void generate(final Object source, final LogReference ... found) {
+			Center.addEvent(new SimpleCombine(LogRefsFound.class, source, found){
+
+				@Override
+				protected void combine(LinkedList<ToolEvent> others) {
+					assert(this.payload.length == 2);
+					if (others.size() == 0)
+						return;
+					
+					LogReference[] ours = (LogReference[]) payload[1];
+					List<LogReference> alsoFound = new ArrayList<>();
+					alsoFound.addAll(Arrays.asList(ours));
+					
+					for (ToolEvent te : others) {
+						assert(te instanceof SimpleCombine);
+						
+						LogReference[] theirs = (LogReference[]) ((SimpleCombine) te).payload[1];
+						alsoFound.addAll(Arrays.asList(theirs));
+					}
+					
+					Debug.info( "LogReferenceFound combined %d events with %d logs.", others.size(), alsoFound.size());
+					
+					this.payload[0] = null;
+					this.payload[1] = alsoFound.toArray(new LogReference[0]);
+				}
+
+				@Override
+				protected void preface() {
+					Debug.event( "LogReferenceFound...");
+				}
+
+				@Override
+				protected void inform(EventListener l) {
+					LogReference[] logs = (LogReference[]) payload[1];
+					((LogRefsFound) l).logRefsFound(payload[0], logs);
+				}
+				
+			});
+		}
+	}
+	
 	public static interface LogsFound extends EventListener {
 		public void logsFound(Object source, Log ... found);
 	}
@@ -195,7 +242,6 @@ public class Events {
 					Log[] logs = (Log[]) payload[1];
 					((LogsFound) l).logsFound(payload[0], logs);
 				}
-				
 			});
 		}
 	}

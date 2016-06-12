@@ -66,7 +66,7 @@ class FSA:
 
     def addStates(self,module):
         # gives a list of all methods and attributes of a module
-        if DEBUG: print "Listing states loaded:"
+        if DEBUG: print "Listing states loaded for " + self.name + ":"
         for candidate in dir(module):
             attribute = getattr(module,candidate)
             if callable(attribute):
@@ -107,9 +107,11 @@ class FSA:
                             self.lastState + "\"!")
                 raise
             # execute the state
+            """
             if DEBUG:
                 print self.name
                 print " DEBUG: current state = ",self.currentState
+            """
 
             try:
                 (stayInFrame, nextState) = methodCall(self)

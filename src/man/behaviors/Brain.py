@@ -219,10 +219,10 @@ class Brain(object):
         self.ballMemRatio = (count / self.BALL_MEM_SIZE)
 
         # Behaviors Protobuf
-        print str(self.CoA.name)
+        # print str(self.CoA.name)
         self.interface.behaviors.robotname = str(self.CoA.name)
-        print str(self.interface.behaviors.robotname)
-        print "-------------------------------"
+        # print str(self.interface.behaviors.robotname)
+        # print "-------------------------------"
         self.interface.behaviors.team = self.teamNumber
         self.interface.behaviors.player = self.playerNumber
         self.interface.behaviors.role = self.teamMembers[self.playerNumber - 1].role
