@@ -27,10 +27,12 @@ angle = 80
 def afterPenalty(player):
 
     ## TODO TEST VALUES: NUMBER OF FRAMES AND RIGHT/LEFT DIFFS
+    # TODO add a check for whistle override
 
     if player.firstFrame():
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
+
 
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
@@ -96,10 +98,6 @@ def afterPenalty(player):
     ## 2: T-Corner
     ## 3: Center Circle Corner
 
-    # Can I use the goalbox "shape" from the protobuf here?
-
-    # TODO see if this could work for "Blue" corners; can we identify our own side in this state?
-
     if player.brain.tracker.isStopped():
         if afterPenalty.lookRight:
 
@@ -155,6 +153,7 @@ def afterPenalty(player):
             if DEBUG_PENALTY_STATES:
                 print("THRESHOLDS WERE NOT MET! Rely on Horizons!")
                 # TODO test if horizons are actually more reliable.
+                # See if this helps if we're blocking corners
             player.brain.resetLocalizationFromPenalty(afterPenalty.leftHorizSum > afterPenalty.rightHorizSum)
 
         if DEBUG_PENALTY_STATES:
