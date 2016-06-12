@@ -68,6 +68,7 @@ public:
 	float old_gyro_zero_y;
 
 	int counter;
+	bool initted;
 
 	// Value of the gyroscope reading itself should also be averaged over time,
 	// in order to remove sharp changes in the gyroscope's values, which could 
@@ -87,7 +88,8 @@ public:
 
 
     // RingBufferWithSumBH<Vector3BH<>, 300> accValues; *< Ringbuffer for collecting the acceleration sensor values of one walking phase or 1 secBH. 
-    // RingBufferWithSumBH<Vector2BH<>, 300> gyroValues; /**< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. */
+    RingBufferWithSumBH<float, 300> gyroXValues; /**< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. */
+    RingBufferWithSumBH<float, 300> gyroYValues; /**< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. */
 
 
 };

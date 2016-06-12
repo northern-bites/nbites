@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "NaoPaths.h"
 #include "Kinematics.h"
+#include "SensorTypes.h"
 
 #include <cassert>
 #include <string>
@@ -274,10 +275,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     sensors.sensors[Sensors::InertialSensor_AngleY] = sensorInertials.angle_y();
 
     // std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
-    // std::cout << "InertialSensor_GyrX: " << sensorInertials.gyr_x() << ", InertialSensor_GyrY: " << sensorInertials.gyr_y() << std::endl;
+    std::cout << "InertialSensor_GyrX: " << sensorInertials.gyr_x() << ", InertialSensor_GyrY: " << sensorInertials.gyr_y() << std::endl;
     float adjGyrX = imuAdjuster->adjustGyrX(sensorInertials.gyr_x());
     float adjGyrY = imuAdjuster->adjustGyrY(sensorInertials.gyr_y());
-    // std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
+    std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
 
     // std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << std::endl;
     
@@ -294,38 +295,38 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     sensors.sensors[Sensors::RFoot_FSR_RearLeft] = sensorFSRs.rrl();
     sensors.sensors[Sensors::RFoot_FSR_RearRight] = sensorFSRs.rrr();
 
-    for (int i = 0; i < 21; i++) {
-    	sensors.joints.angles[nb_joint_order[i]] = sensorAngles[i];
-    }
+    // for (int i = 0; i < 21; i++) {
+    // 	sensors.joints.angles[nb_joint_order[i]] = sensorAngles[i];
+    // }
 
     // Ughhhh idk
 
-    // sensors.joints.angles[Joints::LShoulderPitch] = sensorAngles[];
-    // sensors.joints.angles[Joints::LShoulderRoll] = 0.0;
-    // sensors.joints.angles[Joints::LElbowYaw] = 0.0;
-    // sensors.joints.angles[Joints::LElbowRoll] = 0.0;
-    // sensors.joints.angles[Joints::LWristYaw] = 0.0;
-    // sensors.joints.angles[Joints::LHand] = 0.0;
+    sensors.joints.angles[Joints::LShoulderPitch] = sensorAngles[sensors::LShoulderPitch];
+    sensors.joints.angles[Joints::LShoulderRoll] = sensorAngles[sensors::LShoulderRoll];
+    sensors.joints.angles[Joints::LElbowYaw] = sensorAngles[sensors::LElbowYaw];
+    sensors.joints.angles[Joints::LElbowRoll] = sensorAngles[sensors::LElbowRoll];
+    // sensors.joints.angles[Joints::LWristYaw] = sensorAngles[sensors::LShoulderPitch];
+    // sensors.joints.angles[Joints::LHand] = sensorAngles[sensors::LShoulderPitch];
     
-    // sensors.joints.angles[Joints::LHipYawPitch] = 0.0;
-    // sensors.joints.angles[Joints::LHipRoll] = 0.0;
-    // sensors.joints.angles[Joints::LHipPitch] = 0.0;
-    // sensors.joints.angles[Joints::LKneePitch] = 0.0;
-    // sensors.joints.angles[Joints::LAnklePitch] = 0.0;
-    // sensors.joints.angles[Joints::LAnkleRoll] = 0.0;
+    sensors.joints.angles[Joints::LHipYawPitch] = sensorAngles[sensors::LHipYawPitch];
+    sensors.joints.angles[Joints::LHipRoll] = sensorAngles[sensors::LHipRoll];
+    sensors.joints.angles[Joints::LHipPitch] = sensorAngles[sensors::LHipPitch];
+    sensors.joints.angles[Joints::LKneePitch] = sensorAngles[sensors::LKneePitch];
+    sensors.joints.angles[Joints::LAnklePitch] = sensorAngles[sensors::LAnklePitch];
+    sensors.joints.angles[Joints::LAnkleRoll] = sensorAngles[sensors::LAnkleRoll];
     
-    // sensors.joints.angles[Joints::RHipRoll] = 0.0;
-    // sensors.joints.angles[Joints::RHipPitch] = 0.0;
-    // sensors.joints.angles[Joints::RKneePitch] = 0.0;
-    // sensors.joints.angles[Joints::RAnklePitch] = 0.0;
-    // sensors.joints.angles[Joints::RAnkleRoll] = 0.0;
+    sensors.joints.angles[Joints::RHipRoll] = sensorAngles[sensors::RHipRoll];
+    sensors.joints.angles[Joints::RHipPitch] = sensorAngles[sensors::RHipPitch];
+    sensors.joints.angles[Joints::RKneePitch] = sensorAngles[sensors::RKneePitch];
+    sensors.joints.angles[Joints::RAnklePitch] = sensorAngles[sensors::RAnklePitch];
+    sensors.joints.angles[Joints::RAnkleRoll] = sensorAngles[sensors::RAnkleRoll];
 
-    // sensors.joints.angles[Joints::RShoulderPitch] = 0.0;
-    // sensors.joints.angles[Joints::RShoulderRoll] = 0.0;
-    // sensors.joints.angles[Joints::RElbowYaw] = 0.0;
-    // sensors.joints.angles[Joints::RElbowRoll] = 0.0;
-    // sensors.joints.angles[Joints::RWristYaw] = 0.0;
-    // sensors.joints.angles[Joints::RHand] = 0.0;
+    sensors.joints.angles[Joints::RShoulderPitch] = sensorAngles[sensors::RShoulderPitch];
+    sensors.joints.angles[Joints::RShoulderRoll] = sensorAngles[sensors::RShoulderRoll];
+    sensors.joints.angles[Joints::RElbowYaw] = sensorAngles[sensors::RElbowYaw];
+    sensors.joints.angles[Joints::RElbowRoll] = sensorAngles[sensors::RElbowRoll];
+    // sensors.joints.angles[Joints::RWristYaw] = sensorAngles[sensors::LShoulderPitch];
+    // sensors.joints.angles[Joints::RHand] = sensorAngles[sensors::LShoulderPitch];
 
 
 
