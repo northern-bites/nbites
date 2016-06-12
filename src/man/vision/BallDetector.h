@@ -104,6 +104,10 @@ namespace man {
             bool processWhiteSpots(SpotList & whiteSpots, intPairVector & blackSpots,
             						intPairVector & badBlackSpots, spotVector & actualWhiteSpots,
             						double cameraHeight, bool & foundBall);
+            bool processBlobs(Connectivity & blobber, intPairVector & blackSpots,
+                               		bool & foundBall, intPairVector & badBlackSpots,
+                                	spotVector & actualWhiteSpots, double cameraHeight,
+                                	int bottomQuarer);
 
             bool filterBlackSpots(Spot currentBlob);
             bool filterWhiteBlob(Spot spot, intPairVector & blackSpots,
