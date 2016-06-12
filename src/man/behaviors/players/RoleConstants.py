@@ -110,7 +110,7 @@ evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                 0)
 
 # Tomultuous triangle (odd chaser positioning)
-strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 170,
+strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 175,
                                 NogginConstants.MIDFIELD_Y,
                                 180)
 strikerBottom = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
@@ -125,17 +125,17 @@ if NogginConstants.LEFT_FORWARD_DEFENSE:
                                     NogginConstants.MY_GOALBOX_TOP_Y,
                                     0)
 else:
-    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
-                                    NogginConstants.MY_GOALBOX_TOP_Y - 40,
+    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 80,
+                                    NogginConstants.MY_GOALBOX_TOP_Y,
                                     0)
     
 if NogginConstants.RIGHT_FORWARD_DEFENSE:
-    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 160,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
 else:
     oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 70,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y + 40,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
 
 oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
@@ -190,9 +190,9 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 # Useful constants can be found in src/share/include/FieldConstants.h
 
 if NogginConstants.V5_ROBOT:
-    defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.FIELD_GREEN_HEIGHT)
+    defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X + 150, NogginConstants.FIELD_GREEN_HEIGHT)
 else:
-    defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 40, NogginConstants.FIELD_GREEN_HEIGHT)
+    defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.FIELD_GREEN_HEIGHT)
 
 oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.CENTER_FIELD_Y)
 
