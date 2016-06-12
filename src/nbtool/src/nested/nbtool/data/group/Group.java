@@ -19,6 +19,7 @@ public class Group {
 		this.add(Arrays.asList(logReferences));
 	}
 	
+	/* this method takes ownership of the logrefs.  if you do not wish this, access logs directly */
 	public void add(List<LogReference> logReferences) {
 		synchronized(logs) {
 			for (LogReference lr : logReferences) {
