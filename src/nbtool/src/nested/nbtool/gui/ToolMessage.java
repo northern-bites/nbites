@@ -26,6 +26,12 @@ public class ToolMessage extends JFrame implements ActionListener {
 	
 	private static final Color DARK_GREEN = new Color(0,100,0);
 	private static final Color DARK_ORANGE = new Color(255,140,0);
+	
+	public static void displayAndPrint(String format, Object ... args) {
+		dbs.print(format, args);
+		String displayed = String.format("nbt: " + format, args);
+		display(displayed, Color.CYAN);
+	}
 
 	public static void displayInfo(String format, Object ... args) {
 		if (Debug.level.shows(LogLevel.levelINFO)) {

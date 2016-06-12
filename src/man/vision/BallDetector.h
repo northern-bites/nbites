@@ -10,6 +10,7 @@
 #include "Homography.h"
 #include "Field.h"
 #include "Hough.h"
+#include "Spots.h"
 
 
 namespace man {
@@ -32,29 +33,30 @@ namespace man {
 
 		class Ball {
 		public:
-			Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
-				 int imgWidth_, bool top, bool os, bool ot, bool ob,
-				 double cx, double cy);
+			Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
+				 int imgWidth_, bool tc,
+				 double cx, double cy, double conf);
 			Ball();
 
 			std::string properties();
 
+            Spot & getSpot() { return spot; }
 			double confidence() const { return _confidence; }
 
 			// For tool
-            Blob& getBlob() { return blob; }
 //private: should be private. leaving public for now
 			void compute();
 
 			double pixDiameterFromDist(double d) const;
 
-            Blob blob;
+            Spot spot;
+
 			FuzzyThr thresh;
 			FuzzyThr radThresh;
 
 			int centerX;
 			int centerY;
-			int firstPrincipalLength;
+			int radius;
 
 			double x_rel;
 			double y_rel;
@@ -90,19 +92,21 @@ namespace man {
 
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
-            void filterBlackBlobs(Blob currentBlob,
-                                  std::vector<std::pair<int,int>> & blobs,
-                                  std::vector<Blob> & actualBlobs);
+            bool filterBlackSpots(Spot currentBlob);
+            bool filterWhiteBlob(Spot spot, std::vector<std::pair<int,int>> & blackSpots,
+								 std::vector<std::pair<int,int>> & badBlackSpots);
+            bool filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & blackSpots,
+								 std::vector<std::pair<int,int>> & badBlackSpots);
             int filterWhiteBlobs(Blob currentBlob,
                                   std::vector<std::pair<int,int>> & blobs,
                                   std::vector<std::pair<int,int>> blackBlobs);
-            bool findCorrelatedBlackBlobs(std::vector<std::pair<int,int>> & blackBlobs,
-                                          std::vector<Blob> & actualBlobs,
-                                          double cameraHeight, bool foundBall);
+            bool findCorrelatedBlackSpots(std::vector<std::pair<int,int>> & blackBlobs,
+                                          std::vector<Spot> & actualBlobs,
+                                          double cameraHeight, bool & foundBall);
             bool blobsAreClose(std::pair<int,int> first,
                                std::pair<int,int> second);
 
-            void makeBall(Blob blob, double cameraHeight, double conf,
+            void makeBall(Spot blob, double cameraHeight, double conf,
                           bool foundBall, bool isBlack);
             bool lookForFarAwayBalls(Blob blob);
             bool farSanityChecks(Blob blob);
@@ -121,12 +125,11 @@ namespace man {
 			// For tool
 #ifdef OFFLINE
 			const std::vector<Ball>& getBalls() const { return candidates; }
-			Connectivity* getBlobber() { return &blobber; }
+			const std::vector<Spot>& getWhiteSpots() { return debugWhiteSpots; }
+			const std::vector<Spot>& getBlackSpots() { return debugBlackSpots; }
 			void setDebugBall(bool debug) {debugBall = debug;}
 #endif
 		private:
-			Connectivity blobber;
-            Connectivity blobber2;
 			FieldHomography* homography;
 			Field* field;
 			bool topCamera;
@@ -134,6 +137,9 @@ namespace man {
 			int height;
 			int currentX, currentY;
             std::vector<Edge> goodEdges;
+			std::vector<Spot> debugBlackSpots;
+			std::vector<Spot> debugWhiteSpots;
+			Connectivity blobber;
 
 			DebugImage debugDraw;
 			ImageLiteU8 whiteImage, greenImage, blackImage;
