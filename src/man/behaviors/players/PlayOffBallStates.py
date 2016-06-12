@@ -108,7 +108,7 @@ def doPan(player):
     """
     if player.firstFrame():
         player.stand()
-        player.brain.tracker.repeatWidePan()
+        player.brain.tracker.repeatWideSnapPan()
 
     while player.stateTime < 5:
         return player.stay()
