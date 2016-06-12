@@ -170,6 +170,26 @@ public final class WorldModel extends
             alive_ = input.readBool();
             break;
           }
+          case 192: {
+            bitField0_ |= 0x00800000;
+            sharedBallOn_ = input.readBool();
+            break;
+          }
+          case 205: {
+            bitField0_ |= 0x01000000;
+            sharedBallX_ = input.readFloat();
+            break;
+          }
+          case 213: {
+            bitField0_ |= 0x02000000;
+            sharedBallY_ = input.readFloat();
+            break;
+          }
+          case 216: {
+            bitField0_ |= 0x04000000;
+            sharedBallReliability_ = input.readInt32();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -555,6 +575,66 @@ public final class WorldModel extends
     return alive_;
   }
 
+  public static final int SHARED_BALL_ON_FIELD_NUMBER = 24;
+  private boolean sharedBallOn_;
+  /**
+   * <code>optional bool shared_ball_on = 24;</code>
+   */
+  public boolean hasSharedBallOn() {
+    return ((bitField0_ & 0x00800000) == 0x00800000);
+  }
+  /**
+   * <code>optional bool shared_ball_on = 24;</code>
+   */
+  public boolean getSharedBallOn() {
+    return sharedBallOn_;
+  }
+
+  public static final int SHARED_BALL_X_FIELD_NUMBER = 25;
+  private float sharedBallX_;
+  /**
+   * <code>optional float shared_ball_x = 25;</code>
+   */
+  public boolean hasSharedBallX() {
+    return ((bitField0_ & 0x01000000) == 0x01000000);
+  }
+  /**
+   * <code>optional float shared_ball_x = 25;</code>
+   */
+  public float getSharedBallX() {
+    return sharedBallX_;
+  }
+
+  public static final int SHARED_BALL_Y_FIELD_NUMBER = 26;
+  private float sharedBallY_;
+  /**
+   * <code>optional float shared_ball_y = 26;</code>
+   */
+  public boolean hasSharedBallY() {
+    return ((bitField0_ & 0x02000000) == 0x02000000);
+  }
+  /**
+   * <code>optional float shared_ball_y = 26;</code>
+   */
+  public float getSharedBallY() {
+    return sharedBallY_;
+  }
+
+  public static final int SHARED_BALL_RELIABILITY_FIELD_NUMBER = 27;
+  private int sharedBallReliability_;
+  /**
+   * <code>optional int32 shared_ball_reliability = 27;</code>
+   */
+  public boolean hasSharedBallReliability() {
+    return ((bitField0_ & 0x04000000) == 0x04000000);
+  }
+  /**
+   * <code>optional int32 shared_ball_reliability = 27;</code>
+   */
+  public int getSharedBallReliability() {
+    return sharedBallReliability_;
+  }
+
   private void initFields() {
     timestamp_ = 0L;
     myX_ = 0F;
@@ -579,6 +659,10 @@ public final class WorldModel extends
     claimedBall_ = false;
     intention_ = 0;
     alive_ = false;
+    sharedBallOn_ = false;
+    sharedBallX_ = 0F;
+    sharedBallY_ = 0F;
+    sharedBallReliability_ = 0;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -661,6 +745,18 @@ public final class WorldModel extends
     }
     if (((bitField0_ & 0x00400000) == 0x00400000)) {
       output.writeBool(23, alive_);
+    }
+    if (((bitField0_ & 0x00800000) == 0x00800000)) {
+      output.writeBool(24, sharedBallOn_);
+    }
+    if (((bitField0_ & 0x01000000) == 0x01000000)) {
+      output.writeFloat(25, sharedBallX_);
+    }
+    if (((bitField0_ & 0x02000000) == 0x02000000)) {
+      output.writeFloat(26, sharedBallY_);
+    }
+    if (((bitField0_ & 0x04000000) == 0x04000000)) {
+      output.writeInt32(27, sharedBallReliability_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -762,6 +858,22 @@ public final class WorldModel extends
     if (((bitField0_ & 0x00400000) == 0x00400000)) {
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(23, alive_);
+    }
+    if (((bitField0_ & 0x00800000) == 0x00800000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(24, sharedBallOn_);
+    }
+    if (((bitField0_ & 0x01000000) == 0x01000000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(25, sharedBallX_);
+    }
+    if (((bitField0_ & 0x02000000) == 0x02000000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(26, sharedBallY_);
+    }
+    if (((bitField0_ & 0x04000000) == 0x04000000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(27, sharedBallReliability_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -926,6 +1038,14 @@ public final class WorldModel extends
       bitField0_ = (bitField0_ & ~0x00200000);
       alive_ = false;
       bitField0_ = (bitField0_ & ~0x00400000);
+      sharedBallOn_ = false;
+      bitField0_ = (bitField0_ & ~0x00800000);
+      sharedBallX_ = 0F;
+      bitField0_ = (bitField0_ & ~0x01000000);
+      sharedBallY_ = 0F;
+      bitField0_ = (bitField0_ & ~0x02000000);
+      sharedBallReliability_ = 0;
+      bitField0_ = (bitField0_ & ~0x04000000);
       return this;
     }
 
@@ -1046,6 +1166,22 @@ public final class WorldModel extends
         to_bitField0_ |= 0x00400000;
       }
       result.alive_ = alive_;
+      if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
+        to_bitField0_ |= 0x00800000;
+      }
+      result.sharedBallOn_ = sharedBallOn_;
+      if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
+        to_bitField0_ |= 0x01000000;
+      }
+      result.sharedBallX_ = sharedBallX_;
+      if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
+        to_bitField0_ |= 0x02000000;
+      }
+      result.sharedBallY_ = sharedBallY_;
+      if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
+        to_bitField0_ |= 0x04000000;
+      }
+      result.sharedBallReliability_ = sharedBallReliability_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -1130,6 +1266,18 @@ public final class WorldModel extends
       }
       if (other.hasAlive()) {
         setAlive(other.getAlive());
+      }
+      if (other.hasSharedBallOn()) {
+        setSharedBallOn(other.getSharedBallOn());
+      }
+      if (other.hasSharedBallX()) {
+        setSharedBallX(other.getSharedBallX());
+      }
+      if (other.hasSharedBallY()) {
+        setSharedBallY(other.getSharedBallY());
+      }
+      if (other.hasSharedBallReliability()) {
+        setSharedBallReliability(other.getSharedBallReliability());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -1890,6 +2038,134 @@ public final class WorldModel extends
     public Builder clearAlive() {
       bitField0_ = (bitField0_ & ~0x00400000);
       alive_ = false;
+      onChanged();
+      return this;
+    }
+
+    private boolean sharedBallOn_ ;
+    /**
+     * <code>optional bool shared_ball_on = 24;</code>
+     */
+    public boolean hasSharedBallOn() {
+      return ((bitField0_ & 0x00800000) == 0x00800000);
+    }
+    /**
+     * <code>optional bool shared_ball_on = 24;</code>
+     */
+    public boolean getSharedBallOn() {
+      return sharedBallOn_;
+    }
+    /**
+     * <code>optional bool shared_ball_on = 24;</code>
+     */
+    public Builder setSharedBallOn(boolean value) {
+      bitField0_ |= 0x00800000;
+      sharedBallOn_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional bool shared_ball_on = 24;</code>
+     */
+    public Builder clearSharedBallOn() {
+      bitField0_ = (bitField0_ & ~0x00800000);
+      sharedBallOn_ = false;
+      onChanged();
+      return this;
+    }
+
+    private float sharedBallX_ ;
+    /**
+     * <code>optional float shared_ball_x = 25;</code>
+     */
+    public boolean hasSharedBallX() {
+      return ((bitField0_ & 0x01000000) == 0x01000000);
+    }
+    /**
+     * <code>optional float shared_ball_x = 25;</code>
+     */
+    public float getSharedBallX() {
+      return sharedBallX_;
+    }
+    /**
+     * <code>optional float shared_ball_x = 25;</code>
+     */
+    public Builder setSharedBallX(float value) {
+      bitField0_ |= 0x01000000;
+      sharedBallX_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float shared_ball_x = 25;</code>
+     */
+    public Builder clearSharedBallX() {
+      bitField0_ = (bitField0_ & ~0x01000000);
+      sharedBallX_ = 0F;
+      onChanged();
+      return this;
+    }
+
+    private float sharedBallY_ ;
+    /**
+     * <code>optional float shared_ball_y = 26;</code>
+     */
+    public boolean hasSharedBallY() {
+      return ((bitField0_ & 0x02000000) == 0x02000000);
+    }
+    /**
+     * <code>optional float shared_ball_y = 26;</code>
+     */
+    public float getSharedBallY() {
+      return sharedBallY_;
+    }
+    /**
+     * <code>optional float shared_ball_y = 26;</code>
+     */
+    public Builder setSharedBallY(float value) {
+      bitField0_ |= 0x02000000;
+      sharedBallY_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float shared_ball_y = 26;</code>
+     */
+    public Builder clearSharedBallY() {
+      bitField0_ = (bitField0_ & ~0x02000000);
+      sharedBallY_ = 0F;
+      onChanged();
+      return this;
+    }
+
+    private int sharedBallReliability_ ;
+    /**
+     * <code>optional int32 shared_ball_reliability = 27;</code>
+     */
+    public boolean hasSharedBallReliability() {
+      return ((bitField0_ & 0x04000000) == 0x04000000);
+    }
+    /**
+     * <code>optional int32 shared_ball_reliability = 27;</code>
+     */
+    public int getSharedBallReliability() {
+      return sharedBallReliability_;
+    }
+    /**
+     * <code>optional int32 shared_ball_reliability = 27;</code>
+     */
+    public Builder setSharedBallReliability(int value) {
+      bitField0_ |= 0x04000000;
+      sharedBallReliability_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 shared_ball_reliability = 27;</code>
+     */
+    public Builder clearSharedBallReliability() {
+      bitField0_ = (bitField0_ & ~0x04000000);
+      sharedBallReliability_ = 0;
       onChanged();
       return this;
     }

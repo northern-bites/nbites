@@ -154,7 +154,7 @@ public class NaoRobot {
 		}
 		
 		//where is my shared ball | only for player 4&5: chasers
-		g2.setColor(new Color(204,0,100));
+		g2.setColor(Color.magenta);
 		if(sharedBall) {
 			g2.fill(new Ellipse2D.Double(screenSharedBallX-4, screenSharedBallY-4,8,8));
 			g2.drawString(Integer.toString(playerNumber), screenSharedBallX+1, screenSharedBallX-1);
@@ -194,19 +194,17 @@ public class NaoRobot {
 	}
 	
 	public void wvSharedBall(NBitesTeamBroadcast tb) {
+		if (!tb.dataWorldModel.hasSharedBallOn()) {
+			sharedBall = false;
+			return;
+		} else if (!tb.dataWorldModel.getSharedBallOn()) {
+			sharedBall = false;
+			return;
+		}
 		sharedBall = true;
-		float sinHB, cosHB;
-		
-		float hb = TO_RAD*fieldH+TO_RAD*tb.dataWorldModel.getBallBearing();
-		sinHB = (float) Math.sin(hb);
-		cosHB = (float) Math.cos(hb);
-			
-		float newBallX = fieldX + tb.dataWorldModel.getBallDist()*cosHB;
-		float newBallY = fieldY + tb.dataWorldModel.getBallDist()*sinHB;
-			
-		fieldBallX = (int) newBallX;
-		fieldBallY = (int) newBallY;
-
+		screenSharedBallX = (int)tb.dataWorldModel.getSharedBallX();
+		screenSharedBallY = (int)tb.dataWorldModel.getSharedBallY();
+		return;
 	}
 
 	public void moveTo(float xCoord, float yCoord, float heading) {

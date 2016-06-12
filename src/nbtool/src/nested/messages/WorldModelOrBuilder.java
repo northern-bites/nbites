@@ -213,4 +213,40 @@ public interface WorldModelOrBuilder extends
    * <code>optional bool alive = 23;</code>
    */
   boolean getAlive();
+
+  /**
+   * <code>optional bool shared_ball_on = 24;</code>
+   */
+  boolean hasSharedBallOn();
+  /**
+   * <code>optional bool shared_ball_on = 24;</code>
+   */
+  boolean getSharedBallOn();
+
+  /**
+   * <code>optional float shared_ball_x = 25;</code>
+   */
+  boolean hasSharedBallX();
+  /**
+   * <code>optional float shared_ball_x = 25;</code>
+   */
+  float getSharedBallX();
+
+  /**
+   * <code>optional float shared_ball_y = 26;</code>
+   */
+  boolean hasSharedBallY();
+  /**
+   * <code>optional float shared_ball_y = 26;</code>
+   */
+  float getSharedBallY();
+
+  /**
+   * <code>optional int32 shared_ball_reliability = 27;</code>
+   */
+  boolean hasSharedBallReliability();
+  /**
+   * <code>optional int32 shared_ball_reliability = 27;</code>
+   */
+  int getSharedBallReliability();
 }

@@ -42,4 +42,9 @@ message WorldModel
     optional int32 intention = 22;
 
     optional bool  alive = 23;
+
+    optional bool shared_ball_on  = 24;
+    optional float shared_ball_x = 25;
+    optional float shared_ball_y = 26;
+    optional int32 shared_ball_reliability = 27;
 }

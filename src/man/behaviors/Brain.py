@@ -243,6 +243,10 @@ class Brain(object):
         output.fallen = me.fallen
         output.active = me.active
         output.claimed_ball = me.claimedBall
+        output.shared_ball_on = self.sharedBall.ball_on
+        output.shared_ball_x = self.sharedBall.x
+        output.shared_ball_y = self.sharedBall.y
+
 
     def getCommUpdate(self):
         self.teamMembers[self.playerNumber - 1].updateMe()

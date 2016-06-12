@@ -22,7 +22,7 @@ public final class _File_WorldModel {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020WorldModel.proto\022\010messages\"\275\003\n\nWorldMo" +
+      "\n\020WorldModel.proto\022\010messages\"\244\004\n\nWorldMo" +
       "del\022\021\n\ttimestamp\030\001 \001(\003\022\014\n\004my_x\030\002 \001(\002\022\014\n\004" +
       "my_y\030\003 \001(\002\022\014\n\004my_h\030\004 \001(\002\022\021\n\tmy_uncert\030\005 " +
       "\001(\002\022\024\n\014walking_to_x\030\006 \001(\002\022\024\n\014walking_to_" +
@@ -33,8 +33,11 @@ public final class _File_WorldModel {
       "\n\020in_kicking_state\030\020 \001(\010\022\024\n\014kicking_to_x" +
       "\030\021 \001(\002\022\024\n\014kicking_to_y\030\022 \001(\002\022\016\n\006fallen\030\023",
       " \001(\010\022\016\n\006active\030\024 \001(\010\022\024\n\014claimed_ball\030\025 \001" +
-      "(\010\022\021\n\tintention\030\026 \001(\005\022\r\n\005alive\030\027 \001(\010B\024B\020" +
-      "_File_WorldModelP\001"
+      "(\010\022\021\n\tintention\030\026 \001(\005\022\r\n\005alive\030\027 \001(\010\022\026\n\016" +
+      "shared_ball_on\030\030 \001(\010\022\025\n\rshared_ball_x\030\031 " +
+      "\001(\002\022\025\n\rshared_ball_y\030\032 \001(\002\022\037\n\027shared_bal" +
+      "l_reliability\030\033 \001(\005B\024B\020_File_WorldModelP" +
+      "\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -53,7 +56,7 @@ public final class _File_WorldModel {
     internal_static_messages_WorldModel_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_WorldModel_descriptor,
-        new java.lang.String[] { "Timestamp", "MyX", "MyY", "MyH", "MyUncert", "WalkingToX", "WalkingToY", "BallOn", "BallAge", "BallDist", "BallBearing", "BallVelX", "BallVelY", "BallUncert", "Role", "InKickingState", "KickingToX", "KickingToY", "Fallen", "Active", "ClaimedBall", "Intention", "Alive", });
+        new java.lang.String[] { "Timestamp", "MyX", "MyY", "MyH", "MyUncert", "WalkingToX", "WalkingToY", "BallOn", "BallAge", "BallDist", "BallBearing", "BallVelX", "BallVelY", "BallUncert", "Role", "InKickingState", "KickingToX", "KickingToY", "Fallen", "Active", "ClaimedBall", "Intention", "Alive", "SharedBallOn", "SharedBallX", "SharedBallY", "SharedBallReliability", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
