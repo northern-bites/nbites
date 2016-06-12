@@ -128,6 +128,24 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
     return newY;
 }
 
+void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot, 
+                                            float innerDiam, bool topCamera, 
+                                            int filterThreshold, int greenThreshold, 
+                                            float filterGain) 
+{
+    s.darkSpot(darkSpot);
+    s.innerDiamCm(innerDiam);
+
+    if(!topCamera) {
+        s.innerDiamCm(innerDiam);
+    }
+
+    s.filterThreshold(filterThreshold);
+    s.greenThreshold(greenThreshold);
+    s.filterGain(filterGain);
+
+}
+
 /* We have a potential ball on the horizon. Do some checking to
    screen out potential other stuff.
    This is a substantial area of possible improvement - more sanity
@@ -780,14 +798,15 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	// 						 height - horiz);
 
     SpotDetector spots;
-    spots.darkSpot(true);
-    spots.innerDiamCm(3.0f);
-    if (!topCamera) {
-        spots.innerDiamCm(3.0f);
-    }
-    spots.filterThreshold(150);
-    spots.greenThreshold(60);
-    spots.filterGain(0.5);
+    initializeSpotterSettings(spots, true, 3.0f, topCamera, 150, 60, 0.5);
+    // spots.darkSpot(true);
+    // spots.innerDiamCm(3.0f);
+    // if (!topCamera) {
+    //     spots.innerDiamCm(3.0f);
+    // }
+    // spots.filterThreshold(150);
+    // spots.greenThreshold(60);
+    // spots.filterGain(0.5);
     // spots.spotDetect(smallerY, homography, &smallerGreen);
     spots.spotDetect(yImage, homography, &greenImage);
     SpotList spotter = spots.spots();

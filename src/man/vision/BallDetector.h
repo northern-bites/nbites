@@ -89,6 +89,10 @@ namespace man {
             int scanX(int startX, int startY, int direction, int stop);
             int scanY(int startX, int startY, int direction, int stop);
 
+            void initializeSpotterSettings(SpotDetector &s, bool darkSpot, float innerDiam, 
+            							   bool topCamera, int filterThreshold, int greenThreshold,
+            							   float filterGain);
+
 
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
@@ -108,7 +112,9 @@ namespace man {
 
             void makeBall(Spot blob, double cameraHeight, double conf,
                           bool foundBall, bool isBlack);
+
             bool lookForFarAwayBalls(Blob blob);
+
             bool farSanityChecks(Blob blob);
             bool nearSanityChecks(Blob blob);
 			bool hardSanityCheck(int leftx, int rightx, int topy, int bottomy);
