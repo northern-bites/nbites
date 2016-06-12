@@ -38,7 +38,7 @@ def commMonitor(player):
         player.roleSwitching = False
         player.commMode = 1
     elif player.commMode != 0 and transitions.goodComm(player):
-        print "Switched to good comm mode!"
+        print "Switched to good comm mode! ROLE SWITCHING IS ON."
         player.role = player.brain.playerNumber
         if player.commMode == 2: 
             RoleConstants.roleConfiguration = player.prevRoleConfig
