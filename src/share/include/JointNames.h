@@ -98,3 +98,4 @@ static std::vector<float> toJointAngles(const messages::JointAngles& ja)
     result[R_ELBOW_ROLL] = ja.r_elbow_roll();
     return result;
 }
+}
