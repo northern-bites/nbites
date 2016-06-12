@@ -19,6 +19,7 @@ Enactor::~Enactor()
     // TODO
 }
 
+long printyay = 0;
 void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffness)
 {
     std::vector<float> jointAngles = Kinematics::toJointAngles(angles);
@@ -31,10 +32,19 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
     {
         jointCommand[5][i][0] = jointAngles[i];
         stiffnessCommand[5][i][0] = jointStiffnesses[i];
+        if (printyay == 100) {
+            std::cout<< Kinematics::stringForJoint( (Kinematics::JointName) i)<< " "<< jointAngles[i]<< std::endl;
+        }
         //std::cout << "Joint "<< i<< " "<< jointAngles[i]<<std::endl;
-
     }
-   // std::cout<<"\n\n"<<std::endl;
+
+    std::cout<<"\n\n"<<std::endl;
+    if (printyay == 100) {
+        printyay = 0;
+    } else {
+        printyay++;
+    }
+
 
     try
     {
