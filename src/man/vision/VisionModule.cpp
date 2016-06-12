@@ -534,8 +534,8 @@ void VisionModule::outportalVisionField()
     // (6) Outportal visually detected robots
     int size = 10;
     // Make array bigger than 8 directions so we can do direction +- 1 without error
-    bool* topRobots = new bool[size];
-    bool* bottomRobots = new bool[size];
+    bool topRobots[size];
+    bool bottomRobots[size];
     robotDetector[0]->getDetectedRobots(topRobots,size);
     robotDetector[1]->getDetectedRobots(bottomRobots,size);
 
@@ -547,8 +547,6 @@ void VisionModule::outportalVisionField()
         messages::VRobot* temp = visionField.add_robot();
         temp->set_position(i);
     }
-    delete topRobots;
-    delete bottomRobots;
 
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);
