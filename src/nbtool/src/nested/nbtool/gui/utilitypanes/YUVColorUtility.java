@@ -47,7 +47,7 @@ public class YUVColorUtility extends UtilityParent {
 	        	for (int y = 0; y < 512; ++y) {
 	        		byte Y = (byte) (sliderVal & 0xFF);
 	        		byte U = (byte) (x / 2);
-	        		byte V = (byte) (y / 2);
+	        		byte V = (byte) (256 - (y / 2));
 	        		
 	        		pixels[x / 2][y / 2] = new YUVPixel(Y,U,V);
 	        		bi.setRGB(x, y, YUYV8888Image.yuv444ToARGB888Pixel(Y, U, V));
@@ -78,7 +78,7 @@ public class YUVColorUtility extends UtilityParent {
 	        	public void mouseClicked(MouseEvent e) {
 	        		Point p = e.getPoint();
 	        		if (pixels != null) {
-	        			YUVPixel chsn = pixels[p.x / 2][p.y / 2];
+	        			YUVPixel chsn = pixels[p.x / 2][(p.y / 2)];
 	        			clickedLabel.setText("clicked: " + chsn.toString());
 	        			lastClicked = chsn;
 	        		}
@@ -90,7 +90,7 @@ public class YUVColorUtility extends UtilityParent {
 	        	public void mouseMoved(MouseEvent e) {
 	        		Point p = e.getPoint();
 	        		if (pixels != null) {
-	        			YUVPixel chsn = pixels[p.x / 2][p.y / 2];
+	        			YUVPixel chsn = pixels[p.x / 2][(p.y / 2)];
 	        			mouseOverLabel.setText("mouse: " + chsn.toString());
 	        		}
 	        	}
@@ -148,9 +148,9 @@ public class YUVColorUtility extends UtilityParent {
 
 	        jLabel3.setText("U 255");
 
-	        jLabel4.setText("V 0");
+	        jLabel4.setText("V 255");
 
-	        jLabel5.setText("V 255");
+	        jLabel5.setText("V 0");
 
 	        mouseOverLabel.setText("mouse");
 

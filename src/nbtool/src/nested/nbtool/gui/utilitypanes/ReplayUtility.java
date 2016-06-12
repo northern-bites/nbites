@@ -8,6 +8,8 @@
 //import javax.swing.JOptionPane;
 //import javax.swing.Timer;
 //
+//import nbtool.data.group.Group;
+//import nbtool.data.log.LogReference;
 //import nbtool.gui.logdnd.LogDND;
 //import nbtool.gui.logdnd.LogDND.LogDNDTarget;
 //import nbtool.util.Debug;
@@ -40,15 +42,17 @@
 //		
 //		private class Loop {
 //			
+//			Group session;
+//
 //			boolean valid = false, repeat = false;
 //			int first = -1;
 //			int len = -1;
 //			
 //			int index = -1;
 //			
-//			Loop(Session s, _Log from, _Log to, boolean repeat) {
-//				int fi = s.logs_DO.indexOf(from);
-//				int ti = s.logs_DO.indexOf(to);
+//			Loop(Group s, LogReference from, LogReference to, boolean repeat) {
+//				int fi = s.logs.indexOf(from);
+//				int ti = s.logs.indexOf(to);
 //				
 //				if (!(fi < ti)) {
 //					return;
@@ -64,8 +68,7 @@
 //				Debug.info("Loop(%d, %d)", first, len);
 //			}
 //			
-//			Session session;
-//			_Log getNext() {
+//			Log getNext() {
 //				if (index == len && !repeat)
 //					return null;
 //				
