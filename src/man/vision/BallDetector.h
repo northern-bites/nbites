@@ -77,6 +77,9 @@ namespace man {
 			std::string details;
 		};
 
+		typedef std::vector<std::pair<int, int>> intPairVector;
+		typedef std::vector<Spot> spotVector;
+
 		class BallDetector {
 		public:
 			BallDetector(FieldHomography* homography_, Field* field_, bool topCamera);
@@ -86,27 +89,31 @@ namespace man {
             void edgeSanityCheck(int x, int y, int radius);
             void sanityChecks(int bx, int by, int radius);
             void makeEdgeList(EdgeList & edges);
+
             int scanX(int startX, int startY, int direction, int stop);
             int scanY(int startX, int startY, int direction, int stop);
 
-            void initializeSpotterSettings(SpotDetector &s, bool darkSpot, float innerDiam, 
-            								float altInnerDiam, bool topCamera, int filterThreshold, 
-            								int greenThreshold, float filterGain);
-
-
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
+            void initializeSpotterSettings(SpotDetector &s, bool darkSpot, float innerDiam, 
+								float altInnerDiam, bool topCamera, int filterThreshold, 
+								int greenThreshold, float filterGain);
+
+            void processDarkSpots(SpotList & darkSpots, intPairVector & blackSpots, 
+            						intPairVector & badBlackSpots, spotVector & actualBlackSpots);
+            bool processWhiteSpots(SpotList & whiteSpots, intPairVector & blackSpots,
+            						intPairVector & badBlackSpots, spotVector & actualWhiteSpots,
+            						double cameraHeight, bool & foundBall);
+
             bool filterBlackSpots(Spot currentBlob);
-            bool filterWhiteBlob(Spot spot, std::vector<std::pair<int,int>> & blackSpots,
-								 std::vector<std::pair<int,int>> & badBlackSpots);
-            bool filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & blackSpots,
-								 std::vector<std::pair<int,int>> & badBlackSpots);
-            int filterWhiteBlobs(Blob currentBlob,
-                                  std::vector<std::pair<int,int>> & blobs,
-                                  std::vector<std::pair<int,int>> blackBlobs);
-            bool findCorrelatedBlackSpots(std::vector<std::pair<int,int>> & blackBlobs,
-                                          std::vector<Spot> & actualBlobs,
-                                          double cameraHeight, bool & foundBall);
+            bool filterWhiteBlob(Spot spot, intPairVector & blackSpots,
+            						intPairVector & badBlackSpots);
+            bool filterWhiteSpot(Spot spot, intPairVector & blackSpots,
+            						intPairVector & badBlackSpots);
+            int filterWhiteBlobs(Blob currentBlob, intPairVector &blobs,
+                                  	intPairVector blackBlobs);
+            bool findCorrelatedBlackSpots(intPairVector & blackBlobs,spotVector & actualBlobs,
+                                          	double cameraHeight, bool & foundBall);
             bool blobsAreClose(std::pair<int,int> first,
                                std::pair<int,int> second);
 
@@ -143,8 +150,8 @@ namespace man {
 			int height;
 			int currentX, currentY;
             std::vector<Edge> goodEdges;
-			std::vector<Spot> debugBlackSpots;
-			std::vector<Spot> debugWhiteSpots;
+			spotVector debugBlackSpots;
+			spotVector debugWhiteSpots;
 			Connectivity blobber;
 
 			DebugImage debugDraw;
@@ -152,6 +159,15 @@ namespace man {
 			ImageLiteU16 yImage;
 
 			Ball _best;
+
+			enum SpotType {
+				WHITE_CANDIDATE = 1,
+				WHITE_REJECT,
+				DARK_CANDIDATE,
+				DARK_REJECT,
+				WHITE_BLOB,
+				WHITE_BLOB_BAD
+			};
 
 			// For tool
 			std::vector<Ball> candidates;
