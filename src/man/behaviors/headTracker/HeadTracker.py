@@ -81,7 +81,59 @@ class HeadTracker(FSA.FSA):
     def repeatBasicPan(self):
         '''Repeat the basic fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
+<<<<<<< Updated upstream
     
+=======
+
+    def performSnapPan(self):
+        self.performHeadMove(HeadMoves.SNAP_PAN)
+
+    def repeatSnapPan(self):
+
+        # print "REPEATING STANDARD SNAP PAN WITH NEW TIMES"
+
+        self.repeatHeadMove(HeadMoves.SNAP_PAN)
+
+    def performWideSnapPan(self):
+
+        # print "PERFORMING WIDE SNAP PAN WITH NEW TIMES"
+
+        self.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    def repeatWideSnapPan(self):
+
+        print "REPEATING WIDE SNAP PAN  --  NOTE"
+
+        self.repeatHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    def performFastSnapPan(self):
+        self.performHeadMove(HeadMoves.FAST_SNAP_PAN)
+
+    def repeatFastSnapPan(self):
+        self.repeatHeadMove(HeadMoves.FAST_SNAP_PAN)
+
+    def performWideFastSnapPan(self):
+        self.performHeadMove(HeadMoves.WIDE_FAST_SNAP_PAN)
+
+    def repeatWideFastSnapPan(self):
+        self.repeatHeadMove(HeadMoves.WIDE_FAST_SNAP_PAN)
+
+    def performCenterSnapPan(self):
+
+        print "PERFORMING CENTER SNAP PAN"
+
+        self.performHeadMove(HeadMoves.CENTER_SNAP_PAN)
+
+    def repeatCenterSnapPan(self):
+        self.repeatHeadMove(HeadMoves.CENTER_SNAP_PAN)
+
+    def performGoalieWideSnapPan(self):
+        self.performHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+
+    def repeatGoalieWideSnapPan(self):
+        self.repeatHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+
+>>>>>>> Stashed changes
     def performWidePan(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
@@ -104,7 +156,7 @@ class HeadTracker(FSA.FSA):
     def performKickPan(self, invert = False):
         self.performHeadMove(self.helper.convertKickPan(HeadMoves.FIXED_PITCH_KICK_PAN, invert))
 
-    def trackBall(self):
+    def trackBall(self, gameSet = False):
         """
         Enters a state cycle:
         When ball is in view, tracks via vision values.
@@ -116,9 +168,22 @@ class HeadTracker(FSA.FSA):
             self.bounceTrackBall()
             return
 
-        if (self.currentState is not 'fullPan' and
+        self.target = self.brain.ball
+
+        if (gameSet): # == True
+
+            print "IN GAME SET"
+
+            if (self.currentState is not 'gameSetFullPan' and self.currentState is not 'gameSetTracking'):
+                self.switchTo('gameSetTracking')
+                return
+
+        if (self.currentState is not 'fullPan' and # SNAPPAN -- what is going on here?
             self.currentState is not 'tracking'):
-            self.switchTo('tracking')
+
+            print "----------------SWITCHING TO TRACKING-----------------"
+
+            self.switchTo('tracking') # which is in TrackingStates.py
 
     def bounceTrackBall(self):
         """

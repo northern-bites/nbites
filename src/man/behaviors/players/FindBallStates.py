@@ -11,6 +11,9 @@ def findBall(player):
     """
     Decides what type of search to do.
     """
+
+    print "FIND THE BALL"
+
     if player.firstFrame():
         player.inKickingState = False
         player.claimedBall = False
@@ -23,7 +26,22 @@ def findBall(player):
         if distance <= constants.SCRUM_DIST and bearing < constants.SPIN_SEARCH_BEARING:
             return player.goNow('scrumStrategy')
         else:
-            return player.goNow('spinSearch')
+            return player.goNow('searchInFront')
+
+@superState('gameControllerResponder')
+@stay
+@ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
+def searchInFront(player):
+
+    print "--------------------- Searching in front ----------------------------"
+
+    if player.firstFrame():
+        player.brain.tracker.performCenterSnapPan()
+
+    playerTracker = player.brain.tracker
+
+    if not playerTracker.brain.motion.head_is_active:
+        return player.goNow('spinSearch')
 
 @superState('gameControllerResponder')
 @stay

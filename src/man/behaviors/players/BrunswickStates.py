@@ -73,18 +73,24 @@ def gameSet(player):
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
+        #The player's currentState = gameSet
+
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.gainsOn()
         player.stand()
         player.brain.nav.stand()
-        player.brain.tracker.performWidePan()
+
+        player.brain.tracker.lookToAngleWithTime(-75, 0.75)
 
         if player.wasPenalized:
             player.wasPenalized = False
 
     elif player.brain.tracker.isStopped():
-        player.brain.tracker.trackBall()
+
+        print "-----------BRAIN TRACKER STOPPED, GOING TO TRACK BALL-----------------"
+
+        player.brain.tracker.trackBall(True)
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:

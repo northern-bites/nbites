@@ -122,7 +122,12 @@ class HeadTrackingHelper(object):
         """
         # Note: safe to call every frame.
 
+        print "----IN----TRACK----OBJECT-----"
+
         target = self.tracker.target
+
+        # print "TRACKER TARGET: " + str(target)
+
         changeX, changeY = 0.0, 0.0
 
         # If we cannot see the target, abort.
@@ -134,6 +139,10 @@ class HeadTrackingHelper(object):
 
         # If we haven't seen the target, look towards loc model.
         if target.vis.frames_off > 3:
+
+            print "-----------------LOOKING TO POINT-------------------"
+
+
 # TODO: use a constant above
             self.lookToPoint(target)
 # TODO: safeguard above call from errors due to calling every frame

@@ -212,7 +212,9 @@ def watchWithLineChecks(player):
         and not watchWithLineChecks.looking
         and not watchWithLineChecks.hasPanned):
         watchWithLineChecks.looking = True
-        player.brain.tracker.performBasicPan()
+
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.performGoalieWideSnapPan()
         watchWithLineChecks.hasPanned = True
 
     if player.brain.tracker.isStopped():
@@ -274,7 +276,12 @@ def returnUsingLoc(player):
     if (player.counter % 90 == 0):
         print("Switching headtracker")
         if not returnUsingLoc.panning:
+<<<<<<< Updated upstream
             player.brain.tracker.repeatBasicPan()
+=======
+            # @SNAPPAN-CHANGE
+            player.brain.tracker.repeatGoalieWideSnapPan()
+>>>>>>> Stashed changes
         else:
             player.brain.tracker.trackBall
 
