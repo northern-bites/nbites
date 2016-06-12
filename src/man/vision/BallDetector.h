@@ -90,8 +90,8 @@ namespace man {
             int scanY(int startX, int startY, int direction, int stop);
 
             void initializeSpotterSettings(SpotDetector &s, bool darkSpot, float innerDiam, 
-            							   bool topCamera, int filterThreshold, int greenThreshold,
-            							   float filterGain);
+            								float altInnerDiam, bool topCamera, int filterThreshold, 
+            								int greenThreshold, float filterGain);
 
 
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);

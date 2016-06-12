@@ -129,15 +129,15 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
 }
 
 void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot, 
-                                            float innerDiam, bool topCamera, 
-                                            int filterThreshold, int greenThreshold, 
-                                            float filterGain) 
+                                            float innerDiam, float altInnerDiam, 
+                                            bool topCamera, int filterThreshold, 
+                                            int greenThreshold, float filterGain) 
 {
     s.darkSpot(darkSpot);
     s.innerDiamCm(innerDiam);
 
     if(!topCamera) {
-        s.innerDiamCm(innerDiam);
+        s.innerDiamCm(altInnerDiam);
     }
 
     s.filterThreshold(filterThreshold);
@@ -798,7 +798,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	// 						 height - horiz);
 
     SpotDetector spots;
-    initializeSpotterSettings(spots, true, 3.0f, topCamera, 150, 60, 0.5);
+    initializeSpotterSettings(spots, true, 3.0f, 3.0f, topCamera, 150, 60, 0.5);
     // spots.darkSpot(true);
     // spots.innerDiamCm(3.0f);
     // if (!topCamera) {
@@ -886,14 +886,15 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 		}
 	}
     SpotDetector whitespots;
-    whitespots.darkSpot(false);
-    whitespots.innerDiamCm(13.0f);
-    if (!topCamera) {
-        whitespots.innerDiamCm(25.0f);
-    }
-    whitespots.filterThreshold(140);
-    whitespots.greenThreshold(70);
-    whitespots.filterGain(0.5);
+    initializeSpotterSettings(whitespots, false, 13.0f, 25.0f, topCamera, 140, 70, 0.5);
+    // whitespots.darkSpot(false);
+    // whitespots.innerDiamCm(13.0f);
+    // if (!topCamera) {
+    //     whitespots.innerDiamCm(25.0f);
+    // }
+    // whitespots.filterThreshold(140);
+    // whitespots.greenThreshold(70);
+    // whitespots.filterGain(0.5);
     // whitespots.spotDetect(smallerY, homography, &smallerGreen);
     whitespots.spotDetect(yImage, homography, &greenImage);
     SpotList whitespotter = whitespots.spots();
