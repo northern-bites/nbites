@@ -74,7 +74,6 @@ def setDestination(nav, dest, gain = 1.0, kick = None):
     if MyMath.fabs(dest.relH) > 20:
         print("NavDebug - heading was too great, I'm turning!")
         print("My dest relH: ", MyMath.fabs(dest.relH))
-        print("Radians ninety: ", radians(90))
 
         command.dest.rel_x = 0.0
         command.dest.rel_y = 0.0

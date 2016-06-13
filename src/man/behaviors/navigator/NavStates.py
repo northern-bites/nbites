@@ -66,6 +66,12 @@ def goToPosition(nav):
             goToPosition.fast = True
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
+    dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
+    print("Distance: ", dist)
+    if dist < 50:
+        print("I'm close enough ! I will not go fast anymore")
+        goToPosition.fast = False
+
     # Why would you move like this? This should be refactored,
     # in the mean time never go fast and also never dodge
     # goToPosition.fast = False
