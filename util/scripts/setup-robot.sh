@@ -56,8 +56,11 @@ mv $FOLDER/naoqi-init /etc/init.d/naoqi
 
 # Move the autoload files
 echo "Moving autoload.ini files into place..."
-mv $FOLDER/sys_autoload.ini /etc/naoqi/autoload.ini
+#mv $FOLDER/sys_autoload.ini /etc/naoqi/autoload.ini
 mv $FOLDER/usr_autoload.ini naoqi/preferences/autoload.ini
+
+echo "USING TTS ENABLED autoload.ini -- are you sure this is the right branch?"
+mv tts_autoload.ini /etc/naoqi/autoload.ini
 
 # Move the config files for wpa_supplicant
 echo "Moving config files for wpa_supplicant"
