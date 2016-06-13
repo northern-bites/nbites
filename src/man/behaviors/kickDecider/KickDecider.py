@@ -297,9 +297,10 @@ class KickDecider(object):
         except:
             return None
 
+    """ THIS GETS USED A BUNCH """
     def kicksBeforeBallIsFree(self):
         print "kicksBeforeBallIsFree"
-        asap = self.motionKicksAsap()
+        asap = self.new2016KickStrategy()
         if asap:
             return asap
 
@@ -630,6 +631,10 @@ class KickDecider(object):
         # print("THREEusOpen2016StraightKickStrategy")
         return self.frontKickCrosses()
 
+    """ THIS IS THE ONE WE'RE USING NOW"""
+    def new2016KickStrategy(self):
+        print "New 2016 Kick Strategy"
+        return self.frontKicksOrbit()
 
     def usOpenStrategy2016(self): # TODO REMOVE UNDO POOP
         print "usOpenStrategy2016"
