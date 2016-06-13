@@ -36,6 +36,7 @@ class KickDecider(object):
     
     ### LOW LEVEL PLANNERS ###
     def sweetMovesOrbit(self):
+        print "sweetMovesOrbit"
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -54,6 +55,7 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def frontKickCrosses(self):
+        print "frontKickCrosses"
         self.brain.player.motionKick = True
         
         self.kicks = []
@@ -71,9 +73,9 @@ class KickDecider(object):
 
         return kickReturned
 
-    def motionFrontKicksOrbit(self):
-        self.brain.player.motionKick = True
-
+    def frontKicksOrbit(self):
+        print "frontKicksOrbit"
+        self.brain.player.motionKick = False
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
@@ -91,6 +93,7 @@ class KickDecider(object):
             return None
 
     def frontKicksOrbitIfSmall(self):
+        print "frontKicksOrbitIfSmall"
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -111,6 +114,7 @@ class KickDecider(object):
             return None
 
     def bigKicksOrbit(self):
+        print "bigKicksOrbit"
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -127,6 +131,7 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def frontKicksAsapOnGoal(self):
+        print "frontKicksAsapOnGoal"
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -149,6 +154,7 @@ class KickDecider(object):
             return None
 
     def frontKicksClear(self):
+        print "frontKicksClear"
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -169,6 +175,7 @@ class KickDecider(object):
             return None
 
     def usOpen2016motionKickStraight(self):
+        print "usOpen2016motionKickStraight"
         self.brain.player.motionKick = True
 
         self.kicks = []
@@ -185,13 +192,14 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def motionKicksOrbit(self):
+        print "motionKicksOrbit"
         self.brain.player.motionKick = True
     
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
-        self.kicks.append(kicks.M_LEFT_SIDE)
-        self.kicks.append(kicks.M_RIGHT_SIDE)
+        # self.kicks.append(kicks.M_LEFT_SIDE)
+        # self.kicks.append(kicks.M_RIGHT_SIDE)
         self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
 
@@ -205,13 +213,14 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def motionKicksAsap(self):
+        print "motionKicksAsap"
         self.brain.player.motionKick = True
     
         self.kicks = []
-        self.kicks.append(kicks.M_LEFT_STRAIGHT)
-        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
-        self.kicks.append(kicks.M_LEFT_SIDE)
-        self.kicks.append(kicks.M_RIGHT_SIDE)
+        # self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        # self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        # self.kicks.append(kicks.M_LEFT_SIDE)
+        # self.kicks.append(kicks.M_RIGHT_SIDE)
         self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
 
@@ -230,6 +239,7 @@ class KickDecider(object):
             return None
 
     def motionKicksAsapOnGoal(self):
+        print "motionKicksAsapOnGoal"
         self.brain.player.motionKick = True
     
         self.kicks = []
@@ -254,6 +264,7 @@ class KickDecider(object):
             return None
 
     def motionKicksInScrumAsap(self, obstacles):
+        print "motionKicksInScrumAsap"
         self.brain.player.motionKick = True
     
         self.kicks = []
@@ -285,14 +296,17 @@ class KickDecider(object):
         except:
             return None
 
+    """ THIS GETS USED A BUNCH """
     def kicksBeforeBallIsFree(self):
-        asap = self.motionKicksAsap()
+        print "kicksBeforeBallIsFree"
+        asap = self.new2016KickStrategy()
         if asap:
             return asap
 
         return self.frontKickCrosses()
 
     def kickOutOfBounds(self):
+        print "kickOutOfBounds"
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
@@ -322,6 +336,7 @@ class KickDecider(object):
             return None
 
     def allKicksAsap(self):
+        print "allKicksAsap"
         self.kicks = []
         # self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
         # self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
@@ -353,6 +368,7 @@ class KickDecider(object):
             return None
 
     def sweetMovesForKickOff(self, direction, dest):
+        print "sweetMovesForKickOff"
         """
         direction 0 is a forward kick, direction 1 is a left side pass
         direction -1 is a right side pass
@@ -378,6 +394,7 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def sweetMoveCrossToCenter(self):
+        print "sweetMoveCrossToCenter"
         self.brain.player.motionKick = True
 
         self.kicks = []
@@ -394,6 +411,7 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def allKicksIncludingBigKickAsap(self):
+        print "allKicksIncludingBigKickAsap"
         self.kicks = []
         self.kicks.append(kicks.LEFT_BIG_KICK)
         self.kicks.append(kicks.RIGHT_BIG_KICK)
@@ -425,6 +443,7 @@ class KickDecider(object):
             return None
 
     def motionKickOnGoal(self):
+        print "motionKickOnGoal"
         self.brain.player.motionKick = True
 
         self.kicks = []
@@ -445,6 +464,7 @@ class KickDecider(object):
             return None
 
     def forwardKickOnGoal(self):
+        print "forwardKickOnGoal"
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -465,6 +485,7 @@ class KickDecider(object):
             return None
 
     def timeForSomeHeroics(self):
+        print "timeForSomeHeroics"
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -484,7 +505,7 @@ class KickDecider(object):
             return None
 
     def allKicksAsapOnGoal(self):
-        # print "In allKicksAsapOnGoal"
+        print "allKicksAsapOnGoal"
 
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
@@ -516,6 +537,7 @@ class KickDecider(object):
             return None
 
     def allKicksIncludingBigKickAsapOnGoal(self):
+        print "allKicksIncludingBigKickAsapOnGoal"
         self.kicks = []
         self.kicks.append(kicks.LEFT_BIG_KICK)
         self.kicks.append(kicks.RIGHT_BIG_KICK)
@@ -547,6 +569,7 @@ class KickDecider(object):
             return None
 
     def frontKicksOnGoal(self):
+        print "frontKicksOnGoal"
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
@@ -577,9 +600,10 @@ class KickDecider(object):
     ### HIGH LEVEL PLANNERS ###
     ###########################
     def fastKicking(self):
-        return self.motionFrontKicksOrbit()
+        return self.frontKicksOrbit()
 
     def decidingStrategy(self):
+        print "decidingStrategy"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
             return closeGoalShot
@@ -594,6 +618,7 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def usOpen2016StraightKickStrategy(self): #USOPEN2016 . TODO: REMOVE
+        print "usOpen2016StraightKickStrategy"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
             # print("ONEusOpen2016StraightKickStrategy")
@@ -607,8 +632,13 @@ class KickDecider(object):
         # print("THREEusOpen2016StraightKickStrategy")
         return self.frontKickCrosses()
 
+    """ THIS IS THE ONE WE'RE USING NOW"""
+    def new2016KickStrategy(self):
+        print "New 2016 Kick Strategy"
+        return self.frontKicksOrbit()
 
     def usOpenStrategy2016(self): # TODO REMOVE UNDO POOP
+        print "usOpenStrategy2016"
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
             return closeGoalShot
@@ -621,6 +651,7 @@ class KickDecider(object):
 
     # not currently used
     def nearOurGoal(self):
+        print "nearOurGoal"
         nearOurGoal = (math.fabs(self.brain.loc.h) > 100 and 
                        self.brain.ball.x < nogginC.LANDMARK_BLUE_GOAL_CROSS_X)
         if nearOurGoal:
@@ -913,6 +944,8 @@ class KickDecider(object):
         return r*math.cos(theta), r*math.sin(theta)
 
     def normalizeAngle(self, angle):
+        """ Make sure angle is between -180 and +180 degrees by adding or
+        subtracting 360 degrees as necessary"""
         newAngle = angle
         while newAngle <= -180: newAngle += 360
         while newAngle > 180: newAngle -= 360
