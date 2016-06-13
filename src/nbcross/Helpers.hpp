@@ -34,7 +34,7 @@ SExpr treeFromSpot(man::vision::Spot & b, int width, int height);
 
 SExpr treeFromBlob(man::vision::Blob& b);
 
-SExpr treeFromBall(man::vision::Ball& b);
+SExpr treeFromBall(man::vision::Ball& b, int width, int height);
 
 void imageSizeCheck(bool top, int width, int height);
 
