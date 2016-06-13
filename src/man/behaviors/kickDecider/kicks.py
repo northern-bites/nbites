@@ -117,8 +117,8 @@ BH_LEFT_FORWARD_KICK =  Kick("BH_L_FORWARD", x = 14.6, y =  4.2, dist = 475, bhT
 BH_RIGHT_FORWARD_KICK =  Kick("BH_R_FORWARD", x = 14.6, y =  -4.2, dist = 475, bhType = PMotion_proto.messages.Kick.kickForwardRight)
 
 # Motion kicks
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 16.5, y = 3., dist = 130)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 16.5, y = -3., dist = 130)
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 13.0, y = 3., dist = 70)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 13.0, y = -3., dist = 70)
 
 M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 17.0, y = -.3, h = 60, dist = 130)
 M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 17.0, y = .3, h = -60, dist = 130)
