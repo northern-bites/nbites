@@ -202,15 +202,16 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			// TODO odometry, handle
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
 			logMsg("Walk command - Walking!");
-		 
+		 	float WALK_SPEED_SCALE = 1000.0;
 			// HANDLE
 			tryingToWalk = true;
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 			std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
-			request->body.forward = 00.0; //command->x_percent ;
-			request->body.left = 0.0; //command->y_percent ;
-			request->body.turn = 0.0; //command->theta_percent ;
+			request->body.forward = command->x_percent * WALK_SPEED_SCALE ;
+			request->body.left = command->y_percent * WALK_SPEED_SCALE;
+			request->body.turn = command->theta_percent ;
+			std::cout << "FORWARD: " << request->body.forward << std::endl;
 			request->body.speed = 0.0f;
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
@@ -241,11 +242,11 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	request->body.speed = 0.0f;
 	adjustIMU(sensorInertials);
 
-	request->body.forward = 350;
-	request->body.left = 0.0; 
-	request->body.turn = 0.0; 
+	// request->body.forward = 350;
+	// request->body.left = 0.0; 
+	// request->body.turn = 0.0; 
 
-	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
+	std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
 	// request->body.forward = 600.0; //command->x_percent ;
 	// request->body.left = 00.0; //command->y_percent ;
 	// request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
@@ -547,9 +548,9 @@ void UNSWalkProvider::setCommand(const KickCommand::ptr command) {
 
 void UNSWalkProvider::getOdometryUpdate(portals::OutPortal< ::messages::RobotLocation>& out) const {
 	portals::Message< ::messages::RobotLocation> odometryData(0);
-	odometryData.get()->set_x(odometry->forward);
-	odometryData.get()->set_y(odometry->left);
-	odometryData.get()->set_h(odometry->turn);
+	odometryData.get()->set_x(odometry->forward * MM_TO_CM);
+	odometryData.get()->set_y(odometry->left * MM_TO_CM);
+	odometryData.get()->set_h(odometry->turn * MM_TO_CM);
 	out.setMessage(odometryData);
 }
 

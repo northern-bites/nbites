@@ -71,8 +71,11 @@ def setDestination(nav, dest, gain = 1.0, kick = None):
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK
 
-    if MyMath.fabs(dest.relH) > radians(90):
-        # print("NavDebug - heading was too great, I'm turning!")
+    if MyMath.fabs(dest.relH) > 20:
+        print("NavDebug - heading was too great, I'm turning!")
+        print("My dest relH: ", MyMath.fabs(dest.relH))
+        print("Radians ninety: ", radians(90))
+
         command.dest.rel_x = 0.0
         command.dest.rel_y = 0.0
         command.dest.rel_h = dest.relH
@@ -130,7 +133,7 @@ def setSpeed(nav, speeds):
         nav.printf("!!!!!! USE player.stopWalking() NOT walk(0,0,0)!!!!!")
         return
 
-    print("STOP TRYING TO CREATE AND SEND WALK VECTORS!")
+    # print("STOP TRYING TO CREATE AND SEND WALK VECTORS!")
 
     createAndSendWalkVector(nav, *speeds)
 

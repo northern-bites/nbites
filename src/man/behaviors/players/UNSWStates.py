@@ -53,7 +53,9 @@ def gameReady(player):
         elif player.isKickingOff:
             player.kickoffPosition = roleConstants.theirKickoff
 
-        player.brain.nav.goTo(player.kickoffPosition,
+        myLocation = RelRobotLocation(40, 0, 0)
+
+        player.brain.nav.goTo(myLocation,
                               precision = Navigator.PLAYBOOK,
                               speed = Navigator.QUICK_SPEED,
                               avoidObstacles = True,
