@@ -134,12 +134,12 @@ def afterPenalty(player):
     if afterPenalty.frameCount > 200:
 
         # arbitrary thresholds for now!
-        if afterPenalty.tCornerLeft > 20 and afterPenalty.outerLCornerRight > 20:
+        if afterPenalty.tCornerLeft > 20 or afterPenalty.outerLCornerRight > 20:
             if DEBUG_PENALTY_STATES:
                 print "Player thinks the goal is on the right!"
             afterPenalty.decidedSide = True
 
-        elif afterPenalty.tCornerLeft < -20 and afterPenalty.outerLCornerRight < -20:
+        elif afterPenalty.tCornerLeft < -20 or afterPenalty.outerLCornerRight < -20:
             if DEBUG_PENALTY_STATES:
                 print "Player thinks the goal is on the left!"
             afterPenalty.decidedSide = True
@@ -168,6 +168,7 @@ def afterPenalty(player):
                 return player.goNow('gamePenalized')
 
         # TODO see if the goalie role affects this
+        player.brain.tracker.lookToAngle(0)
         return player.goNow('walkOut')
 
     # Stay until we've finished checking out our surroundings
