@@ -28,6 +28,7 @@ def kickEngine(nav):
     State that we stay in while calling kick engine
     """
     if nav.firstFrame():
+        print "First frame of kick engine"
         helper.executeKickEngine(nav, kickEngine.kickType)
         return nav.stay()
 
@@ -298,6 +299,7 @@ walking.transitions = {}
 
 ### Stopping States ###
 def stopped(nav):
+    print "'Nav stopped' state"
     return nav.stay()
 
 def atPosition(nav):

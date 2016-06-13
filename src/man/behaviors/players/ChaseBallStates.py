@@ -19,6 +19,7 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
+    print "approachBall"
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
@@ -58,7 +59,7 @@ def walkToWayPoint(player):
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.tracker.trackBall()
     
-    player.kick = player.decider.usOpen2016StraightKickStrategy() #USOPEN 2016
+    player.kick = player.decider.new2016KickStrategy() #USOPEN 2016
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
     ball = player.brain.ball
@@ -138,11 +139,11 @@ def prepareForKick(player):
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
             # print "Overriding kick decider for kickoff!"
             player.shouldKickOff = False
-            player.kick = player.decider.kicksBeforeBallIsFree()
+            player.kick = player.decider.new2016KickStrategy()
         else:
             player.shouldKickOff = False
             # print("PREPAREFOREKICK THIS CASE")
-            player.kick = player.decider.usOpen2016StraightKickStrategy()
+            player.kick = player.decider.new2016KickStrategy()
         player.inKickingState = True
     
     elif player.finishedPlay:
@@ -363,10 +364,10 @@ def positionForKick(player):
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
 
-        if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
-            positionForKick.speed = Navigator.GRADUAL_SPEED
-        else:
-            positionForKick.speed = MIN_SPEED
+        # if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
+        #     positionForKick.speed = Navigator.GRADUAL_SPEED
+        # else:
+        positionForKick.speed = MIN_SPEED
 
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)
@@ -377,7 +378,8 @@ def positionForKick(player):
     player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
         print player.kick
-        if player.motionKick:
+        return player.goLater('executeSweetKick')
+        if player.motionKick or True:
            return player.goNow('executeMotionKick')
         elif player.kick.bhKickType or True:
             player.brain.nav.stand()
