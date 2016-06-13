@@ -566,7 +566,7 @@ void VisionModule::reloadColorParams() {
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
 {
     NBL_WARN("VisionModule: using colors for camera[%d] = {%s}",
-             topCamera, latestUsedColorParams[!topCamera].serialize().c_str() );
+             !topCamera, latestUsedColorParams[!topCamera].serialize().c_str() );
 
     if (colorParams[!topCamera]) delete colorParams[!topCamera];
     colorParams[!topCamera] = colors;
@@ -583,7 +583,7 @@ void VisionModule::reloadCameraOffsets() {
 void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
 {
     NBL_WARN("VisionModule: using offsets for camera[%d] = {%lf, %lf}",
-             topCamera, params->getRoll(), params->getTilt());
+             !topCamera, params->getRoll(), params->getTilt());
 
     if (calibrationParams[!topCamera]) delete calibrationParams[!topCamera];
     calibrationParams[!topCamera] = params;

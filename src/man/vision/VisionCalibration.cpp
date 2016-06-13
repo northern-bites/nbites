@@ -7,6 +7,8 @@
 #include "DebugConfig.h"
 #endif
 
+#define NBL_LOGGING_LEVEL NBL_INFO_LEVEL
+
 namespace man {
 namespace vision {
 namespace calibration {
@@ -80,28 +82,40 @@ namespace calibration {
 
     static inline float color_normalize(double val) {
         float ret = (float) (val / 255) - 0.5f;
+        if (ret < -0.5f) ret = -0.5f;
+        if (ret > 0.5f) ret = 0.5f;
+
         NBL_ASSERT_GE(ret, -0.5f)
         NBL_ASSERT_LE(ret, 0.5f)
+
         return ret;
     }
 
-#define get(obj, field) ( (float) obj[field].asNumber().asDouble())
+    static inline float get_norm_for(json::Object& obj, std::string field) {
+//        NBL_INFO("getting for: %s", field.c_str())
+        float parsed = (float) obj[field].asNumber().asDouble();
+//        NBL_INFO("was: %f", parsed)
+        return color_normalize(parsed);
+    }
 
     Colors * parseColorsFromJSON(json::Object& object) {
         Colors * ret = new Colors;
 
         {
+//            NBL_INFO("parsing green...")
             json::Object& green = object["green"].asObject();
-            ret->green.load(get(green, "uAtY0"), get(green, "vAtY0"), get(green, "uAtY255"), get(green, "vAtY255"), get(green, "u_fuzzy_range"), get(green, "v_fuzzy_range"));
+            ret->green.load(get_norm_for(green, "uAtY0"), get_norm_for(green, "vAtY0"), get_norm_for(green, "uAtY255"), get_norm_for(green, "vAtY255"), get_norm_for(green, "u_fuzzy_range"), get_norm_for(green, "v_fuzzy_range"));
         }
 
         {
+//            NBL_INFO("parsing white...")
             json::Object& white = object["white"].asObject();
-            ret->green.load(get(white, "uAtY0"), get(white, "vAtY0"), get(white, "uAtY255"), get(white, "vAtY255"), get(white, "u_fuzzy_range"), get(white, "v_fuzzy_range"));
+            ret->white.load(get_norm_for(white, "uAtY0"), get_norm_for(white, "vAtY0"), get_norm_for(white, "uAtY255"), get_norm_for(white, "vAtY255"), get_norm_for(white, "u_fuzzy_range"), get_norm_for(white, "v_fuzzy_range"));
         }
 
+//        NBL_INFO("parsing black...")
         json::Object& black = object["black"].asObject();
-        ret->orange.load(get(black, "uAtY0"), get(black, "vAtY0"), get(black, "uAtY255"), get(black, "vAtY255"), get(black, "u_fuzzy_range"), get(black, "v_fuzzy_range"));
+        ret->orange.load(get_norm_for(black, "uAtY0"), get_norm_for(black, "vAtY0"), get_norm_for(black, "uAtY255"), get_norm_for(black, "vAtY255"), get_norm_for(black, "u_fuzzy_range"), get_norm_for(black, "v_fuzzy_range"));
 
         return ret;
     }
