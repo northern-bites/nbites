@@ -923,7 +923,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 
     if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots, actualWhiteSpots, 
                  cameraHeight, bottomQuarter)) {
-        std::cout<<"Process Blobs True. Center at - "<<_best.centerX<<std::endl;
 #ifdef OFFLINE
         foundBall = true;
 #else
@@ -938,7 +937,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 
     if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots, 
                       cameraHeight,foundBall)) {
-        std::cout<<"Process White Spots True. Center at - "<<_best.centerX<<std::endl;
 #ifdef OFFLINE
         foundBall = true;
 #else
