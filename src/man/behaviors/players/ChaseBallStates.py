@@ -9,43 +9,112 @@ from ..navigator import Navigator
 from ..navigator import PID
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
-from noggin_constants import MAX_SPEED, MIN_SPEED 
+from noggin_constants import MAX_SPEED, MIN_SPEED
 from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
-from math import fabs, degrees, cos, sin, pi, radians, copysign
+from math import fabs, degrees, radians, cos, sin, pi, copysign
 
 @superState('gameControllerResponder')
 @stay
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
-    if player.brain.nav.dodging:
-        return player.stay()
-
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
-        player.brain.tracker.trackBall()
-        if player.shouldKickOff:
-            if player.inKickOffPlay:
-                return player.goNow('giveAndGo')
-            else:
-                return player.goNow('positionAndKickBall')
 
-        elif player.penaltyKicking:
-            return player.goNow('prepareForPenaltyKick')
+    if player.brain.nav.dodging:
+        return player.stay()
+
+    player.brain.tracker.trackBall()
+    if player.shouldKickOff:
+        if player.inKickOffPlay:
+            return player.goNow('giveAndGo')
         else:
-            player.brain.nav.chaseBall(MAX_SPEED, fast = True)
+            return player.goNow('positionAndKickBall')
 
-    if (transitions.shouldPrepareForKick(player) or
-        player.brain.nav.isAtPosition()):
-        return player.goNow('positionAndKickBall')
-    
-    elif transitions.shouldDecelerate(player):
-        player.brain.nav.chaseBall(MIN_SPEED, fast = True)
+    elif player.penaltyKicking:
+        return player.goNow('prepareForPenaltyKick')
     else:
-        player.brain.nav.chaseBall(MAX_SPEED, fast = True)
+        return player.goNow('lineUpKick')
 
+    return player.goLater('lineUpKick')
+
+@defaultState('walkToWayPoint')
+@superState('gameControllerResponder')
+@stay
+@ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
+@ifSwitchNow(transitions.shouldFindBall, 'findBall')
+def lineUpKick(player):
+    """ super state to walk around the ball and line up to kick"""
+    pass
+
+@superState('lineUpKick')
+def walkToWayPoint(player):
+    if player.brain.nav.dodging:
+        return player.stay()    
+
+    if player.firstFrame():
+        player.decider = KickDecider.KickDecider(player.brain)
+        player.brain.tracker.trackBall()
+    
+    player.kick = player.decider.usOpen2016StraightKickStrategy() #USOPEN 2016
+    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
+
+    ball = player.brain.ball
+
+    if transitions.shouldDecelerate(player):
+        speed = MIN_SPEED
+    else:
+        speed = MAX_SPEED
+
+    if fabs(relH) <= constants.MAX_BEARING_DIFF:
+        wayPoint = RobotLocation(ball.x - constants.WAYPOINT_DIST*cos(radians(player.kick.setupH)),
+                                ball.y - constants.WAYPOINT_DIST*sin(radians(player.kick.setupH)),
+                                player.brain.loc.h)
+
+        player.brain.nav.goTo(wayPoint, Navigator.CLOSE_ENOUGH, speed, True, fast = True)
+
+        if transitions.shouldSpinToKickHeading(player):
+            return player.goNow('spinToKickHeading')
+
+    else:
+        player.brain.nav.chaseBall(speed, fast = True)
+
+        if transitions.shouldPrepareForKick(player):
+            return player.goLater('positionAndKickBall')
+
+    return player.stay()
+
+@superState('lineUpKick')
+def spinToKickHeading(player):
+    """
+    spins to the ball until it is facing the ball 
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+    if player.brain.nav.dodging:
+        return player.stay()
+
+    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
+
+    if fabs(relH) <= constants.FACING_KICK_ACCEPTABLE_BEARING:
+        return player.goNow('positionForKick')
+
+    if fabs(relH) <= constants.FACING_BALL_ACCEPTABLE_BEARING:
+        speed = Navigator.GRADUAL_SPEED
+    elif fabs(relH) >= constants.MAX_BEARING_DIFF:
+        speed = Navigator.FAST_SPEED
+    else:
+        slope = (Navigator.FAST_SPEED - Navigator.GRADUAL_SPEED) / (constants.MAX_BEARING_DIFF - constants.FACING_BALL_ACCEPTABLE_BEARING)
+        intercept = Navigator.FAST_SPEED - slope*constants.MAX_BEARING_DIFF
+        speed = slope*fabs(relH) + intercept
+
+    # spins the appropriate direction
+    player.brain.nav.walk(0., 0., copysign(speed, relH))
+
+    return player.stay()
 
 @defaultState('prepareForKick')
 @superState('gameControllerResponder')
@@ -67,17 +136,27 @@ def prepareForKick(player):
 
     if not player.inKickOffPlay:
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
-            print "Overriding kick decider for kickoff!"
+            # print "Overriding kick decider for kickoff!"
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
-            player.kick = player.decider.fastKicking()
+            player.shouldKickOff = False
+            # print("PREPAREFOREKICK THIS CASE")
+            player.kick = player.decider.usOpen2016StraightKickStrategy()
         player.inKickingState = True
+    
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
+#Josh's code
     player.motionKick = True
     return player.goNow('lineUp')
+#dans potential field stuff
+    # # only orbit is small orbit
+    # relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
+    # if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
+    #     return player.goNow('orbitBall')
+    # return player.goNow('followPotentialField')
 
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
@@ -133,7 +212,7 @@ def followPotentialField(player):
         else:
             normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
 
-            if fabs(ball.bearing_deg) < constants.FACING_BALL_ACCEPTABLE_BEARING:
+            if fabs(ball.bearing_deg) < 2*constants.FACING_KICK_ACCEPTABLE_BEARING:
                 hComp = 0
             elif attractorDist < constants.CLOSE_TO_ATTRACTOR_DIST:
                 hComp = copysign(Navigator.FAST_SPEED, ball.bearing_deg)
@@ -253,14 +332,12 @@ def spinToBall(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        print "spinning to ball"
 
     theta = degrees(player.brain.ball.bearing)
-    spinToBall.isFacingBall = fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
+    spinToBall.isFacingBall = fabs(theta) <= 2*constants.FACING_KICK_ACCEPTABLE_BEARING
 
     if spinToBall.isFacingBall:
-        print "facing ball"
-        return player.goLater('positionAndKickBall')
+        return player.goLater('approachBall')
 
     # spins the appropriate direction
     if theta < 0:
@@ -299,10 +376,14 @@ def positionForKick(player):
 
     player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
+        print player.kick
         if player.motionKick:
            return player.goNow('executeMotionKick')
+        elif player.kick.bhKickType or True:
+            player.brain.nav.stand()
+            return player.goLater('executeBHKick')
         else:
             player.brain.nav.stand()
-            return player.goNow('executeKick')
+            return player.goLater('executeSweetKick')
 
     return player.stay()

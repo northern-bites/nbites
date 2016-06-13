@@ -307,6 +307,14 @@ public:
 
   void clear();
 
+  void merge(LineFit b)
+  {
+      sumW += b.sumW;
+      sumX += b.sumX;
+      sumY += b.sumY;
+  }
+
+
   double area() const { return sumW; }
 
   double centerX() const { return sumX / sumW;}

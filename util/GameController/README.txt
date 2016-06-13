@@ -10,25 +10,35 @@ The sources mentioned in some sections of this document are available at
 https://github.com/bhuman/GameController .
 
 
+### Acknowledgement
+
+The development was partially supported by the RoboCup Federation within the calls for
+Support for Projects for League Developments for 2013 and 2015.
+
+
 ## 1. Building from Source
 
 To build it from the source code you may use Apache Ant.
 Just call "ant" in the main directory.
-	
-## 2. Executing the Jar
+
+Building the source code requires the JDK 1.7 or newer.
+
+
+## 2. GameController
+
+### Executing the Jar
 
 Double-click GameController.jar or run 
 
 Usage: `java -jar GameController.jar {options}`
 
     (-h | --help)                   display help
-    (-b | --broadcast) <address>    set broadcast ip (default is 255.255.255.255)
+    (-i | --interface) <interface>  set network interface (default is a connected IPv4 interface)
     (-l | --league) (spl | spl_dropin | hl_kid | hl_teen | hl_adult)
                                     select league (default is spl)
     (-w | --window)                 select window mode (default is fullscreen)
 
 
-## 3. Usage
 ### Start Dialog
 
 Select your league. The default can be specified as a command line parameter (see above).
@@ -36,21 +46,28 @@ Select your league. The default can be specified as a command line parameter (se
 Pick the two teams that are playing. They have to be different teams. If you are 
 practicing alone, use the "Invisibles" as second team.
 
-SPL: You also have to select whether you play a game in the preliminaries, a play-off
-game, or a drop-in player game. In the preliminaries and in drop-player games the clock
-will continue to run during game stoppages and there will be no penalty shootout in case
-of a draw. In drop-in player games, there are no coaches, teams cannot call a timeout,
-and there are no substitutes.
+SPL: The GameController automatically selects the jersey colors: If only one team has 
+custom jerseys (defined in the file "teams.cfg"), its jersey color is picked first,
+otherwise the jersey color of the left is picked first. For both teams, the first jersey
+color that they have and, if picking second, that does not conflict with the jersey color
+of the opponent is selected in the following sequence:
+
+* Left team: custom 1, custom 2, blue, red
+* Right team: custom 1, custom 2, red, blue
+
+You also have to select whether you play a game in the preliminaries or a 
+play-off game. In the preliminaries the clock will continue to run during game stoppages
+and there will be no penalty shootout in case of a draw. In play-off games, the clock
+will be stopped and there may be penalty shootout.
 
 HL: You also have to select whether you play a normal game or a knock-out game. A
 knock-out game will continue after a draw with two halves of extra time (if goals were
-scored before) and then a penalty shoot-out if necessary.
+scored before) and then a penalty shoot-out if necessary. You can also select whether
+teams exchange their colors in the halftime.
 
 You can select whether the GameController should run in fullscreen mode or in windowed
 mode. Note that the fullscreen mode does not work correctly on some Linux desktops,
 because although they report to Java that they would support this feature, they do not.
-
-HL: You can also select whether teams exchange their colors in the halftime.
 
 
 ### Main Screen
@@ -94,41 +111,88 @@ to the clock to increase the game time in one-minute steps. This is only availab
 stoppages of play.
 
 
-## 4. Shortcuts
+### Penalty Shootout
 
-While the GameController is running, you may use the following keys on the keyboard instead of pushing buttons:
+In the penalty shootout, press "Set" and place the robots in their correct locations. Press
+"Play" to start a single shot. The penalty shot is ended by either pressing "+" for the 
+penalty taker or by pressing "Finish" if the shot failed. In both cases, a penalty shot ends
+in the state "Finished". Press "Set" again to start the next shot.
 
-    Esc	      - press it twice to close the GameController
+
+### Shortcuts
+
+While the GameController is running, you may use the following keys on the keyboard instead
+of pushing buttons:
+
+    Esc       - press it twice to close the GameController
     Delete    - toggle test-mode (everything is legal, every button is visible and enabled)
     Backspace - undo last action
 
 only SPL
 
-    B	- out by blue
-    R	- out by red
+    B    - out by blue
+    R    - out by red
+    Y    - out by yellow
+    K    - out by black
 
-    P	- pushing
-    L	- leaving the field
-    I	- fallen / inactive / local game stuck
-    D	- illegal defender
-    G   - kickoff goal 
-    O	- illegal ball contact
-    U	- request for pickup
-    C   - coach motion
-    T   - teammate pushing
-    S	- substitute
+    P    - pushing
+    L    - leaving the field
+    I    - fallen / inactive / local game stuck
+    D    - illegal defender
+    G    - kickoff goal 
+    O    - illegal ball contact
+    U    - request for pickup
+    C    - coach motion
+    T    - teammate pushing
+    S    - substitute
 
 only Humanoid-League
 
-    B	- out by blue
-    R	- out by red
+    B    - out by blue
+    R    - out by red
 
-    M	- ball manipulation
-    P	- physical contact
-    A	- illegal attack
-    D	- illegal defense
-    I	- service / incapable
-    S	- substitute
+    M    - ball manipulation
+    P    - physical contact
+    A    - illegal attack
+    D    - illegal defense
+    I    - service / incapable
+    S    - substitute
+
+
+## 3. GameStateVisualizer
+
+### Executing the Jar
+
+Double-click GameStateVisualizer.jar or run 
+
+Usage: `java -jar GameStateVisualizer.jar {options}`
+
+    (-h | --help)                   display help
+    (-l | --league) (spl | spl_dropin | hl_kid | hl_teen | hl_adult)
+                                    select league (default is spl)
+
+### Shortcuts
+
+In addition to the usual keyboard combinations to terminate the application
+(Alt+F4 / Cmd+Q), pressing F11 toggles between the normal mode and the test
+mode. In the latter, the messages sent by the GameController are dumped on
+the screen.
+
+
+## 4. TeamCommunicationMonitor
+
+The TeamCommunicationMonitor (TCM) is a tool for visualizing the data
+communicated by robots during SPL games.
+
+It serves two main purposes:
+
+1. offering diagnostic data such as which robots are communicating on which
+   team ports and whether the data that is sent by these conforms to the
+   SPLStandardMessage, which is the standard communication protocol in the SPL
+2. visualizing the data that was sent via SPLStandardMessages in both textual
+   and graphical form.
+
+For more info see [TCM](TCM.md).
 
 
 ## 5. libgamectrl (SPL)
@@ -185,6 +249,7 @@ the right foot bumper. The state is shown by the right foot LED, and only in
 the Initial state. An active GameController will overwrite these settings.
 
 
+
 ## 6. Coach Messages
 
 The coach broadcasts messages as defined in SPLCoachMessage.h to the UDP port
@@ -202,20 +267,23 @@ Please note that the field "team" now contains the team number, not the color.
 
 ## 7. Misc
 
-The format of the packets the GameController broadcasts and receives at port
-GAMECONTROLLER_PORT is defined in the file RoboCupGameControlData.h. It differs
-from the version used in 2014 in several ways:
+The format of the packets the GameController broadcasts at port
+GAMECONTROLLER\_DATA\_PORT and receives at port GAMECONTROLLER\_RETURN\_PORT
+is defined in the file RoboCupGameControlData.h. It differs from the version used
+in 2014 in several ways:
+
+- Inside the messages, teams are now identified by their number rather than their 
+  color (e.g. kickOffTeam, dropInTeam).
 
 - SPLCoachMessage as well as TeamInfo now have a sequence number of 1 byte which
   is set by the coach.
 
-- Coach messages now have a data packet size of 80 bytes instead of 40 (actually
-  it is 81 bytes, but only for memory alignment reasons). 
+- Coach messages now have a data packet size of 81 bytes instead of 40. 
 
 - RoboCupGameControlData now has the gameType flag, which indicates whether the
-  current game is a round-robin game (time does not stop + no whistles) or a
-  play-off game, i.e. a (quarter / semi) final (whistle is used + time is
-  stopped).
+  current game is a round-robin game (time does not stop), a drop-in player game
+  (the same, but only one half), or a play-off game, i.e. a (quarter / semi)
+  final (time is stopped).
 
 
 ## 8. Known Issues

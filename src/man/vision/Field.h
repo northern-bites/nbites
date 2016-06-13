@@ -2,6 +2,10 @@
 #define Field_h_DEFINED
 
 #include <boost/shared_ptr.hpp>
+#include "Homography.h"
+#include "Point.h"
+#include "RansacTypes.h"
+#include "Ransac.h"
 #include "Vision.h"
 
 namespace man {
@@ -11,7 +15,6 @@ namespace vision {
 }
 
 //#include "VisionModule.h"
-#include "Homography.h"
 
 //#include "Threshold.h"
 //#include "NaoPose.h"
@@ -48,7 +51,8 @@ public:
 
     // main methods
 	void setDebugImage(DebugImage * di);
-	void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange);
+	void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
+		ImageLiteU16 yImg);
 	void getColor(int x, int y);
    	bool isGreen();
 	bool isWhite();
@@ -60,6 +64,8 @@ public:
 	void drawDot(int x, int y, int c);
 	void drawLine(int x, int y, int x1, int y1, int c);
 
+	void findFieldEdge(int pH);
+	void findFieldEdgeLines(unsigned int * seed);
     // Returns true if x is WITHIN SCOPE convex hull and sets y
     //  to height of hull at that x. (True could still be off field)
 	bool onField(double x, double & y);
@@ -70,6 +76,7 @@ public:
     int getInitialHorizonEstimate(int pH);
     int getImprovedEstimate(int pH);
 	int horizonAt(int x);
+    float horizonDist() { return getPixDistance(horizonAt(IMAGE_WIDTH / 2)); }
 	int blockHorizonAt(int x);
 	int occludingHorizonAt(int x);
 	float distanceToHorizon(int x, int y);
@@ -99,7 +106,6 @@ public:
 	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}
 	void setDrawFieldHorizon(bool debug) {debugDrawFieldEdge = debug;}
 	void setDrawCameraHorizon(bool debug) {drawCameraHorizon = debug;}
-	void setGreenThresh(int gt) {greenThresh = gt; }
 #endif
 
 private:
@@ -107,9 +113,12 @@ private:
 	bool topCamera;
 	DebugImage debugDraw;
 	ImageLiteU8 whiteImage, greenImage, orangeImage;
+	ImageLiteU16 yImage;
 	int currentX, currentY;
 	FieldHomography * homography;
 	int width, height;
+
+	std::vector<PointI> edgePointsTop;
 
 	// the field horizon
 	int horizon;
@@ -120,6 +129,7 @@ private:
 
 	int  topEdge[IMAGE_WIDTH+1];
 	int topBlock[IMAGE_WIDTH+1];
+	int greenTops[HULLS];
     point<int> convex[HULLS];
 	point<int> blockages[HULLS];
 	point<double> convexWorld[HULLS];
@@ -128,13 +138,13 @@ private:
     bool debugFieldEdge;
 	bool debugDrawFieldEdge;
 	bool drawCameraHorizon;
-	int greenThresh;
+	bool debugRansac;
 #else
     static const bool debugHorizon = false;
     static const bool debugFieldEdge = false;
 	static const bool debugDrawFieldEdge = false;
 	static const bool drawCameraHorizon = false;
-	static const int greenThresh = 128;
+	static const bool debugRansac = false;
 #endif
 };
 

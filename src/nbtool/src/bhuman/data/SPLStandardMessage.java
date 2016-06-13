@@ -49,17 +49,17 @@ public class SPLStandardMessage implements Serializable {
     // +ve x-axis points towards the goal we are attempting to score on
     // +ve y-axis is 90 degrees counter clockwise from the +ve x-axis
     // angle in radians, 0 along the +x axis, increasing counter clockwise
-    public float[] pose;      // x,y,theta
+    public float[] pose = new float[3];      // x,y,theta
 
     // the robot's target position on the field
     // the coordinate system is the same as for the pose
     // if the robot does not have any target, this attribute should be set to the robot's position
-    public float[] walkingTo;
+    public float[] walkingTo = new float[2];
 
     // the target position of the next shot (either pass or goal shot)
     // the coordinate system is the same as for the pose
     // if the robot does not intend to shoot, this attribute should be set to the robot's position
-    public float[] shootingTo;
+    public float[] shootingTo = new float[2];
 
     // Ball information
     public float ballAge;        // seconds since this robot last saw the ball. -1.f if we haven't seen it
@@ -69,11 +69,11 @@ public class SPLStandardMessage implements Serializable {
     // 0,0 is in centre of the robot
     // +ve x-axis points forward from the robot
     // +ve y-axis is 90 degrees counter clockwise from the +ve x-axis
-    public float[] ball;
+    public float[] ball = new float[2];
 
     // velocity of the ball (same coordinate system as above)
     // the unit is millimeters per second
-    public float[] ballVel;
+    public float[] ballVel = new float[2];
 
     // describes what - in the robot's opinion - the teammates should do:
     public enum Suggestion {
@@ -84,7 +84,7 @@ public class SPLStandardMessage implements Serializable {
         OFFENSE, // 3 - support the ball
         PLAY_BALL // 4 - play the ball
     }
-    public Suggestion[] suggestion;
+    public Suggestion[] suggestion = new Suggestion[SPL_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS];
 
     // describes what the robot intends to do
     public enum Intention {
@@ -141,7 +141,48 @@ public class SPLStandardMessage implements Serializable {
     public boolean currentSideConfidenceValid = false;
     public boolean dataValid = false;
 
-    public List<String> errors = new LinkedList<String>();
+    public List<String> errors = new LinkedList<>();
+
+    public static SPLStandardMessage createFrom(final SPLStandardMessage message) {
+        final SPLStandardMessage m = new SPLStandardMessage();
+        m.header = message.header;
+        m.version = message.version;
+        m.playerNum = message.playerNum;
+        m.teamNum = message.teamNum;
+        m.fallen = message.fallen;
+        m.pose = message.pose;
+        m.walkingTo = message.walkingTo;
+        m.shootingTo = message.shootingTo;
+        m.ballAge = message.ballAge;
+        m.ball = message.ball;
+        m.ballVel = message.ballVel;
+        m.suggestion = message.suggestion;
+        m.intention = message.intention;
+        m.averageWalkSpeed = message.averageWalkSpeed;
+        m.maxKickDistance = message.maxKickDistance;
+        m.currentPositionConfidence = message.currentPositionConfidence;
+        m.currentSideConfidence = message.currentSideConfidence;
+        m.nominalDataBytes = message.nominalDataBytes;
+        m.data = message.data;
+        m.valid = message.valid;
+        m.headerValid = message.headerValid;
+        m.versionValid = message.versionValid;
+        m.playerNumValid = message.playerNumValid;
+        m.teamNumValid = message.teamNumValid;
+        m.fallenValid = message.fallenValid;
+        m.poseValid = message.poseValid;
+        m.walkingToValid = message.walkingToValid;
+        m.shootingToValid = message.shootingToValid;
+        m.ballValid = message.ballValid;
+        m.suggestionValid = message.suggestionValid;
+        m.intentionValid = message.intentionValid;
+        m.averageWalkSpeedValid = message.averageWalkSpeedValid;
+        m.maxKickDistanceValid = message.maxKickDistanceValid;
+        m.currentPositionConfidenceValid = message.currentPositionConfidenceValid;
+        m.currentSideConfidenceValid = message.currentSideConfidenceValid;
+        m.dataValid = message.dataValid;
+        return m;
+    }
 
     public byte[] toByteArray() {
         ByteBuffer buffer = ByteBuffer.allocate(SIZE);
@@ -223,7 +264,6 @@ public class SPLStandardMessage implements Serializable {
                             errors.add("invalid fallen state; expected 0 or 1, is: " + fallenState);
                     }
 
-                    pose = new float[3];
                     pose[0] = buffer.getFloat();
                     pose[1] = buffer.getFloat();
                     pose[2] = buffer.getFloat();
@@ -231,14 +271,12 @@ public class SPLStandardMessage implements Serializable {
                         poseValid = true;
                     }
 
-                    walkingTo = new float[2];
                     walkingTo[0] = buffer.getFloat();
                     walkingTo[1] = buffer.getFloat();
                     if (!Float.isNaN(walkingTo[0]) && !Float.isNaN(walkingTo[1])) {
                         walkingToValid = true;
                     }
 
-                    shootingTo = new float[2];
                     shootingTo[0] = buffer.getFloat();
                     shootingTo[1] = buffer.getFloat();
                     if (!Float.isNaN(shootingTo[0]) && !Float.isNaN(shootingTo[1])) {
@@ -247,18 +285,15 @@ public class SPLStandardMessage implements Serializable {
 
                     ballAge = buffer.getFloat();
 
-                    ball = new float[2];
                     ball[0] = buffer.getFloat();
                     ball[1] = buffer.getFloat();
 
-                    ballVel = new float[2];
                     ballVel[0] = buffer.getFloat();
                     ballVel[1] = buffer.getFloat();
                     if (!Float.isNaN(ballAge) && !Float.isNaN(ball[0]) && !Float.isNaN(ball[1]) && !Float.isNaN(ballVel[0]) && !Float.isNaN(ballVel[1])) {
                         ballValid = true;
                     }
 
-                    this.suggestion = new Suggestion[SPL_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS];
                     for (int i = 0; i < SPL_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS; i++) {
                         int s = (int) buffer.get();
                         if (s == -1) {
@@ -324,6 +359,11 @@ public class SPLStandardMessage implements Serializable {
             }
         } catch (RuntimeException e) {
             errors.add("error while reading message: " + e.getClass().getSimpleName() + e.getMessage());
+        }
+        
+        System.out.println("SPLStandardMessage errors:");
+        for (String s : errors) {
+        	System.out.println("\t" + s);
         }
 
         valid = headerValid && versionValid && playerNumValid && teamNumValid && fallenValid && poseValid && walkingToValid && shootingToValid && ballValid && intentionValid && averageWalkSpeedValid && maxKickDistanceValid && currentPositionConfidenceValid && currentSideConfidenceValid && dataValid;

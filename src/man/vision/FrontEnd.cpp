@@ -119,8 +119,8 @@ uint32_t
       *py++ = (short)y;
       *pw++ = colors->white .scoreMax(y, abs(u - UVZero) + UVZero, abs(v - UVZero) + UVZero);
       *pg++ = colors->green .scoreMax(y, u, v);
-      *po++ = colors->orange.scoreMax(y, u, v ^ UVMask);
-
+      //*po++ = colors->orange.scoreMax(y, u, v ^ UVMask); //making orange into black for experimentation
+      *po++ = colors->orange.scoreMax(y, abs(u - UVZero) + UVZero, abs(v - UVZero) + UVZero);
       if (colorTable)
         *pc++ = colorTable[(u >> (UVBits - 7) << 14) + (v >> (UVBits - 7) << 7) + (y >> (YBits - 7))];
     }
@@ -160,13 +160,14 @@ void ImageFrontEnd::run(const YuvLite& src, const Colors* colors, uint8_t* color
     dstAllocated = size;
   }
 
-  if (fast())
+  if (fast()) {
     _time = man::vision::_acquire_image(src.pixelAddr(), dstBase.pitch(),
                                         dstBase.height(), src.pitch(),
                                         colors, dstImages, colorTable);
-  else
+  } else {
     _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), 
                         src.pitch(), colors, dstImages, colorTable);
+  }
 }
 
 }

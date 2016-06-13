@@ -96,7 +96,7 @@ EdgeDetector::EdgeDetector()
 
   gradientThreshold(8);
   edgeThreshold(16);
-  greenThreshold(80);
+  greenThreshold(120);
   correctEdgeDirection(false);
   fast(true);
 }
@@ -193,7 +193,7 @@ uint32_t EdgeDetector::gradient(const ImageLiteU16& source)
   int size = pitch * (source.height() - 2);
   if (size > gradAllocated)
   {
-    delete[] gradMem;
+      //delete[] gradMem;
     gradPixels = (uint16_t*)alignedAlloc(size * 2, 4, gradMem);
     gradAllocated = size;
   }

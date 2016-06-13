@@ -92,6 +92,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::sharedBall_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("naiveBall",
+                      make_getter(&PyInterface::naiveBall_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         .add_property("sharedFlip",
                       make_getter(&PyInterface::sharedFlip_ptr,
                                   return_value_policy

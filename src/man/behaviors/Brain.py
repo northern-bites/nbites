@@ -74,6 +74,7 @@ class Brain(object):
         self.motion = None
         self.game = None
         self.locUncert = 0
+        self.naiveBall = None
 
         # New vision system...
         self.visionLines = None
@@ -106,6 +107,19 @@ class Brain(object):
 
         # So that we only try to sit down once upon receiving command
         self.sitting = False
+
+        # CHINA HACK(s)
+        self.penalizedHack = False
+        self.penalizedEdgeClose = 0
+        self.penalizedCount = 0
+
+        # US OPEN 16 HACK(z)
+        self.ballMem = []
+        self.ballMemIndx = 0
+        self.BALL_MEM_SIZE = 15
+        self.ballMemRatio = 0.0
+        for i in range(self.BALL_MEM_SIZE):
+            self.ballMem.append(0)
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -189,6 +203,20 @@ class Brain(object):
         # Flush the output
         sys.stdout.flush()
 
+        # US OPEN :(
+        if self.ball.vis.on:
+            self.ballMem[self.ballMemIndx] = 1
+        else:
+            self.ballMem[self.ballMemIndx] = 0
+        self.ballMemIndx = (self.ballMemIndx + 1) % self.BALL_MEM_SIZE
+        count = 0
+        for i in range(self.BALL_MEM_SIZE):
+            count += self.ballMem[i]
+
+        self.ballMemRatio = (count / self.BALL_MEM_SIZE) 
+
+
+
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
         output = self.interface.myWorldModel
@@ -262,6 +290,7 @@ class Brain(object):
             or self.player.gameState == 'gameSet'):
             self.ball.x = Constants.CENTER_FIELD_X
             self.ball.y = Constants.CENTER_FIELD_Y
+        self.naiveBall = self.interface.naiveBall
 
     def updateObstacles(self):
         self.obstacles = [0.] * 9
@@ -271,7 +300,6 @@ class Brain(object):
             curr_obst = self.interface.fieldObstacles.obstacle(i)
             if curr_obst.position != curr_obst.position.NONE:
                 self.obstacles[int(curr_obst.position)] = (curr_obst.distance, curr_obst.closest_y)
-
                 if curr_obst.detector == curr_obst.detector.ARMS:
                     self.obstacleDetectors[int(curr_obst.position)] = 'a'
                 elif curr_obst.detector == curr_obst.detector.SONARS:
@@ -307,6 +335,15 @@ class Brain(object):
         self.interface.resetLocRequest.y = y
         self.interface.resetLocRequest.h = h * (math.pi / 180.)
         self.interface.resetLocRequest.timestamp = int(self.time * 1000)
+
+    def resetLocToCross(self):
+        """
+        """
+        print "LOC TO CROSS"
+        self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X, Constants.FIELD_GREEN_HEIGHT / 2, 0)
+        # self.interface.resetLocRequest.x = Constants.LANDMARK_BLUE_GOAL_CROSS_X
+        # self.interface.resetLocRequest.y = Constants.FIELD_GREEN_HEIGHT / 2
+        # self.interface.resetLocRequest.h = 0
 
     def resetInitialLocalization(self):
         """

@@ -56,7 +56,11 @@ public class GameControllerInfo extends Static {
                     }
                 }
             }
-            Text.drawText(gl, half, 0, 0.6f, 0.3f);
+            Text.drawText(gl, half, 0, 0.9f, 0.3f);
+
+            int minutes = (data.secsRemaining < 0 ? (-data.secsRemaining) : data.secsRemaining) / 60;
+            int seconds = (data.secsRemaining < 0 ? (-data.secsRemaining) : data.secsRemaining) % 60;
+            Text.drawText(gl, (data.secsRemaining < 0 ? "-" : "") + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 0.6f, 0.3f);
 
             // Display game state
             final String state;

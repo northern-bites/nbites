@@ -42,6 +42,9 @@ private:
     void switchTeam();
     void switchKickOff();
 
+    void flag_setPenalized(bool p);
+    void flag_setPlaying();
+
     messages::GameState latest_data;
     unsigned int team_number;
     unsigned int player_number;

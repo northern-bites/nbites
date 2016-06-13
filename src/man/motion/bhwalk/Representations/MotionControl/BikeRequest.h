@@ -8,19 +8,19 @@
 #include "Modules/MotionControl/BIKEParameters.h"
 #include "Tools/Streams/AutoStreamable.h"
 
-STREAMABLE(BikeRequest,
-{
-public:
-  ENUM(BMotionID,
-    kickForward,
-    newKick,
-    none
-  );
+// STREAMABLE(BikeRequest,
+// {
+// public:
+//   ENUM(BMotionID,
+//     kickForward,
+//     newKick,
+//     none
+//   );
 
-  static BMotionID getBMotionFromName(const char* name),
+//   static BMotionID getBMotionFromName(const char* name),
 
-  (BMotionID)(none) bMotionType,
-  (bool)(false) mirror,
-  (bool)(false) dynamical,
-  (std::vector<DynPoint>) dynPoints,
-});
+//   (BMotionID)(none) bMotionType,
+//   (bool)(false) mirror,
+//   (bool)(false) dynamical,
+//   (std::vector<DynPoint>) dynPoints,
+// });

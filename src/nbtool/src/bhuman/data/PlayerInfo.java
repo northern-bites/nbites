@@ -18,7 +18,7 @@ public class PlayerInfo implements Serializable
 
     /** What type of penalty a player may have. */
     public static final byte PENALTY_NONE = 0;
-    
+
     public static final byte PENALTY_SPL_ILLEGAL_BALL_CONTACT = 1;
     public static final byte PENALTY_SPL_PLAYER_PUSHING = 2;
     public static final byte PENALTY_SPL_ILLEGAL_MOTION_IN_SET = 3;
@@ -28,7 +28,7 @@ public class PlayerInfo implements Serializable
     public static final byte PENALTY_SPL_KICK_OFF_GOAL = 7;
     public static final byte PENALTY_SPL_REQUEST_FOR_PICKUP = 8;
     public static final byte PENALTY_SPL_COACH_MOTION = 9;
-    
+
     public static final byte PENALTY_HL_BALL_MANIPULATION = 1;
     public static final byte PENALTY_HL_PHYSICAL_CONTACT = 2;
     public static final byte PENALTY_HL_ILLEGAL_ATTACK = 3;
@@ -38,7 +38,7 @@ public class PlayerInfo implements Serializable
 
     public static final byte PENALTY_SUBSTITUTE = 14;
     public static final byte PENALTY_MANUAL = 15;
-    
+
     /** The size in bytes this class has packed. */
     public static final int SIZE =
             1 + // penalty
@@ -52,7 +52,7 @@ public class PlayerInfo implements Serializable
     //this is streamed
     public byte penalty = PENALTY_NONE; // penalty state of the player
     public byte secsTillUnpenalised;    // estimate of time till unpenalised
-    
+
     /**
      * Packing this Java class to the C-structure to be send.
      * @return Byte array representing the C-structure.
@@ -91,13 +91,13 @@ public class PlayerInfo implements Serializable
         penalty = buffer.get();
         secsTillUnpenalised = buffer.get();
     }
-    
+
     @Override
     public String toString()
     {
         String out = "----------------------------------------\n";
         String temp;
-        
+
         if (Rules.league instanceof SPL) {
             switch (penalty) {
                 case PENALTY_NONE:                      temp = "none"; break;

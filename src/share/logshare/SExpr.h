@@ -16,29 +16,7 @@
  Both are valid sexprs.  If a non-safe find or indexing operation CANNOT complete, it returns NULL,
  */
 
-namespace nblog {
-    
-    //Top-level keys
-    const std::string LOG_FIRST_ATOM_S = "nblog";
-    const std::string LOG_CONTENTS_S = "contents";
-    const std::string LOG_CREATED_S = "created";
-    const std::string LOG_VERSION_S = "version";
-    const std::string LOG_CHECKSUM_S = "checksum";
-    const std::string LOG_HOST_TYPE_S = "host_type";
-    const std::string LOG_FROM_ADDR_S = "from_address";
-    
-    //content item keys
-    const std::string CONTENT_TYPE_S = "type";
-    const std::string CONTENT_FROM_S = "from";
-    const std::string CONTENT_WHEN_S = "when";
-    const std::string CONTENT_IINDEX_S = "iindex";
-    const std::string CONTENT_NBYTES_S = "nbytes";
-    const std::string CONTENT_IMAGE_WIDTH_S = "width";
-    const std::string CONTENT_IMAGE_HEIGHT_S = "height";
-    const std::string CONTENT_IMAGE_ENCODING_S = "encoding";
-    
-    //command key
-    const std::string COMMAND_FIRST_ATOM_S = "command";
+namespace nbl {
     
     typedef enum {
         SEXPR_ATOM,
@@ -53,12 +31,12 @@ namespace nblog {
         SExpr( const SExpr& other );
         SExpr& operator=( const SExpr& other );
         
-        //Constructor for a generic content item.
-        //use .append() to add more specific keys
-        SExpr(const std::string& type,
-              const std::string& from, clock_t created,
-              size_t image_index, size_t nbytes);
-        
+//        //Constructor for a generic content item.
+//        //use .append() to add more specific keys
+//        SExpr(const std::string& type,
+//              const std::string& from, clock_t created,
+//              size_t image_index, size_t nbytes);
+
         //list node with elements in l
         SExpr(const std::vector<SExpr>& l);
         //empty LIST.

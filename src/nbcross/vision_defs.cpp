@@ -24,9 +24,39 @@ void getCalibrationOffsets(Log* l, double* r, double* p, int w, int h, bool t);
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top);
 SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
-SExpr treeFromBall(man::vision::Ball& b);
-SExpr treeFromBlob(man::vision::Blob& b);
+SExpr treeFromBall(man::vision::Ball& b, int width, int height);
+SExpr treeFromSpot(man::vision::Spot& b, int width, int height);
 
+messages::YUVImage emptyTop(
+    man::vision::DEFAULT_TOP_IMAGE_WIDTH * 2,
+    man::vision::DEFAULT_TOP_IMAGE_HEIGHT
+);
+
+messages::YUVImage emptyBot(
+    man::vision::DEFAULT_TOP_IMAGE_WIDTH,
+    man::vision::DEFAULT_TOP_IMAGE_HEIGHT / 2
+);
+
+void imageSizeCheck(bool top, int width, int height) {
+    if (top) {
+        if (width != 2 * man::vision::DEFAULT_TOP_IMAGE_WIDTH ||
+            height != man::vision::DEFAULT_TOP_IMAGE_HEIGHT ) {
+            printf("WARNING! topCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
+                   width, height);
+        }
+    } else {
+        //bot
+        if ( // 2 / 2 == 1
+            width != man::vision::DEFAULT_TOP_IMAGE_WIDTH ||
+            height != ( man::vision::DEFAULT_TOP_IMAGE_HEIGHT / 2 ) ) {
+            printf("WARNING! botCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
+                   width, height);
+        }
+    }
+}
+
+//robotName may be empty ("").
+man::vision::VisionModule& getModuleRef(const std::string robotName);
 
 int Vision_func() {
 
@@ -57,6 +87,8 @@ int Vision_func() {
     } else {
         std::cout << "Could not get height from description!\n";
     }
+    
+    imageSizeCheck(topCamera, width, height);
 
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
@@ -80,15 +112,16 @@ int Vision_func() {
         rname = robotName->get(1)->value();
     }
 
-    man::vision::VisionModule module(width / 2, height, rname);
+    //man::vision::VisionModule module(width / 2, height, rname);
+    man::vision::VisionModule& module = getModuleRef(rname);
 
     // Images to pass to vision module, top & bottom
     messages::YUVImage realImage(buf, width, height, width);
-    messages::YUVImage emptyImage(width, height);
 
     // Setup module
     portals::Message<messages::YUVImage> rImageMessage(&realImage);
-    portals::Message<messages::YUVImage> eImageMessage(&emptyImage);
+    portals::Message<messages::YUVImage> eImageMessage(
+                                topCamera ? &emptyBot : & emptyTop );
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
     if (topCamera) {
@@ -99,6 +132,7 @@ int Vision_func() {
         module.topIn.setMessage(eImageMessage);
         module.bottomIn.setMessage(rImageMessage);
     }
+    
     module.jointsIn.setMessage(jointsMessage);
 
     // If log includes color parameters in description, have module use those
@@ -117,7 +151,7 @@ int Vision_func() {
         }
     }
 
-    // If log includes calibration parameters in description, have madule use those
+    // If log includes calibration parameters in description, have module use those
     std::vector<SExpr*> calParamsVec = args[0]->tree().recursiveFind("CalibrationParams");
     if (calParamsVec.size() != 0) {
         SExpr* calParams = calParamsVec.at(calParamsVec.size()-2);
@@ -231,7 +265,6 @@ int Vision_func() {
     //-------------------
     Log* colorSegRet = new Log();
     int colorSegLength = (width / 4) * (height / 2);
-
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
     memcpy(segBuf, frontEnd->colorImage().pixelAddr(), colorSegLength);
@@ -277,7 +310,9 @@ int Vision_func() {
     Log* lineRet = new Log();
     std::string lineBuf;
 
-  // std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
+    bool debugLines = false;
+    if (debugLines)
+        std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
 
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
@@ -321,36 +356,48 @@ int Vision_func() {
         lineBuf.append((const char*) &fcEP0, sizeof(double));
         lineBuf.append((const char*) &fcEP1, sizeof(double));
 
-   //    std::cout << line.print() << std::endl;
+        if (debugLines)
+            std::cout << line.print() << std::endl;
     }
 
-  // std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
+    if (debugLines)
+        std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
+
     int i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
-   //    std::cout << line.field().print() << std::endl;
+        if (debugLines)
+            std::cout << line.field().print() << std::endl;
     }
 
-    //std::cout << std::endl << "Field lines:" << std::endl;
-    //std::cout << "0.idx, 1.idx, id, idx" << std::endl;
+    if (debugLines) {
+        std::cout << std::endl << "Field lines:" << std::endl;
+        std::cout << "0.idx, 1.idx, id, idx" << std::endl;
+    }
     man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
 
     for (int i = 0; i < fieldLineList->size(); i++) {
         man::vision::FieldLine& line = (*fieldLineList)[i];
-   //    std::cout << line.print() << std::endl;
+        if (debugLines)
+            std::cout << line.print() << std::endl;
     }
 
- //   std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
+    if (debugLines)
+        std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
     man::vision::GoalboxDetector* box = module.getBox(topCamera);
     man::vision::CornerDetector* corners = module.getCorners(topCamera);
 
- //   if (box->first != NULL)
-  //     std::cout << box->print() << std::endl;
+    if (debugLines) {
+       if (box->first != NULL)
+          std::cout << box->print() << std::endl;
+    }
 
-  //  std::cout << "    line0, line1, type (concave, convex, T)" << std::endl;
-    for (int i = 0; i < corners->size(); i++) {
-        const man::vision::Corner& corner = (*corners)[i];
-   //     std::cout << corner.print() << std::endl;
+    if (debugLines) {
+        std::cout << "    line0, line1, type (concave, convex, T)" << std::endl;
+        for (int i = 0; i < corners->size(); i++) {
+            const man::vision::Corner& corner = (*corners)[i];
+           std::cout << corner.print() << std::endl;
+        }
     }
 
     lineRet->setData(lineBuf);
@@ -363,24 +410,15 @@ int Vision_func() {
 
     Log* ballRet = new Log();
     std::vector<man::vision::Ball> balls = detector->getBalls();
-    std::list<man::vision::Blob> blobs = detector->getBlobber()->blobs;
 
     SExpr allBalls;
     int count = 0;
     for (auto i=balls.begin(); i!=balls.end(); i++) {
-        SExpr ballTree = treeFromBall(*i);
+        SExpr ballTree = treeFromBall(*i, width, height);
         SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
         allBalls.append(next);
         count++;
     }
-    count = 0;
-    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
-        SExpr blobTree = treeFromBlob(*i);
-        SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
-        allBalls.append(next);
-        count++;
-    }
-
     ballRet->setTree(allBalls);
     rets.push_back(ballRet);
 
@@ -410,12 +448,11 @@ int Vision_func() {
     ccdRet->setData(pointsBuf);
     rets.push_back(ccdRet);
 
-	std::cout << "Debug image" << std::endl;
     //-------------------
     //  DEBUG IMAGE
     //-------------------
     Log* debugImage = new Log();
-    int debugImageLength = (width / 4) * (height / 2);
+    int debugImageLength = (width / 2) * (height / 2);
 
     // Create temp buffer and fill with debug image
     uint8_t debBuf[debugImageLength];
@@ -427,7 +464,6 @@ int Vision_func() {
 
     rets.push_back(debugImage);
 
-	std::cout << "Exiting Vision Call" << std::endl;
     return 0;
 }
 
@@ -437,10 +473,13 @@ int CameraCalibration_func() {
     int failures = 0;
     double totalR = 0;
     double totalT = 0;
+    
+    man::vision::VisionModule& module = getModuleRef("");
 
     // Repeat for each log
     for (int i = 0; i < 7; i++) {
-
+        module.reset();
+        
         Log* l = new Log(args[i]);
 
         size_t length = l->data().size();
@@ -455,11 +494,9 @@ int CameraCalibration_func() {
         int height = atoi(l->tree().find("contents")->get(1)->
                                        find("height")->get(1)->value().c_str());
 
-        double rollChange, pitchChange;
+        imageSizeCheck(top, width, height);
         
-        // Init vision module with offsets of 0.0
-        man::vision::VisionModule module(width / 2, height);
-
+        double rollChange, pitchChange;
 
         // Read number of bytes of image, inertials, and joints if exist
         int numBytes[3];
@@ -496,19 +533,24 @@ int CameraCalibration_func() {
 
         // If log includes "BlackStar," set flag
         std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
-        if (blackStarVec.size() != 0) {
+        if (blackStarVec.size() != 0)
             module.blackStar(true);
-            std::cout << "\nBLACK STAR TRUE!!!\n\n";
-        } else std::cout << "\nBLACK STAR FALSE\n\n";
-        
         
         // Create messages
         messages::YUVImage image(buf, width, height, width);
         portals::Message<messages::YUVImage> imageMessage(&image);
         portals::Message<messages::JointAngles> jointsMessage(&joints);
 
-        module.topIn.setMessage(imageMessage);
-        module.bottomIn.setMessage(imageMessage);
+        if (top) {
+            portals::Message<messages::YUVImage> emptyMessage(&emptyBot);
+            module.topIn.setMessage(imageMessage);
+            module.bottomIn.setMessage(emptyMessage);
+        } else {
+            portals::Message<messages::YUVImage> emptyMessage(&emptyTop);
+            module.topIn.setMessage(emptyMessage);
+            module.bottomIn.setMessage(imageMessage);
+        }
+        
         module.jointsIn.setMessage(jointsMessage);
 
         module.run();
@@ -519,6 +561,8 @@ int CameraCalibration_func() {
 
         rollBefore = fh->roll();
         tiltBefore = fh->tilt();
+
+        std::cout << "Calibrating log " << i+1 << ": "; 
 
         bool success = fh->calibrateFromStar(*module.getFieldLines(top));
 
@@ -534,9 +578,11 @@ int CameraCalibration_func() {
 
     if (failures > 4) {
         // Handle failure
-        printf("FAILED: %d times\n", failures);
+        printf("Failed calibration %d times\n", failures);
         rets.push_back(new Log("(failure)"));
     } else {
+        printf("Success calibrating %d times\n", 7 - failures);
+
         totalR /= (args.size() - failures);
         totalT /= (args.size() - failures);
 
@@ -599,7 +645,7 @@ void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
     textFile.seekg (0, textFile.end);
     long size = textFile.tellg();
     textFile.seekg(0);
-    
+
     // Read file into buffer and convert to string
     char* buff = new char[size];
     textFile.read(buff, size);
@@ -607,7 +653,7 @@ void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
 
     // Get SExpr from string
     SExpr* savedParams, * savedSExpr = SExpr::read((const std::string)sexpText);
-    
+
     if (top) {
         savedParams = savedSExpr->get(1)->find("Top");
     } else {
@@ -619,7 +665,7 @@ void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
 
     const std::vector<SExpr>& newParams = *params->get(1)->getList();
     savedParams->get(1)->setList(newParams);
-       
+
     // Write out
     size = savedSExpr->print().length();
     char* buffer = new char[size + 1];
@@ -673,37 +719,59 @@ SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top) {
     return SExpr(atoms);
 }
 
-SExpr treeFromBall(man::vision::Ball& b)
+SExpr treeFromBall(man::vision::Ball& b, int width, int height)
 {
     SExpr x(b.x_rel);
     SExpr y(b.y_rel);
     SExpr p = SExpr::list({x, y});
-    SExpr bl = treeFromBlob(b.getBlob());
+    SExpr bl = treeFromSpot(b.getSpot(), width, height);
 
     SExpr rel = SExpr::keyValue("rel", p);
-    SExpr blob = SExpr::keyValue("blob", bl);
+    SExpr spot = SExpr::keyValue("blob", bl);
     SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
-    SExpr toRet = SExpr::list({rel, blob, exDiam});
+    SExpr toRet = SExpr::list({rel, spot, exDiam});
 
     return toRet;
 }
 
-SExpr treeFromBlob(man::vision::Blob& b)
+SExpr treeFromSpot(man::vision::Spot & b, int width, int height)
 {
-    SExpr x(b.centerX());
-    SExpr y(b.centerY());
+    SExpr x(b.ix() + width / 2);
+    SExpr y(-b.iy() + height / 2);
     SExpr p = SExpr::list({x, y});
 
     SExpr center = SExpr::keyValue("center", p);
-    SExpr area = SExpr::keyValue("area", b.area());
-    SExpr count = SExpr::keyValue("count", b.count());
-    SExpr len1 = SExpr::keyValue("len1", b.firstPrincipalLength());
-    SExpr len2 = SExpr::keyValue("len2", b.secondPrincipalLength());
-    SExpr ang1 = SExpr::keyValue("ang1", b.firstPrincipalAngle());
-    SExpr ang2 = SExpr::keyValue("ang2", b.secondPrincipalAngle());
+    SExpr area = SExpr::keyValue("area", 0.1f);
+    SExpr count = SExpr::keyValue("count", 1);
+    SExpr len1 = SExpr::keyValue("len1", b.innerDiam);
+    SExpr len2 = SExpr::keyValue("len2", b.innerDiam);
+    SExpr ang1 = SExpr::keyValue("ang1", 0);
+    SExpr ang2 = SExpr::keyValue("ang2", 0);
     SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
 
     return toRet;
 }
 
 int Scratch_func() {}
+
+#include <map>
+std::map<const std::string, man::vision::VisionModule *> vmRefMap;
+
+man::vision::VisionModule& getModuleRef(const std::string robotName) {
+    if (vmRefMap.find(robotName) != vmRefMap.end()) {
+        printf("nbcross-getModuleRef REUSING MODULE [%s]\n",
+               robotName.c_str() );
+		man::vision::VisionModule* module = vmRefMap[robotName];
+		module->reset();
+        return *module;
+
+    } else {
+        printf("nbcross-getModuleRef CREATING NEW MODULE [%s]\n",
+               robotName.c_str() );
+        man::vision::VisionModule * newInst =
+            new man::vision::VisionModule(man::vision::DEFAULT_TOP_IMAGE_WIDTH,
+                                      man::vision::DEFAULT_TOP_IMAGE_HEIGHT, robotName);
+        vmRefMap[robotName] = newInst;
+        return *newInst;
+    }
+}

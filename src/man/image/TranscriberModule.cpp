@@ -13,17 +13,20 @@
 #include <bn/i2c/i2c-dev.h>
 #include <vector>
 
+#include <ctime>
+#include <sys/stat.h>
+
 #include "Profiler.h"
 #include "DebugConfig.h"
 
-#include "../log/logging.h"
-#include "../control/control.h"
-#include "nbdebug.h"
-#include "thumbnail.h"
-#include "../../share/logshare/SExpr.h"
+#include "Logging.hpp"
+#include "Control.hpp"
 
-using nblog::SExpr;
-using nblog::NBLog;
+//#include "thumbnail.h"
+#include "SExpr.h"
+
+using nbl::SExpr;
+using nbl::NBLog;
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 
@@ -623,19 +626,19 @@ void TranscriberModule::run_()
 {
     struct stat file_stats;
     std::string filepath;
-// #ifdef NAOQI_2
+#ifdef V5_ROBOT
     if(it.type() == Camera::TOP) {
         filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
     } else {
         filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
     }
-// #else
-//     if(it.type() == Camera::TOP) {
-//         filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
-//     } else {
-//         filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
-//     }
-// #endif
+#else
+    if(it.type() == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+    } else {
+        filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+    }
+#endif
 
     if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
         fclose(file);
@@ -659,6 +662,14 @@ void TranscriberModule::run_()
     jointsIn.latch();
     inertsIn.latch();
 
+    filteredBallIn.latch();
+    naiveBallIn.latch();
+
+    // filteredBallOut.setMessage(portals::Message<messages::FilteredBall>(
+    //                      &filteredBallIn.message()));
+    // naiveBallOut.setMessage(portals::Message<messages::NaiveBall>(
+    //                      &naiveBallIn.message()));
+
     /* Pass the most recent joints and inerts thru transcriber and outportal,
      * so that vision has synced images, joints, and inerts to process. */
     jointsOut.setMessage(portals::Message<messages::JointAngles>(
@@ -671,60 +682,90 @@ void TranscriberModule::run_()
     imageOut.setMessage(imageOutMessage);
 
 #ifdef USE_LOGGING
-    if (control::flags[control::thumbnail]) {
-        std::string image_from;
-        
-        if (it.type() == Camera::TOP) {
-            image_from = "camera_TOP";
-        } else {
-            image_from = "camera_BOT";
-        }
-
-        logThumbnail(image, image_from, ++image_index);
-    }
+//    if (control::flags[control::thumbnail]) {
+//        std::string image_from;
+//        
+//        if (it.type() == Camera::TOP) {
+//            image_from = "camera_TOP";
+//        } else {
+//            image_from = "camera_BOT";
+//        }
+//
+//        logThumbnail(image, image_from, ++image_index);
+//    }
+//
+//    if (control::flags[control::multiball]) {
+//        messages::NaiveBall nb_pb = naiveBallIn.message();
+//        messages::FilteredBall fb_pb = filteredBallIn.message();
+//
+//        std::string nb_buf;
+//        std::string fb_buf;
+//
+//        nb_pb.SerializeToString(&nb_buf);
+//        fb_pb.SerializeToString(&fb_buf);
+//
+//        int nb_length = nb_buf.length();
+//        int fb_length = fb_buf.length();
+//
+//        nb_buf.append(fb_buf);
+//
+//        std::vector<SExpr> contents;
+//
+//        SExpr naive("MULTIBALL", "multiball", clock(), -1, nb_buf.length());
+//        naive.append(SExpr("nb_length", nb_length));
+//        naive.append(SExpr("fb_length", fb_length));
+//
+//        contents.push_back(naive);
+//
+//        SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
+//        contents.push_back(filter);
+//
+//        NBLog(NBL_IMAGE_BUFFER, "multiball",
+//                   contents, nb_buf);
+//    }
 #endif
 }
     
 void logThumbnail(messages::YUVImage& image, std::string& ifrom, size_t iindex)
 {
-    int from_width = image.width() / 2;
-    
-    if (from_width == 640) {
-        resconvert::ImageResolution rFrom = resconvert::R640_480;
-        resconvert::ImageResolution rTo = resconvert::R080_060;
-        
-        char buffer[resconvert::ImageBufferSize[rTo]];
-        resconvert::resDownPck(rFrom, (const resconvert::YUVSubPixel *) image.pixelAddress(0,0), rTo, (resconvert::YUVSubPixel *) buffer);
-        //std::string im_buf(buffer, resconvert::ImageBufferSize[rTo]);
-        
-        SExpr ci1("YUVImage", ifrom, clock(), iindex, resconvert::ImageBufferSize[rTo]);
-        ci1.append(SExpr::keyValue("width", resconvert::ImageWidth[rTo]));
-        ci1.append(SExpr::keyValue("height", resconvert::ImageHeight[rTo]));
-        ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
-        
-        std::vector<SExpr> contents = {ci1};
-        NBLog(NBL_IMAGE_BUFFER, "thumbnail",
-              contents, (const void *) buffer, resconvert::ImageBufferSize[rTo]);
-        
-    } else if (from_width == 320) {
-        resconvert::ImageResolution rFrom = resconvert::R320_240;
-        resconvert::ImageResolution rTo = resconvert::R080_060;
-        
-        char buffer[resconvert::ImageBufferSize[rTo]];
-        resconvert::resDownPck(rFrom, (const resconvert::YUVSubPixel *) image.pixelAddress(0,0), rTo, (resconvert::YUVSubPixel *) buffer);
-        //std::string im_buf(buffer, ImageBufferSize[rTo]);
-        
-        SExpr ci1("YUVImage", ifrom, clock(), iindex, resconvert::ImageBufferSize[rTo]);
-        ci1.append(SExpr::keyValue("width", resconvert::ImageWidth[rTo]));
-        ci1.append(SExpr::keyValue("height", resconvert::ImageHeight[rTo]));
-        ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
-        
-        std::vector<SExpr> contents = {ci1};
-        NBLog(NBL_IMAGE_BUFFER, "thumbnail",
-              contents, (void *) buffer, resconvert::ImageBufferSize[rTo]);
-    } else {
-        printf("WARNING: thumbnail sees size it's not prepared for!\n");
-    }
+//    int from_width = image.width() / 2;
+//    
+//    if (from_width == 640) {
+//        resconvert::ImageResolution rFrom = resconvert::R640_480;
+//        resconvert::ImageResolution rTo = resconvert::R080_060;
+//        
+//        char buffer[resconvert::ImageBufferSize[rTo]];
+//        resconvert::resDownPck(rFrom, (const resconvert::YUVSubPixel *) image.pixelAddress(0,0), rTo, (resconvert::YUVSubPixel *) buffer);
+//        //std::string im_buf(buffer, resconvert::ImageBufferSize[rTo]);
+//        
+//        SExpr ci1("YUVImage", ifrom, clock(), iindex, resconvert::ImageBufferSize[rTo]);
+//        ci1.append(SExpr::keyValue("width", resconvert::ImageWidth[rTo]));
+//        ci1.append(SExpr::keyValue("height", resconvert::ImageHeight[rTo]));
+//        ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
+//        
+//        std::vector<SExpr> contents = {ci1};
+//        NBLog(NBL_IMAGE_BUFFER, "thumbnail",
+//              contents, (const void *) buffer, resconvert::ImageBufferSize[rTo]);
+//        
+//    } else if (from_width == 320) {
+//        resconvert::ImageResolution rFrom = resconvert::R320_240;
+//        resconvert::ImageResolution rTo = resconvert::R080_060;
+//        
+//        char buffer[resconvert::ImageBufferSize[rTo]];
+//        resconvert::resDownPck(rFrom, (const resconvert::YUVSubPixel *) image.pixelAddress(0,0), rTo, (resconvert::YUVSubPixel *) buffer);
+//        //std::string im_buf(buffer, ImageBufferSize[rTo]);
+//        
+//        SExpr ci1("YUVImage", ifrom, clock(), iindex, resconvert::ImageBufferSize[rTo]);
+//        ci1.append(SExpr::keyValue("width", resconvert::ImageWidth[rTo]));
+//        ci1.append(SExpr::keyValue("height", resconvert::ImageHeight[rTo]));
+//        ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
+//        
+//        std::vector<SExpr> contents = {ci1};
+//        NBLog(NBL_IMAGE_BUFFER, "thumbnail",
+//              contents, (void *) buffer, resconvert::ImageBufferSize[rTo]);
+//    } else {
+//        printf("WARNING: thumbnail sees size it's not prepared for!\n");
+//    }
 }
 
 }

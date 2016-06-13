@@ -22,6 +22,8 @@
 namespace man {
 namespace vision {
 
+    const int DEFAULT_TOP_IMAGE_WIDTH = 640;
+    const int DEFAULT_TOP_IMAGE_HEIGHT= 480;
 
 class VisionModule : public portals::Module {
 public:
@@ -51,13 +53,13 @@ public:
     CenterCircleDetector* getCCD(bool topCamera = true) const {return centerCircleDetector[!topCamera]; }
 
 #ifdef OFFLINE
-	void setDebugDrawingParameters(nblog::SExpr* debugParams);
+	void setDebugDrawingParameters(nbl::SExpr* debugParams);
 #endif
     
     // For use by vision_defs
     void setColorParams(Colors* colors, bool topCamera);
     const std::string getStringFromTxtFile(std::string path);
-    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
+    Colors* getColorsFromLisp(nbl::SExpr* colors, int camera);
     void setCalibrationParams(std::string robotName);
     void setCalibrationParams(int camera, std::string robotName);
     void setCalibrationParams(CalibrationParams* params, bool topCamera);
@@ -93,9 +95,11 @@ private:
     BallDetector* ballDetector[2];
 
     bool blackStar_;
+
+    std::string name;
     
     // Lisp tree with color params saved
-    nblog::SExpr colors;
+    nbl::SExpr colors;
 
     // Tracking ball stuff
     bool ballOn;
@@ -104,12 +108,12 @@ private:
 
 	uint8_t * debugSpace[2];
 
-    nblog::SExpr* calibrationLisp;
+    nbl::SExpr* calibrationLisp;
     size_t image_index;
 
     // Constants for tilt azimuth adjustment hack
-    static constexpr double azimuth_m = 0.0426;
-    static constexpr double azimuth_b = -0.0011;
+    static constexpr double azimuth_m = 0.032228876;
+    static constexpr double azimuth_b = 0.0003214286;
 
     // obstacleBox
     RobotObstacle* robotImageObstacle;

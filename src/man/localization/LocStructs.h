@@ -118,7 +118,7 @@ struct ReconstructedLocation
 
     bool onField() 
     { 
-        return (x >= 0 && x <= FIELD_GREEN_WIDTH && y >= 0 && y <= FIELD_GREEN_HEIGHT); 
+        return (x >= GREEN_PAD_X && x <= FIELD_GREEN_WIDTH - GREEN_PAD_X && y >= GREEN_PAD_Y && y <= FIELD_GREEN_HEIGHT - GREEN_PAD_Y); 
     }
 };
 

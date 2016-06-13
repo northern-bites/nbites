@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!-- ant build file for java nbtool -->
+<project basedir="." default="build" name="nbtool">
+
+    <!-- allow access to environment vars if we want them -->
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+
+    <!-- must compile with java 1.7 (ubuntu support) -->
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+
+    <!-- include *.class and *.jar in classpath -->
+    <path id="nbtool.classpath">
+        <pathelement location="../../build/nbtool"/>
+        <pathelement location="./jars/gluegen-rt-natives-android-aarch64.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-android-armv6.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-linux-amd64.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-linux-armv6.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-linux-armv6hf.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-linux-i586.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-macosx-universal.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-solaris-amd64.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-solaris-i586.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-windows-amd64.jar"/>
+        <pathelement location="./jars/gluegen-rt-natives-windows-i586.jar"/>
+        <pathelement location="./jars/gluegen-rt.jar"/>
+        <pathelement location="./jars/jogl-all-natives-android-aarch64.jar"/>
+        <pathelement location="./jars/jogl-all-natives-android-armv6.jar"/>
+        <pathelement location="./jars/jogl-all-natives-linux-amd64.jar"/>
+        <pathelement location="./jars/jogl-all-natives-linux-armv6.jar"/>
+        <pathelement location="./jars/jogl-all-natives-linux-armv6hf.jar"/>
+        <pathelement location="./jars/jogl-all-natives-linux-i586.jar"/>
+        <pathelement location="./jars/jogl-all-natives-macosx-universal.jar"/>
+        <pathelement location="./jars/jogl-all-natives-solaris-amd64.jar"/>
+        <pathelement location="./jars/jogl-all-natives-solaris-i586.jar"/>
+        <pathelement location="./jars/jogl-all-natives-windows-amd64.jar"/>
+        <pathelement location="./jars/jogl-all-natives-windows-i586.jar"/>
+        <pathelement location="./jars/jogl-all.jar"/>
+    </path>
+
+    <!-- setup build dir, copy resources from src/nested/nbtool -->
+    <target name="init">
+        <mkdir dir="../../build/nbtool"/>
+	<echo message="copying files from src dirs..."/>
+        <copy includeemptydirs="false" todir="../../build/nbtool/nbtool" verbose="true">
+            <fileset dir="src/nested/nbtool">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- make clean! -->
+    <target name="clean">
+        <delete dir="../../build/nbtool"/>
+    </target>
+
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-nbtool" name="build"/>
+
+    <!-- target for recompiling java protobuf files -->
+    <!-- not a dependency of build-nbtool because protoc will always recompile -->
+    <target name="protoc">
+        <property name="proto.dir" id="proto.dir" value="../share/messages/" />
+        <fileset id="proto.srcs" dir="${proto.dir}" casesensitive="yes">
+            <patternset>
+                <include name="**/*.proto"/>
+            </patternset>
+        </fileset>
+        <!-- get command-line style set of pathes -->
+        <pathconvert pathsep=" " refid="proto.srcs" property="converted.srcs"/>
+        <!-- include path must be absolute prefix of above (protoc requires this) -->
+        <property name="proto.dir.path" location="${proto.dir}"/>
+
+        <echo message="building protobufs"/>
+        <exec executable="protoc" failonerror="true">
+            <arg value="--java_out=./src/nested/" />
+            <arg value="-I=${proto.dir.path}" />
+            <arg line="${converted.srcs}" />
+        </exec>
+    </target>
+
+    <!-- bhuman has terrible package structure, compile them separately -->
+    <target depends="init" name="build-bhuman">
+        <echo message="building bhuman tool"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="../../build/nbtool" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src/bhuman/"/>
+            <classpath refid="nbtool.classpath"/>
+        </javac>
+    </target>
+
+    <!-- compile everything else!  -->
+    <target depends="init,build-bhuman" name="build-nbtool">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="../../build/nbtool" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src/nested/"/>
+            <classpath refid="nbtool.classpath"/>
+        </javac>
+    </target>
+
+    <!-- in case you wanted to run nbtool with ant (not recommended) -->
+    <target name="NBTool_v8">
+        <java classname="nbtool.term.NBTool_v8" failonerror="true" fork="yes">
+            <jvmarg line="-ea"/>
+            <classpath refid="nbtool.classpath"/>
+        </java>
+    </target>
+</project>

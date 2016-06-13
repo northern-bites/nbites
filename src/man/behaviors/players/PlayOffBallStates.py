@@ -4,7 +4,7 @@ import RoleConstants as role
 import ChaseBallTransitions as chase
 import ChaseBallConstants as chaseConstants
 import ClaimTransitions as claims
-from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findStrikerHome, findDefenderHome
+from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findStrikerHome, findDefenderHome, calculateHomePosition
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from objects import Location, RobotLocation
@@ -12,8 +12,14 @@ from ..util import *
 from math import hypot, fabs, atan2, degrees
 import random
 
+# IMPORTANT China 2015 bug found
+# TODO fix oscillation between positionAtHome and positionAsSupporter
+
+
+
 @defaultState('branchOnRole')
 @superState('gameControllerResponder')
+@ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
 @ifSwitchNow(transitions.shouldBeSupporter, 'positionAsSupporter')
 @ifSwitchNow(transitions.shouldApproachBall, 'approachBall')
 def playOffBall(player):
@@ -22,60 +28,35 @@ def playOffBall(player):
     """
     player.inKickingState = False
 
+#USOPEN2016: Back to Search Field by Quad
 @superState('playOffBall')
 def branchOnRole(player):
     """
-    Chasers have different behavior than defenders, so we branch on
-    role here.
+    Chasers are going to have a different behavior again.
+    We will branch on behavior based on role here
     """
+    # print("TIME SINCE PLAYING:", player.brain.gameController.timeSincePlaying)
     if role.isChaser(player.role):
-        if transitions.shouldFindSharedBall(player):
+        if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
             return player.goNow('searchFieldForSharedBall')
-        return player.goNow('positionAtHome')
+        return player.goNow('searchFieldByQuad')
     return player.goNow('positionAtHome')
+
 
 @superState('playOffBall')
 @stay
 @ifSwitchNow(shared.navAtPosition, 'watchForBall')
 def positionAtHome(player):
     """
-    Go to the player's home position. Defenders look in the direction of the 
-    shared ball if it is on with reliability >= 2. Cherry pickers look in the direction
-    of the shared ball if it is on with reliability >= 1.
+    Go to the player's home position.
     """
-
-    if role.isFirstChaser(player.role) and transitions.shouldFindSharedBall(player):
-        return player.goLater('searchFieldForSharedBall')
-
-    if player.brain.ball.vis.frames_off < 10:
-        ball = player.brain.ball
-        bearing = ball.bearing_deg
-    elif player.brain.sharedBall.ball_on:
-        ball = player.brain.sharedBall
-        bearing = degrees(atan2(ball.y - player.brain.loc.y,
-                        ball.x - player.brain.loc.x)) - player.brain.loc.h
-    else:
-        ball = None
-
-    if ball != None and not (role.isDefender(player.role) and NogginConstants.FIXED_D_HOME):
-        if role.isLeftDefender(player.role):
-            home = findDefenderHome(True, ball, bearing + player.brain.loc.h)
-        elif role.isRightDefender(player.role):
-            home = findDefenderHome(False, ball, bearing + player.brain.loc.h)
-        elif role.isStriker(player.role):
-            home = findStrikerHome(ball, bearing + player.brain.loc.h)
-        else:
-            home = player.homePosition
-
+    if role.isDefender(player.role):
+        home = calculateHomePosition(player)
     else:
         home = player.homePosition
 
     if player.firstFrame():
-        if role.isCherryPicker(player.role):
-            player.brain.tracker.repeatBasicPan()
-        else:
-            player.brain.tracker.trackBall()
-        
+        player.brain.tracker.trackBall()
         fastWalk = role.isChaser(player.role)
         player.brain.nav.goTo(home, precision = nav.HOME,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
@@ -85,24 +66,80 @@ def positionAtHome(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchLater(transitions.shouldSpinSearchFromWatching, 'spinInHomePosition')
+@ifSwitchNow(transitions.shouldSpinSearchFromWatching, 'spinAtHome')
 def watchForBall(player):
     """
-    The player is at home, waiting for the ball to be within it's box (range)
+    The player is at home, waiting for the ball to be within box.
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
-    if transitions.tooFarFromHome(50, player):
+    if transitions.tooFarFromHome(player, 50, 20):
         return player.goLater('positionAtHome')
+
+@defaultState('doFirstHalfSpin')
+@superState('playOffBall')
+@ifSwitchNow(transitions.stopSpinning, 'positionAtHome')
+def spinAtHome(player):
+    """
+    Spin while at home.
+    """
+    pass
+
+@superState('spinAtHome')
+def doFirstHalfSpin(player):
+    """
+    Spin to where we think the ball is.
+    """
+    if player.firstFrame():
+        player.setWalk(0, 0, nav.QUICK_SPEED)
+        player.brain.tracker.lookToSpinDirection(1)
+
+    while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
+        return player.stay()
+
+    return player.goNow('doPan')
+
+@superState('spinAtHome')
+def doPan(player):
+    """
+    Wide pan for 5 seconds.
+    """
+    if player.firstFrame():
+        player.stand()
+        player.brain.tracker.repeatWidePan()
+
+    while player.stateTime < 5:
+        return player.stay()
+
+    return player.goNow('doSecondHalfSpin')
+
+@superState('spinAtHome')
+def doSecondHalfSpin(player):
+    """
+    Keep spinning in the same direction.
+    """
+    if player.firstFrame():
+        player.setWalk(0, 0, nav.QUICK_SPEED)
+        player.brain.tracker.lookToSpinDirection(1)
+
+    while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
+        return player.stay()
+
+    if role.isFirstChaser(player.role):
+        return player.goNow('searchFieldByQuad')
+    return player.goNow('playOffBall')
 
 @superState('playOffBall')
 @stay
-@ifSwitchLater(shared.ballOffForNFrames(120), 'playOffBall')
+@ifSwitchLater(transitions.shouldNotBeSupporter, 'playOffBall')
 def positionAsSupporter(player):
+    """
+    Position to support teammate with claim.
+    """
     positionAsSupporter.position = getSupporterPosition(player, player.role)
-    fastWalk = role.isChaser(player.role)
+    fastWalk = False
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -120,8 +157,9 @@ def positionAsSupporter(player):
 
 @superState('playOffBall')
 @stay
+@ifSwitchNow(transitions.noBallFoundAtSharedBall, 'searchFieldByQuad') #was: positionAtHome USOPEN2016
 @ifSwitchNow(transitions.shouldFindFlippedSharedBall, 'searchFieldForFlippedSharedBall')
-@ifSwitchNow(transitions.shouldStopLookingForSharedBall, 'positionAtHome')
+@ifSwitchNow(transitions.shouldStopLookingForSharedBall, 'searchFieldByQuad') #was: positionAtHome USOPEN2016
 def searchFieldForSharedBall(player):
     """
     Searches the field for the shared ball.
@@ -151,7 +189,7 @@ def searchFieldForSharedBall(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.shouldStopLookingForFlippedSharedBall, 'positionAtHome')
+@ifSwitchNow(transitions.shouldStopLookingForFlippedSharedBall, 'searchFieldByQuad') #was: positionAtHome USOPEN2016
 def searchFieldForFlippedSharedBall(player):
     """
     Flips the shared ball and searches for it.
@@ -181,7 +219,6 @@ def searchFieldForFlippedSharedBall(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
 def searchFieldByQuad(player):
     """
     Search the field quadrant by quadrant. Choose first quadrant by loc heading.
@@ -189,25 +226,25 @@ def searchFieldByQuad(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.brain.tracker.repeatBasicPan()
-        searchFieldByQuad.dest = min(points, key=lambda x:fabs(player.brain.loc.getRelativeBearing(x)))
+        searchFieldByQuad.dest = min(points, key=lambda x:fabs(player.brain.loc.distTo(x)))
         player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)
+        searchFieldByQuad.quadIndex = points.index(searchFieldByQuad.dest)
+        searchFieldByQuad.quadsWalked = 0
 
-    if shared.navAtPosition(player):
-        if searchFieldByQuad.dest == quad1Center:
-            searchFieldByQuad.dest = quad2Center
-        elif searchFieldByQuad.dest == quad3Center:
-            searchFieldByQuad.dest = quad1Center
-        elif searchFieldByQuad.dest == quad2Center:
-            searchFieldByQuad.dest = quad4Center
-        elif searchFieldByQuad.dest == quad4Center:
-            searchFieldByQuad.dest = quad3Center
+    if shared.navAtPosition(player) and player.brain.loc.distTo(searchFieldByQuad.dest) < 60:
+        searchFieldByQuad.quadIndex += 1
+        searchFieldByQuad.quadsWalked += 1
+        searchFieldByQuad.dest = points[searchFieldByQuad.quadIndex % len(points)]
+
+    if searchFieldByQuad.quadsWalked > 3:
+        return player.goLater('playOffBall')
 
     player.brain.nav.updateDest(searchFieldByQuad.dest)
 
 quad1Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * .6)
-quad2Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * 1.4)
-quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * 1.4)
-quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * .6)
+quad2Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * 1.4)
+quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * .6)
+quad4Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * 1.4)
 points = [quad1Center, quad2Center, quad3Center, quad4Center]
