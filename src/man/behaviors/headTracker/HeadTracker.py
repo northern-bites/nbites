@@ -170,11 +170,11 @@ class HeadTracker(FSA.FSA):
 
             print "IN GAME SET"
 
-            if (self.currentState is not 'gameSetFullPan' and self.currentState is not 'gameSetTracking'):
+            if (self.currentState is not 'gameSetSnapPan' and self.currentState is not 'gameSetTracking'):
                 self.switchTo('gameSetTracking')
                 return
 
-        if (self.currentState is not 'fullPan' and # SNAPPAN -- what is going on here?
+        if (self.currentState is not 'snapPan' and # SNAPPAN -- what is going on here?
             self.currentState is not 'tracking'):
 
             print "----------------SWITCHING TO TRACKING-----------------"
@@ -211,6 +211,9 @@ class HeadTracker(FSA.FSA):
         self.performHeadMove(self.helper.lookToAngle(yaw))
 
     def lookToAngleWithTime(self, yaw, time):
+
+        print "----------LOOKING TO " + str(yaw) + " WITH TIME " + str(time) + " ------------"
+
 
         self.performHeadMove(self.helper.lookToAngleWithTime(yaw, time))
 

@@ -122,7 +122,7 @@ class HeadTrackingHelper(object):
         """
         # Note: safe to call every frame.
 
-        print "----IN----TRACK----OBJECT-----"
+        print "--------------TRACKING AN OBJECT-------------"
 
         target = self.tracker.target
 
@@ -254,6 +254,9 @@ class HeadTrackingHelper(object):
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
     def lookToAngleWithTime(self, yaw, time):
+
+        
+        
         if yaw > 55 or yaw < -55:
             pitch = 11.0
         else:

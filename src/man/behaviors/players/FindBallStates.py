@@ -41,6 +41,9 @@ def searchInFront(player):
     playerTracker = player.brain.tracker
 
     if not playerTracker.brain.motion.head_is_active:
+
+        print "-----------GOING TO SPIN SEARCH----------"
+
         return player.goNow('spinSearch')
 
 @superState('gameControllerResponder')

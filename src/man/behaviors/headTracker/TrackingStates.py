@@ -38,11 +38,14 @@ def tracking(tracker):
 
             print "------GOING TO FULL PAN LATER--------"
 
-            return tracker.goLater('fullPan')
+            return tracker.goLater('snapPan')
 
     return tracker.stay()
 
 def gameSetTracking(tracker):
+    #SNAP PAN --- MAY CHANGE SNAP PAN BACK TO FULL PAN
+
+    print "--------------IN GAME SET TRACKING-----------------"
 
     tracker.target = tracker.brain.ball
 
@@ -53,7 +56,7 @@ def gameSetTracking(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-            return tracker.goLater('gameSetFullPan')
+            return tracker.goLater('gameSetSnapPan')
 
     return tracker.stay()
 
@@ -69,6 +72,9 @@ def bounceTracking(tracker):
     return tracker.stay()
 
 def trackingFieldObject(tracker):
+
+    print "--------TRACKING FIELD OBJECT-------------"
+
     tracker.helper.trackStationaryObject()
     if not tracker.target.on and tracker.counter > 15:
         if (tracker.target.frames_off >
@@ -197,6 +203,9 @@ def lookStraightThenTrack(tracker):
     return tracker.stay()
 
 def fullPan(tracker):
+
+    print "FULL PAN IN TRACKING STATES"
+
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
     Once the ball is located, switches to tracking.
@@ -208,10 +217,38 @@ def fullPan(tracker):
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
 
-        print "FULL PAN: FISRT FRAME SNAP PAN"
+        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
+
+    if not tracker.brain.motion.head_is_active:
+        tracker.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
+
+    if not isinstance(tracker.target, Vision.messages.FilteredBall):
+        if tracker.target.on:
+            return tracker.goLater('trackingFieldObject')
+
+    if (isinstance(tracker.target, Vision.messages.FilteredBall) and
+        tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+        return tracker.goLater('tracking')
+
+    return tracker.stay()
+
+def snapPan(tracker):
+
+    print "SNAP PAN IN TRACKING STATES"
+
+    """
+    Repeatedly executes the headMove FIXED_PITCH_PAN.
+    Once the ball is located, switches to tracking.
+    """
+    if tracker.firstFrame():
+        # Send the motion request message to stop
+        request = tracker.brain.interface.motionRequest
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
+        # Smartly start the pan
 
         # tracker.helper.startingPan(HeadMoves.WIDE_SNAP_PAN)
-        tracker.helper.lookToAngleWithTime(-75, 0.75)
+        tracker.lookToAngleWithTime(-75, 0.75)
         # tracker.lookToAngleWithTime(-75,1)
         # tracker.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
@@ -228,7 +265,7 @@ def fullPan(tracker):
 
     return tracker.stay()
 
-def gameSetFullPan(tracker):
+def gameSetSnapPan(tracker):
 
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
