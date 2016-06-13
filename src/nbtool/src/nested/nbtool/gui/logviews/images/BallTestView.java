@@ -62,6 +62,27 @@ public class BallTestView extends ViewParent {
 		}
 	}
 	
+	private void addPoint(Point where) {
+		if (where != null) {
+			Debug.print("adding...");
+			JsonArray balls = new JsonArray();
+			JsonObject ball = new JsonObject();
+			
+			ball.put(BALL_IMG_X_KEY, where.x);
+			ball.put(BALL_IMG_Y_KEY, where.y);
+			balls.add(ball);
+			
+			displayedLog.topLevelDictionary.put(BALLS_KEY, balls);
+		} else {
+			clear();
+		}
+	}
+	
+	private void clear() {
+		Debug.print("clearing...");
+		displayedLog.topLevelDictionary.put(BALLS_KEY, new JsonArray());
+	}
+	
 	@Override
 	public void setupDisplay() {
 		this.display = this.displayedLog.blocks.get(0).parseAsYUVImage().toBufferedImage();
@@ -70,17 +91,8 @@ public class BallTestView extends ViewParent {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Point where = pointOnImage(e.getPoint());
-				if (where != null) {
-					JsonArray balls = new JsonArray();
-					JsonObject ball = new JsonObject();
-					
-					ball.put(BALL_IMG_X_KEY, where.x);
-					ball.put(BALL_IMG_Y_KEY, where.y);
-					balls.add(ball);
-					
-					displayedLog.topLevelDictionary.put(BALLS_KEY, balls);
-					repaint();
-				}
+				addPoint(where);
+				repaint();
 			}
 		});
 		
@@ -88,7 +100,7 @@ public class BallTestView extends ViewParent {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				debug.info("clearing balls...");
-				displayedLog.topLevelDictionary.put(BALLS_KEY, new JsonArray());
+				clear();
 				repaint();
 			}
 		});
@@ -103,10 +115,14 @@ public class BallTestView extends ViewParent {
 		super.paintComponent(g);
 		
 		g.drawImage(display, 100, 100, null);
-		g.setColor(Color.RED);
+		g.setFont(g.getFont().deriveFont(20.0f));
 		
 		if (this.displayedLog.topLevelDictionary.containsKey(BALLS_KEY)) {
 			JsonArray balls = this.displayedLog.topLevelDictionary.get(BALLS_KEY).asArray();
+			g.setColor(Color.GREEN);
+			g.drawString("contains: " + balls.serialize(), 5, 20);
+			
+			g.setColor(Color.RED);
 			for (JsonValue ball : balls) {
 				JsonObject theBall = ball.asObject();
 				
@@ -117,6 +133,9 @@ public class BallTestView extends ViewParent {
 						ball_y - (BALL_DISPLAY_HEIGHT / 2),
 						BALL_DISPLAY_WIDTH, BALL_DISPLAY_HEIGHT);
 			}
+		} else {
+			g.setColor(Color.RED);
+			g.drawString("not annotated", 5, 20);
 		}
 	}
 

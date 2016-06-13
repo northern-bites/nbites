@@ -20,36 +20,38 @@ import nbtool.util.SharedConstants;
 
 public abstract class VisionView extends ViewParent implements IOFirstResponder {
 
+	public static final String DEFAULT_VISION_FUNCTION_NAME = "Vision";
+
 	/* you must implement this! */
 	protected abstract void setupVisionDisplay();
 
 	/* you may override these! */
-	
+
 	//determines what function 'callVision()' executes
 	protected String functionName() {
-		return "Vision";
+		return DEFAULT_VISION_FUNCTION_NAME;
 	}
-	
+
 	//Should VisionView call setupVisionDisplay() if no NBCross instance is found?
 	protected boolean continueIfNoNBCross() {
 		return false;
 	}
-	
+
 	/******
 	 * These variables and methods are provided as helpers.
 	 */
-	
+
 	/* latest from nbcross */
 	protected Log latestVisionLog = null;
-	
+
 	protected final boolean callVision() {
 		return callVision(displayedLog);
 	}
-	
+
 	protected final boolean callVision(Log with) {
 		CrossInstance ci = CrossServer.instanceByIndex(0);
 		if (ci == null) return false;
-		
+
 		assert(ci.tryAddCall(new IOFirstResponder(){
 
 			@Override
@@ -59,7 +61,7 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 			public void ioReceived(IOInstance inst, int ret, Log... out) {
 				assert(out.length == 1);
 				assert(out[0].logClass.equals("VisionReturn"));
-				
+
 				latestVisionLog = out[0];
 				outer.ioReceived(inst, ret, out);
 			}
@@ -68,65 +70,65 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 			public boolean ioMayRespondOnCenterThread(IOInstance inst) {
 				return false;
 			}
-			
+
 		}, functionName(), displayedLog));
-		
+
 		return true;
 	}
-		
+
 	protected final YUYV8888Image getOriginal() {
 		return displayedLog.blocks.get(0).parseAsYUVImage();
 	}
-	
+
 	protected final byte[] originalImageBytes() {
 		return displayedLog.blocks.get(0).data;
 	}
-	
+
 	protected final boolean isTop() {
 		String wf0 = displayedLog.blocks.get(0).whereFrom;
 		if (wf0.equals("camera_TOP")) return true;
 		if (wf0.equals("camera_BOT")) return false;
 		throw new RuntimeException("tripoint image block had invalid type: " + wf0);
 	}
-	
+
 	protected final int originalWidth() {
 		return displayedLog.blocks.get(0).dict.
 			get(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS()).asNumber().asInt();
 	}
-	
+
 	protected final int originalHeight() {
 		return displayedLog.blocks.get(0).dict.
 			get(SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS()).asNumber().asInt();
 	}
-	
+
 	protected final Block getYBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("yBuffer");
 	}
-	
+
 	protected final Block getWhiteBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("whiteRet");
 	}
-	
+
 	protected final Block getGreenBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("greenRet");
 	}
-	
+
 	protected final Block getOrangeBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("orangeRet");
 	}
-	
+
 	protected final Block getSegmentedBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("segBuffer");
 	}
-	
+
 	protected final Block getEdgeBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("edgeBuffer");
 	}
-	
+
 	protected final Block getLineBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("lineBuffer");
 	}
-	
+
 	protected final Block getBallBlock() {
 		if (latestVisionLog != null) {
 			for (Block b : latestVisionLog.blocks) {
@@ -135,18 +137,18 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 					return b;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	protected final Block getCCDBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("ccdBuffer");
 	}
-	
+
 	protected final Block getDebugImageBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("debugImage");
 	}
-	
+
 	/******
 	 * Begin internal implementation.
 	 */
@@ -156,7 +158,7 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 	public final String[] displayableTypes() {
 		return new String[]{SharedConstants.LogClass_Tripoint()};
 	}
-	
+
 	@Override
 	public final boolean ioMayRespondOnCenterThread(IOInstance inst) {
 		return false;
@@ -167,12 +169,12 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 		if (callVision() || continueIfNoNBCross()) {
 			setupVisionDisplay();
 		} else {
-			Debug.error("%s view not loading because it could not call Vision()", 
+			Debug.error("%s view not loading because it could not call Vision()",
 					this.getClass().getName());
 			this.setLayout(null);
 			final NBCrossErrorPane errorPanel = new NBCrossErrorPane();
 			this.add(errorPanel);
-			
+
 			this.addComponentListener(new ComponentListener(){
 				@Override
 				public void componentResized(ComponentEvent e) {reset(errorPanel);}
@@ -185,17 +187,17 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 			});
 		}
 	}
-	
+
 	private final void reset(NBCrossErrorPane panel) {
 		panel.setBounds(10,10,this.getSize().width - 20, this.getSize().height - 20);
-	}	
-	
+	}
+
 	private class NBCrossErrorPane extends JPanel {
 		@Override
 		public void paintComponent(Graphics g) {
 			g.setColor(Color.DARK_GRAY);
 			g.fillRect(0, 0, this.getSize().width, this.getSize().height);
-			
+
 			g.setColor(Color.RED);
 			Font use = this.getFont().deriveFont(24.0f);
 			g.setFont(use);
