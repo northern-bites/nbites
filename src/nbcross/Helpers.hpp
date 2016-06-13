@@ -30,6 +30,8 @@ enum VisionColor {
     VISION_ORANGE
 };
 
+SExpr treeFromSpot(man::vision::Spot & b, int width, int height);
+
 SExpr treeFromBlob(man::vision::Blob& b);
 
 SExpr treeFromBall(man::vision::Ball& b);

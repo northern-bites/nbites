@@ -626,19 +626,19 @@ void TranscriberModule::run_()
 {
     struct stat file_stats;
     std::string filepath;
-// #ifdef NAOQI_2
+#ifdef V5_ROBOT
     if(it.type() == Camera::TOP) {
         filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
     } else {
         filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
     }
-// #else
-//     if(it.type() == Camera::TOP) {
-//         filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
-//     } else {
-//         filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
-//     }
-// #endif
+#else
+    if(it.type() == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+    } else {
+        filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+    }
+#endif
 
     if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
         fclose(file);

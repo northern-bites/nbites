@@ -2,6 +2,47 @@
 
 /* HELPER FUNCTIONS */
 
+SExpr treeFromSpot(man::vision::Spot & b, int width, int height)
+{
+    SExpr xLo(b.xLo() + width / 2);
+    SExpr xHi(b.xHi() + width / 2);
+    SExpr yLo(b.yLo() + height / 2);
+    SExpr yHi(b.yHi() + height / 2);
+
+    SExpr x(b.rawX);
+    SExpr y(b.rawY);
+    SExpr p = SExpr::list({x, y});
+    SExpr ul = SExpr::list({xLo, yHi});
+    SExpr lr = SExpr::list({xHi, yLo});
+
+    SExpr center = SExpr::keyValue("center", p);
+    SExpr topleft = SExpr::keyValue("topLeft", ul);
+    SExpr lowerright = SExpr::keyValue("lowerRight", lr);
+    SExpr innerdiam = SExpr::keyValue("inner", b.innerDiam);
+    SExpr outerdiam = SExpr::keyValue("outer", b.outerDiam);
+    SExpr spottype = SExpr::keyValue("spottype", b.spotType);
+    SExpr toRet = SExpr::list({center, topleft, lowerright, innerdiam, outerdiam,
+        spottype});
+
+    return toRet;
+}
+
+SExpr treeFromBall(man::vision::Ball& b, int width, int height)
+{
+    SExpr x(b.x_rel);
+    SExpr y(b.y_rel);
+    SExpr p = SExpr::list({x, y});
+    SExpr bl = treeFromSpot(b.getSpot(), width, height);
+
+    SExpr rel = SExpr::keyValue("rel", p);
+    SExpr spot = SExpr::keyValue("blob", bl);
+    SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
+    SExpr toRet = SExpr::list({rel, spot, exDiam});
+
+    return toRet;
+}
+
+
 SExpr treeFromBlob(man::vision::Blob& b)
 {
     SExpr x(b.centerX());
@@ -16,21 +57,6 @@ SExpr treeFromBlob(man::vision::Blob& b)
     SExpr ang1 = SExpr::keyValue("ang1", b.firstPrincipalAngle());
     SExpr ang2 = SExpr::keyValue("ang2", b.secondPrincipalAngle());
     SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
-
-    return toRet;
-}
-
-SExpr treeFromBall(man::vision::Ball& b)
-{
-    SExpr x(b.x_rel);
-    SExpr y(b.y_rel);
-    SExpr p = SExpr::list({x, y});
-    SExpr bl = treeFromBlob(b.getBlob());
-
-    SExpr rel = SExpr::keyValue("rel", p);
-    SExpr blob = SExpr::keyValue("blob", bl);
-    SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
-    SExpr toRet = SExpr::list({rel, blob, exDiam});
 
     return toRet;
 }
