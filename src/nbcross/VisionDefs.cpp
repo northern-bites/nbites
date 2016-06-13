@@ -66,6 +66,9 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
 
     imageSizeCheck(topCamera, width, height);
 
+    printf("ARGUMENT WAS: camera:%d width:%d height:%d",
+           !topCamera, width, height);
+
 //    messages::YUVImage realImage = imageBlock.copyAsYUVImage();
 //    messages::YUVImage realImage = imageBlock.parseAsYUVImage();
 
@@ -127,7 +130,10 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
         theLog->topLevelDictionary.end()) {
         NBL_INFO("using ModifiedColorParams");
         json::Object& offsets = theLog->topLevelDictionary["ModifiedColorParams"].asObject();
+//        NBL_INFO("ModifiedColorParams object retrieved");
+        module.latestUsedColorParams[!topCamera] = offsets;
         module.setColorParams(man::vision::calibration::parseColorsFromJSON(offsets), topCamera);
+        NBL_INFO("ModifiedColorParams object parsed");
     }
 
     if (theLog->blocks.size() > 3 && theLog->blocks[2].type == SharedConstants::SexprType_DEFAULT()) {
