@@ -5,14 +5,13 @@
 #include "Man.h"
 #include "SharedData.h"
 
-
 #include <sys/file.h>
 #include <errno.h>
 
 int lockFD = 0;
 man::Man* instance;
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
+//const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
     instance->preClose();
@@ -73,6 +72,7 @@ void establishLock()
 
 int main() {
     signal(SIGTERM, handler);
+    signal(SIGINT, handler);
 
     establishLock();
 
@@ -86,8 +86,8 @@ int main() {
     fprintf(stderr, "Man re-opening stderr...\n");
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
-//    freopen(MAN_LOG_PATH, "w", stdout);
-     freopen(MAN_LOG_PATH, "wa", stdout);
+     freopen(MAN_LOG_PATH, "w", stdout);
+    
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     

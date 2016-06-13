@@ -19,9 +19,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import nbtool.gui.field.*;
 import nbtool.data.NBitesTeamBroadcast;
 import nbtool.data.log.Log;
+import nbtool.gui.field.Field;
+import nbtool.gui.field.FieldConstants;
+import nbtool.gui.field.NaoRobot;
 import nbtool.io.BroadcastIO;
 import nbtool.io.BroadcastIO.TeamBroadcastInstance;
 import nbtool.io.BroadcastIO.TeamBroadcastListener;
@@ -29,11 +31,11 @@ import nbtool.io.CommonIO.IOInstance;
 import nbtool.util.Debug;
 
 public class WorldViewUtility extends UtilityParent {
-	
+
 	private class WorldView extends JFrame implements TeamBroadcastListener, ActionListener, ComponentListener
 	{
 		private TeamBroadcastInstance broadcastListener = null;
-		
+
 		@Override
 		public void componentResized(ComponentEvent e) {}
 
@@ -42,12 +44,7 @@ public class WorldViewUtility extends UtilityParent {
 
 		@Override
 		public void componentShown(ComponentEvent e) {
-			if (broadcastListener != null) {
-				return;
-			} else {
-				Debug.plain("WorldView creating broadcast listener...");
-				broadcastListener = BroadcastIO.createTBI(this);
-			}
+
 		}
 
 		@Override
@@ -60,20 +57,19 @@ public class WorldViewUtility extends UtilityParent {
 				broadcastListener = null;
 			}
 		}
-		
+
 		protected WorldView() {
 			super();
-			
+
 			addComponentListener(this);
 
 			this.setTitle("WorldView");
 			//default, usually overridden later.
 			this.setSize((int) FieldConstants.FIELD_WIDTH + 150, (int) FieldConstants.FIELD_HEIGHT + 50);
 			this.getContentPane().setLayout(new BorderLayout());
-			
+
 			initiateTools();
 			initiateFieldAndPlayers();
-			
 		}
 
 		@Override
@@ -100,7 +96,7 @@ public class WorldViewUtility extends UtilityParent {
 			for (String s : tb.message.errors) {
 				Debug.print("\t%s", s);
 			}
-			
+
 			if(runWorldview) {
 				if(tb.dataTeamPacket.getTeamNumber() == teamNumber) {
 					int index = tb.dataTeamPacket.getPlayerNumber() - 1;
@@ -118,13 +114,13 @@ public class WorldViewUtility extends UtilityParent {
 						updateTeamInfo(tb);
 						fieldDisplay.repaint();
 					} else {
-						Debug.warn("WorldView got packet from correct team with OOB player: %d", 
+						Debug.warn("WorldView got packet from correct team with OOB player: %d",
 								tb.dataTeamPacket.getPlayerNumber());
 					}
 				}
 			}
 		}
-		
+
 		private void initiateFieldAndPlayers() {
 			fieldDisplay = new JPanel() {
 				@Override
@@ -134,55 +130,55 @@ public class WorldViewUtility extends UtilityParent {
 					f.drawField(g2, shouldFlip,lineColors);
 					for(int i=0; i<robots.length; i++) {
 						if(robots[i] != null) {
-							robots[i].drawNaoWV(g2, shouldFlip);	
+							robots[i].drawNaoWV(g2, shouldFlip);
 						}
 					}
 				}
 			};
-			
+
 			this.getContentPane().add(fieldDisplay, BorderLayout.CENTER);
 		}
-		
+
 		private void initiateTools() {
-			
+
 			accessories = new JPanel();
 			accessories.setLayout(new BoxLayout(accessories, BoxLayout.PAGE_AXIS));
-			
+
 			flip = new JButton("flip");
 			flip.addActionListener(this);
 			flip.setAlignmentX(Component.LEFT_ALIGNMENT);
 			flip.setEnabled(true);
 			accessories.add(flip);
-			
+
 			teamNumberInput = new JTextField("0",2);
 			teamNumberInput.setMaximumSize(new Dimension(Short.MAX_VALUE, teamNumberInput.getPreferredSize().height));
 			teamNumberInput.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 			accessories.add(teamNumberInput);
-			
+
 			startWorldView = new JButton("Start WorldView");
 			startWorldView.addActionListener(this);
 			startWorldView.setAlignmentX(Component.LEFT_ALIGNMENT);
 			accessories.add(startWorldView);
-			
+
 			JLabel robotStates = new JLabel("Robot States");
 			robotStates.setFont(new Font("Verdana", Font.BOLD, 16));
 			robotStates.setAlignmentX(Component.LEFT_ALIGNMENT);
 			accessories.add(robotStates);
-			
+
 			for(int i=0; i<5; i++) {
 				if(playerRoles[i] == null) { playerRoles[i] = "Inactive";}
 				teamInfo[i] = new JLabel("Player "+(i+1)+": "+playerRoles[i]);
 				teamInfo[i].setAlignmentX(Component.LEFT_ALIGNMENT);
 				accessories.add(teamInfo[i]);
 			}
-			
+
 			//accessories.add(Box.createHorizontalStrut(200));
 			accessories.add(Box.createVerticalGlue());
 
 			this.getContentPane().add(accessories, BorderLayout.EAST);
 		}
-		
+
 		private void updateTeamInfo(NBitesTeamBroadcast tb) {
 			int role = tb.dataWorldModel.getRole();
 			int playerNum = tb.dataTeamPacket.getPlayerNumber();
@@ -204,18 +200,18 @@ public class WorldViewUtility extends UtilityParent {
 				teamInfo[playerNum-1].setText("Player "+(playerNum)+": "+playerRoles[playerNum-1]);
 			}
 		}
-		
+
 		JPanel fieldDisplay;
 		Field f = new Field();
 		NaoRobot robots[] = new NaoRobot[5];
-		
+
 		JPanel accessories;
 		private JButton flip;
 		private JButton startWorldView;
 		private JTextField teamNumberInput;
 		private JLabel teamInfo[] = new JLabel[5];
 		private String playerRoles[] = new String[5];
-		
+
 		private boolean shouldFlip = false;
 		private boolean lineColors = false;
 		private boolean runWorldview = false;
@@ -232,6 +228,7 @@ public class WorldViewUtility extends UtilityParent {
 					flip.setText("unflip");
 				}
 			}
+
 			if(e.getActionCommand() == "Start WorldView") {
 				runWorldview = true;
 				if(teamNumberInput.getText() != null) {
@@ -241,7 +238,12 @@ public class WorldViewUtility extends UtilityParent {
 						Debug.info("Now listening to team %s", teamNumber);
 					} catch(NumberFormatException E) {
 						E.printStackTrace();
+						return;
 					}
+
+					Debug.plain("WorldView creating broadcast listener...");
+					broadcastListener = BroadcastIO.createTBI(this,
+							BroadcastIO.teamPort(teamNumber));
 				}
 			} else if(e.getActionCommand() == "Stop") {
 				runWorldview = false;
