@@ -152,7 +152,7 @@ def prepareForKick(player):
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
     if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
         return player.goNow('orbitBall')
-    return player.goNow('followPotentialField')
+    return player.goNow('orbitBall')
 
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
