@@ -7,34 +7,67 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import nbtool.data.calibration.ColorParam;
-import nbtool.data.calibration.ColorParam.Set;
 import nbtool.data.json.Json;
 import nbtool.data.json.JsonParser.JsonParseException;
+import nbtool.data.log.Block;
+import nbtool.data.log.Log;
 import nbtool.gui.ToolMessage;
+import nbtool.gui.logdnd.LogDND;
+import nbtool.gui.logdnd.LogDND.LogDNDTarget;
+import nbtool.gui.logviews.images.ImageDisplay;
+import nbtool.gui.logviews.misc.VisionView;
+import nbtool.images.Y8Image;
+import nbtool.io.CommonIO.IOFirstResponder;
+import nbtool.io.CommonIO.IOInstance;
+import nbtool.nio.CrossServer;
+import nbtool.nio.CrossServer.CrossInstance;
 import nbtool.util.Debug;
+import nbtool.util.SharedConstants;
 
+public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, ColorCalibrationListener> {
 
-public class ColorCalibrationUtility extends UtilityParent {
+	private static ColorCalibrationUtility instance = null;
+	private static Debug.DebugSettings debug = Debug.createSettings(Debug.INFO);
 
-	/* utility parent implementation code */
-	/**************************************/
-	
+	ColorCalibrationUtility() {
+		if (instance != null) {
+			throw new RuntimeException("singeton class");
+		} else {
+			instance = this;
+		}
+	}
+
+	@Override
+	public ColorParam.Set getLatest() {
+		return color_parameters;
+	}
+
 	private static Display display = null;
-	
+
 	@Override
 	public JFrame supplyDisplay() {
 		if (display != null) {
 			return display;
 		} else {
-			return (display = new Display());
+			try {
+				return (display = new Display());
+			} catch (java.lang.OutOfMemoryError err) {
+				err.printStackTrace();
+				Debug.print("%s", err.getMessage());
+				return null;
+			}
 		}
 	}
 
@@ -47,158 +80,71 @@ public class ColorCalibrationUtility extends UtilityParent {
 	public char preferredMemnonic() {
 		return 'c';
 	}
- 
-	/* GUI code */
-	/****************************/
-	
+
+	private static ColorParam.Set color_parameters = null;
+
+	private static void colorParametersUpdated() {
+		Debug.print("color parameters have updated.");
+
+		if (display != null && display.applyGlobally) {
+			instance.fireChanged();
+		}
+	}
+
 	private static class Display extends JFrame {
 
-		private final ColorCalibrationPanel panel = new ColorCalibrationPanel();
-		
-		private JSlider[] sliders = {
-				panel.Y0USliderWT,
-				panel.Y0VSliderWT,
-				panel.Y255USliderWT,
-				panel.Y255VSliderWT,
-				panel.FuzzyUSliderWT,
-				panel.FuzzyVSliderWT,
-				panel.Y0USliderWB,
-				panel.Y0VSliderWB,
-				panel.Y255USliderWB,
-				panel.Y255VSliderWB,
-				panel.FuzzyUSliderWB,
-				panel.FuzzyVSliderWB,
-				panel.Y0USliderGT,
-				panel.Y0VSliderGT,
-				panel.Y255USliderGT,
-				panel.Y255VSliderGT,
-				panel.FuzzyUSliderGT,
-				panel.FuzzyVSliderGT,
-				panel.Y0USliderGB,
-				panel.Y0VSliderGB,
-				panel.Y255USliderGB,
-				panel.Y255VSliderGB,
-				panel.FuzzyUSliderGB,
-				panel.FuzzyVSliderGB
-				
-		};
-		
-		private JSpinner[] spinners = {
-				panel.Y0USpinnerWT,
-				panel.Y0VSpinnerWT,
-				panel.Y255USpinnerWT,
-				panel.Y255VSpinnerWT,
-				panel.FuzzyUSpinnerWT,
-				panel.FuzzyVSpinnerWT,
-				panel.Y0USpinnerWB,
-				panel.Y0VSpinnerWB,
-				panel.Y255USpinnerWB,
-				panel.Y255VSpinnerWB,
-				panel.FuzzyUSpinnerWB,
-				panel.FuzzyVSpinnerWB,
-				panel.Y0USpinnerGT,
-				panel.Y0VSpinnerGT,
-				panel.Y255USpinnerGT,
-				panel.Y255VSpinnerGT,
-				panel.FuzzyUSpinnerGT,
-				panel.FuzzyVSpinnerGT,
-				panel.Y0USpinnerGB,
-				panel.Y0VSpinnerGB,
-				panel.Y255USpinnerGB,
-				panel.Y255VSpinnerGB,
-				panel.FuzzyUSpinnerGB,
-				panel.FuzzyVSpinnerGB
-		};
-		
-		private void updateNB(ChangeEvent e) {
-			
-			ColorParam.Set set = new ColorParam.Set();
-			
-			set.getTop().white.uAtY0 = (double) panel.Y0USliderWT.getValue();
-			set.getTop().white.vAtY0 = (double) panel.Y0VSliderWT.getValue();
-			set.getTop().white.uAtY255 = (double) panel.Y255USliderWT.getValue();
-			set.getTop().white.vAtY255 = (double) panel.Y255VSliderWT.getValue();
-			set.getTop().white.u_fuzzy_range = (double) panel.FuzzyUSliderWT.getValue();
-			set.getTop().white.v_fuzzy_range = (double) panel.FuzzyVSliderWT.getValue();
-			set.getBot().white.uAtY0 = (double) panel.Y0USliderWB.getValue();
-			set.getBot().white.vAtY0 = (double) panel.Y0VSliderWB.getValue();
-			set.getBot().white.uAtY255 = (double) panel.Y255USliderWB.getValue();
-			set.getBot().white.vAtY255 = (double) panel.Y255VSliderWB.getValue();
-			set.getBot().white.u_fuzzy_range = (double) panel.FuzzyUSliderWB.getValue();
-			set.getBot().white.v_fuzzy_range = (double) panel.FuzzyVSliderWB.getValue();
-			set.getTop().green.uAtY0 = (double) panel.Y0USliderGT.getValue();
-			set.getTop().green.vAtY0 =  (double) panel.Y0VSliderGT.getValue();
-			set.getTop().green.uAtY255 = (double) panel.Y255USliderGT.getValue();
-			set.getTop().green.vAtY255 = (double) panel.Y255VSliderGT.getValue();
-			set.getTop().green.u_fuzzy_range = (double) panel.FuzzyUSliderGT.getValue();
-			set.getTop().green.v_fuzzy_range = (double) panel.FuzzyVSliderGT.getValue();
-			set.getBot().green.uAtY0 = (double) panel.Y0USliderGB.getValue();
-			set.getBot().green.vAtY0 = (double) panel.Y0VSliderGB.getValue();
-			set.getBot().green.uAtY255 = (double) panel.Y255USliderGB.getValue();
-			set.getBot().green.vAtY255 = (double) panel.Y255VSliderGB.getValue();
-			set.getBot().green.u_fuzzy_range = (double) panel.FuzzyUSliderGB.getValue();
-			set.getBot().green.v_fuzzy_range = (double) panel.FuzzyVSliderGB.getValue();
-	
-			set.getTop().white.uAtY0 = (Integer) panel.Y0USpinnerWT.getValue();
-			set.getTop().white.vAtY0 = (Integer) panel.Y0VSpinnerWT.getValue();
-			set.getTop().white.uAtY255 = (Integer) panel.Y255USpinnerWT.getValue();
-			set.getTop().white.vAtY255 = (Integer) panel.Y255VSpinnerWT.getValue();
-			set.getTop().white.u_fuzzy_range = (Integer) panel.FuzzyUSpinnerWT.getValue();
-			set.getTop().white.v_fuzzy_range = (Integer) panel.FuzzyVSpinnerWT.getValue();
-			set.getBot().white.uAtY0 = (Integer) panel.Y0USpinnerWB.getValue();
-			set.getBot().white.vAtY0 = (Integer) panel.Y0VSpinnerWB.getValue();
-			set.getBot().white.uAtY255 = (Integer) panel.Y255USpinnerWB.getValue();
-			set.getBot().white.vAtY255 = (Integer) panel.Y255VSpinnerWB.getValue();
-			set.getBot().white.u_fuzzy_range = (Integer) panel.FuzzyUSpinnerWB.getValue();
-			set.getBot().white.v_fuzzy_range = (Integer) panel.FuzzyVSpinnerWB.getValue();
-			set.getTop().green.uAtY0 = (Integer) panel.Y0USpinnerGT.getValue();
-			set.getTop().green.vAtY0 =  (Integer) panel.Y0VSpinnerGT.getValue();
-			set.getTop().green.uAtY255 = (Integer) panel.Y255USpinnerGT.getValue();
-			set.getTop().green.vAtY255 = (Integer) panel.Y255VSpinnerGT.getValue();
-			set.getTop().green.u_fuzzy_range = (Integer) panel.FuzzyUSpinnerGT.getValue();
-			set.getTop().green.v_fuzzy_range = (Integer) panel.FuzzyVSpinnerGT.getValue();
-			set.getBot().green.uAtY0 = (Integer) panel.Y0USpinnerGB.getValue();
-			set.getBot().green.vAtY0 = (Integer) panel.Y0VSpinnerGB.getValue();
-			set.getBot().green.uAtY255 = (Integer) panel.Y255USpinnerGB.getValue();
-			set.getBot().green.vAtY255 = (Integer) panel.Y255VSpinnerGB.getValue();
-			set.getBot().green.u_fuzzy_range = (Integer) panel.FuzzyUSpinnerGB.getValue();
-			set.getBot().green.v_fuzzy_range = (Integer) panel.FuzzyVSpinnerGB.getValue();
-	
-			Debug.print("Changing parameter: %s",e);
-		}
-		
-		private ChangeListener slideListener = new ChangeListener() {
-			
+		JTabbedPane tabs = new JTabbedPane();
+		TabHandler[] handlers = new TabHandler[4];
+		boolean applyGlobally = false;
+
+		private ActionListener saveListener = new ActionListener() {
 			@Override
-			public void stateChanged(ChangeEvent e) {
-				for (int i = 0; i < spinners.length; ++i) {
-					spinners[i].setValue( (Integer) sliders[i].getValue());
+			public void actionPerformed(ActionEvent e) {
+				Debug.warn("saving color parameters to NBITES_DIR !");
+
+				try {
+					Files.write(ColorParam.getPath(),
+							color_parameters.serialize().print().getBytes(StandardCharsets.UTF_8));
+					ToolMessage.displayWarn("wrote color parameters");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					ToolMessage.displayError("could not write color parameters.");
 				}
-				updateNB(e);
 			}
 		};
-		
-		private ChangeListener spinnerListener = new ChangeListener() {
+
+		private ActionListener sendListener = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Debug.notRefactored();
+			}
+
+		};
+
+		private ChangeListener globalListener = new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				for (int i = 0; i < sliders.length; ++i) {
-					sliders[i].setValue( (Integer) spinners[i].getValue());
+				boolean nv = ((JCheckBox) e.getSource()).isSelected();
+				for (TabHandler th : handlers) {
+					th.tab.globalCheckBox.setSelected(nv);
 				}
-				updateNB(e);
+
+				applyGlobally = nv;
 			}
-			
 		};
-		
+
 		Display() {
 			super("color calibration utility");
-			
+
 			Debug.plain("getting initial color parameters");
 			Path colorPath = ColorParam.getPath();
-			assert(Files.exists(colorPath) && Files.isRegularFile(colorPath));
-			
+			assert (Files.exists(colorPath) && Files.isRegularFile(colorPath));
+
 			ColorParam.Set set = null;
-			
+
 			try {
 				String contents = new String(Files.readAllBytes(colorPath));
 				set = ColorParam.Set.parse(Json.parse(contents).asObject());
@@ -210,95 +156,252 @@ public class ColorCalibrationUtility extends UtilityParent {
 			} catch (JsonParseException e1) {
 				e1.printStackTrace();
 				Debug.error("JsonParseException: %s", e1.getMessage());
-            	ToolMessage.displayError("error parsing json file %s !",colorPath);
-            	return;
+				ToolMessage.displayError("error parsing json file %s !", colorPath);
+				return;
 			}
-			
-			assert(set != null);
-			
-			Debug.print("setting");
-						
-			panel.Y0USliderWT.setValue((int) set.getTop().white.uAtY0);
-			panel.Y0VSliderWT.setValue((int) set.getTop().white.vAtY0);
-			panel.Y255USliderWT.setValue((int) set.getTop().white.uAtY255);
-			panel.Y255VSliderWT.setValue((int) set.getTop().white.vAtY255);
-			panel.FuzzyUSliderWT.setValue((int) set.getTop().white.u_fuzzy_range);
-			panel.FuzzyVSliderWT.setValue((int) set.getTop().white.v_fuzzy_range);
-			panel.Y0USliderWB.setValue((int) set.getBot().white.uAtY0);
-			panel.Y0VSliderWB.setValue((int) set.getBot().white.vAtY0);
-			panel.Y255USliderWB.setValue((int) set.getBot().white.uAtY255);
-			panel.Y255VSliderWB.setValue((int) set.getBot().white.vAtY255);
-			panel.FuzzyUSliderWB.setValue((int) set.getBot().white.u_fuzzy_range);
-			panel.FuzzyVSliderWB.setValue((int) set.getBot().white.v_fuzzy_range);
-			panel.Y0USliderGT.setValue((int) set.getTop().green.uAtY0);
-			panel.Y0VSliderGT.setValue((int) set.getTop().green.vAtY0);
-			panel.Y255USliderGT.setValue((int) set.getTop().green.uAtY255);
-			panel.Y255VSliderGT.setValue((int) set.getTop().green.vAtY255);
-			panel.FuzzyUSliderGT.setValue((int) set.getTop().green.u_fuzzy_range);
-			panel.FuzzyVSliderGT.setValue((int) set.getTop().green.v_fuzzy_range);
-			panel.Y0USliderGB.setValue((int) set.getBot().green.uAtY0);
-			panel.Y0VSliderGB.setValue((int) set.getBot().green.vAtY0);
-			panel.Y255USliderGB.setValue((int) set.getBot().green.uAtY255);
-			panel.Y255VSliderGB.setValue((int) set.getBot().green.vAtY255);
-			panel.FuzzyUSliderGB.setValue((int) set.getBot().green.u_fuzzy_range);
-			panel.FuzzyVSliderGB.setValue((int) set.getBot().green.v_fuzzy_range);			
-			
-			
-			panel.Y0USpinnerWT.setValue((int) set.getTop().white.uAtY0);
-			panel.Y0VSpinnerWT.setValue((int) set.getTop().white.vAtY0);
-			panel.Y255USpinnerWT.setValue((int) set.getTop().white.uAtY255);
-			panel.Y255VSpinnerWT.setValue((int) set.getTop().white.vAtY255);
-			panel.FuzzyUSpinnerWT.setValue((int) set.getTop().white.u_fuzzy_range);
-			panel.FuzzyVSpinnerWT.setValue((int) set.getTop().white.v_fuzzy_range);
-			panel.Y0USpinnerWB.setValue((int) set.getBot().white.uAtY0);
-			panel.Y0VSpinnerWB.setValue((int) set.getBot().white.vAtY0);
-			panel.Y255USpinnerWB.setValue((int) set.getBot().white.uAtY255);
-			panel.Y255VSpinnerWB.setValue((int) set.getBot().white.vAtY255);
-			panel.FuzzyUSpinnerWB.setValue((int) set.getBot().white.u_fuzzy_range);
-			panel.FuzzyVSpinnerWB.setValue((int) set.getBot().white.v_fuzzy_range);
-			panel.Y0USpinnerGT.setValue((int) set.getTop().green.uAtY0);
-			panel.Y0VSpinnerGT.setValue((int) set.getTop().green.vAtY0);
-			panel.Y255USpinnerGT.setValue((int) set.getTop().green.uAtY255);
-			panel.Y255VSpinnerGT.setValue((int) set.getTop().green.vAtY255);
-			panel.FuzzyUSpinnerGT.setValue((int) set.getTop().green.u_fuzzy_range);
-			panel.FuzzyVSpinnerGT.setValue((int) set.getTop().green.v_fuzzy_range);
-			panel.Y0USpinnerGB.setValue((int) set.getBot().green.uAtY0);
-			panel.Y0VSpinnerGB.setValue((int) set.getBot().green.vAtY0);
-			panel.Y255USpinnerGB.setValue((int) set.getBot().green.uAtY255);
-			panel.Y255VSpinnerGB.setValue((int) set.getBot().green.vAtY255);
-			panel.FuzzyUSpinnerGB.setValue((int) set.getBot().green.u_fuzzy_range);
-			panel.FuzzyVSpinnerGB.setValue((int) set.getBot().green.v_fuzzy_range);			
-			
 
-			
-			this.setContentPane(panel);
-			
-			this.setMinimumSize(new Dimension(600,200));
-			
-			this.panel.SendButtonGB = new JButton("Send")
-			this.panel.SendButtonGB.addActionListener("Send");
-			
-					
-					
-					new ActionListener(){
+			assert (set != null);
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					//TODO do
-					Debug.notRefactored();
-				}
-				
-			});
-			
-			for (JSlider slider : sliders) {
-				slider.setMaximum(255);
-				slider.setMinimum(0);
-				slider.addChangeListener(slideListener);
+			color_parameters = set;
+
+			/**
+			 * THIS IS WHERE THE TABS ARE SET UP:
+			 * true is top, false is bottom!
+			 * Camera.Which enum is defined in nbtool.data.calibration.ColorParam.java
+			 * */
+
+			handlers[0] = new TabHandler(true, ColorParam.Camera.Which.white);
+			handlers[1] = new TabHandler(false, ColorParam.Camera.Which.white);
+
+			handlers[2] = new TabHandler(true, ColorParam.Camera.Which.green);
+			handlers[3] = new TabHandler(false, ColorParam.Camera.Which.green);
+
+			for (TabHandler th : handlers) {
+				tabs.add(th.title(), th.tab);
+
+				th.tab.SaveButton.addActionListener(saveListener);
+				th.tab.SendButton.addActionListener(sendListener);
+				th.tab.globalCheckBox.addChangeListener(globalListener);
 			}
-			for (JSpinner spinner : spinners) {
-				spinner.addChangeListener(spinnerListener);
+
+			for (int i = 0; i < handlers.length; ++i) {
+				handlers[i].takeFrom(set);
+			}
+
+			for (int i = 0; i < handlers.length; ++i) {
+				handlers[i].installListeners();
+			}
+
+			Dimension minSize = new Dimension(tabs.getMinimumSize());
+			minSize.width += 50;
+			minSize.height += 50;
+
+			this.setContentPane(tabs);
+			this.setMinimumSize(minSize);
+		}
+
+	}
+
+	private static class TabHandler {
+		boolean top;
+		ColorParam.Camera.Which camera;
+		ColorCalibrationTab tab;
+
+		ImageDisplay imageDisplay;
+
+		Log dropped = null;
+		int dropped_width, dropped_height;
+
+		public String title() {
+			return (top ? "top" : "bot") + " " + camera.toString();
+		}
+
+		static class Group {
+			JSlider slider;
+			JSpinner spinner;
+			ColorParam.Part part;
+
+			Group (JSlider slider, JSpinner spinner, ColorParam.Part part) {
+				this.slider = slider; this.spinner = spinner; this.part = part;
 			}
 		}
+
+		private ArrayList<Group> groups = new ArrayList<>();
+
+		private void visionCall() {
+			assert(dropped != null);
+			assert(color_parameters != null);
+
+			dropped.topLevelDictionary.put("ModifiedColorParams", color_parameters.get(top).serialize());
+			debug.info("%s", dropped.topLevelDictionary.get("ModifiedColorParams").print());
+
+			CrossInstance ci = CrossServer.instanceByIndex(0);
+			if (ci == null) {
+				ToolMessage.displayWarn("{%s} cannot call vision, no CrossInstance!", title());
+				return;
+			}
+
+			assert(ci.tryAddCall(new IOFirstResponder(){
+
+				@Override
+				public void ioFinished(IOInstance instance) { }
+
+				@Override
+				public void ioReceived(IOInstance inst, int ret, Log... out) {
+					assert(out.length == 1);
+					assert(out[0].logClass.equals("VisionReturn"));
+
+					String search = camera.toString() + "Ret";
+					debug.info("TabHandler looking for: %s", search);
+
+					Block block = out[0].find(search);
+					Y8Image image = new Y8Image(dropped_width / 2, dropped_height / 2, block.data);
+
+					if (imageDisplay != null)
+						imageDisplay.setImage(image.toBufferedImage());
+					else debug.error("{%s} null image display!", title());
+				}
+
+				@Override
+				public boolean ioMayRespondOnCenterThread(IOInstance inst) {
+					return false;
+				}
+
+			}, VisionView.DEFAULT_VISION_FUNCTION_NAME, dropped));
+		}
+
+		private void wasUpdated() {
+
+			setTo(color_parameters);
+
+			if (dropped != null) {
+				debug.info("{%s} making vision call", title());
+				visionCall();
+			}
+
+			colorParametersUpdated();
+		}
+
+		public void useLog(Log dropped) {
+			Debug.print("{%s} using log: %s", title(), dropped);
+			this.dropped = dropped;
+			dropped_width = dropped.blocks.get(0).dict.get(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS())
+					.asNumber().asInt();
+			dropped_height = dropped.blocks.get(0).dict.get(SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS())
+						.asNumber().asInt();
+			visionCall();
+		}
+
+		public void takeFrom(ColorParam.Set set) {
+			ColorParam.Camera cam = set.get(top);
+			ColorParam param = cam.get(camera);
+			for (Group g : groups) {
+				int val = (int) param.get(g.part);
+				g.slider.setValue(val);
+				g.spinner.setValue(val);
+			}
+		}
+
+		public void setTo(ColorParam.Set set) {
+			ColorParam.Camera cam = set.get(top);
+			ColorParam param = cam.get(camera);
+
+			for (Group g : groups) {
+				param.set(g.part, g.slider.getValue());
+			}
+		}
+
+		private ChangeListener fromSpinner = new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				for (int i = 0; i < groups.size(); ++i) {
+					Group rel = groups.get(i);
+					rel.slider.setValue(
+							(Integer) rel.spinner.getValue()
+							);
+				}
+
+				wasUpdated();
+			}
+
+		};
+
+		private ChangeListener fromSlider = new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				for (int i = 0; i < groups.size(); ++i) {
+					Group rel = groups.get(i);
+					rel.spinner.setValue(
+							rel.slider.getValue()
+							);
+				}
+
+				wasUpdated();
+			}
+		};
+
+		protected void installListeners() {
+			for (Group g : groups) {
+				g.slider.addChangeListener(fromSlider);
+				g.spinner.addChangeListener(fromSpinner);
+			}
+		}
+
+		public TabHandler(final boolean top, ColorParam.Camera.Which camera) {
+
+			debug.info("in constructor");
+
+			this.top = top; this.camera = camera;
+			this.tab = new ColorCalibrationTab();
+			this.tab.tabTitle.setText(title());
+
+			groups.add(new Group(tab.Y0USlider, tab.Y0USpinner, ColorParam.Part.uAtY0));
+			groups.add(new Group(tab.Y255USlider, tab.Y255USpinner, ColorParam.Part.uAtY255));
+
+			groups.add(new Group(tab.Y0VSlider, tab.Y0VSpinner, ColorParam.Part.vAtY0));
+			groups.add(new Group(tab.Y255VSlider, tab.Y255VSpinner, ColorParam.Part.vAtY255));
+
+			groups.add(new Group(tab.FuzzyUSlider, tab.FuzzyUSpinner, ColorParam.Part.u_fuzzy_range));
+			groups.add(new Group(tab.FuzzyVSlider, tab.FuzzyVSpinner, ColorParam.Part.v_fuzzy_range));
+
+			for (Group g : groups) {
+				g.spinner.setModel(new SpinnerNumberModel(0,0,255,1));
+				g.slider.setMinimum(0);
+				g.slider.setMaximum(255);
+			}
+
+			imageDisplay = new ImageDisplay();
+			tab.imageTabs.add("result", imageDisplay);
+
+			LogDND.makeComponentTarget(tab, new LogDNDTarget(){
+			@Override
+			public void takeLogsFromDrop(Log[] log) {
+					if (log.length > 0) {
+						Log attempt = log[0];
+
+						if (!attempt.logClass.equals("tripoint")) {
+							ToolMessage.displayError("must use tripoint log for ColorCalibration, not %s!",
+									attempt.logClass);
+							return;
+						}
+
+						String reqFrom = top ? "camera_TOP" : "camera_BOT";
+
+						if (!attempt.blocks.get(0).whereFrom.equals(reqFrom)) {
+							ToolMessage.displayError("tab {%s} must have log from: %s",
+									title(), reqFrom);
+							return;
+						}
+
+						useLog(log[0]);
+					}
+			}
+			});
+
+			debug.info("leaving constructor");
+		}
 	}
-	
+
 }
