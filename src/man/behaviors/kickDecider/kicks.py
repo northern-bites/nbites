@@ -76,7 +76,7 @@ LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight",
                                  dist = 300,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
-                                 x = 20, y = -,
+                                 x = 20, y = -5,
                                  dist = 300,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
