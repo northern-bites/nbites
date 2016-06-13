@@ -120,23 +120,40 @@ strikerTop = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                 NogginConstants.MIDFIELD_Y + 60,
                                 0)
 
+## SUMMER 2016 CHANGES ##
+
 if NogginConstants.LEFT_FORWARD_DEFENSE:
-    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
-                                    NogginConstants.MY_GOALBOX_TOP_Y,
+    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 300,
+                                    NogginConstants.MY_GOALBOX_TOP_Y + 10,
                                     0)
-else:
-    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 80,
-                                    NogginConstants.MY_GOALBOX_TOP_Y,
+    evenDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 200,
+                                    NogginConstants.MY_GOALBOX_TOP_Y + 10,
                                     0)
     
+else:
+    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 120,
+                                    NogginConstants.MY_GOALBOX_TOP_Y,
+                                    0)
+    evenDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 110,
+                                    NogginConstants.MY_GOALBOX_TOP_Y,
+                                    0)
+
 if NogginConstants.RIGHT_FORWARD_DEFENSE:
     oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 160,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
-else:
-    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 70,
+    oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
+else:
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
+                                0)
+    oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
+                                0)
+
+## END SUMMER 2016 CHANGES ##
 
 oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                               NogginConstants.GREEN_PAD_Y + 100,
@@ -217,12 +234,12 @@ def setRoleConstants(player, role):
     player.role = role
     if isLeftDefender(role):
         player.homePosition = evenDefenderHome
-        player.kickoffPosition = evenDefenderHome
+        player.kickoffPosition = evenDefenderKickoff
         player.box = evenDefenderBox
         player.isKickingOff = False
     elif isRightDefender(role):
         player.homePosition = oddDefenderHome
-        player.kickoffPosition = oddDefenderHome
+        player.kickoffPosition = oddDefenderKickoff
         player.box = oddDefenderBox
         player.isKickingOff = False
     elif isFirstChaser(role):
