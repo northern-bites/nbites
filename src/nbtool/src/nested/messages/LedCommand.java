@@ -7,27 +7,35 @@ package messages;
  * Protobuf type {@code messages.LedCommand}
  */
 public  final class LedCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.LedCommand)
-    LedCommandOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements LedCommandOrBuilder {
   // Use LedCommand.newBuilder() to construct.
   private LedCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private LedCommand() {
-    ledId_ = java.util.Collections.emptyList();
-    rgbHex_ = java.util.Collections.emptyList();
+  private LedCommand(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final LedCommand defaultInstance;
+  public static LedCommand getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public LedCommand getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private LedCommand(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -91,11 +99,10 @@ public  final class LedCommand extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
         ledId_ = java.util.Collections.unmodifiableList(ledId_);
@@ -119,6 +126,22 @@ public  final class LedCommand extends
             messages.LedCommand.class, messages.LedCommand.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<LedCommand> PARSER =
+      new com.google.protobuf.AbstractParser<LedCommand>() {
+    public LedCommand parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new LedCommand(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<LedCommand> getParserForType() {
+    return PARSER;
+  }
+
+  // repeated int32 led_id = 1;
   public static final int LED_ID_FIELD_NUMBER = 1;
   private java.util.List<java.lang.Integer> ledId_;
   /**
@@ -156,6 +179,7 @@ public  final class LedCommand extends
     return ledId_.get(index);
   }
 
+  // repeated int32 rgb_hex = 2;
   public static final int RGB_HEX_FIELD_NUMBER = 2;
   private java.util.List<java.lang.Integer> rgbHex_;
   /**
@@ -178,11 +202,14 @@ public  final class LedCommand extends
     return rgbHex_.get(index);
   }
 
+  private void initFields() {
+    ledId_ = java.util.Collections.emptyList();
+    rgbHex_ = java.util.Collections.emptyList();
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -190,17 +217,19 @@ public  final class LedCommand extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     for (int i = 0; i < ledId_.size(); i++) {
       output.writeInt32(1, ledId_.get(i));
     }
     for (int i = 0; i < rgbHex_.size(); i++) {
       output.writeInt32(2, rgbHex_.get(i));
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -222,12 +251,18 @@ public  final class LedCommand extends
       size += dataSize;
       size += 1 * getRgbHexList().size();
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.LedCommand parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -281,17 +316,12 @@ public  final class LedCommand extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.LedCommand prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -303,9 +333,8 @@ public  final class LedCommand extends
    * Protobuf type {@code messages.LedCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.LedCommand)
-      messages.LedCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.LedCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_LedCommand.internal_static_messages_LedCommand_descriptor;
@@ -332,6 +361,10 @@ public  final class LedCommand extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       ledId_ = java.util.Collections.emptyList();
@@ -339,6 +372,10 @@ public  final class LedCommand extends
       rgbHex_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000002);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -406,8 +443,7 @@ public  final class LedCommand extends
         }
         onChanged();
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -434,6 +470,7 @@ public  final class LedCommand extends
     }
     private int bitField0_;
 
+    // repeated int32 led_id = 1;
     private java.util.List<java.lang.Integer> ledId_ = java.util.Collections.emptyList();
     private void ensureLedIdIsMutable() {
       if (!((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -515,8 +552,7 @@ public  final class LedCommand extends
     public Builder addAllLedId(
         java.lang.Iterable<? extends java.lang.Integer> values) {
       ensureLedIdIsMutable();
-      com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, ledId_);
+      super.addAll(values, ledId_);
       onChanged();
       return this;
     }
@@ -535,6 +571,7 @@ public  final class LedCommand extends
       return this;
     }
 
+    // repeated int32 rgb_hex = 2;
     private java.util.List<java.lang.Integer> rgbHex_ = java.util.Collections.emptyList();
     private void ensureRgbHexIsMutable() {
       if (!((bitField0_ & 0x00000002) == 0x00000002)) {
@@ -586,8 +623,7 @@ public  final class LedCommand extends
     public Builder addAllRgbHex(
         java.lang.Iterable<? extends java.lang.Integer> values) {
       ensureRgbHexIsMutable();
-      com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, rgbHex_);
+      super.addAll(values, rgbHex_);
       onChanged();
       return this;
     }
@@ -604,47 +640,11 @@ public  final class LedCommand extends
     // @@protoc_insertion_point(builder_scope:messages.LedCommand)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.LedCommand)
-  private static final messages.LedCommand DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.LedCommand();
+    defaultInstance = new LedCommand(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.LedCommand getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<LedCommand>
-      PARSER = new com.google.protobuf.AbstractParser<LedCommand>() {
-    public LedCommand parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new LedCommand(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<LedCommand> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<LedCommand> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.LedCommand getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.LedCommand)
 }
 

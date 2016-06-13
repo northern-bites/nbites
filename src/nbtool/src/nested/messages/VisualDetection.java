@@ -7,42 +7,35 @@ package messages;
  * Protobuf type {@code messages.VisualDetection}
  */
 public  final class VisualDetection extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.VisualDetection)
-    VisualDetectionOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements VisualDetectionOrBuilder {
   // Use VisualDetection.newBuilder() to construct.
   private VisualDetection(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private VisualDetection() {
-    distance_ = 0F;
-    bearing_ = 0F;
-    bearingDeg_ = 0F;
-    distanceSd_ = 0F;
-    bearingSd_ = 0F;
-    certainty_ = 0;
-    on_ = false;
-    framesOn_ = 0;
-    framesOff_ = 0;
-    concreteCoords_ = java.util.Collections.emptyList();
-    angleXDeg_ = 0F;
-    angleYDeg_ = 0F;
-    redGoalie_ = false;
-    navyGoalie_ = false;
-    intopcam_ = false;
-    x_ = 0;
-    y_ = 0;
+  private VisualDetection(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final VisualDetection defaultInstance;
+  public static VisualDetection getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public VisualDetection getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private VisualDetection(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -111,7 +104,7 @@ public  final class VisualDetection extends
               concreteCoords_ = new java.util.ArrayList<messages.Point>();
               mutable_bitField0_ |= 0x00000200;
             }
-            concreteCoords_.add(input.readMessage(messages.Point.parser(), extensionRegistry));
+            concreteCoords_.add(input.readMessage(messages.Point.PARSER, extensionRegistry));
             break;
           }
           case 93: {
@@ -152,11 +145,10 @@ public  final class VisualDetection extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       if (((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
         concreteCoords_ = java.util.Collections.unmodifiableList(concreteCoords_);
@@ -177,7 +169,23 @@ public  final class VisualDetection extends
             messages.VisualDetection.class, messages.VisualDetection.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<VisualDetection> PARSER =
+      new com.google.protobuf.AbstractParser<VisualDetection>() {
+    public VisualDetection parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new VisualDetection(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<VisualDetection> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float distance = 1;
   public static final int DISTANCE_FIELD_NUMBER = 1;
   private float distance_;
   /**
@@ -193,6 +201,7 @@ public  final class VisualDetection extends
     return distance_;
   }
 
+  // optional float bearing = 2;
   public static final int BEARING_FIELD_NUMBER = 2;
   private float bearing_;
   /**
@@ -208,6 +217,7 @@ public  final class VisualDetection extends
     return bearing_;
   }
 
+  // optional float bearing_deg = 3;
   public static final int BEARING_DEG_FIELD_NUMBER = 3;
   private float bearingDeg_;
   /**
@@ -223,6 +233,7 @@ public  final class VisualDetection extends
     return bearingDeg_;
   }
 
+  // optional float distance_sd = 4;
   public static final int DISTANCE_SD_FIELD_NUMBER = 4;
   private float distanceSd_;
   /**
@@ -238,6 +249,7 @@ public  final class VisualDetection extends
     return distanceSd_;
   }
 
+  // optional float bearing_sd = 5;
   public static final int BEARING_SD_FIELD_NUMBER = 5;
   private float bearingSd_;
   /**
@@ -253,6 +265,7 @@ public  final class VisualDetection extends
     return bearingSd_;
   }
 
+  // optional int32 certainty = 6;
   public static final int CERTAINTY_FIELD_NUMBER = 6;
   private int certainty_;
   /**
@@ -268,6 +281,7 @@ public  final class VisualDetection extends
     return certainty_;
   }
 
+  // optional bool on = 7;
   public static final int ON_FIELD_NUMBER = 7;
   private boolean on_;
   /**
@@ -283,6 +297,7 @@ public  final class VisualDetection extends
     return on_;
   }
 
+  // optional int32 frames_on = 8;
   public static final int FRAMES_ON_FIELD_NUMBER = 8;
   private int framesOn_;
   /**
@@ -298,6 +313,7 @@ public  final class VisualDetection extends
     return framesOn_;
   }
 
+  // optional int32 frames_off = 9;
   public static final int FRAMES_OFF_FIELD_NUMBER = 9;
   private int framesOff_;
   /**
@@ -313,6 +329,7 @@ public  final class VisualDetection extends
     return framesOff_;
   }
 
+  // repeated .messages.Point concrete_coords = 10;
   public static final int CONCRETE_COORDS_FIELD_NUMBER = 10;
   private java.util.List<messages.Point> concreteCoords_;
   /**
@@ -348,6 +365,7 @@ public  final class VisualDetection extends
     return concreteCoords_.get(index);
   }
 
+  // optional float angle_x_deg = 11;
   public static final int ANGLE_X_DEG_FIELD_NUMBER = 11;
   private float angleXDeg_;
   /**
@@ -363,6 +381,7 @@ public  final class VisualDetection extends
     return angleXDeg_;
   }
 
+  // optional float angle_y_deg = 12;
   public static final int ANGLE_Y_DEG_FIELD_NUMBER = 12;
   private float angleYDeg_;
   /**
@@ -378,6 +397,7 @@ public  final class VisualDetection extends
     return angleYDeg_;
   }
 
+  // optional bool red_goalie = 13;
   public static final int RED_GOALIE_FIELD_NUMBER = 13;
   private boolean redGoalie_;
   /**
@@ -401,6 +421,7 @@ public  final class VisualDetection extends
     return redGoalie_;
   }
 
+  // optional bool navy_goalie = 14;
   public static final int NAVY_GOALIE_FIELD_NUMBER = 14;
   private boolean navyGoalie_;
   /**
@@ -416,6 +437,7 @@ public  final class VisualDetection extends
     return navyGoalie_;
   }
 
+  // optional bool intopcam = 15;
   public static final int INTOPCAM_FIELD_NUMBER = 15;
   private boolean intopcam_;
   /**
@@ -431,6 +453,7 @@ public  final class VisualDetection extends
     return intopcam_;
   }
 
+  // optional int32 x = 17;
   public static final int X_FIELD_NUMBER = 17;
   private int x_;
   /**
@@ -446,6 +469,7 @@ public  final class VisualDetection extends
     return x_;
   }
 
+  // optional int32 y = 18;
   public static final int Y_FIELD_NUMBER = 18;
   private int y_;
   /**
@@ -461,11 +485,29 @@ public  final class VisualDetection extends
     return y_;
   }
 
+  private void initFields() {
+    distance_ = 0F;
+    bearing_ = 0F;
+    bearingDeg_ = 0F;
+    distanceSd_ = 0F;
+    bearingSd_ = 0F;
+    certainty_ = 0;
+    on_ = false;
+    framesOn_ = 0;
+    framesOff_ = 0;
+    concreteCoords_ = java.util.Collections.emptyList();
+    angleXDeg_ = 0F;
+    angleYDeg_ = 0F;
+    redGoalie_ = false;
+    navyGoalie_ = false;
+    intopcam_ = false;
+    x_ = 0;
+    y_ = 0;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -473,6 +515,7 @@ public  final class VisualDetection extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, distance_);
     }
@@ -524,11 +567,12 @@ public  final class VisualDetection extends
     if (((bitField0_ & 0x00008000) == 0x00008000)) {
       output.writeInt32(18, y_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -600,12 +644,18 @@ public  final class VisualDetection extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(18, y_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.VisualDetection parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -659,17 +709,12 @@ public  final class VisualDetection extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.VisualDetection prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -681,9 +726,8 @@ public  final class VisualDetection extends
    * Protobuf type {@code messages.VisualDetection}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.VisualDetection)
-      messages.VisualDetectionOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.VisualDetectionOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionField.internal_static_messages_VisualDetection_descriptor;
@@ -711,6 +755,10 @@ public  final class VisualDetection extends
         getConcreteCoordsFieldBuilder();
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       distance_ = 0F;
@@ -752,6 +800,10 @@ public  final class VisualDetection extends
       y_ = 0;
       bitField0_ = (bitField0_ & ~0x00010000);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -938,8 +990,7 @@ public  final class VisualDetection extends
       if (other.hasY()) {
         setY(other.getY());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -966,6 +1017,7 @@ public  final class VisualDetection extends
     }
     private int bitField0_;
 
+    // optional float distance = 1;
     private float distance_ ;
     /**
      * <code>optional float distance = 1;</code>
@@ -998,6 +1050,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional float bearing = 2;
     private float bearing_ ;
     /**
      * <code>optional float bearing = 2;</code>
@@ -1030,6 +1083,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional float bearing_deg = 3;
     private float bearingDeg_ ;
     /**
      * <code>optional float bearing_deg = 3;</code>
@@ -1062,6 +1116,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional float distance_sd = 4;
     private float distanceSd_ ;
     /**
      * <code>optional float distance_sd = 4;</code>
@@ -1094,6 +1149,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional float bearing_sd = 5;
     private float bearingSd_ ;
     /**
      * <code>optional float bearing_sd = 5;</code>
@@ -1126,6 +1182,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional int32 certainty = 6;
     private int certainty_ ;
     /**
      * <code>optional int32 certainty = 6;</code>
@@ -1158,6 +1215,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional bool on = 7;
     private boolean on_ ;
     /**
      * <code>optional bool on = 7;</code>
@@ -1190,6 +1248,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional int32 frames_on = 8;
     private int framesOn_ ;
     /**
      * <code>optional int32 frames_on = 8;</code>
@@ -1222,6 +1281,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional int32 frames_off = 9;
     private int framesOff_ ;
     /**
      * <code>optional int32 frames_off = 9;</code>
@@ -1254,6 +1314,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // repeated .messages.Point concrete_coords = 10;
     private java.util.List<messages.Point> concreteCoords_ =
       java.util.Collections.emptyList();
     private void ensureConcreteCoordsIsMutable() {
@@ -1395,8 +1456,7 @@ public  final class VisualDetection extends
         java.lang.Iterable<? extends messages.Point> values) {
       if (concreteCoordsBuilder_ == null) {
         ensureConcreteCoordsIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, concreteCoords_);
+        super.addAll(values, concreteCoords_);
         onChanged();
       } else {
         concreteCoordsBuilder_.addAllMessages(values);
@@ -1494,6 +1554,7 @@ public  final class VisualDetection extends
       return concreteCoordsBuilder_;
     }
 
+    // optional float angle_x_deg = 11;
     private float angleXDeg_ ;
     /**
      * <code>optional float angle_x_deg = 11;</code>
@@ -1526,6 +1587,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional float angle_y_deg = 12;
     private float angleYDeg_ ;
     /**
      * <code>optional float angle_y_deg = 12;</code>
@@ -1558,6 +1620,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional bool red_goalie = 13;
     private boolean redGoalie_ ;
     /**
      * <code>optional bool red_goalie = 13;</code>
@@ -1606,6 +1669,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional bool navy_goalie = 14;
     private boolean navyGoalie_ ;
     /**
      * <code>optional bool navy_goalie = 14;</code>
@@ -1638,6 +1702,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional bool intopcam = 15;
     private boolean intopcam_ ;
     /**
      * <code>optional bool intopcam = 15;</code>
@@ -1670,6 +1735,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional int32 x = 17;
     private int x_ ;
     /**
      * <code>optional int32 x = 17;</code>
@@ -1702,6 +1768,7 @@ public  final class VisualDetection extends
       return this;
     }
 
+    // optional int32 y = 18;
     private int y_ ;
     /**
      * <code>optional int32 y = 18;</code>
@@ -1737,47 +1804,11 @@ public  final class VisualDetection extends
     // @@protoc_insertion_point(builder_scope:messages.VisualDetection)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.VisualDetection)
-  private static final messages.VisualDetection DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.VisualDetection();
+    defaultInstance = new VisualDetection(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.VisualDetection getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<VisualDetection>
-      PARSER = new com.google.protobuf.AbstractParser<VisualDetection>() {
-    public VisualDetection parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new VisualDetection(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<VisualDetection> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<VisualDetection> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.VisualDetection getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.VisualDetection)
 }
 

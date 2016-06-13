@@ -7,27 +7,35 @@ package messages;
  * Protobuf type {@code messages.ArmContactState}
  */
 public  final class ArmContactState extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.ArmContactState)
-    ArmContactStateOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements ArmContactStateOrBuilder {
   // Use ArmContactState.newBuilder() to construct.
   private ArmContactState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private ArmContactState() {
-    rightPushDirection_ = 0;
-    leftPushDirection_ = 0;
+  private ArmContactState(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final ArmContactState defaultInstance;
+  public static ArmContactState getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public ArmContactState getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private ArmContactState(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -53,7 +61,7 @@ public  final class ArmContactState extends
               unknownFields.mergeVarintField(1, rawValue);
             } else {
               bitField0_ |= 0x00000001;
-              rightPushDirection_ = rawValue;
+              rightPushDirection_ = value;
             }
             break;
           }
@@ -64,18 +72,17 @@ public  final class ArmContactState extends
               unknownFields.mergeVarintField(2, rawValue);
             } else {
               bitField0_ |= 0x00000002;
-              leftPushDirection_ = rawValue;
+              leftPushDirection_ = value;
             }
             break;
           }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -91,6 +98,21 @@ public  final class ArmContactState extends
     return messages._File_ArmContactState.internal_static_messages_ArmContactState_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.ArmContactState.class, messages.ArmContactState.Builder.class);
+  }
+
+  public static com.google.protobuf.Parser<ArmContactState> PARSER =
+      new com.google.protobuf.AbstractParser<ArmContactState>() {
+    public ArmContactState parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new ArmContactState(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<ArmContactState> getParserForType() {
+    return PARSER;
   }
 
   /**
@@ -174,9 +196,7 @@ public  final class ArmContactState extends
     public static final int NORTHWEST_VALUE = 8;
 
 
-    public final int getNumber() {
-      return value;
-    }
+    public final int getNumber() { return value; }
 
     public static PushDirection valueOf(int value) {
       switch (value) {
@@ -197,8 +217,8 @@ public  final class ArmContactState extends
         internalGetValueMap() {
       return internalValueMap;
     }
-    private static final com.google.protobuf.Internal.EnumLiteMap<
-        PushDirection> internalValueMap =
+    private static com.google.protobuf.Internal.EnumLiteMap<PushDirection>
+        internalValueMap =
           new com.google.protobuf.Internal.EnumLiteMap<PushDirection>() {
             public PushDirection findValueByNumber(int number) {
               return PushDirection.valueOf(number);
@@ -241,8 +261,9 @@ public  final class ArmContactState extends
   }
 
   private int bitField0_;
+  // optional .messages.ArmContactState.PushDirection right_push_direction = 1;
   public static final int RIGHT_PUSH_DIRECTION_FIELD_NUMBER = 1;
-  private int rightPushDirection_;
+  private messages.ArmContactState.PushDirection rightPushDirection_;
   /**
    * <code>optional .messages.ArmContactState.PushDirection right_push_direction = 1;</code>
    */
@@ -253,12 +274,12 @@ public  final class ArmContactState extends
    * <code>optional .messages.ArmContactState.PushDirection right_push_direction = 1;</code>
    */
   public messages.ArmContactState.PushDirection getRightPushDirection() {
-    messages.ArmContactState.PushDirection result = messages.ArmContactState.PushDirection.valueOf(rightPushDirection_);
-    return result == null ? messages.ArmContactState.PushDirection.NONE : result;
+    return rightPushDirection_;
   }
 
+  // optional .messages.ArmContactState.PushDirection left_push_direction = 2;
   public static final int LEFT_PUSH_DIRECTION_FIELD_NUMBER = 2;
-  private int leftPushDirection_;
+  private messages.ArmContactState.PushDirection leftPushDirection_;
   /**
    * <code>optional .messages.ArmContactState.PushDirection left_push_direction = 2;</code>
    */
@@ -269,15 +290,17 @@ public  final class ArmContactState extends
    * <code>optional .messages.ArmContactState.PushDirection left_push_direction = 2;</code>
    */
   public messages.ArmContactState.PushDirection getLeftPushDirection() {
-    messages.ArmContactState.PushDirection result = messages.ArmContactState.PushDirection.valueOf(leftPushDirection_);
-    return result == null ? messages.ArmContactState.PushDirection.NONE : result;
+    return leftPushDirection_;
   }
 
+  private void initFields() {
+    rightPushDirection_ = messages.ArmContactState.PushDirection.NONE;
+    leftPushDirection_ = messages.ArmContactState.PushDirection.NONE;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -285,34 +308,42 @@ public  final class ArmContactState extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeEnum(1, rightPushDirection_);
+      output.writeEnum(1, rightPushDirection_.getNumber());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeEnum(2, leftPushDirection_);
+      output.writeEnum(2, leftPushDirection_.getNumber());
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(1, rightPushDirection_);
+        .computeEnumSize(1, rightPushDirection_.getNumber());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(2, leftPushDirection_);
+        .computeEnumSize(2, leftPushDirection_.getNumber());
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.ArmContactState parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -366,17 +397,12 @@ public  final class ArmContactState extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.ArmContactState prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -388,9 +414,8 @@ public  final class ArmContactState extends
    * Protobuf type {@code messages.ArmContactState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.ArmContactState)
-      messages.ArmContactStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.ArmContactStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_ArmContactState.internal_static_messages_ArmContactState_descriptor;
@@ -417,13 +442,21 @@ public  final class ArmContactState extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
-      rightPushDirection_ = 0;
+      rightPushDirection_ = messages.ArmContactState.PushDirection.NONE;
       bitField0_ = (bitField0_ & ~0x00000001);
-      leftPushDirection_ = 0;
+      leftPushDirection_ = messages.ArmContactState.PushDirection.NONE;
       bitField0_ = (bitField0_ & ~0x00000002);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -477,8 +510,7 @@ public  final class ArmContactState extends
       if (other.hasLeftPushDirection()) {
         setLeftPushDirection(other.getLeftPushDirection());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -505,7 +537,8 @@ public  final class ArmContactState extends
     }
     private int bitField0_;
 
-    private int rightPushDirection_ = 0;
+    // optional .messages.ArmContactState.PushDirection right_push_direction = 1;
+    private messages.ArmContactState.PushDirection rightPushDirection_ = messages.ArmContactState.PushDirection.NONE;
     /**
      * <code>optional .messages.ArmContactState.PushDirection right_push_direction = 1;</code>
      */
@@ -516,8 +549,7 @@ public  final class ArmContactState extends
      * <code>optional .messages.ArmContactState.PushDirection right_push_direction = 1;</code>
      */
     public messages.ArmContactState.PushDirection getRightPushDirection() {
-      messages.ArmContactState.PushDirection result = messages.ArmContactState.PushDirection.valueOf(rightPushDirection_);
-      return result == null ? messages.ArmContactState.PushDirection.NONE : result;
+      return rightPushDirection_;
     }
     /**
      * <code>optional .messages.ArmContactState.PushDirection right_push_direction = 1;</code>
@@ -527,7 +559,7 @@ public  final class ArmContactState extends
         throw new NullPointerException();
       }
       bitField0_ |= 0x00000001;
-      rightPushDirection_ = value.getNumber();
+      rightPushDirection_ = value;
       onChanged();
       return this;
     }
@@ -536,12 +568,13 @@ public  final class ArmContactState extends
      */
     public Builder clearRightPushDirection() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      rightPushDirection_ = 0;
+      rightPushDirection_ = messages.ArmContactState.PushDirection.NONE;
       onChanged();
       return this;
     }
 
-    private int leftPushDirection_ = 0;
+    // optional .messages.ArmContactState.PushDirection left_push_direction = 2;
+    private messages.ArmContactState.PushDirection leftPushDirection_ = messages.ArmContactState.PushDirection.NONE;
     /**
      * <code>optional .messages.ArmContactState.PushDirection left_push_direction = 2;</code>
      */
@@ -552,8 +585,7 @@ public  final class ArmContactState extends
      * <code>optional .messages.ArmContactState.PushDirection left_push_direction = 2;</code>
      */
     public messages.ArmContactState.PushDirection getLeftPushDirection() {
-      messages.ArmContactState.PushDirection result = messages.ArmContactState.PushDirection.valueOf(leftPushDirection_);
-      return result == null ? messages.ArmContactState.PushDirection.NONE : result;
+      return leftPushDirection_;
     }
     /**
      * <code>optional .messages.ArmContactState.PushDirection left_push_direction = 2;</code>
@@ -563,7 +595,7 @@ public  final class ArmContactState extends
         throw new NullPointerException();
       }
       bitField0_ |= 0x00000002;
-      leftPushDirection_ = value.getNumber();
+      leftPushDirection_ = value;
       onChanged();
       return this;
     }
@@ -572,7 +604,7 @@ public  final class ArmContactState extends
      */
     public Builder clearLeftPushDirection() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      leftPushDirection_ = 0;
+      leftPushDirection_ = messages.ArmContactState.PushDirection.NONE;
       onChanged();
       return this;
     }
@@ -580,47 +612,11 @@ public  final class ArmContactState extends
     // @@protoc_insertion_point(builder_scope:messages.ArmContactState)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.ArmContactState)
-  private static final messages.ArmContactState DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.ArmContactState();
+    defaultInstance = new ArmContactState(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.ArmContactState getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<ArmContactState>
-      PARSER = new com.google.protobuf.AbstractParser<ArmContactState>() {
-    public ArmContactState parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new ArmContactState(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<ArmContactState> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<ArmContactState> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.ArmContactState getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.ArmContactState)
 }
 

@@ -7,29 +7,35 @@ package messages;
  * Protobuf type {@code messages.DestinationWalk}
  */
 public  final class DestinationWalk extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.DestinationWalk)
-    DestinationWalkOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements DestinationWalkOrBuilder {
   // Use DestinationWalk.newBuilder() to construct.
   private DestinationWalk(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private DestinationWalk() {
-    relX_ = 0F;
-    relY_ = 0F;
-    relH_ = 0F;
-    gain_ = 0F;
+  private DestinationWalk(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final DestinationWalk defaultInstance;
+  public static DestinationWalk getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public DestinationWalk getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private DestinationWalk(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -73,7 +79,7 @@ public  final class DestinationWalk extends
             if (((bitField0_ & 0x00000010) == 0x00000010)) {
               subBuilder = kick_.toBuilder();
             }
-            kick_ = input.readMessage(messages.MotionKick.parser(), extensionRegistry);
+            kick_ = input.readMessage(messages.MotionKick.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(kick_);
               kick_ = subBuilder.buildPartial();
@@ -84,11 +90,10 @@ public  final class DestinationWalk extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -106,7 +111,23 @@ public  final class DestinationWalk extends
             messages.DestinationWalk.class, messages.DestinationWalk.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<DestinationWalk> PARSER =
+      new com.google.protobuf.AbstractParser<DestinationWalk>() {
+    public DestinationWalk parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new DestinationWalk(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<DestinationWalk> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float rel_x = 1;
   public static final int REL_X_FIELD_NUMBER = 1;
   private float relX_;
   /**
@@ -122,6 +143,7 @@ public  final class DestinationWalk extends
     return relX_;
   }
 
+  // optional float rel_y = 2;
   public static final int REL_Y_FIELD_NUMBER = 2;
   private float relY_;
   /**
@@ -137,6 +159,7 @@ public  final class DestinationWalk extends
     return relY_;
   }
 
+  // optional float rel_h = 3;
   public static final int REL_H_FIELD_NUMBER = 3;
   private float relH_;
   /**
@@ -152,6 +175,7 @@ public  final class DestinationWalk extends
     return relH_;
   }
 
+  // optional float gain = 4;
   public static final int GAIN_FIELD_NUMBER = 4;
   private float gain_;
   /**
@@ -167,6 +191,7 @@ public  final class DestinationWalk extends
     return gain_;
   }
 
+  // optional .messages.MotionKick kick = 5;
   public static final int KICK_FIELD_NUMBER = 5;
   private messages.MotionKick kick_;
   /**
@@ -179,20 +204,26 @@ public  final class DestinationWalk extends
    * <code>optional .messages.MotionKick kick = 5;</code>
    */
   public messages.MotionKick getKick() {
-    return kick_ == null ? messages.MotionKick.getDefaultInstance() : kick_;
+    return kick_;
   }
   /**
    * <code>optional .messages.MotionKick kick = 5;</code>
    */
   public messages.MotionKickOrBuilder getKickOrBuilder() {
-    return kick_ == null ? messages.MotionKick.getDefaultInstance() : kick_;
+    return kick_;
   }
 
+  private void initFields() {
+    relX_ = 0F;
+    relY_ = 0F;
+    relH_ = 0F;
+    gain_ = 0F;
+    kick_ = messages.MotionKick.getDefaultInstance();
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -200,6 +231,7 @@ public  final class DestinationWalk extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, relX_);
     }
@@ -213,13 +245,14 @@ public  final class DestinationWalk extends
       output.writeFloat(4, gain_);
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      output.writeMessage(5, getKick());
+      output.writeMessage(5, kick_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -241,14 +274,20 @@ public  final class DestinationWalk extends
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getKick());
+        .computeMessageSize(5, kick_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.DestinationWalk parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -302,17 +341,12 @@ public  final class DestinationWalk extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.DestinationWalk prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -324,9 +358,8 @@ public  final class DestinationWalk extends
    * Protobuf type {@code messages.DestinationWalk}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.DestinationWalk)
-      messages.DestinationWalkOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.DestinationWalkOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_DestinationWalk_descriptor;
@@ -354,6 +387,10 @@ public  final class DestinationWalk extends
         getKickFieldBuilder();
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       relX_ = 0F;
@@ -365,12 +402,16 @@ public  final class DestinationWalk extends
       gain_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000008);
       if (kickBuilder_ == null) {
-        kick_ = null;
+        kick_ = messages.MotionKick.getDefaultInstance();
       } else {
         kickBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000010);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -449,8 +490,7 @@ public  final class DestinationWalk extends
       if (other.hasKick()) {
         mergeKick(other.getKick());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -477,6 +517,7 @@ public  final class DestinationWalk extends
     }
     private int bitField0_;
 
+    // optional float rel_x = 1;
     private float relX_ ;
     /**
      * <code>optional float rel_x = 1;</code>
@@ -509,6 +550,7 @@ public  final class DestinationWalk extends
       return this;
     }
 
+    // optional float rel_y = 2;
     private float relY_ ;
     /**
      * <code>optional float rel_y = 2;</code>
@@ -541,6 +583,7 @@ public  final class DestinationWalk extends
       return this;
     }
 
+    // optional float rel_h = 3;
     private float relH_ ;
     /**
      * <code>optional float rel_h = 3;</code>
@@ -573,6 +616,7 @@ public  final class DestinationWalk extends
       return this;
     }
 
+    // optional float gain = 4;
     private float gain_ ;
     /**
      * <code>optional float gain = 4;</code>
@@ -605,7 +649,8 @@ public  final class DestinationWalk extends
       return this;
     }
 
-    private messages.MotionKick kick_ = null;
+    // optional .messages.MotionKick kick = 5;
+    private messages.MotionKick kick_ = messages.MotionKick.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.MotionKick, messages.MotionKick.Builder, messages.MotionKickOrBuilder> kickBuilder_;
     /**
@@ -619,7 +664,7 @@ public  final class DestinationWalk extends
      */
     public messages.MotionKick getKick() {
       if (kickBuilder_ == null) {
-        return kick_ == null ? messages.MotionKick.getDefaultInstance() : kick_;
+        return kick_;
       } else {
         return kickBuilder_.getMessage();
       }
@@ -660,7 +705,6 @@ public  final class DestinationWalk extends
     public Builder mergeKick(messages.MotionKick value) {
       if (kickBuilder_ == null) {
         if (((bitField0_ & 0x00000010) == 0x00000010) &&
-            kick_ != null &&
             kick_ != messages.MotionKick.getDefaultInstance()) {
           kick_ =
             messages.MotionKick.newBuilder(kick_).mergeFrom(value).buildPartial();
@@ -679,7 +723,7 @@ public  final class DestinationWalk extends
      */
     public Builder clearKick() {
       if (kickBuilder_ == null) {
-        kick_ = null;
+        kick_ = messages.MotionKick.getDefaultInstance();
         onChanged();
       } else {
         kickBuilder_.clear();
@@ -702,8 +746,7 @@ public  final class DestinationWalk extends
       if (kickBuilder_ != null) {
         return kickBuilder_.getMessageOrBuilder();
       } else {
-        return kick_ == null ?
-            messages.MotionKick.getDefaultInstance() : kick_;
+        return kick_;
       }
     }
     /**
@@ -715,7 +758,7 @@ public  final class DestinationWalk extends
       if (kickBuilder_ == null) {
         kickBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.MotionKick, messages.MotionKick.Builder, messages.MotionKickOrBuilder>(
-                getKick(),
+                kick_,
                 getParentForChildren(),
                 isClean());
         kick_ = null;
@@ -726,47 +769,11 @@ public  final class DestinationWalk extends
     // @@protoc_insertion_point(builder_scope:messages.DestinationWalk)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.DestinationWalk)
-  private static final messages.DestinationWalk DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.DestinationWalk();
+    defaultInstance = new DestinationWalk(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.DestinationWalk getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<DestinationWalk>
-      PARSER = new com.google.protobuf.AbstractParser<DestinationWalk>() {
-    public DestinationWalk parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new DestinationWalk(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<DestinationWalk> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<DestinationWalk> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.DestinationWalk getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.DestinationWalk)
 }
 

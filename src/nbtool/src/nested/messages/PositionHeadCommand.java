@@ -7,29 +7,35 @@ package messages;
  * Protobuf type {@code messages.PositionHeadCommand}
  */
 public  final class PositionHeadCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.PositionHeadCommand)
-    PositionHeadCommandOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements PositionHeadCommandOrBuilder {
   // Use PositionHeadCommand.newBuilder() to construct.
   private PositionHeadCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private PositionHeadCommand() {
-    headYaw_ = 0F;
-    headPitch_ = 0F;
-    maxSpeedYaw_ = -1F;
-    maxSpeedPitch_ = -1F;
+  private PositionHeadCommand(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final PositionHeadCommand defaultInstance;
+  public static PositionHeadCommand getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public PositionHeadCommand getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private PositionHeadCommand(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -71,11 +77,10 @@ public  final class PositionHeadCommand extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -93,7 +98,23 @@ public  final class PositionHeadCommand extends
             messages.PositionHeadCommand.class, messages.PositionHeadCommand.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<PositionHeadCommand> PARSER =
+      new com.google.protobuf.AbstractParser<PositionHeadCommand>() {
+    public PositionHeadCommand parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new PositionHeadCommand(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<PositionHeadCommand> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float head_yaw = 1;
   public static final int HEAD_YAW_FIELD_NUMBER = 1;
   private float headYaw_;
   /**
@@ -109,6 +130,7 @@ public  final class PositionHeadCommand extends
     return headYaw_;
   }
 
+  // optional float head_pitch = 2;
   public static final int HEAD_PITCH_FIELD_NUMBER = 2;
   private float headPitch_;
   /**
@@ -124,6 +146,7 @@ public  final class PositionHeadCommand extends
     return headPitch_;
   }
 
+  // optional float max_speed_yaw = 3 [default = -1];
   public static final int MAX_SPEED_YAW_FIELD_NUMBER = 3;
   private float maxSpeedYaw_;
   /**
@@ -139,6 +162,7 @@ public  final class PositionHeadCommand extends
     return maxSpeedYaw_;
   }
 
+  // optional float max_speed_pitch = 4 [default = -1];
   public static final int MAX_SPEED_PITCH_FIELD_NUMBER = 4;
   private float maxSpeedPitch_;
   /**
@@ -154,11 +178,16 @@ public  final class PositionHeadCommand extends
     return maxSpeedPitch_;
   }
 
+  private void initFields() {
+    headYaw_ = 0F;
+    headPitch_ = 0F;
+    maxSpeedYaw_ = -1F;
+    maxSpeedPitch_ = -1F;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -166,6 +195,7 @@ public  final class PositionHeadCommand extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, headYaw_);
     }
@@ -178,11 +208,12 @@ public  final class PositionHeadCommand extends
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeFloat(4, maxSpeedPitch_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -202,12 +233,18 @@ public  final class PositionHeadCommand extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(4, maxSpeedPitch_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.PositionHeadCommand parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -261,17 +298,12 @@ public  final class PositionHeadCommand extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.PositionHeadCommand prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -283,9 +315,8 @@ public  final class PositionHeadCommand extends
    * Protobuf type {@code messages.PositionHeadCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.PositionHeadCommand)
-      messages.PositionHeadCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.PositionHeadCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_PositionHeadCommand_descriptor;
@@ -312,6 +343,10 @@ public  final class PositionHeadCommand extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       headYaw_ = 0F;
@@ -323,6 +358,10 @@ public  final class PositionHeadCommand extends
       maxSpeedPitch_ = -1F;
       bitField0_ = (bitField0_ & ~0x00000008);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -390,8 +429,7 @@ public  final class PositionHeadCommand extends
       if (other.hasMaxSpeedPitch()) {
         setMaxSpeedPitch(other.getMaxSpeedPitch());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -418,6 +456,7 @@ public  final class PositionHeadCommand extends
     }
     private int bitField0_;
 
+    // optional float head_yaw = 1;
     private float headYaw_ ;
     /**
      * <code>optional float head_yaw = 1;</code>
@@ -450,6 +489,7 @@ public  final class PositionHeadCommand extends
       return this;
     }
 
+    // optional float head_pitch = 2;
     private float headPitch_ ;
     /**
      * <code>optional float head_pitch = 2;</code>
@@ -482,6 +522,7 @@ public  final class PositionHeadCommand extends
       return this;
     }
 
+    // optional float max_speed_yaw = 3 [default = -1];
     private float maxSpeedYaw_ = -1F;
     /**
      * <code>optional float max_speed_yaw = 3 [default = -1];</code>
@@ -514,6 +555,7 @@ public  final class PositionHeadCommand extends
       return this;
     }
 
+    // optional float max_speed_pitch = 4 [default = -1];
     private float maxSpeedPitch_ = -1F;
     /**
      * <code>optional float max_speed_pitch = 4 [default = -1];</code>
@@ -549,47 +591,11 @@ public  final class PositionHeadCommand extends
     // @@protoc_insertion_point(builder_scope:messages.PositionHeadCommand)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.PositionHeadCommand)
-  private static final messages.PositionHeadCommand DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.PositionHeadCommand();
+    defaultInstance = new PositionHeadCommand(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.PositionHeadCommand getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<PositionHeadCommand>
-      PARSER = new com.google.protobuf.AbstractParser<PositionHeadCommand>() {
-    public PositionHeadCommand parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new PositionHeadCommand(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<PositionHeadCommand> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<PositionHeadCommand> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.PositionHeadCommand getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.PositionHeadCommand)
 }
 

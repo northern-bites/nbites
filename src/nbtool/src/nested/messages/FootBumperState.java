@@ -7,25 +7,35 @@ package messages;
  * Protobuf type {@code messages.FootBumperState}
  */
 public  final class FootBumperState extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.FootBumperState)
-    FootBumperStateOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements FootBumperStateOrBuilder {
   // Use FootBumperState.newBuilder() to construct.
   private FootBumperState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private FootBumperState() {
+  private FootBumperState(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final FootBumperState defaultInstance;
+  public static FootBumperState getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public FootBumperState getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private FootBumperState(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -49,7 +59,7 @@ public  final class FootBumperState extends
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
               subBuilder = lFootBumperLeft_.toBuilder();
             }
-            lFootBumperLeft_ = input.readMessage(messages.ButtonState.parser(), extensionRegistry);
+            lFootBumperLeft_ = input.readMessage(messages.ButtonState.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(lFootBumperLeft_);
               lFootBumperLeft_ = subBuilder.buildPartial();
@@ -62,7 +72,7 @@ public  final class FootBumperState extends
             if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = lFootBumperRight_.toBuilder();
             }
-            lFootBumperRight_ = input.readMessage(messages.ButtonState.parser(), extensionRegistry);
+            lFootBumperRight_ = input.readMessage(messages.ButtonState.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(lFootBumperRight_);
               lFootBumperRight_ = subBuilder.buildPartial();
@@ -75,7 +85,7 @@ public  final class FootBumperState extends
             if (((bitField0_ & 0x00000004) == 0x00000004)) {
               subBuilder = rFootBumperLeft_.toBuilder();
             }
-            rFootBumperLeft_ = input.readMessage(messages.ButtonState.parser(), extensionRegistry);
+            rFootBumperLeft_ = input.readMessage(messages.ButtonState.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(rFootBumperLeft_);
               rFootBumperLeft_ = subBuilder.buildPartial();
@@ -88,7 +98,7 @@ public  final class FootBumperState extends
             if (((bitField0_ & 0x00000008) == 0x00000008)) {
               subBuilder = rFootBumperRight_.toBuilder();
             }
-            rFootBumperRight_ = input.readMessage(messages.ButtonState.parser(), extensionRegistry);
+            rFootBumperRight_ = input.readMessage(messages.ButtonState.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(rFootBumperRight_);
               rFootBumperRight_ = subBuilder.buildPartial();
@@ -99,11 +109,10 @@ public  final class FootBumperState extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -121,7 +130,23 @@ public  final class FootBumperState extends
             messages.FootBumperState.class, messages.FootBumperState.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<FootBumperState> PARSER =
+      new com.google.protobuf.AbstractParser<FootBumperState>() {
+    public FootBumperState parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new FootBumperState(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<FootBumperState> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional .messages.ButtonState l_foot_bumper_left = 1;
   public static final int L_FOOT_BUMPER_LEFT_FIELD_NUMBER = 1;
   private messages.ButtonState lFootBumperLeft_;
   /**
@@ -142,7 +167,7 @@ public  final class FootBumperState extends
    * </pre>
    */
   public messages.ButtonState getLFootBumperLeft() {
-    return lFootBumperLeft_ == null ? messages.ButtonState.getDefaultInstance() : lFootBumperLeft_;
+    return lFootBumperLeft_;
   }
   /**
    * <code>optional .messages.ButtonState l_foot_bumper_left = 1;</code>
@@ -152,9 +177,10 @@ public  final class FootBumperState extends
    * </pre>
    */
   public messages.ButtonStateOrBuilder getLFootBumperLeftOrBuilder() {
-    return lFootBumperLeft_ == null ? messages.ButtonState.getDefaultInstance() : lFootBumperLeft_;
+    return lFootBumperLeft_;
   }
 
+  // optional .messages.ButtonState l_foot_bumper_right = 2;
   public static final int L_FOOT_BUMPER_RIGHT_FIELD_NUMBER = 2;
   private messages.ButtonState lFootBumperRight_;
   /**
@@ -167,15 +193,16 @@ public  final class FootBumperState extends
    * <code>optional .messages.ButtonState l_foot_bumper_right = 2;</code>
    */
   public messages.ButtonState getLFootBumperRight() {
-    return lFootBumperRight_ == null ? messages.ButtonState.getDefaultInstance() : lFootBumperRight_;
+    return lFootBumperRight_;
   }
   /**
    * <code>optional .messages.ButtonState l_foot_bumper_right = 2;</code>
    */
   public messages.ButtonStateOrBuilder getLFootBumperRightOrBuilder() {
-    return lFootBumperRight_ == null ? messages.ButtonState.getDefaultInstance() : lFootBumperRight_;
+    return lFootBumperRight_;
   }
 
+  // optional .messages.ButtonState r_foot_bumper_left = 3;
   public static final int R_FOOT_BUMPER_LEFT_FIELD_NUMBER = 3;
   private messages.ButtonState rFootBumperLeft_;
   /**
@@ -196,7 +223,7 @@ public  final class FootBumperState extends
    * </pre>
    */
   public messages.ButtonState getRFootBumperLeft() {
-    return rFootBumperLeft_ == null ? messages.ButtonState.getDefaultInstance() : rFootBumperLeft_;
+    return rFootBumperLeft_;
   }
   /**
    * <code>optional .messages.ButtonState r_foot_bumper_left = 3;</code>
@@ -206,9 +233,10 @@ public  final class FootBumperState extends
    * </pre>
    */
   public messages.ButtonStateOrBuilder getRFootBumperLeftOrBuilder() {
-    return rFootBumperLeft_ == null ? messages.ButtonState.getDefaultInstance() : rFootBumperLeft_;
+    return rFootBumperLeft_;
   }
 
+  // optional .messages.ButtonState r_foot_bumper_right = 4;
   public static final int R_FOOT_BUMPER_RIGHT_FIELD_NUMBER = 4;
   private messages.ButtonState rFootBumperRight_;
   /**
@@ -221,20 +249,25 @@ public  final class FootBumperState extends
    * <code>optional .messages.ButtonState r_foot_bumper_right = 4;</code>
    */
   public messages.ButtonState getRFootBumperRight() {
-    return rFootBumperRight_ == null ? messages.ButtonState.getDefaultInstance() : rFootBumperRight_;
+    return rFootBumperRight_;
   }
   /**
    * <code>optional .messages.ButtonState r_foot_bumper_right = 4;</code>
    */
   public messages.ButtonStateOrBuilder getRFootBumperRightOrBuilder() {
-    return rFootBumperRight_ == null ? messages.ButtonState.getDefaultInstance() : rFootBumperRight_;
+    return rFootBumperRight_;
   }
 
+  private void initFields() {
+    lFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
+    lFootBumperRight_ = messages.ButtonState.getDefaultInstance();
+    rFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
+    rFootBumperRight_ = messages.ButtonState.getDefaultInstance();
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -242,48 +275,56 @@ public  final class FootBumperState extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, getLFootBumperLeft());
+      output.writeMessage(1, lFootBumperLeft_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(2, getLFootBumperRight());
+      output.writeMessage(2, lFootBumperRight_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeMessage(3, getRFootBumperLeft());
+      output.writeMessage(3, rFootBumperLeft_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeMessage(4, getRFootBumperRight());
+      output.writeMessage(4, rFootBumperRight_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getLFootBumperLeft());
+        .computeMessageSize(1, lFootBumperLeft_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, getLFootBumperRight());
+        .computeMessageSize(2, lFootBumperRight_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, getRFootBumperLeft());
+        .computeMessageSize(3, rFootBumperLeft_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, getRFootBumperRight());
+        .computeMessageSize(4, rFootBumperRight_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.FootBumperState parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -337,17 +378,12 @@ public  final class FootBumperState extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.FootBumperState prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -359,9 +395,8 @@ public  final class FootBumperState extends
    * Protobuf type {@code messages.FootBumperState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.FootBumperState)
-      messages.FootBumperStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.FootBumperStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_ButtonState.internal_static_messages_FootBumperState_descriptor;
@@ -392,33 +427,41 @@ public  final class FootBumperState extends
         getRFootBumperRightFieldBuilder();
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       if (lFootBumperLeftBuilder_ == null) {
-        lFootBumperLeft_ = null;
+        lFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
       } else {
         lFootBumperLeftBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000001);
       if (lFootBumperRightBuilder_ == null) {
-        lFootBumperRight_ = null;
+        lFootBumperRight_ = messages.ButtonState.getDefaultInstance();
       } else {
         lFootBumperRightBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000002);
       if (rFootBumperLeftBuilder_ == null) {
-        rFootBumperLeft_ = null;
+        rFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
       } else {
         rFootBumperLeftBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000004);
       if (rFootBumperRightBuilder_ == null) {
-        rFootBumperRight_ = null;
+        rFootBumperRight_ = messages.ButtonState.getDefaultInstance();
       } else {
         rFootBumperRightBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000008);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -502,8 +545,7 @@ public  final class FootBumperState extends
       if (other.hasRFootBumperRight()) {
         mergeRFootBumperRight(other.getRFootBumperRight());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -530,7 +572,8 @@ public  final class FootBumperState extends
     }
     private int bitField0_;
 
-    private messages.ButtonState lFootBumperLeft_ = null;
+    // optional .messages.ButtonState l_foot_bumper_left = 1;
+    private messages.ButtonState lFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder> lFootBumperLeftBuilder_;
     /**
@@ -552,7 +595,7 @@ public  final class FootBumperState extends
      */
     public messages.ButtonState getLFootBumperLeft() {
       if (lFootBumperLeftBuilder_ == null) {
-        return lFootBumperLeft_ == null ? messages.ButtonState.getDefaultInstance() : lFootBumperLeft_;
+        return lFootBumperLeft_;
       } else {
         return lFootBumperLeftBuilder_.getMessage();
       }
@@ -605,7 +648,6 @@ public  final class FootBumperState extends
     public Builder mergeLFootBumperLeft(messages.ButtonState value) {
       if (lFootBumperLeftBuilder_ == null) {
         if (((bitField0_ & 0x00000001) == 0x00000001) &&
-            lFootBumperLeft_ != null &&
             lFootBumperLeft_ != messages.ButtonState.getDefaultInstance()) {
           lFootBumperLeft_ =
             messages.ButtonState.newBuilder(lFootBumperLeft_).mergeFrom(value).buildPartial();
@@ -628,7 +670,7 @@ public  final class FootBumperState extends
      */
     public Builder clearLFootBumperLeft() {
       if (lFootBumperLeftBuilder_ == null) {
-        lFootBumperLeft_ = null;
+        lFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
         onChanged();
       } else {
         lFootBumperLeftBuilder_.clear();
@@ -659,8 +701,7 @@ public  final class FootBumperState extends
       if (lFootBumperLeftBuilder_ != null) {
         return lFootBumperLeftBuilder_.getMessageOrBuilder();
       } else {
-        return lFootBumperLeft_ == null ?
-            messages.ButtonState.getDefaultInstance() : lFootBumperLeft_;
+        return lFootBumperLeft_;
       }
     }
     /**
@@ -676,7 +717,7 @@ public  final class FootBumperState extends
       if (lFootBumperLeftBuilder_ == null) {
         lFootBumperLeftBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder>(
-                getLFootBumperLeft(),
+                lFootBumperLeft_,
                 getParentForChildren(),
                 isClean());
         lFootBumperLeft_ = null;
@@ -684,7 +725,8 @@ public  final class FootBumperState extends
       return lFootBumperLeftBuilder_;
     }
 
-    private messages.ButtonState lFootBumperRight_ = null;
+    // optional .messages.ButtonState l_foot_bumper_right = 2;
+    private messages.ButtonState lFootBumperRight_ = messages.ButtonState.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder> lFootBumperRightBuilder_;
     /**
@@ -698,7 +740,7 @@ public  final class FootBumperState extends
      */
     public messages.ButtonState getLFootBumperRight() {
       if (lFootBumperRightBuilder_ == null) {
-        return lFootBumperRight_ == null ? messages.ButtonState.getDefaultInstance() : lFootBumperRight_;
+        return lFootBumperRight_;
       } else {
         return lFootBumperRightBuilder_.getMessage();
       }
@@ -739,7 +781,6 @@ public  final class FootBumperState extends
     public Builder mergeLFootBumperRight(messages.ButtonState value) {
       if (lFootBumperRightBuilder_ == null) {
         if (((bitField0_ & 0x00000002) == 0x00000002) &&
-            lFootBumperRight_ != null &&
             lFootBumperRight_ != messages.ButtonState.getDefaultInstance()) {
           lFootBumperRight_ =
             messages.ButtonState.newBuilder(lFootBumperRight_).mergeFrom(value).buildPartial();
@@ -758,7 +799,7 @@ public  final class FootBumperState extends
      */
     public Builder clearLFootBumperRight() {
       if (lFootBumperRightBuilder_ == null) {
-        lFootBumperRight_ = null;
+        lFootBumperRight_ = messages.ButtonState.getDefaultInstance();
         onChanged();
       } else {
         lFootBumperRightBuilder_.clear();
@@ -781,8 +822,7 @@ public  final class FootBumperState extends
       if (lFootBumperRightBuilder_ != null) {
         return lFootBumperRightBuilder_.getMessageOrBuilder();
       } else {
-        return lFootBumperRight_ == null ?
-            messages.ButtonState.getDefaultInstance() : lFootBumperRight_;
+        return lFootBumperRight_;
       }
     }
     /**
@@ -794,7 +834,7 @@ public  final class FootBumperState extends
       if (lFootBumperRightBuilder_ == null) {
         lFootBumperRightBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder>(
-                getLFootBumperRight(),
+                lFootBumperRight_,
                 getParentForChildren(),
                 isClean());
         lFootBumperRight_ = null;
@@ -802,7 +842,8 @@ public  final class FootBumperState extends
       return lFootBumperRightBuilder_;
     }
 
-    private messages.ButtonState rFootBumperLeft_ = null;
+    // optional .messages.ButtonState r_foot_bumper_left = 3;
+    private messages.ButtonState rFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder> rFootBumperLeftBuilder_;
     /**
@@ -824,7 +865,7 @@ public  final class FootBumperState extends
      */
     public messages.ButtonState getRFootBumperLeft() {
       if (rFootBumperLeftBuilder_ == null) {
-        return rFootBumperLeft_ == null ? messages.ButtonState.getDefaultInstance() : rFootBumperLeft_;
+        return rFootBumperLeft_;
       } else {
         return rFootBumperLeftBuilder_.getMessage();
       }
@@ -877,7 +918,6 @@ public  final class FootBumperState extends
     public Builder mergeRFootBumperLeft(messages.ButtonState value) {
       if (rFootBumperLeftBuilder_ == null) {
         if (((bitField0_ & 0x00000004) == 0x00000004) &&
-            rFootBumperLeft_ != null &&
             rFootBumperLeft_ != messages.ButtonState.getDefaultInstance()) {
           rFootBumperLeft_ =
             messages.ButtonState.newBuilder(rFootBumperLeft_).mergeFrom(value).buildPartial();
@@ -900,7 +940,7 @@ public  final class FootBumperState extends
      */
     public Builder clearRFootBumperLeft() {
       if (rFootBumperLeftBuilder_ == null) {
-        rFootBumperLeft_ = null;
+        rFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
         onChanged();
       } else {
         rFootBumperLeftBuilder_.clear();
@@ -931,8 +971,7 @@ public  final class FootBumperState extends
       if (rFootBumperLeftBuilder_ != null) {
         return rFootBumperLeftBuilder_.getMessageOrBuilder();
       } else {
-        return rFootBumperLeft_ == null ?
-            messages.ButtonState.getDefaultInstance() : rFootBumperLeft_;
+        return rFootBumperLeft_;
       }
     }
     /**
@@ -948,7 +987,7 @@ public  final class FootBumperState extends
       if (rFootBumperLeftBuilder_ == null) {
         rFootBumperLeftBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder>(
-                getRFootBumperLeft(),
+                rFootBumperLeft_,
                 getParentForChildren(),
                 isClean());
         rFootBumperLeft_ = null;
@@ -956,7 +995,8 @@ public  final class FootBumperState extends
       return rFootBumperLeftBuilder_;
     }
 
-    private messages.ButtonState rFootBumperRight_ = null;
+    // optional .messages.ButtonState r_foot_bumper_right = 4;
+    private messages.ButtonState rFootBumperRight_ = messages.ButtonState.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder> rFootBumperRightBuilder_;
     /**
@@ -970,7 +1010,7 @@ public  final class FootBumperState extends
      */
     public messages.ButtonState getRFootBumperRight() {
       if (rFootBumperRightBuilder_ == null) {
-        return rFootBumperRight_ == null ? messages.ButtonState.getDefaultInstance() : rFootBumperRight_;
+        return rFootBumperRight_;
       } else {
         return rFootBumperRightBuilder_.getMessage();
       }
@@ -1011,7 +1051,6 @@ public  final class FootBumperState extends
     public Builder mergeRFootBumperRight(messages.ButtonState value) {
       if (rFootBumperRightBuilder_ == null) {
         if (((bitField0_ & 0x00000008) == 0x00000008) &&
-            rFootBumperRight_ != null &&
             rFootBumperRight_ != messages.ButtonState.getDefaultInstance()) {
           rFootBumperRight_ =
             messages.ButtonState.newBuilder(rFootBumperRight_).mergeFrom(value).buildPartial();
@@ -1030,7 +1069,7 @@ public  final class FootBumperState extends
      */
     public Builder clearRFootBumperRight() {
       if (rFootBumperRightBuilder_ == null) {
-        rFootBumperRight_ = null;
+        rFootBumperRight_ = messages.ButtonState.getDefaultInstance();
         onChanged();
       } else {
         rFootBumperRightBuilder_.clear();
@@ -1053,8 +1092,7 @@ public  final class FootBumperState extends
       if (rFootBumperRightBuilder_ != null) {
         return rFootBumperRightBuilder_.getMessageOrBuilder();
       } else {
-        return rFootBumperRight_ == null ?
-            messages.ButtonState.getDefaultInstance() : rFootBumperRight_;
+        return rFootBumperRight_;
       }
     }
     /**
@@ -1066,7 +1104,7 @@ public  final class FootBumperState extends
       if (rFootBumperRightBuilder_ == null) {
         rFootBumperRightBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder>(
-                getRFootBumperRight(),
+                rFootBumperRight_,
                 getParentForChildren(),
                 isClean());
         rFootBumperRight_ = null;
@@ -1077,47 +1115,11 @@ public  final class FootBumperState extends
     // @@protoc_insertion_point(builder_scope:messages.FootBumperState)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.FootBumperState)
-  private static final messages.FootBumperState DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.FootBumperState();
+    defaultInstance = new FootBumperState(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.FootBumperState getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<FootBumperState>
-      PARSER = new com.google.protobuf.AbstractParser<FootBumperState>() {
-    public FootBumperState parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new FootBumperState(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<FootBumperState> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<FootBumperState> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.FootBumperState getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.FootBumperState)
 }
 

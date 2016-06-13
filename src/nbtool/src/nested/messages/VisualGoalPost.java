@@ -7,27 +7,35 @@ package messages;
  * Protobuf type {@code messages.VisualGoalPost}
  */
 public  final class VisualGoalPost extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.VisualGoalPost)
-    VisualGoalPostOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements VisualGoalPostOrBuilder {
   // Use VisualGoalPost.newBuilder() to construct.
   private VisualGoalPost(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private VisualGoalPost() {
-    height_ = 0F;
-    width_ = 0F;
+  private VisualGoalPost(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final VisualGoalPost defaultInstance;
+  public static VisualGoalPost getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public VisualGoalPost getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private VisualGoalPost(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -51,7 +59,7 @@ public  final class VisualGoalPost extends
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
               subBuilder = visualDetection_.toBuilder();
             }
-            visualDetection_ = input.readMessage(messages.VisualDetection.parser(), extensionRegistry);
+            visualDetection_ = input.readMessage(messages.VisualDetection.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(visualDetection_);
               visualDetection_ = subBuilder.buildPartial();
@@ -74,7 +82,7 @@ public  final class VisualGoalPost extends
             if (((bitField0_ & 0x00000008) == 0x00000008)) {
               subBuilder = leftTop_.toBuilder();
             }
-            leftTop_ = input.readMessage(messages.Point.parser(), extensionRegistry);
+            leftTop_ = input.readMessage(messages.Point.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(leftTop_);
               leftTop_ = subBuilder.buildPartial();
@@ -87,7 +95,7 @@ public  final class VisualGoalPost extends
             if (((bitField0_ & 0x00000010) == 0x00000010)) {
               subBuilder = rightTop_.toBuilder();
             }
-            rightTop_ = input.readMessage(messages.Point.parser(), extensionRegistry);
+            rightTop_ = input.readMessage(messages.Point.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(rightTop_);
               rightTop_ = subBuilder.buildPartial();
@@ -100,7 +108,7 @@ public  final class VisualGoalPost extends
             if (((bitField0_ & 0x00000020) == 0x00000020)) {
               subBuilder = leftBot_.toBuilder();
             }
-            leftBot_ = input.readMessage(messages.Point.parser(), extensionRegistry);
+            leftBot_ = input.readMessage(messages.Point.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(leftBot_);
               leftBot_ = subBuilder.buildPartial();
@@ -113,7 +121,7 @@ public  final class VisualGoalPost extends
             if (((bitField0_ & 0x00000040) == 0x00000040)) {
               subBuilder = rightBot_.toBuilder();
             }
-            rightBot_ = input.readMessage(messages.Point.parser(), extensionRegistry);
+            rightBot_ = input.readMessage(messages.Point.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(rightBot_);
               rightBot_ = subBuilder.buildPartial();
@@ -124,11 +132,10 @@ public  final class VisualGoalPost extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -146,7 +153,23 @@ public  final class VisualGoalPost extends
             messages.VisualGoalPost.class, messages.VisualGoalPost.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<VisualGoalPost> PARSER =
+      new com.google.protobuf.AbstractParser<VisualGoalPost>() {
+    public VisualGoalPost parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new VisualGoalPost(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<VisualGoalPost> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional .messages.VisualDetection visual_detection = 1;
   public static final int VISUAL_DETECTION_FIELD_NUMBER = 1;
   private messages.VisualDetection visualDetection_;
   /**
@@ -159,15 +182,16 @@ public  final class VisualGoalPost extends
    * <code>optional .messages.VisualDetection visual_detection = 1;</code>
    */
   public messages.VisualDetection getVisualDetection() {
-    return visualDetection_ == null ? messages.VisualDetection.getDefaultInstance() : visualDetection_;
+    return visualDetection_;
   }
   /**
    * <code>optional .messages.VisualDetection visual_detection = 1;</code>
    */
   public messages.VisualDetectionOrBuilder getVisualDetectionOrBuilder() {
-    return visualDetection_ == null ? messages.VisualDetection.getDefaultInstance() : visualDetection_;
+    return visualDetection_;
   }
 
+  // optional float height = 2;
   public static final int HEIGHT_FIELD_NUMBER = 2;
   private float height_;
   /**
@@ -183,6 +207,7 @@ public  final class VisualGoalPost extends
     return height_;
   }
 
+  // optional float width = 3;
   public static final int WIDTH_FIELD_NUMBER = 3;
   private float width_;
   /**
@@ -198,6 +223,7 @@ public  final class VisualGoalPost extends
     return width_;
   }
 
+  // optional .messages.Point left_top = 4;
   public static final int LEFT_TOP_FIELD_NUMBER = 4;
   private messages.Point leftTop_;
   /**
@@ -210,15 +236,16 @@ public  final class VisualGoalPost extends
    * <code>optional .messages.Point left_top = 4;</code>
    */
   public messages.Point getLeftTop() {
-    return leftTop_ == null ? messages.Point.getDefaultInstance() : leftTop_;
+    return leftTop_;
   }
   /**
    * <code>optional .messages.Point left_top = 4;</code>
    */
   public messages.PointOrBuilder getLeftTopOrBuilder() {
-    return leftTop_ == null ? messages.Point.getDefaultInstance() : leftTop_;
+    return leftTop_;
   }
 
+  // optional .messages.Point right_top = 5;
   public static final int RIGHT_TOP_FIELD_NUMBER = 5;
   private messages.Point rightTop_;
   /**
@@ -231,15 +258,16 @@ public  final class VisualGoalPost extends
    * <code>optional .messages.Point right_top = 5;</code>
    */
   public messages.Point getRightTop() {
-    return rightTop_ == null ? messages.Point.getDefaultInstance() : rightTop_;
+    return rightTop_;
   }
   /**
    * <code>optional .messages.Point right_top = 5;</code>
    */
   public messages.PointOrBuilder getRightTopOrBuilder() {
-    return rightTop_ == null ? messages.Point.getDefaultInstance() : rightTop_;
+    return rightTop_;
   }
 
+  // optional .messages.Point left_bot = 6;
   public static final int LEFT_BOT_FIELD_NUMBER = 6;
   private messages.Point leftBot_;
   /**
@@ -252,15 +280,16 @@ public  final class VisualGoalPost extends
    * <code>optional .messages.Point left_bot = 6;</code>
    */
   public messages.Point getLeftBot() {
-    return leftBot_ == null ? messages.Point.getDefaultInstance() : leftBot_;
+    return leftBot_;
   }
   /**
    * <code>optional .messages.Point left_bot = 6;</code>
    */
   public messages.PointOrBuilder getLeftBotOrBuilder() {
-    return leftBot_ == null ? messages.Point.getDefaultInstance() : leftBot_;
+    return leftBot_;
   }
 
+  // optional .messages.Point right_bot = 7;
   public static final int RIGHT_BOT_FIELD_NUMBER = 7;
   private messages.Point rightBot_;
   /**
@@ -273,20 +302,28 @@ public  final class VisualGoalPost extends
    * <code>optional .messages.Point right_bot = 7;</code>
    */
   public messages.Point getRightBot() {
-    return rightBot_ == null ? messages.Point.getDefaultInstance() : rightBot_;
+    return rightBot_;
   }
   /**
    * <code>optional .messages.Point right_bot = 7;</code>
    */
   public messages.PointOrBuilder getRightBotOrBuilder() {
-    return rightBot_ == null ? messages.Point.getDefaultInstance() : rightBot_;
+    return rightBot_;
   }
 
+  private void initFields() {
+    visualDetection_ = messages.VisualDetection.getDefaultInstance();
+    height_ = 0F;
+    width_ = 0F;
+    leftTop_ = messages.Point.getDefaultInstance();
+    rightTop_ = messages.Point.getDefaultInstance();
+    leftBot_ = messages.Point.getDefaultInstance();
+    rightBot_ = messages.Point.getDefaultInstance();
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -294,8 +331,9 @@ public  final class VisualGoalPost extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, getVisualDetection());
+      output.writeMessage(1, visualDetection_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeFloat(2, height_);
@@ -304,28 +342,29 @@ public  final class VisualGoalPost extends
       output.writeFloat(3, width_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeMessage(4, getLeftTop());
+      output.writeMessage(4, leftTop_);
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      output.writeMessage(5, getRightTop());
+      output.writeMessage(5, rightTop_);
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      output.writeMessage(6, getLeftBot());
+      output.writeMessage(6, leftBot_);
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
-      output.writeMessage(7, getRightBot());
+      output.writeMessage(7, rightBot_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getVisualDetection());
+        .computeMessageSize(1, visualDetection_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
@@ -337,26 +376,32 @@ public  final class VisualGoalPost extends
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, getLeftTop());
+        .computeMessageSize(4, leftTop_);
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getRightTop());
+        .computeMessageSize(5, rightTop_);
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, getLeftBot());
+        .computeMessageSize(6, leftBot_);
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, getRightBot());
+        .computeMessageSize(7, rightBot_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.VisualGoalPost parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -410,17 +455,12 @@ public  final class VisualGoalPost extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.VisualGoalPost prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -432,9 +472,8 @@ public  final class VisualGoalPost extends
    * Protobuf type {@code messages.VisualGoalPost}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.VisualGoalPost)
-      messages.VisualGoalPostOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.VisualGoalPostOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionField.internal_static_messages_VisualGoalPost_descriptor;
@@ -466,10 +505,14 @@ public  final class VisualGoalPost extends
         getRightBotFieldBuilder();
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       if (visualDetectionBuilder_ == null) {
-        visualDetection_ = null;
+        visualDetection_ = messages.VisualDetection.getDefaultInstance();
       } else {
         visualDetectionBuilder_.clear();
       }
@@ -479,30 +522,34 @@ public  final class VisualGoalPost extends
       width_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000004);
       if (leftTopBuilder_ == null) {
-        leftTop_ = null;
+        leftTop_ = messages.Point.getDefaultInstance();
       } else {
         leftTopBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000008);
       if (rightTopBuilder_ == null) {
-        rightTop_ = null;
+        rightTop_ = messages.Point.getDefaultInstance();
       } else {
         rightTopBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000010);
       if (leftBotBuilder_ == null) {
-        leftBot_ = null;
+        leftBot_ = messages.Point.getDefaultInstance();
       } else {
         leftBotBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000020);
       if (rightBotBuilder_ == null) {
-        rightBot_ = null;
+        rightBot_ = messages.Point.getDefaultInstance();
       } else {
         rightBotBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000040);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -611,8 +658,7 @@ public  final class VisualGoalPost extends
       if (other.hasRightBot()) {
         mergeRightBot(other.getRightBot());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -639,7 +685,8 @@ public  final class VisualGoalPost extends
     }
     private int bitField0_;
 
-    private messages.VisualDetection visualDetection_ = null;
+    // optional .messages.VisualDetection visual_detection = 1;
+    private messages.VisualDetection visualDetection_ = messages.VisualDetection.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder> visualDetectionBuilder_;
     /**
@@ -653,7 +700,7 @@ public  final class VisualGoalPost extends
      */
     public messages.VisualDetection getVisualDetection() {
       if (visualDetectionBuilder_ == null) {
-        return visualDetection_ == null ? messages.VisualDetection.getDefaultInstance() : visualDetection_;
+        return visualDetection_;
       } else {
         return visualDetectionBuilder_.getMessage();
       }
@@ -694,7 +741,6 @@ public  final class VisualGoalPost extends
     public Builder mergeVisualDetection(messages.VisualDetection value) {
       if (visualDetectionBuilder_ == null) {
         if (((bitField0_ & 0x00000001) == 0x00000001) &&
-            visualDetection_ != null &&
             visualDetection_ != messages.VisualDetection.getDefaultInstance()) {
           visualDetection_ =
             messages.VisualDetection.newBuilder(visualDetection_).mergeFrom(value).buildPartial();
@@ -713,7 +759,7 @@ public  final class VisualGoalPost extends
      */
     public Builder clearVisualDetection() {
       if (visualDetectionBuilder_ == null) {
-        visualDetection_ = null;
+        visualDetection_ = messages.VisualDetection.getDefaultInstance();
         onChanged();
       } else {
         visualDetectionBuilder_.clear();
@@ -736,8 +782,7 @@ public  final class VisualGoalPost extends
       if (visualDetectionBuilder_ != null) {
         return visualDetectionBuilder_.getMessageOrBuilder();
       } else {
-        return visualDetection_ == null ?
-            messages.VisualDetection.getDefaultInstance() : visualDetection_;
+        return visualDetection_;
       }
     }
     /**
@@ -749,7 +794,7 @@ public  final class VisualGoalPost extends
       if (visualDetectionBuilder_ == null) {
         visualDetectionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder>(
-                getVisualDetection(),
+                visualDetection_,
                 getParentForChildren(),
                 isClean());
         visualDetection_ = null;
@@ -757,6 +802,7 @@ public  final class VisualGoalPost extends
       return visualDetectionBuilder_;
     }
 
+    // optional float height = 2;
     private float height_ ;
     /**
      * <code>optional float height = 2;</code>
@@ -789,6 +835,7 @@ public  final class VisualGoalPost extends
       return this;
     }
 
+    // optional float width = 3;
     private float width_ ;
     /**
      * <code>optional float width = 3;</code>
@@ -821,7 +868,8 @@ public  final class VisualGoalPost extends
       return this;
     }
 
-    private messages.Point leftTop_ = null;
+    // optional .messages.Point left_top = 4;
+    private messages.Point leftTop_ = messages.Point.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Point, messages.Point.Builder, messages.PointOrBuilder> leftTopBuilder_;
     /**
@@ -835,7 +883,7 @@ public  final class VisualGoalPost extends
      */
     public messages.Point getLeftTop() {
       if (leftTopBuilder_ == null) {
-        return leftTop_ == null ? messages.Point.getDefaultInstance() : leftTop_;
+        return leftTop_;
       } else {
         return leftTopBuilder_.getMessage();
       }
@@ -876,7 +924,6 @@ public  final class VisualGoalPost extends
     public Builder mergeLeftTop(messages.Point value) {
       if (leftTopBuilder_ == null) {
         if (((bitField0_ & 0x00000008) == 0x00000008) &&
-            leftTop_ != null &&
             leftTop_ != messages.Point.getDefaultInstance()) {
           leftTop_ =
             messages.Point.newBuilder(leftTop_).mergeFrom(value).buildPartial();
@@ -895,7 +942,7 @@ public  final class VisualGoalPost extends
      */
     public Builder clearLeftTop() {
       if (leftTopBuilder_ == null) {
-        leftTop_ = null;
+        leftTop_ = messages.Point.getDefaultInstance();
         onChanged();
       } else {
         leftTopBuilder_.clear();
@@ -918,8 +965,7 @@ public  final class VisualGoalPost extends
       if (leftTopBuilder_ != null) {
         return leftTopBuilder_.getMessageOrBuilder();
       } else {
-        return leftTop_ == null ?
-            messages.Point.getDefaultInstance() : leftTop_;
+        return leftTop_;
       }
     }
     /**
@@ -931,7 +977,7 @@ public  final class VisualGoalPost extends
       if (leftTopBuilder_ == null) {
         leftTopBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Point, messages.Point.Builder, messages.PointOrBuilder>(
-                getLeftTop(),
+                leftTop_,
                 getParentForChildren(),
                 isClean());
         leftTop_ = null;
@@ -939,7 +985,8 @@ public  final class VisualGoalPost extends
       return leftTopBuilder_;
     }
 
-    private messages.Point rightTop_ = null;
+    // optional .messages.Point right_top = 5;
+    private messages.Point rightTop_ = messages.Point.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Point, messages.Point.Builder, messages.PointOrBuilder> rightTopBuilder_;
     /**
@@ -953,7 +1000,7 @@ public  final class VisualGoalPost extends
      */
     public messages.Point getRightTop() {
       if (rightTopBuilder_ == null) {
-        return rightTop_ == null ? messages.Point.getDefaultInstance() : rightTop_;
+        return rightTop_;
       } else {
         return rightTopBuilder_.getMessage();
       }
@@ -994,7 +1041,6 @@ public  final class VisualGoalPost extends
     public Builder mergeRightTop(messages.Point value) {
       if (rightTopBuilder_ == null) {
         if (((bitField0_ & 0x00000010) == 0x00000010) &&
-            rightTop_ != null &&
             rightTop_ != messages.Point.getDefaultInstance()) {
           rightTop_ =
             messages.Point.newBuilder(rightTop_).mergeFrom(value).buildPartial();
@@ -1013,7 +1059,7 @@ public  final class VisualGoalPost extends
      */
     public Builder clearRightTop() {
       if (rightTopBuilder_ == null) {
-        rightTop_ = null;
+        rightTop_ = messages.Point.getDefaultInstance();
         onChanged();
       } else {
         rightTopBuilder_.clear();
@@ -1036,8 +1082,7 @@ public  final class VisualGoalPost extends
       if (rightTopBuilder_ != null) {
         return rightTopBuilder_.getMessageOrBuilder();
       } else {
-        return rightTop_ == null ?
-            messages.Point.getDefaultInstance() : rightTop_;
+        return rightTop_;
       }
     }
     /**
@@ -1049,7 +1094,7 @@ public  final class VisualGoalPost extends
       if (rightTopBuilder_ == null) {
         rightTopBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Point, messages.Point.Builder, messages.PointOrBuilder>(
-                getRightTop(),
+                rightTop_,
                 getParentForChildren(),
                 isClean());
         rightTop_ = null;
@@ -1057,7 +1102,8 @@ public  final class VisualGoalPost extends
       return rightTopBuilder_;
     }
 
-    private messages.Point leftBot_ = null;
+    // optional .messages.Point left_bot = 6;
+    private messages.Point leftBot_ = messages.Point.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Point, messages.Point.Builder, messages.PointOrBuilder> leftBotBuilder_;
     /**
@@ -1071,7 +1117,7 @@ public  final class VisualGoalPost extends
      */
     public messages.Point getLeftBot() {
       if (leftBotBuilder_ == null) {
-        return leftBot_ == null ? messages.Point.getDefaultInstance() : leftBot_;
+        return leftBot_;
       } else {
         return leftBotBuilder_.getMessage();
       }
@@ -1112,7 +1158,6 @@ public  final class VisualGoalPost extends
     public Builder mergeLeftBot(messages.Point value) {
       if (leftBotBuilder_ == null) {
         if (((bitField0_ & 0x00000020) == 0x00000020) &&
-            leftBot_ != null &&
             leftBot_ != messages.Point.getDefaultInstance()) {
           leftBot_ =
             messages.Point.newBuilder(leftBot_).mergeFrom(value).buildPartial();
@@ -1131,7 +1176,7 @@ public  final class VisualGoalPost extends
      */
     public Builder clearLeftBot() {
       if (leftBotBuilder_ == null) {
-        leftBot_ = null;
+        leftBot_ = messages.Point.getDefaultInstance();
         onChanged();
       } else {
         leftBotBuilder_.clear();
@@ -1154,8 +1199,7 @@ public  final class VisualGoalPost extends
       if (leftBotBuilder_ != null) {
         return leftBotBuilder_.getMessageOrBuilder();
       } else {
-        return leftBot_ == null ?
-            messages.Point.getDefaultInstance() : leftBot_;
+        return leftBot_;
       }
     }
     /**
@@ -1167,7 +1211,7 @@ public  final class VisualGoalPost extends
       if (leftBotBuilder_ == null) {
         leftBotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Point, messages.Point.Builder, messages.PointOrBuilder>(
-                getLeftBot(),
+                leftBot_,
                 getParentForChildren(),
                 isClean());
         leftBot_ = null;
@@ -1175,7 +1219,8 @@ public  final class VisualGoalPost extends
       return leftBotBuilder_;
     }
 
-    private messages.Point rightBot_ = null;
+    // optional .messages.Point right_bot = 7;
+    private messages.Point rightBot_ = messages.Point.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Point, messages.Point.Builder, messages.PointOrBuilder> rightBotBuilder_;
     /**
@@ -1189,7 +1234,7 @@ public  final class VisualGoalPost extends
      */
     public messages.Point getRightBot() {
       if (rightBotBuilder_ == null) {
-        return rightBot_ == null ? messages.Point.getDefaultInstance() : rightBot_;
+        return rightBot_;
       } else {
         return rightBotBuilder_.getMessage();
       }
@@ -1230,7 +1275,6 @@ public  final class VisualGoalPost extends
     public Builder mergeRightBot(messages.Point value) {
       if (rightBotBuilder_ == null) {
         if (((bitField0_ & 0x00000040) == 0x00000040) &&
-            rightBot_ != null &&
             rightBot_ != messages.Point.getDefaultInstance()) {
           rightBot_ =
             messages.Point.newBuilder(rightBot_).mergeFrom(value).buildPartial();
@@ -1249,7 +1293,7 @@ public  final class VisualGoalPost extends
      */
     public Builder clearRightBot() {
       if (rightBotBuilder_ == null) {
-        rightBot_ = null;
+        rightBot_ = messages.Point.getDefaultInstance();
         onChanged();
       } else {
         rightBotBuilder_.clear();
@@ -1272,8 +1316,7 @@ public  final class VisualGoalPost extends
       if (rightBotBuilder_ != null) {
         return rightBotBuilder_.getMessageOrBuilder();
       } else {
-        return rightBot_ == null ?
-            messages.Point.getDefaultInstance() : rightBot_;
+        return rightBot_;
       }
     }
     /**
@@ -1285,7 +1328,7 @@ public  final class VisualGoalPost extends
       if (rightBotBuilder_ == null) {
         rightBotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Point, messages.Point.Builder, messages.PointOrBuilder>(
-                getRightBot(),
+                rightBot_,
                 getParentForChildren(),
                 isClean());
         rightBot_ = null;
@@ -1296,47 +1339,11 @@ public  final class VisualGoalPost extends
     // @@protoc_insertion_point(builder_scope:messages.VisualGoalPost)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.VisualGoalPost)
-  private static final messages.VisualGoalPost DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.VisualGoalPost();
+    defaultInstance = new VisualGoalPost(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.VisualGoalPost getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<VisualGoalPost>
-      PARSER = new com.google.protobuf.AbstractParser<VisualGoalPost>() {
-    public VisualGoalPost parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new VisualGoalPost(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<VisualGoalPost> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<VisualGoalPost> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.VisualGoalPost getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.VisualGoalPost)
 }
 

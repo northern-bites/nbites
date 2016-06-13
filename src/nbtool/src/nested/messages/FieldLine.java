@@ -7,30 +7,35 @@ package messages;
  * Protobuf type {@code messages.FieldLine}
  */
 public  final class FieldLine extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.FieldLine)
-    FieldLineOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements FieldLineOrBuilder {
   // Use FieldLine.newBuilder() to construct.
   private FieldLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private FieldLine() {
-    id_ = 0;
-    correspondence_ = 0;
-    prob_ = 0F;
-    index_ = 0;
-    wz0_ = 0F;
+  private FieldLine(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final FieldLine defaultInstance;
+  public static FieldLine getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public FieldLine getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private FieldLine(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -54,7 +59,7 @@ public  final class FieldLine extends
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
               subBuilder = inner_.toBuilder();
             }
-            inner_ = input.readMessage(messages.HoughLine.parser(), extensionRegistry);
+            inner_ = input.readMessage(messages.HoughLine.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(inner_);
               inner_ = subBuilder.buildPartial();
@@ -67,7 +72,7 @@ public  final class FieldLine extends
             if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = outer_.toBuilder();
             }
-            outer_ = input.readMessage(messages.HoughLine.parser(), extensionRegistry);
+            outer_ = input.readMessage(messages.HoughLine.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(outer_);
               outer_ = subBuilder.buildPartial();
@@ -103,11 +108,10 @@ public  final class FieldLine extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -125,7 +129,23 @@ public  final class FieldLine extends
             messages.FieldLine.class, messages.FieldLine.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<FieldLine> PARSER =
+      new com.google.protobuf.AbstractParser<FieldLine>() {
+    public FieldLine parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new FieldLine(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<FieldLine> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional .messages.HoughLine inner = 1;
   public static final int INNER_FIELD_NUMBER = 1;
   private messages.HoughLine inner_;
   /**
@@ -138,15 +158,16 @@ public  final class FieldLine extends
    * <code>optional .messages.HoughLine inner = 1;</code>
    */
   public messages.HoughLine getInner() {
-    return inner_ == null ? messages.HoughLine.getDefaultInstance() : inner_;
+    return inner_;
   }
   /**
    * <code>optional .messages.HoughLine inner = 1;</code>
    */
   public messages.HoughLineOrBuilder getInnerOrBuilder() {
-    return inner_ == null ? messages.HoughLine.getDefaultInstance() : inner_;
+    return inner_;
   }
 
+  // optional .messages.HoughLine outer = 2;
   public static final int OUTER_FIELD_NUMBER = 2;
   private messages.HoughLine outer_;
   /**
@@ -159,15 +180,16 @@ public  final class FieldLine extends
    * <code>optional .messages.HoughLine outer = 2;</code>
    */
   public messages.HoughLine getOuter() {
-    return outer_ == null ? messages.HoughLine.getDefaultInstance() : outer_;
+    return outer_;
   }
   /**
    * <code>optional .messages.HoughLine outer = 2;</code>
    */
   public messages.HoughLineOrBuilder getOuterOrBuilder() {
-    return outer_ == null ? messages.HoughLine.getDefaultInstance() : outer_;
+    return outer_;
   }
 
+  // optional int32 id = 3;
   public static final int ID_FIELD_NUMBER = 3;
   private int id_;
   /**
@@ -183,6 +205,7 @@ public  final class FieldLine extends
     return id_;
   }
 
+  // optional int32 correspondence = 4;
   public static final int CORRESPONDENCE_FIELD_NUMBER = 4;
   private int correspondence_;
   /**
@@ -198,6 +221,7 @@ public  final class FieldLine extends
     return correspondence_;
   }
 
+  // optional float prob = 5;
   public static final int PROB_FIELD_NUMBER = 5;
   private float prob_;
   /**
@@ -213,6 +237,7 @@ public  final class FieldLine extends
     return prob_;
   }
 
+  // optional int32 index = 6;
   public static final int INDEX_FIELD_NUMBER = 6;
   private int index_;
   /**
@@ -228,6 +253,7 @@ public  final class FieldLine extends
     return index_;
   }
 
+  // optional float wz0 = 7;
   public static final int WZ0_FIELD_NUMBER = 7;
   private float wz0_;
   /**
@@ -243,11 +269,19 @@ public  final class FieldLine extends
     return wz0_;
   }
 
+  private void initFields() {
+    inner_ = messages.HoughLine.getDefaultInstance();
+    outer_ = messages.HoughLine.getDefaultInstance();
+    id_ = 0;
+    correspondence_ = 0;
+    prob_ = 0F;
+    index_ = 0;
+    wz0_ = 0F;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -255,11 +289,12 @@ public  final class FieldLine extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, getInner());
+      output.writeMessage(1, inner_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(2, getOuter());
+      output.writeMessage(2, outer_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       output.writeInt32(3, id_);
@@ -276,21 +311,22 @@ public  final class FieldLine extends
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
       output.writeFloat(7, wz0_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getInner());
+        .computeMessageSize(1, inner_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, getOuter());
+        .computeMessageSize(2, outer_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
@@ -312,12 +348,18 @@ public  final class FieldLine extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(7, wz0_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.FieldLine parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -371,17 +413,12 @@ public  final class FieldLine extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.FieldLine prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -393,9 +430,8 @@ public  final class FieldLine extends
    * Protobuf type {@code messages.FieldLine}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.FieldLine)
-      messages.FieldLineOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.FieldLineOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_FieldLine_descriptor;
@@ -424,16 +460,20 @@ public  final class FieldLine extends
         getOuterFieldBuilder();
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       if (innerBuilder_ == null) {
-        inner_ = null;
+        inner_ = messages.HoughLine.getDefaultInstance();
       } else {
         innerBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000001);
       if (outerBuilder_ == null) {
-        outer_ = null;
+        outer_ = messages.HoughLine.getDefaultInstance();
       } else {
         outerBuilder_.clear();
       }
@@ -449,6 +489,10 @@ public  final class FieldLine extends
       wz0_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000040);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -545,8 +589,7 @@ public  final class FieldLine extends
       if (other.hasWz0()) {
         setWz0(other.getWz0());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -573,7 +616,8 @@ public  final class FieldLine extends
     }
     private int bitField0_;
 
-    private messages.HoughLine inner_ = null;
+    // optional .messages.HoughLine inner = 1;
+    private messages.HoughLine inner_ = messages.HoughLine.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.HoughLine, messages.HoughLine.Builder, messages.HoughLineOrBuilder> innerBuilder_;
     /**
@@ -587,7 +631,7 @@ public  final class FieldLine extends
      */
     public messages.HoughLine getInner() {
       if (innerBuilder_ == null) {
-        return inner_ == null ? messages.HoughLine.getDefaultInstance() : inner_;
+        return inner_;
       } else {
         return innerBuilder_.getMessage();
       }
@@ -628,7 +672,6 @@ public  final class FieldLine extends
     public Builder mergeInner(messages.HoughLine value) {
       if (innerBuilder_ == null) {
         if (((bitField0_ & 0x00000001) == 0x00000001) &&
-            inner_ != null &&
             inner_ != messages.HoughLine.getDefaultInstance()) {
           inner_ =
             messages.HoughLine.newBuilder(inner_).mergeFrom(value).buildPartial();
@@ -647,7 +690,7 @@ public  final class FieldLine extends
      */
     public Builder clearInner() {
       if (innerBuilder_ == null) {
-        inner_ = null;
+        inner_ = messages.HoughLine.getDefaultInstance();
         onChanged();
       } else {
         innerBuilder_.clear();
@@ -670,8 +713,7 @@ public  final class FieldLine extends
       if (innerBuilder_ != null) {
         return innerBuilder_.getMessageOrBuilder();
       } else {
-        return inner_ == null ?
-            messages.HoughLine.getDefaultInstance() : inner_;
+        return inner_;
       }
     }
     /**
@@ -683,7 +725,7 @@ public  final class FieldLine extends
       if (innerBuilder_ == null) {
         innerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.HoughLine, messages.HoughLine.Builder, messages.HoughLineOrBuilder>(
-                getInner(),
+                inner_,
                 getParentForChildren(),
                 isClean());
         inner_ = null;
@@ -691,7 +733,8 @@ public  final class FieldLine extends
       return innerBuilder_;
     }
 
-    private messages.HoughLine outer_ = null;
+    // optional .messages.HoughLine outer = 2;
+    private messages.HoughLine outer_ = messages.HoughLine.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.HoughLine, messages.HoughLine.Builder, messages.HoughLineOrBuilder> outerBuilder_;
     /**
@@ -705,7 +748,7 @@ public  final class FieldLine extends
      */
     public messages.HoughLine getOuter() {
       if (outerBuilder_ == null) {
-        return outer_ == null ? messages.HoughLine.getDefaultInstance() : outer_;
+        return outer_;
       } else {
         return outerBuilder_.getMessage();
       }
@@ -746,7 +789,6 @@ public  final class FieldLine extends
     public Builder mergeOuter(messages.HoughLine value) {
       if (outerBuilder_ == null) {
         if (((bitField0_ & 0x00000002) == 0x00000002) &&
-            outer_ != null &&
             outer_ != messages.HoughLine.getDefaultInstance()) {
           outer_ =
             messages.HoughLine.newBuilder(outer_).mergeFrom(value).buildPartial();
@@ -765,7 +807,7 @@ public  final class FieldLine extends
      */
     public Builder clearOuter() {
       if (outerBuilder_ == null) {
-        outer_ = null;
+        outer_ = messages.HoughLine.getDefaultInstance();
         onChanged();
       } else {
         outerBuilder_.clear();
@@ -788,8 +830,7 @@ public  final class FieldLine extends
       if (outerBuilder_ != null) {
         return outerBuilder_.getMessageOrBuilder();
       } else {
-        return outer_ == null ?
-            messages.HoughLine.getDefaultInstance() : outer_;
+        return outer_;
       }
     }
     /**
@@ -801,7 +842,7 @@ public  final class FieldLine extends
       if (outerBuilder_ == null) {
         outerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.HoughLine, messages.HoughLine.Builder, messages.HoughLineOrBuilder>(
-                getOuter(),
+                outer_,
                 getParentForChildren(),
                 isClean());
         outer_ = null;
@@ -809,6 +850,7 @@ public  final class FieldLine extends
       return outerBuilder_;
     }
 
+    // optional int32 id = 3;
     private int id_ ;
     /**
      * <code>optional int32 id = 3;</code>
@@ -841,6 +883,7 @@ public  final class FieldLine extends
       return this;
     }
 
+    // optional int32 correspondence = 4;
     private int correspondence_ ;
     /**
      * <code>optional int32 correspondence = 4;</code>
@@ -873,6 +916,7 @@ public  final class FieldLine extends
       return this;
     }
 
+    // optional float prob = 5;
     private float prob_ ;
     /**
      * <code>optional float prob = 5;</code>
@@ -905,6 +949,7 @@ public  final class FieldLine extends
       return this;
     }
 
+    // optional int32 index = 6;
     private int index_ ;
     /**
      * <code>optional int32 index = 6;</code>
@@ -937,6 +982,7 @@ public  final class FieldLine extends
       return this;
     }
 
+    // optional float wz0 = 7;
     private float wz0_ ;
     /**
      * <code>optional float wz0 = 7;</code>
@@ -972,47 +1018,11 @@ public  final class FieldLine extends
     // @@protoc_insertion_point(builder_scope:messages.FieldLine)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.FieldLine)
-  private static final messages.FieldLine DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.FieldLine();
+    defaultInstance = new FieldLine(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.FieldLine getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<FieldLine>
-      PARSER = new com.google.protobuf.AbstractParser<FieldLine>() {
-    public FieldLine parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new FieldLine(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<FieldLine> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<FieldLine> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.FieldLine getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.FieldLine)
 }
 

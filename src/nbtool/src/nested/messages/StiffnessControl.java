@@ -7,26 +7,35 @@ package messages;
  * Protobuf type {@code messages.StiffnessControl}
  */
 public  final class StiffnessControl extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.StiffnessControl)
-    StiffnessControlOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements StiffnessControlOrBuilder {
   // Use StiffnessControl.newBuilder() to construct.
   private StiffnessControl(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private StiffnessControl() {
-    remove_ = false;
+  private StiffnessControl(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final StiffnessControl defaultInstance;
+  public static StiffnessControl getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public StiffnessControl getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private StiffnessControl(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -53,11 +62,10 @@ public  final class StiffnessControl extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -75,7 +83,23 @@ public  final class StiffnessControl extends
             messages.StiffnessControl.class, messages.StiffnessControl.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<StiffnessControl> PARSER =
+      new com.google.protobuf.AbstractParser<StiffnessControl>() {
+    public StiffnessControl parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new StiffnessControl(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<StiffnessControl> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional bool remove = 1;
   public static final int REMOVE_FIELD_NUMBER = 1;
   private boolean remove_;
   /**
@@ -91,11 +115,13 @@ public  final class StiffnessControl extends
     return remove_;
   }
 
+  private void initFields() {
+    remove_ = false;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -103,14 +129,16 @@ public  final class StiffnessControl extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, remove_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -118,12 +146,18 @@ public  final class StiffnessControl extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(1, remove_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.StiffnessControl parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -177,17 +211,12 @@ public  final class StiffnessControl extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.StiffnessControl prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -199,9 +228,8 @@ public  final class StiffnessControl extends
    * Protobuf type {@code messages.StiffnessControl}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.StiffnessControl)
-      messages.StiffnessControlOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.StiffnessControlOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_StiffnessControl.internal_static_messages_StiffnessControl_descriptor;
@@ -228,11 +256,19 @@ public  final class StiffnessControl extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       remove_ = false;
       bitField0_ = (bitField0_ & ~0x00000001);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -279,8 +315,7 @@ public  final class StiffnessControl extends
       if (other.hasRemove()) {
         setRemove(other.getRemove());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -307,6 +342,7 @@ public  final class StiffnessControl extends
     }
     private int bitField0_;
 
+    // optional bool remove = 1;
     private boolean remove_ ;
     /**
      * <code>optional bool remove = 1;</code>
@@ -342,47 +378,11 @@ public  final class StiffnessControl extends
     // @@protoc_insertion_point(builder_scope:messages.StiffnessControl)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.StiffnessControl)
-  private static final messages.StiffnessControl DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.StiffnessControl();
+    defaultInstance = new StiffnessControl(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.StiffnessControl getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<StiffnessControl>
-      PARSER = new com.google.protobuf.AbstractParser<StiffnessControl>() {
-    public StiffnessControl parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new StiffnessControl(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<StiffnessControl> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<StiffnessControl> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.StiffnessControl getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.StiffnessControl)
 }
 

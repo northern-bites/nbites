@@ -7,26 +7,35 @@ package messages;
  * Protobuf type {@code messages.Particle}
  */
 public  final class Particle extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Particle)
-    ParticleOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements ParticleOrBuilder {
   // Use Particle.newBuilder() to construct.
   private Particle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private Particle() {
-    weight_ = 0F;
+  private Particle(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final Particle defaultInstance;
+  public static Particle getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public Particle getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private Particle(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -55,7 +64,7 @@ public  final class Particle extends
             if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = loc_.toBuilder();
             }
-            loc_ = input.readMessage(messages.RobotLocation.parser(), extensionRegistry);
+            loc_ = input.readMessage(messages.RobotLocation.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(loc_);
               loc_ = subBuilder.buildPartial();
@@ -66,11 +75,10 @@ public  final class Particle extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -88,7 +96,23 @@ public  final class Particle extends
             messages.Particle.class, messages.Particle.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<Particle> PARSER =
+      new com.google.protobuf.AbstractParser<Particle>() {
+    public Particle parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new Particle(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<Particle> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float weight = 1;
   public static final int WEIGHT_FIELD_NUMBER = 1;
   private float weight_;
   /**
@@ -104,6 +128,7 @@ public  final class Particle extends
     return weight_;
   }
 
+  // optional .messages.RobotLocation loc = 2;
   public static final int LOC_FIELD_NUMBER = 2;
   private messages.RobotLocation loc_;
   /**
@@ -116,20 +141,23 @@ public  final class Particle extends
    * <code>optional .messages.RobotLocation loc = 2;</code>
    */
   public messages.RobotLocation getLoc() {
-    return loc_ == null ? messages.RobotLocation.getDefaultInstance() : loc_;
+    return loc_;
   }
   /**
    * <code>optional .messages.RobotLocation loc = 2;</code>
    */
   public messages.RobotLocationOrBuilder getLocOrBuilder() {
-    return loc_ == null ? messages.RobotLocation.getDefaultInstance() : loc_;
+    return loc_;
   }
 
+  private void initFields() {
+    weight_ = 0F;
+    loc_ = messages.RobotLocation.getDefaultInstance();
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -137,17 +165,19 @@ public  final class Particle extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, weight_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(2, getLoc());
+      output.writeMessage(2, loc_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -157,14 +187,20 @@ public  final class Particle extends
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, getLoc());
+        .computeMessageSize(2, loc_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.Particle parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -218,17 +254,12 @@ public  final class Particle extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.Particle prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -240,9 +271,8 @@ public  final class Particle extends
    * Protobuf type {@code messages.Particle}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Particle)
-      messages.ParticleOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.ParticleOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_ParticleSwarm.internal_static_messages_Particle_descriptor;
@@ -270,17 +300,25 @@ public  final class Particle extends
         getLocFieldBuilder();
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       weight_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000001);
       if (locBuilder_ == null) {
-        loc_ = null;
+        loc_ = messages.RobotLocation.getDefaultInstance();
       } else {
         locBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000002);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -338,8 +376,7 @@ public  final class Particle extends
       if (other.hasLoc()) {
         mergeLoc(other.getLoc());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -366,6 +403,7 @@ public  final class Particle extends
     }
     private int bitField0_;
 
+    // optional float weight = 1;
     private float weight_ ;
     /**
      * <code>optional float weight = 1;</code>
@@ -398,7 +436,8 @@ public  final class Particle extends
       return this;
     }
 
-    private messages.RobotLocation loc_ = null;
+    // optional .messages.RobotLocation loc = 2;
+    private messages.RobotLocation loc_ = messages.RobotLocation.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder> locBuilder_;
     /**
@@ -412,7 +451,7 @@ public  final class Particle extends
      */
     public messages.RobotLocation getLoc() {
       if (locBuilder_ == null) {
-        return loc_ == null ? messages.RobotLocation.getDefaultInstance() : loc_;
+        return loc_;
       } else {
         return locBuilder_.getMessage();
       }
@@ -453,7 +492,6 @@ public  final class Particle extends
     public Builder mergeLoc(messages.RobotLocation value) {
       if (locBuilder_ == null) {
         if (((bitField0_ & 0x00000002) == 0x00000002) &&
-            loc_ != null &&
             loc_ != messages.RobotLocation.getDefaultInstance()) {
           loc_ =
             messages.RobotLocation.newBuilder(loc_).mergeFrom(value).buildPartial();
@@ -472,7 +510,7 @@ public  final class Particle extends
      */
     public Builder clearLoc() {
       if (locBuilder_ == null) {
-        loc_ = null;
+        loc_ = messages.RobotLocation.getDefaultInstance();
         onChanged();
       } else {
         locBuilder_.clear();
@@ -495,8 +533,7 @@ public  final class Particle extends
       if (locBuilder_ != null) {
         return locBuilder_.getMessageOrBuilder();
       } else {
-        return loc_ == null ?
-            messages.RobotLocation.getDefaultInstance() : loc_;
+        return loc_;
       }
     }
     /**
@@ -508,7 +545,7 @@ public  final class Particle extends
       if (locBuilder_ == null) {
         locBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder>(
-                getLoc(),
+                loc_,
                 getParentForChildren(),
                 isClean());
         loc_ = null;
@@ -519,47 +556,11 @@ public  final class Particle extends
     // @@protoc_insertion_point(builder_scope:messages.Particle)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.Particle)
-  private static final messages.Particle DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.Particle();
+    defaultInstance = new Particle(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.Particle getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<Particle>
-      PARSER = new com.google.protobuf.AbstractParser<Particle>() {
-    public Particle parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new Particle(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<Particle> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<Particle> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.Particle getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.Particle)
 }
 

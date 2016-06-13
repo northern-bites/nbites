@@ -7,54 +7,35 @@ package messages;
  * Protobuf type {@code messages.FilteredBall}
  */
 public  final class FilteredBall extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.FilteredBall)
-    FilteredBallOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements FilteredBallOrBuilder {
   // Use FilteredBall.newBuilder() to construct.
   private FilteredBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private FilteredBall() {
-    distance_ = 0F;
-    bearing_ = 0F;
-    relX_ = 0F;
-    relY_ = 0F;
-    velX_ = 0F;
-    velY_ = 0F;
-    varRelX_ = 0F;
-    varRelY_ = 0F;
-    varVelX_ = 0F;
-    varVelY_ = 0F;
-    isStationary_ = false;
-    bearingDeg_ = 0F;
-    x_ = 0F;
-    y_ = 0F;
-    relXDest_ = 0F;
-    relYDest_ = 0F;
-    speed_ = 0F;
-    relYIntersectDest_ = 0F;
-    statRelX_ = 0F;
-    statRelY_ = 0F;
-    statDistance_ = 0F;
-    statBearing_ = 0F;
-    movRelX_ = 0F;
-    movRelY_ = 0F;
-    movDistance_ = 0F;
-    movBearing_ = 0F;
-    movVelX_ = 0F;
-    movVelY_ = 0F;
-    movSpeed_ = 0F;
+  private FilteredBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final FilteredBall defaultInstance;
+  public static FilteredBall getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public FilteredBall getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private FilteredBall(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -78,7 +59,7 @@ public  final class FilteredBall extends
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
               subBuilder = vis_.toBuilder();
             }
-            vis_ = input.readMessage(messages.VBall.parser(), extensionRegistry);
+            vis_ = input.readMessage(messages.VBall.PARSER, extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(vis_);
               vis_ = subBuilder.buildPartial();
@@ -234,11 +215,10 @@ public  final class FilteredBall extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -256,7 +236,23 @@ public  final class FilteredBall extends
             messages.FilteredBall.class, messages.FilteredBall.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<FilteredBall> PARSER =
+      new com.google.protobuf.AbstractParser<FilteredBall>() {
+    public FilteredBall parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new FilteredBall(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<FilteredBall> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional .messages.VBall vis = 1;
   public static final int VIS_FIELD_NUMBER = 1;
   private messages.VBall vis_;
   /**
@@ -269,15 +265,16 @@ public  final class FilteredBall extends
    * <code>optional .messages.VBall vis = 1;</code>
    */
   public messages.VBall getVis() {
-    return vis_ == null ? messages.VBall.getDefaultInstance() : vis_;
+    return vis_;
   }
   /**
    * <code>optional .messages.VBall vis = 1;</code>
    */
   public messages.VBallOrBuilder getVisOrBuilder() {
-    return vis_ == null ? messages.VBall.getDefaultInstance() : vis_;
+    return vis_;
   }
 
+  // optional float distance = 2;
   public static final int DISTANCE_FIELD_NUMBER = 2;
   private float distance_;
   /**
@@ -293,6 +290,7 @@ public  final class FilteredBall extends
     return distance_;
   }
 
+  // optional float bearing = 3;
   public static final int BEARING_FIELD_NUMBER = 3;
   private float bearing_;
   /**
@@ -308,6 +306,7 @@ public  final class FilteredBall extends
     return bearing_;
   }
 
+  // optional float rel_x = 4;
   public static final int REL_X_FIELD_NUMBER = 4;
   private float relX_;
   /**
@@ -331,6 +330,7 @@ public  final class FilteredBall extends
     return relX_;
   }
 
+  // optional float rel_y = 5;
   public static final int REL_Y_FIELD_NUMBER = 5;
   private float relY_;
   /**
@@ -346,6 +346,7 @@ public  final class FilteredBall extends
     return relY_;
   }
 
+  // optional float vel_x = 6;
   public static final int VEL_X_FIELD_NUMBER = 6;
   private float velX_;
   /**
@@ -361,6 +362,7 @@ public  final class FilteredBall extends
     return velX_;
   }
 
+  // optional float vel_y = 7;
   public static final int VEL_Y_FIELD_NUMBER = 7;
   private float velY_;
   /**
@@ -376,6 +378,7 @@ public  final class FilteredBall extends
     return velY_;
   }
 
+  // optional float var_rel_x = 8;
   public static final int VAR_REL_X_FIELD_NUMBER = 8;
   private float varRelX_;
   /**
@@ -391,6 +394,7 @@ public  final class FilteredBall extends
     return varRelX_;
   }
 
+  // optional float var_rel_y = 9;
   public static final int VAR_REL_Y_FIELD_NUMBER = 9;
   private float varRelY_;
   /**
@@ -406,6 +410,7 @@ public  final class FilteredBall extends
     return varRelY_;
   }
 
+  // optional float var_vel_x = 10;
   public static final int VAR_VEL_X_FIELD_NUMBER = 10;
   private float varVelX_;
   /**
@@ -421,6 +426,7 @@ public  final class FilteredBall extends
     return varVelX_;
   }
 
+  // optional float var_vel_y = 11;
   public static final int VAR_VEL_Y_FIELD_NUMBER = 11;
   private float varVelY_;
   /**
@@ -436,6 +442,7 @@ public  final class FilteredBall extends
     return varVelY_;
   }
 
+  // optional bool is_stationary = 12;
   public static final int IS_STATIONARY_FIELD_NUMBER = 12;
   private boolean isStationary_;
   /**
@@ -451,6 +458,7 @@ public  final class FilteredBall extends
     return isStationary_;
   }
 
+  // optional float bearing_deg = 13;
   public static final int BEARING_DEG_FIELD_NUMBER = 13;
   private float bearingDeg_;
   /**
@@ -466,6 +474,7 @@ public  final class FilteredBall extends
     return bearingDeg_;
   }
 
+  // optional float x = 14;
   public static final int X_FIELD_NUMBER = 14;
   private float x_;
   /**
@@ -481,6 +490,7 @@ public  final class FilteredBall extends
     return x_;
   }
 
+  // optional float y = 15;
   public static final int Y_FIELD_NUMBER = 15;
   private float y_;
   /**
@@ -496,6 +506,7 @@ public  final class FilteredBall extends
     return y_;
   }
 
+  // optional float rel_x_dest = 16;
   public static final int REL_X_DEST_FIELD_NUMBER = 16;
   private float relXDest_;
   /**
@@ -511,6 +522,7 @@ public  final class FilteredBall extends
     return relXDest_;
   }
 
+  // optional float rel_y_dest = 17;
   public static final int REL_Y_DEST_FIELD_NUMBER = 17;
   private float relYDest_;
   /**
@@ -526,6 +538,7 @@ public  final class FilteredBall extends
     return relYDest_;
   }
 
+  // optional float speed = 18;
   public static final int SPEED_FIELD_NUMBER = 18;
   private float speed_;
   /**
@@ -549,6 +562,7 @@ public  final class FilteredBall extends
     return speed_;
   }
 
+  // optional float rel_y_intersect_dest = 19;
   public static final int REL_Y_INTERSECT_DEST_FIELD_NUMBER = 19;
   private float relYIntersectDest_;
   /**
@@ -564,6 +578,7 @@ public  final class FilteredBall extends
     return relYIntersectDest_;
   }
 
+  // optional float stat_rel_x = 20;
   public static final int STAT_REL_X_FIELD_NUMBER = 20;
   private float statRelX_;
   /**
@@ -579,6 +594,7 @@ public  final class FilteredBall extends
     return statRelX_;
   }
 
+  // optional float stat_rel_y = 21;
   public static final int STAT_REL_Y_FIELD_NUMBER = 21;
   private float statRelY_;
   /**
@@ -594,6 +610,7 @@ public  final class FilteredBall extends
     return statRelY_;
   }
 
+  // optional float stat_distance = 22;
   public static final int STAT_DISTANCE_FIELD_NUMBER = 22;
   private float statDistance_;
   /**
@@ -609,6 +626,7 @@ public  final class FilteredBall extends
     return statDistance_;
   }
 
+  // optional float stat_bearing = 23;
   public static final int STAT_BEARING_FIELD_NUMBER = 23;
   private float statBearing_;
   /**
@@ -624,6 +642,7 @@ public  final class FilteredBall extends
     return statBearing_;
   }
 
+  // optional float mov_rel_x = 24;
   public static final int MOV_REL_X_FIELD_NUMBER = 24;
   private float movRelX_;
   /**
@@ -639,6 +658,7 @@ public  final class FilteredBall extends
     return movRelX_;
   }
 
+  // optional float mov_rel_y = 25;
   public static final int MOV_REL_Y_FIELD_NUMBER = 25;
   private float movRelY_;
   /**
@@ -654,6 +674,7 @@ public  final class FilteredBall extends
     return movRelY_;
   }
 
+  // optional float mov_distance = 26;
   public static final int MOV_DISTANCE_FIELD_NUMBER = 26;
   private float movDistance_;
   /**
@@ -669,6 +690,7 @@ public  final class FilteredBall extends
     return movDistance_;
   }
 
+  // optional float mov_bearing = 27;
   public static final int MOV_BEARING_FIELD_NUMBER = 27;
   private float movBearing_;
   /**
@@ -684,6 +706,7 @@ public  final class FilteredBall extends
     return movBearing_;
   }
 
+  // optional float mov_vel_x = 28;
   public static final int MOV_VEL_X_FIELD_NUMBER = 28;
   private float movVelX_;
   /**
@@ -699,6 +722,7 @@ public  final class FilteredBall extends
     return movVelX_;
   }
 
+  // optional float mov_vel_y = 29;
   public static final int MOV_VEL_Y_FIELD_NUMBER = 29;
   private float movVelY_;
   /**
@@ -714,6 +738,7 @@ public  final class FilteredBall extends
     return movVelY_;
   }
 
+  // optional float mov_speed = 30;
   public static final int MOV_SPEED_FIELD_NUMBER = 30;
   private float movSpeed_;
   /**
@@ -729,11 +754,42 @@ public  final class FilteredBall extends
     return movSpeed_;
   }
 
+  private void initFields() {
+    vis_ = messages.VBall.getDefaultInstance();
+    distance_ = 0F;
+    bearing_ = 0F;
+    relX_ = 0F;
+    relY_ = 0F;
+    velX_ = 0F;
+    velY_ = 0F;
+    varRelX_ = 0F;
+    varRelY_ = 0F;
+    varVelX_ = 0F;
+    varVelY_ = 0F;
+    isStationary_ = false;
+    bearingDeg_ = 0F;
+    x_ = 0F;
+    y_ = 0F;
+    relXDest_ = 0F;
+    relYDest_ = 0F;
+    speed_ = 0F;
+    relYIntersectDest_ = 0F;
+    statRelX_ = 0F;
+    statRelY_ = 0F;
+    statDistance_ = 0F;
+    statBearing_ = 0F;
+    movRelX_ = 0F;
+    movRelY_ = 0F;
+    movDistance_ = 0F;
+    movBearing_ = 0F;
+    movVelX_ = 0F;
+    movVelY_ = 0F;
+    movSpeed_ = 0F;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -741,8 +797,9 @@ public  final class FilteredBall extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, getVis());
+      output.writeMessage(1, vis_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeFloat(2, distance_);
@@ -831,17 +888,18 @@ public  final class FilteredBall extends
     if (((bitField0_ & 0x20000000) == 0x20000000)) {
       output.writeFloat(30, movSpeed_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getVis());
+        .computeMessageSize(1, vis_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
@@ -959,12 +1017,18 @@ public  final class FilteredBall extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(30, movSpeed_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.FilteredBall parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1018,17 +1082,12 @@ public  final class FilteredBall extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.FilteredBall prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -1040,9 +1099,8 @@ public  final class FilteredBall extends
    * Protobuf type {@code messages.FilteredBall}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.FilteredBall)
-      messages.FilteredBallOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.FilteredBallOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_FilteredBall_descriptor;
@@ -1070,10 +1128,14 @@ public  final class FilteredBall extends
         getVisFieldBuilder();
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       if (visBuilder_ == null) {
-        vis_ = null;
+        vis_ = messages.VBall.getDefaultInstance();
       } else {
         visBuilder_.clear();
       }
@@ -1137,6 +1199,10 @@ public  final class FilteredBall extends
       movSpeed_ = 0F;
       bitField0_ = (bitField0_ & ~0x20000000);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -1390,8 +1456,7 @@ public  final class FilteredBall extends
       if (other.hasMovSpeed()) {
         setMovSpeed(other.getMovSpeed());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -1418,7 +1483,8 @@ public  final class FilteredBall extends
     }
     private int bitField0_;
 
-    private messages.VBall vis_ = null;
+    // optional .messages.VBall vis = 1;
+    private messages.VBall vis_ = messages.VBall.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VBall, messages.VBall.Builder, messages.VBallOrBuilder> visBuilder_;
     /**
@@ -1432,7 +1498,7 @@ public  final class FilteredBall extends
      */
     public messages.VBall getVis() {
       if (visBuilder_ == null) {
-        return vis_ == null ? messages.VBall.getDefaultInstance() : vis_;
+        return vis_;
       } else {
         return visBuilder_.getMessage();
       }
@@ -1473,7 +1539,6 @@ public  final class FilteredBall extends
     public Builder mergeVis(messages.VBall value) {
       if (visBuilder_ == null) {
         if (((bitField0_ & 0x00000001) == 0x00000001) &&
-            vis_ != null &&
             vis_ != messages.VBall.getDefaultInstance()) {
           vis_ =
             messages.VBall.newBuilder(vis_).mergeFrom(value).buildPartial();
@@ -1492,7 +1557,7 @@ public  final class FilteredBall extends
      */
     public Builder clearVis() {
       if (visBuilder_ == null) {
-        vis_ = null;
+        vis_ = messages.VBall.getDefaultInstance();
         onChanged();
       } else {
         visBuilder_.clear();
@@ -1515,8 +1580,7 @@ public  final class FilteredBall extends
       if (visBuilder_ != null) {
         return visBuilder_.getMessageOrBuilder();
       } else {
-        return vis_ == null ?
-            messages.VBall.getDefaultInstance() : vis_;
+        return vis_;
       }
     }
     /**
@@ -1528,7 +1592,7 @@ public  final class FilteredBall extends
       if (visBuilder_ == null) {
         visBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VBall, messages.VBall.Builder, messages.VBallOrBuilder>(
-                getVis(),
+                vis_,
                 getParentForChildren(),
                 isClean());
         vis_ = null;
@@ -1536,6 +1600,7 @@ public  final class FilteredBall extends
       return visBuilder_;
     }
 
+    // optional float distance = 2;
     private float distance_ ;
     /**
      * <code>optional float distance = 2;</code>
@@ -1568,6 +1633,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float bearing = 3;
     private float bearing_ ;
     /**
      * <code>optional float bearing = 3;</code>
@@ -1600,6 +1666,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float rel_x = 4;
     private float relX_ ;
     /**
      * <code>optional float rel_x = 4;</code>
@@ -1648,6 +1715,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float rel_y = 5;
     private float relY_ ;
     /**
      * <code>optional float rel_y = 5;</code>
@@ -1680,6 +1748,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float vel_x = 6;
     private float velX_ ;
     /**
      * <code>optional float vel_x = 6;</code>
@@ -1712,6 +1781,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float vel_y = 7;
     private float velY_ ;
     /**
      * <code>optional float vel_y = 7;</code>
@@ -1744,6 +1814,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float var_rel_x = 8;
     private float varRelX_ ;
     /**
      * <code>optional float var_rel_x = 8;</code>
@@ -1776,6 +1847,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float var_rel_y = 9;
     private float varRelY_ ;
     /**
      * <code>optional float var_rel_y = 9;</code>
@@ -1808,6 +1880,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float var_vel_x = 10;
     private float varVelX_ ;
     /**
      * <code>optional float var_vel_x = 10;</code>
@@ -1840,6 +1913,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float var_vel_y = 11;
     private float varVelY_ ;
     /**
      * <code>optional float var_vel_y = 11;</code>
@@ -1872,6 +1946,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional bool is_stationary = 12;
     private boolean isStationary_ ;
     /**
      * <code>optional bool is_stationary = 12;</code>
@@ -1904,6 +1979,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float bearing_deg = 13;
     private float bearingDeg_ ;
     /**
      * <code>optional float bearing_deg = 13;</code>
@@ -1936,6 +2012,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float x = 14;
     private float x_ ;
     /**
      * <code>optional float x = 14;</code>
@@ -1968,6 +2045,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float y = 15;
     private float y_ ;
     /**
      * <code>optional float y = 15;</code>
@@ -2000,6 +2078,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float rel_x_dest = 16;
     private float relXDest_ ;
     /**
      * <code>optional float rel_x_dest = 16;</code>
@@ -2032,6 +2111,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float rel_y_dest = 17;
     private float relYDest_ ;
     /**
      * <code>optional float rel_y_dest = 17;</code>
@@ -2064,6 +2144,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float speed = 18;
     private float speed_ ;
     /**
      * <code>optional float speed = 18;</code>
@@ -2112,6 +2193,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float rel_y_intersect_dest = 19;
     private float relYIntersectDest_ ;
     /**
      * <code>optional float rel_y_intersect_dest = 19;</code>
@@ -2144,6 +2226,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float stat_rel_x = 20;
     private float statRelX_ ;
     /**
      * <code>optional float stat_rel_x = 20;</code>
@@ -2176,6 +2259,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float stat_rel_y = 21;
     private float statRelY_ ;
     /**
      * <code>optional float stat_rel_y = 21;</code>
@@ -2208,6 +2292,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float stat_distance = 22;
     private float statDistance_ ;
     /**
      * <code>optional float stat_distance = 22;</code>
@@ -2240,6 +2325,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float stat_bearing = 23;
     private float statBearing_ ;
     /**
      * <code>optional float stat_bearing = 23;</code>
@@ -2272,6 +2358,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float mov_rel_x = 24;
     private float movRelX_ ;
     /**
      * <code>optional float mov_rel_x = 24;</code>
@@ -2304,6 +2391,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float mov_rel_y = 25;
     private float movRelY_ ;
     /**
      * <code>optional float mov_rel_y = 25;</code>
@@ -2336,6 +2424,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float mov_distance = 26;
     private float movDistance_ ;
     /**
      * <code>optional float mov_distance = 26;</code>
@@ -2368,6 +2457,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float mov_bearing = 27;
     private float movBearing_ ;
     /**
      * <code>optional float mov_bearing = 27;</code>
@@ -2400,6 +2490,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float mov_vel_x = 28;
     private float movVelX_ ;
     /**
      * <code>optional float mov_vel_x = 28;</code>
@@ -2432,6 +2523,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float mov_vel_y = 29;
     private float movVelY_ ;
     /**
      * <code>optional float mov_vel_y = 29;</code>
@@ -2464,6 +2556,7 @@ public  final class FilteredBall extends
       return this;
     }
 
+    // optional float mov_speed = 30;
     private float movSpeed_ ;
     /**
      * <code>optional float mov_speed = 30;</code>
@@ -2499,47 +2592,11 @@ public  final class FilteredBall extends
     // @@protoc_insertion_point(builder_scope:messages.FilteredBall)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.FilteredBall)
-  private static final messages.FilteredBall DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.FilteredBall();
+    defaultInstance = new FilteredBall(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.FilteredBall getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<FilteredBall>
-      PARSER = new com.google.protobuf.AbstractParser<FilteredBall>() {
-    public FilteredBall parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new FilteredBall(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<FilteredBall> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<FilteredBall> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.FilteredBall getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.FilteredBall)
 }
 

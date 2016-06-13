@@ -7,28 +7,35 @@ package messages;
  * Protobuf type {@code messages.FallStatus}
  */
 public  final class FallStatus extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.FallStatus)
-    FallStatusOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements FallStatusOrBuilder {
   // Use FallStatus.newBuilder() to construct.
   private FallStatus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private FallStatus() {
-    falling_ = false;
-    fallen_ = false;
-    onFront_ = false;
+  private FallStatus(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final FallStatus defaultInstance;
+  public static FallStatus getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public FallStatus getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private FallStatus(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -65,11 +72,10 @@ public  final class FallStatus extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -87,7 +93,23 @@ public  final class FallStatus extends
             messages.FallStatus.class, messages.FallStatus.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<FallStatus> PARSER =
+      new com.google.protobuf.AbstractParser<FallStatus>() {
+    public FallStatus parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new FallStatus(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<FallStatus> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional bool falling = 1;
   public static final int FALLING_FIELD_NUMBER = 1;
   private boolean falling_;
   /**
@@ -103,6 +125,7 @@ public  final class FallStatus extends
     return falling_;
   }
 
+  // optional bool fallen = 2;
   public static final int FALLEN_FIELD_NUMBER = 2;
   private boolean fallen_;
   /**
@@ -118,6 +141,7 @@ public  final class FallStatus extends
     return fallen_;
   }
 
+  // optional bool on_front = 3;
   public static final int ON_FRONT_FIELD_NUMBER = 3;
   private boolean onFront_;
   /**
@@ -141,11 +165,15 @@ public  final class FallStatus extends
     return onFront_;
   }
 
+  private void initFields() {
+    falling_ = false;
+    fallen_ = false;
+    onFront_ = false;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -153,6 +181,7 @@ public  final class FallStatus extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, falling_);
     }
@@ -162,11 +191,12 @@ public  final class FallStatus extends
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       output.writeBool(3, onFront_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -182,12 +212,18 @@ public  final class FallStatus extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(3, onFront_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.FallStatus parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -241,17 +277,12 @@ public  final class FallStatus extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.FallStatus prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -263,9 +294,8 @@ public  final class FallStatus extends
    * Protobuf type {@code messages.FallStatus}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.FallStatus)
-      messages.FallStatusOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.FallStatusOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_FallStatus.internal_static_messages_FallStatus_descriptor;
@@ -292,6 +322,10 @@ public  final class FallStatus extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       falling_ = false;
@@ -301,6 +335,10 @@ public  final class FallStatus extends
       onFront_ = false;
       bitField0_ = (bitField0_ & ~0x00000004);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -361,8 +399,7 @@ public  final class FallStatus extends
       if (other.hasOnFront()) {
         setOnFront(other.getOnFront());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -389,6 +426,7 @@ public  final class FallStatus extends
     }
     private int bitField0_;
 
+    // optional bool falling = 1;
     private boolean falling_ ;
     /**
      * <code>optional bool falling = 1;</code>
@@ -421,6 +459,7 @@ public  final class FallStatus extends
       return this;
     }
 
+    // optional bool fallen = 2;
     private boolean fallen_ ;
     /**
      * <code>optional bool fallen = 2;</code>
@@ -453,6 +492,7 @@ public  final class FallStatus extends
       return this;
     }
 
+    // optional bool on_front = 3;
     private boolean onFront_ ;
     /**
      * <code>optional bool on_front = 3;</code>
@@ -504,47 +544,11 @@ public  final class FallStatus extends
     // @@protoc_insertion_point(builder_scope:messages.FallStatus)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.FallStatus)
-  private static final messages.FallStatus DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.FallStatus();
+    defaultInstance = new FallStatus(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.FallStatus getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<FallStatus>
-      PARSER = new com.google.protobuf.AbstractParser<FallStatus>() {
-    public FallStatus parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new FallStatus(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<FallStatus> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<FallStatus> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.FallStatus getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.FallStatus)
 }
 

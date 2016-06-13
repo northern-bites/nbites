@@ -7,26 +7,35 @@ package messages;
  * Protobuf type {@code messages.ScriptedMove}
  */
 public  final class ScriptedMove extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.ScriptedMove)
-    ScriptedMoveOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements ScriptedMoveOrBuilder {
   // Use ScriptedMove.newBuilder() to construct.
   private ScriptedMove(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private ScriptedMove() {
-    command_ = java.util.Collections.emptyList();
+  private ScriptedMove(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final ScriptedMove defaultInstance;
+  public static ScriptedMove getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public ScriptedMove getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private ScriptedMove(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -50,17 +59,16 @@ public  final class ScriptedMove extends
               command_ = new java.util.ArrayList<messages.BodyJointCommand>();
               mutable_bitField0_ |= 0x00000001;
             }
-            command_.add(input.readMessage(messages.BodyJointCommand.parser(), extensionRegistry));
+            command_.add(input.readMessage(messages.BodyJointCommand.PARSER, extensionRegistry));
             break;
           }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
         command_ = java.util.Collections.unmodifiableList(command_);
@@ -81,6 +89,22 @@ public  final class ScriptedMove extends
             messages.ScriptedMove.class, messages.ScriptedMove.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<ScriptedMove> PARSER =
+      new com.google.protobuf.AbstractParser<ScriptedMove>() {
+    public ScriptedMove parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new ScriptedMove(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<ScriptedMove> getParserForType() {
+    return PARSER;
+  }
+
+  // repeated .messages.BodyJointCommand command = 1;
   public static final int COMMAND_FIELD_NUMBER = 1;
   private java.util.List<messages.BodyJointCommand> command_;
   /**
@@ -116,11 +140,13 @@ public  final class ScriptedMove extends
     return command_.get(index);
   }
 
+  private void initFields() {
+    command_ = java.util.Collections.emptyList();
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -128,14 +154,16 @@ public  final class ScriptedMove extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     for (int i = 0; i < command_.size(); i++) {
       output.writeMessage(1, command_.get(i));
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -143,12 +171,18 @@ public  final class ScriptedMove extends
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, command_.get(i));
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.ScriptedMove parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -202,17 +236,12 @@ public  final class ScriptedMove extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.ScriptedMove prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -224,9 +253,8 @@ public  final class ScriptedMove extends
    * Protobuf type {@code messages.ScriptedMove}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.ScriptedMove)
-      messages.ScriptedMoveOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.ScriptedMoveOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_ScriptedMove_descriptor;
@@ -254,6 +282,10 @@ public  final class ScriptedMove extends
         getCommandFieldBuilder();
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       if (commandBuilder_ == null) {
@@ -263,6 +295,10 @@ public  final class ScriptedMove extends
         commandBuilder_.clear();
       }
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -335,8 +371,7 @@ public  final class ScriptedMove extends
           }
         }
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -363,6 +398,7 @@ public  final class ScriptedMove extends
     }
     private int bitField0_;
 
+    // repeated .messages.BodyJointCommand command = 1;
     private java.util.List<messages.BodyJointCommand> command_ =
       java.util.Collections.emptyList();
     private void ensureCommandIsMutable() {
@@ -504,8 +540,7 @@ public  final class ScriptedMove extends
         java.lang.Iterable<? extends messages.BodyJointCommand> values) {
       if (commandBuilder_ == null) {
         ensureCommandIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, command_);
+        super.addAll(values, command_);
         onChanged();
       } else {
         commandBuilder_.addAllMessages(values);
@@ -606,47 +641,11 @@ public  final class ScriptedMove extends
     // @@protoc_insertion_point(builder_scope:messages.ScriptedMove)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.ScriptedMove)
-  private static final messages.ScriptedMove DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.ScriptedMove();
+    defaultInstance = new ScriptedMove(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.ScriptedMove getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<ScriptedMove>
-      PARSER = new com.google.protobuf.AbstractParser<ScriptedMove>() {
-    public ScriptedMove parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new ScriptedMove(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<ScriptedMove> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<ScriptedMove> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.ScriptedMove getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.ScriptedMove)
 }
 

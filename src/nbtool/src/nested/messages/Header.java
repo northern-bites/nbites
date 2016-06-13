@@ -7,29 +7,35 @@ package messages;
  * Protobuf type {@code messages.Header}
  */
 public  final class Header extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Header)
-    HeaderOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements HeaderOrBuilder {
   // Use Header.newBuilder() to construct.
   private Header(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private Header() {
-    timestamp_ = 0L;
-    name_ = "";
-    version_ = 0;
-    topCamera_ = false;
+  private Header(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final Header defaultInstance;
+  public static Header getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public Header getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private Header(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -54,9 +60,8 @@ public  final class Header extends
             break;
           }
           case 18: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000002;
-            name_ = bs;
+            name_ = input.readBytes();
             break;
           }
           case 24: {
@@ -72,11 +77,10 @@ public  final class Header extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -94,7 +98,23 @@ public  final class Header extends
             messages.Header.class, messages.Header.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<Header> PARSER =
+      new com.google.protobuf.AbstractParser<Header>() {
+    public Header parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new Header(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<Header> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional int64 timestamp = 1;
   public static final int TIMESTAMP_FIELD_NUMBER = 1;
   private long timestamp_;
   /**
@@ -110,8 +130,9 @@ public  final class Header extends
     return timestamp_;
   }
 
+  // required string name = 2;
   public static final int NAME_FIELD_NUMBER = 2;
-  private volatile java.lang.Object name_;
+  private java.lang.Object name_;
   /**
    * <code>required string name = 2;</code>
    */
@@ -152,6 +173,7 @@ public  final class Header extends
     }
   }
 
+  // required int32 version = 3;
   public static final int VERSION_FIELD_NUMBER = 3;
   private int version_;
   /**
@@ -167,6 +189,7 @@ public  final class Header extends
     return version_;
   }
 
+  // optional bool top_camera = 4;
   public static final int TOP_CAMERA_FIELD_NUMBER = 4;
   private boolean topCamera_;
   /**
@@ -182,11 +205,16 @@ public  final class Header extends
     return topCamera_;
   }
 
+  private void initFields() {
+    timestamp_ = 0L;
+    name_ = "";
+    version_ = 0;
+    topCamera_ = false;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     if (!hasName()) {
       memoizedIsInitialized = 0;
@@ -202,11 +230,12 @@ public  final class Header extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeInt64(1, timestamp_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 2, name_);
+      output.writeBytes(2, getNameBytes());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       output.writeInt32(3, version_);
@@ -214,11 +243,12 @@ public  final class Header extends
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeBool(4, topCamera_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -227,7 +257,8 @@ public  final class Header extends
         .computeInt64Size(1, timestamp_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, name_);
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(2, getNameBytes());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
@@ -237,12 +268,18 @@ public  final class Header extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(4, topCamera_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.Header parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -296,17 +333,12 @@ public  final class Header extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.Header prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -318,9 +350,8 @@ public  final class Header extends
    * Protobuf type {@code messages.Header}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Header)
-      messages.HeaderOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.HeaderOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Header.internal_static_messages_Header_descriptor;
@@ -347,6 +378,10 @@ public  final class Header extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       timestamp_ = 0L;
@@ -358,6 +393,10 @@ public  final class Header extends
       topCamera_ = false;
       bitField0_ = (bitField0_ & ~0x00000008);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -427,16 +466,17 @@ public  final class Header extends
       if (other.hasTopCamera()) {
         setTopCamera(other.getTopCamera());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
     public final boolean isInitialized() {
       if (!hasName()) {
+        
         return false;
       }
       if (!hasVersion()) {
+        
         return false;
       }
       return true;
@@ -461,6 +501,7 @@ public  final class Header extends
     }
     private int bitField0_;
 
+    // optional int64 timestamp = 1;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 1;</code>
@@ -493,6 +534,7 @@ public  final class Header extends
       return this;
     }
 
+    // required string name = 2;
     private java.lang.Object name_ = "";
     /**
      * <code>required string name = 2;</code>
@@ -506,12 +548,9 @@ public  final class Header extends
     public java.lang.String getName() {
       java.lang.Object ref = name_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          name_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        name_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
@@ -569,6 +608,7 @@ public  final class Header extends
       return this;
     }
 
+    // required int32 version = 3;
     private int version_ ;
     /**
      * <code>required int32 version = 3;</code>
@@ -601,6 +641,7 @@ public  final class Header extends
       return this;
     }
 
+    // optional bool top_camera = 4;
     private boolean topCamera_ ;
     /**
      * <code>optional bool top_camera = 4;</code>
@@ -636,47 +677,11 @@ public  final class Header extends
     // @@protoc_insertion_point(builder_scope:messages.Header)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.Header)
-  private static final messages.Header DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.Header();
+    defaultInstance = new Header(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.Header getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<Header>
-      PARSER = new com.google.protobuf.AbstractParser<Header>() {
-    public Header parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new Header(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<Header> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<Header> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.Header getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.Header)
 }
 

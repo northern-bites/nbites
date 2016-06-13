@@ -34,31 +34,30 @@ public final class _File_ParticleSwarm {
       "RobotLocationB\027B\023_File_ParticleSwarmP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_messages_ParticleSwarm_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_messages_ParticleSwarm_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_ParticleSwarm_descriptor,
+              new java.lang.String[] { "Particle", });
+          internal_static_messages_Particle_descriptor =
+            getDescriptor().getMessageTypes().get(1);
+          internal_static_messages_Particle_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_Particle_descriptor,
+              new java.lang.String[] { "Weight", "Loc", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           messages._File_RobotLocation.getDescriptor(),
         }, assigner);
-    internal_static_messages_ParticleSwarm_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_ParticleSwarm_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_ParticleSwarm_descriptor,
-        new java.lang.String[] { "Particle", });
-    internal_static_messages_Particle_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_messages_Particle_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_Particle_descriptor,
-        new java.lang.String[] { "Weight", "Loc", });
-    messages._File_RobotLocation.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

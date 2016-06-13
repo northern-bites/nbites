@@ -7,31 +7,35 @@ package messages;
  * Protobuf type {@code messages.RobotLocation}
  */
 public  final class RobotLocation extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.RobotLocation)
-    RobotLocationOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements RobotLocationOrBuilder {
   // Use RobotLocation.newBuilder() to construct.
   private RobotLocation(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private RobotLocation() {
-    x_ = 0F;
-    y_ = 0F;
-    h_ = 0F;
-    timestamp_ = 0L;
-    uncert_ = 0F;
-    lost_ = false;
+  private RobotLocation(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final RobotLocation defaultInstance;
+  public static RobotLocation getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public RobotLocation getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private RobotLocation(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -83,11 +87,10 @@ public  final class RobotLocation extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -105,7 +108,23 @@ public  final class RobotLocation extends
             messages.RobotLocation.class, messages.RobotLocation.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<RobotLocation> PARSER =
+      new com.google.protobuf.AbstractParser<RobotLocation>() {
+    public RobotLocation parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new RobotLocation(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<RobotLocation> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float x = 1;
   public static final int X_FIELD_NUMBER = 1;
   private float x_;
   /**
@@ -121,6 +140,7 @@ public  final class RobotLocation extends
     return x_;
   }
 
+  // optional float y = 2;
   public static final int Y_FIELD_NUMBER = 2;
   private float y_;
   /**
@@ -136,6 +156,7 @@ public  final class RobotLocation extends
     return y_;
   }
 
+  // optional float h = 3;
   public static final int H_FIELD_NUMBER = 3;
   private float h_;
   /**
@@ -151,6 +172,7 @@ public  final class RobotLocation extends
     return h_;
   }
 
+  // optional int64 timestamp = 4;
   public static final int TIMESTAMP_FIELD_NUMBER = 4;
   private long timestamp_;
   /**
@@ -166,6 +188,7 @@ public  final class RobotLocation extends
     return timestamp_;
   }
 
+  // optional float uncert = 5;
   public static final int UNCERT_FIELD_NUMBER = 5;
   private float uncert_;
   /**
@@ -181,6 +204,7 @@ public  final class RobotLocation extends
     return uncert_;
   }
 
+  // optional bool lost = 6;
   public static final int LOST_FIELD_NUMBER = 6;
   private boolean lost_;
   /**
@@ -196,11 +220,18 @@ public  final class RobotLocation extends
     return lost_;
   }
 
+  private void initFields() {
+    x_ = 0F;
+    y_ = 0F;
+    h_ = 0F;
+    timestamp_ = 0L;
+    uncert_ = 0F;
+    lost_ = false;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -208,6 +239,7 @@ public  final class RobotLocation extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, x_);
     }
@@ -226,11 +258,12 @@ public  final class RobotLocation extends
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       output.writeBool(6, lost_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -258,12 +291,18 @@ public  final class RobotLocation extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(6, lost_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.RobotLocation parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -317,17 +356,12 @@ public  final class RobotLocation extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.RobotLocation prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -339,9 +373,8 @@ public  final class RobotLocation extends
    * Protobuf type {@code messages.RobotLocation}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.RobotLocation)
-      messages.RobotLocationOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.RobotLocationOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_RobotLocation.internal_static_messages_RobotLocation_descriptor;
@@ -368,6 +401,10 @@ public  final class RobotLocation extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       x_ = 0F;
@@ -383,6 +420,10 @@ public  final class RobotLocation extends
       lost_ = false;
       bitField0_ = (bitField0_ & ~0x00000020);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -464,8 +505,7 @@ public  final class RobotLocation extends
       if (other.hasLost()) {
         setLost(other.getLost());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -492,6 +532,7 @@ public  final class RobotLocation extends
     }
     private int bitField0_;
 
+    // optional float x = 1;
     private float x_ ;
     /**
      * <code>optional float x = 1;</code>
@@ -524,6 +565,7 @@ public  final class RobotLocation extends
       return this;
     }
 
+    // optional float y = 2;
     private float y_ ;
     /**
      * <code>optional float y = 2;</code>
@@ -556,6 +598,7 @@ public  final class RobotLocation extends
       return this;
     }
 
+    // optional float h = 3;
     private float h_ ;
     /**
      * <code>optional float h = 3;</code>
@@ -588,6 +631,7 @@ public  final class RobotLocation extends
       return this;
     }
 
+    // optional int64 timestamp = 4;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 4;</code>
@@ -620,6 +664,7 @@ public  final class RobotLocation extends
       return this;
     }
 
+    // optional float uncert = 5;
     private float uncert_ ;
     /**
      * <code>optional float uncert = 5;</code>
@@ -652,6 +697,7 @@ public  final class RobotLocation extends
       return this;
     }
 
+    // optional bool lost = 6;
     private boolean lost_ ;
     /**
      * <code>optional bool lost = 6;</code>
@@ -687,47 +733,11 @@ public  final class RobotLocation extends
     // @@protoc_insertion_point(builder_scope:messages.RobotLocation)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.RobotLocation)
-  private static final messages.RobotLocation DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.RobotLocation();
+    defaultInstance = new RobotLocation(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.RobotLocation getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<RobotLocation>
-      PARSER = new com.google.protobuf.AbstractParser<RobotLocation>() {
-    public RobotLocation parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new RobotLocation(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<RobotLocation> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<RobotLocation> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.RobotLocation getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.RobotLocation)
 }
 

@@ -7,34 +7,35 @@ package messages;
  * Protobuf type {@code messages.InertialState}
  */
 public  final class InertialState extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.InertialState)
-    InertialStateOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements InertialStateOrBuilder {
   // Use InertialState.newBuilder() to construct.
   private InertialState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private InertialState() {
-    accX_ = 0F;
-    accY_ = 0F;
-    accZ_ = 0F;
-    gyrX_ = 0F;
-    gyrY_ = 0F;
-    gyrZ_ = 0F;
-    angleX_ = 0F;
-    angleY_ = 0F;
-    angleZ_ = 0F;
+  private InertialState(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final InertialState defaultInstance;
+  public static InertialState getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public InertialState getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private InertialState(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -101,11 +102,10 @@ public  final class InertialState extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -123,7 +123,23 @@ public  final class InertialState extends
             messages.InertialState.class, messages.InertialState.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<InertialState> PARSER =
+      new com.google.protobuf.AbstractParser<InertialState>() {
+    public InertialState parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new InertialState(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<InertialState> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float acc_x = 1;
   public static final int ACC_X_FIELD_NUMBER = 1;
   private float accX_;
   /**
@@ -147,6 +163,7 @@ public  final class InertialState extends
     return accX_;
   }
 
+  // optional float acc_y = 2;
   public static final int ACC_Y_FIELD_NUMBER = 2;
   private float accY_;
   /**
@@ -162,6 +179,7 @@ public  final class InertialState extends
     return accY_;
   }
 
+  // optional float acc_z = 3;
   public static final int ACC_Z_FIELD_NUMBER = 3;
   private float accZ_;
   /**
@@ -177,6 +195,7 @@ public  final class InertialState extends
     return accZ_;
   }
 
+  // optional float gyr_x = 4;
   public static final int GYR_X_FIELD_NUMBER = 4;
   private float gyrX_;
   /**
@@ -200,6 +219,7 @@ public  final class InertialState extends
     return gyrX_;
   }
 
+  // optional float gyr_y = 5;
   public static final int GYR_Y_FIELD_NUMBER = 5;
   private float gyrY_;
   /**
@@ -215,6 +235,7 @@ public  final class InertialState extends
     return gyrY_;
   }
 
+  // optional float gyr_z = 6;
   public static final int GYR_Z_FIELD_NUMBER = 6;
   private float gyrZ_;
   /**
@@ -230,6 +251,7 @@ public  final class InertialState extends
     return gyrZ_;
   }
 
+  // optional float angle_x = 7;
   public static final int ANGLE_X_FIELD_NUMBER = 7;
   private float angleX_;
   /**
@@ -253,6 +275,7 @@ public  final class InertialState extends
     return angleX_;
   }
 
+  // optional float angle_y = 8;
   public static final int ANGLE_Y_FIELD_NUMBER = 8;
   private float angleY_;
   /**
@@ -268,6 +291,7 @@ public  final class InertialState extends
     return angleY_;
   }
 
+  // optional float angle_z = 9;
   public static final int ANGLE_Z_FIELD_NUMBER = 9;
   private float angleZ_;
   /**
@@ -283,11 +307,21 @@ public  final class InertialState extends
     return angleZ_;
   }
 
+  private void initFields() {
+    accX_ = 0F;
+    accY_ = 0F;
+    accZ_ = 0F;
+    gyrX_ = 0F;
+    gyrY_ = 0F;
+    gyrZ_ = 0F;
+    angleX_ = 0F;
+    angleY_ = 0F;
+    angleZ_ = 0F;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -295,6 +329,7 @@ public  final class InertialState extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, accX_);
     }
@@ -322,11 +357,12 @@ public  final class InertialState extends
     if (((bitField0_ & 0x00000100) == 0x00000100)) {
       output.writeFloat(9, angleZ_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -366,12 +402,18 @@ public  final class InertialState extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(9, angleZ_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.InertialState parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -425,17 +467,12 @@ public  final class InertialState extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.InertialState prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -447,9 +484,8 @@ public  final class InertialState extends
    * Protobuf type {@code messages.InertialState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.InertialState)
-      messages.InertialStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.InertialStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_InertialState.internal_static_messages_InertialState_descriptor;
@@ -476,6 +512,10 @@ public  final class InertialState extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       accX_ = 0F;
@@ -497,6 +537,10 @@ public  final class InertialState extends
       angleZ_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000100);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -599,8 +643,7 @@ public  final class InertialState extends
       if (other.hasAngleZ()) {
         setAngleZ(other.getAngleZ());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -627,6 +670,7 @@ public  final class InertialState extends
     }
     private int bitField0_;
 
+    // optional float acc_x = 1;
     private float accX_ ;
     /**
      * <code>optional float acc_x = 1;</code>
@@ -675,6 +719,7 @@ public  final class InertialState extends
       return this;
     }
 
+    // optional float acc_y = 2;
     private float accY_ ;
     /**
      * <code>optional float acc_y = 2;</code>
@@ -707,6 +752,7 @@ public  final class InertialState extends
       return this;
     }
 
+    // optional float acc_z = 3;
     private float accZ_ ;
     /**
      * <code>optional float acc_z = 3;</code>
@@ -739,6 +785,7 @@ public  final class InertialState extends
       return this;
     }
 
+    // optional float gyr_x = 4;
     private float gyrX_ ;
     /**
      * <code>optional float gyr_x = 4;</code>
@@ -787,6 +834,7 @@ public  final class InertialState extends
       return this;
     }
 
+    // optional float gyr_y = 5;
     private float gyrY_ ;
     /**
      * <code>optional float gyr_y = 5;</code>
@@ -819,6 +867,7 @@ public  final class InertialState extends
       return this;
     }
 
+    // optional float gyr_z = 6;
     private float gyrZ_ ;
     /**
      * <code>optional float gyr_z = 6;</code>
@@ -851,6 +900,7 @@ public  final class InertialState extends
       return this;
     }
 
+    // optional float angle_x = 7;
     private float angleX_ ;
     /**
      * <code>optional float angle_x = 7;</code>
@@ -899,6 +949,7 @@ public  final class InertialState extends
       return this;
     }
 
+    // optional float angle_y = 8;
     private float angleY_ ;
     /**
      * <code>optional float angle_y = 8;</code>
@@ -931,6 +982,7 @@ public  final class InertialState extends
       return this;
     }
 
+    // optional float angle_z = 9;
     private float angleZ_ ;
     /**
      * <code>optional float angle_z = 9;</code>
@@ -966,47 +1018,11 @@ public  final class InertialState extends
     // @@protoc_insertion_point(builder_scope:messages.InertialState)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.InertialState)
-  private static final messages.InertialState DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.InertialState();
+    defaultInstance = new InertialState(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.InertialState getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<InertialState>
-      PARSER = new com.google.protobuf.AbstractParser<InertialState>() {
-    public InertialState parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new InertialState(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<InertialState> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<InertialState> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.InertialState getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.InertialState)
 }
 

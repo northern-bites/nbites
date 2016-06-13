@@ -43,29 +43,29 @@ public final class _File_Obstacle {
       "SONARS\020\002\022\n\n\006VISION\020\003B\022B\016_File_ObstacleP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_messages_FieldObstacles_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_messages_FieldObstacles_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_FieldObstacles_descriptor,
+              new java.lang.String[] { "Obstacle", });
+          internal_static_messages_FieldObstacles_Obstacle_descriptor =
+            internal_static_messages_FieldObstacles_descriptor.getNestedTypes().get(0);
+          internal_static_messages_FieldObstacles_Obstacle_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_FieldObstacles_Obstacle_descriptor,
+              new java.lang.String[] { "Position", "Distance", "Detector", "ClosestY", "BoxBottom", "BoxLeft", "BoxRight", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_messages_FieldObstacles_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_FieldObstacles_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_FieldObstacles_descriptor,
-        new java.lang.String[] { "Obstacle", });
-    internal_static_messages_FieldObstacles_Obstacle_descriptor =
-      internal_static_messages_FieldObstacles_descriptor.getNestedTypes().get(0);
-    internal_static_messages_FieldObstacles_Obstacle_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_FieldObstacles_Obstacle_descriptor,
-        new java.lang.String[] { "Position", "Distance", "Detector", "ClosestY", "BoxBottom", "BoxLeft", "BoxRight", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

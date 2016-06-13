@@ -7,28 +7,35 @@ package messages;
  * Protobuf type {@code messages.WalkCommand}
  */
 public  final class WalkCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.WalkCommand)
-    WalkCommandOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements WalkCommandOrBuilder {
   // Use WalkCommand.newBuilder() to construct.
   private WalkCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private WalkCommand() {
-    xPercent_ = 0F;
-    yPercent_ = 0F;
-    hPercent_ = 0F;
+  private WalkCommand(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final WalkCommand defaultInstance;
+  public static WalkCommand getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public WalkCommand getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private WalkCommand(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -65,11 +72,10 @@ public  final class WalkCommand extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -87,7 +93,23 @@ public  final class WalkCommand extends
             messages.WalkCommand.class, messages.WalkCommand.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<WalkCommand> PARSER =
+      new com.google.protobuf.AbstractParser<WalkCommand>() {
+    public WalkCommand parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new WalkCommand(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<WalkCommand> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float x_percent = 1;
   public static final int X_PERCENT_FIELD_NUMBER = 1;
   private float xPercent_;
   /**
@@ -103,6 +125,7 @@ public  final class WalkCommand extends
     return xPercent_;
   }
 
+  // optional float y_percent = 2;
   public static final int Y_PERCENT_FIELD_NUMBER = 2;
   private float yPercent_;
   /**
@@ -118,6 +141,7 @@ public  final class WalkCommand extends
     return yPercent_;
   }
 
+  // optional float h_percent = 3;
   public static final int H_PERCENT_FIELD_NUMBER = 3;
   private float hPercent_;
   /**
@@ -133,11 +157,15 @@ public  final class WalkCommand extends
     return hPercent_;
   }
 
+  private void initFields() {
+    xPercent_ = 0F;
+    yPercent_ = 0F;
+    hPercent_ = 0F;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -145,6 +173,7 @@ public  final class WalkCommand extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, xPercent_);
     }
@@ -154,11 +183,12 @@ public  final class WalkCommand extends
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       output.writeFloat(3, hPercent_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -174,12 +204,18 @@ public  final class WalkCommand extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(3, hPercent_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.WalkCommand parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -233,17 +269,12 @@ public  final class WalkCommand extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.WalkCommand prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -255,9 +286,8 @@ public  final class WalkCommand extends
    * Protobuf type {@code messages.WalkCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.WalkCommand)
-      messages.WalkCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.WalkCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_WalkCommand_descriptor;
@@ -284,6 +314,10 @@ public  final class WalkCommand extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       xPercent_ = 0F;
@@ -293,6 +327,10 @@ public  final class WalkCommand extends
       hPercent_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000004);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -353,8 +391,7 @@ public  final class WalkCommand extends
       if (other.hasHPercent()) {
         setHPercent(other.getHPercent());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -381,6 +418,7 @@ public  final class WalkCommand extends
     }
     private int bitField0_;
 
+    // optional float x_percent = 1;
     private float xPercent_ ;
     /**
      * <code>optional float x_percent = 1;</code>
@@ -413,6 +451,7 @@ public  final class WalkCommand extends
       return this;
     }
 
+    // optional float y_percent = 2;
     private float yPercent_ ;
     /**
      * <code>optional float y_percent = 2;</code>
@@ -445,6 +484,7 @@ public  final class WalkCommand extends
       return this;
     }
 
+    // optional float h_percent = 3;
     private float hPercent_ ;
     /**
      * <code>optional float h_percent = 3;</code>
@@ -480,47 +520,11 @@ public  final class WalkCommand extends
     // @@protoc_insertion_point(builder_scope:messages.WalkCommand)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.WalkCommand)
-  private static final messages.WalkCommand DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.WalkCommand();
+    defaultInstance = new WalkCommand(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.WalkCommand getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<WalkCommand>
-      PARSER = new com.google.protobuf.AbstractParser<WalkCommand>() {
-    public WalkCommand parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new WalkCommand(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<WalkCommand> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<WalkCommand> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.WalkCommand getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.WalkCommand)
 }
 

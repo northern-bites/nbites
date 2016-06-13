@@ -7,27 +7,35 @@ package messages;
  * Protobuf type {@code messages.MotionKick}
  */
 public  final class MotionKick extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.MotionKick)
-    MotionKickOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements MotionKickOrBuilder {
   // Use MotionKick.newBuilder() to construct.
   private MotionKick(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private MotionKick() {
-    performMotionKick_ = false;
-    kickType_ = 0;
+  private MotionKick(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final MotionKick defaultInstance;
+  public static MotionKick getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public MotionKick getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private MotionKick(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -59,11 +67,10 @@ public  final class MotionKick extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -81,7 +88,23 @@ public  final class MotionKick extends
             messages.MotionKick.class, messages.MotionKick.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<MotionKick> PARSER =
+      new com.google.protobuf.AbstractParser<MotionKick>() {
+    public MotionKick parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new MotionKick(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<MotionKick> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional bool perform_motion_kick = 1;
   public static final int PERFORM_MOTION_KICK_FIELD_NUMBER = 1;
   private boolean performMotionKick_;
   /**
@@ -97,6 +120,7 @@ public  final class MotionKick extends
     return performMotionKick_;
   }
 
+  // optional int32 kick_type = 2;
   public static final int KICK_TYPE_FIELD_NUMBER = 2;
   private int kickType_;
   /**
@@ -112,11 +136,14 @@ public  final class MotionKick extends
     return kickType_;
   }
 
+  private void initFields() {
+    performMotionKick_ = false;
+    kickType_ = 0;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -124,17 +151,19 @@ public  final class MotionKick extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, performMotionKick_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeInt32(2, kickType_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -146,12 +175,18 @@ public  final class MotionKick extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(2, kickType_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.MotionKick parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -205,17 +240,12 @@ public  final class MotionKick extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.MotionKick prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -227,9 +257,8 @@ public  final class MotionKick extends
    * Protobuf type {@code messages.MotionKick}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.MotionKick)
-      messages.MotionKickOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.MotionKickOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_MotionKick_descriptor;
@@ -256,6 +285,10 @@ public  final class MotionKick extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       performMotionKick_ = false;
@@ -263,6 +296,10 @@ public  final class MotionKick extends
       kickType_ = 0;
       bitField0_ = (bitField0_ & ~0x00000002);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -316,8 +353,7 @@ public  final class MotionKick extends
       if (other.hasKickType()) {
         setKickType(other.getKickType());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -344,6 +380,7 @@ public  final class MotionKick extends
     }
     private int bitField0_;
 
+    // optional bool perform_motion_kick = 1;
     private boolean performMotionKick_ ;
     /**
      * <code>optional bool perform_motion_kick = 1;</code>
@@ -376,6 +413,7 @@ public  final class MotionKick extends
       return this;
     }
 
+    // optional int32 kick_type = 2;
     private int kickType_ ;
     /**
      * <code>optional int32 kick_type = 2;</code>
@@ -411,47 +449,11 @@ public  final class MotionKick extends
     // @@protoc_insertion_point(builder_scope:messages.MotionKick)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.MotionKick)
-  private static final messages.MotionKick DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.MotionKick();
+    defaultInstance = new MotionKick(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.MotionKick getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<MotionKick>
-      PARSER = new com.google.protobuf.AbstractParser<MotionKick>() {
-    public MotionKick parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new MotionKick(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<MotionKick> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<MotionKick> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.MotionKick getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.MotionKick)
 }
 

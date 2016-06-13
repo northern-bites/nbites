@@ -7,26 +7,35 @@ package messages;
  * Protobuf type {@code messages.StiffStatus}
  */
 public  final class StiffStatus extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.StiffStatus)
-    StiffStatusOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements StiffStatusOrBuilder {
   // Use StiffStatus.newBuilder() to construct.
   private StiffStatus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private StiffStatus() {
-    on_ = false;
+  private StiffStatus(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final StiffStatus defaultInstance;
+  public static StiffStatus getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public StiffStatus getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private StiffStatus(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -53,11 +62,10 @@ public  final class StiffStatus extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -75,7 +83,23 @@ public  final class StiffStatus extends
             messages.StiffStatus.class, messages.StiffStatus.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<StiffStatus> PARSER =
+      new com.google.protobuf.AbstractParser<StiffStatus>() {
+    public StiffStatus parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new StiffStatus(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<StiffStatus> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional bool on = 1;
   public static final int ON_FIELD_NUMBER = 1;
   private boolean on_;
   /**
@@ -91,11 +115,13 @@ public  final class StiffStatus extends
     return on_;
   }
 
+  private void initFields() {
+    on_ = false;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -103,14 +129,16 @@ public  final class StiffStatus extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, on_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -118,12 +146,18 @@ public  final class StiffStatus extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(1, on_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.StiffStatus parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -177,17 +211,12 @@ public  final class StiffStatus extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.StiffStatus prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -199,9 +228,8 @@ public  final class StiffStatus extends
    * Protobuf type {@code messages.StiffStatus}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.StiffStatus)
-      messages.StiffStatusOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.StiffStatusOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_StiffnessControl.internal_static_messages_StiffStatus_descriptor;
@@ -228,11 +256,19 @@ public  final class StiffStatus extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       on_ = false;
       bitField0_ = (bitField0_ & ~0x00000001);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -279,8 +315,7 @@ public  final class StiffStatus extends
       if (other.hasOn()) {
         setOn(other.getOn());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -307,6 +342,7 @@ public  final class StiffStatus extends
     }
     private int bitField0_;
 
+    // optional bool on = 1;
     private boolean on_ ;
     /**
      * <code>optional bool on = 1;</code>
@@ -342,47 +378,11 @@ public  final class StiffStatus extends
     // @@protoc_insertion_point(builder_scope:messages.StiffStatus)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.StiffStatus)
-  private static final messages.StiffStatus DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.StiffStatus();
+    defaultInstance = new StiffStatus(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.StiffStatus getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<StiffStatus>
-      PARSER = new com.google.protobuf.AbstractParser<StiffStatus>() {
-    public StiffStatus parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new StiffStatus(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<StiffStatus> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<StiffStatus> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.StiffStatus getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.StiffStatus)
 }
 

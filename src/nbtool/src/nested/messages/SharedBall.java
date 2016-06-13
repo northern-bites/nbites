@@ -7,29 +7,35 @@ package messages;
  * Protobuf type {@code messages.SharedBall}
  */
 public  final class SharedBall extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.SharedBall)
-    SharedBallOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements SharedBallOrBuilder {
   // Use SharedBall.newBuilder() to construct.
   private SharedBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private SharedBall() {
-    x_ = 0F;
-    y_ = 0F;
-    ballOn_ = false;
-    reliability_ = 0;
+  private SharedBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final SharedBall defaultInstance;
+  public static SharedBall getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public SharedBall getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private SharedBall(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -71,11 +77,10 @@ public  final class SharedBall extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -93,7 +98,23 @@ public  final class SharedBall extends
             messages.SharedBall.class, messages.SharedBall.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<SharedBall> PARSER =
+      new com.google.protobuf.AbstractParser<SharedBall>() {
+    public SharedBall parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new SharedBall(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<SharedBall> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float x = 1;
   public static final int X_FIELD_NUMBER = 1;
   private float x_;
   /**
@@ -109,6 +130,7 @@ public  final class SharedBall extends
     return x_;
   }
 
+  // optional float y = 2;
   public static final int Y_FIELD_NUMBER = 2;
   private float y_;
   /**
@@ -124,6 +146,7 @@ public  final class SharedBall extends
     return y_;
   }
 
+  // optional bool ball_on = 3;
   public static final int BALL_ON_FIELD_NUMBER = 3;
   private boolean ballOn_;
   /**
@@ -139,6 +162,7 @@ public  final class SharedBall extends
     return ballOn_;
   }
 
+  // optional int32 reliability = 4;
   public static final int RELIABILITY_FIELD_NUMBER = 4;
   private int reliability_;
   /**
@@ -154,11 +178,16 @@ public  final class SharedBall extends
     return reliability_;
   }
 
+  private void initFields() {
+    x_ = 0F;
+    y_ = 0F;
+    ballOn_ = false;
+    reliability_ = 0;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -166,6 +195,7 @@ public  final class SharedBall extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, x_);
     }
@@ -178,11 +208,12 @@ public  final class SharedBall extends
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeInt32(4, reliability_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -202,12 +233,18 @@ public  final class SharedBall extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(4, reliability_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.SharedBall parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -261,17 +298,12 @@ public  final class SharedBall extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.SharedBall prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -283,9 +315,8 @@ public  final class SharedBall extends
    * Protobuf type {@code messages.SharedBall}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.SharedBall)
-      messages.SharedBallOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.SharedBallOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_SharedBall_descriptor;
@@ -312,6 +343,10 @@ public  final class SharedBall extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       x_ = 0F;
@@ -323,6 +358,10 @@ public  final class SharedBall extends
       reliability_ = 0;
       bitField0_ = (bitField0_ & ~0x00000008);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -390,8 +429,7 @@ public  final class SharedBall extends
       if (other.hasReliability()) {
         setReliability(other.getReliability());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -418,6 +456,7 @@ public  final class SharedBall extends
     }
     private int bitField0_;
 
+    // optional float x = 1;
     private float x_ ;
     /**
      * <code>optional float x = 1;</code>
@@ -450,6 +489,7 @@ public  final class SharedBall extends
       return this;
     }
 
+    // optional float y = 2;
     private float y_ ;
     /**
      * <code>optional float y = 2;</code>
@@ -482,6 +522,7 @@ public  final class SharedBall extends
       return this;
     }
 
+    // optional bool ball_on = 3;
     private boolean ballOn_ ;
     /**
      * <code>optional bool ball_on = 3;</code>
@@ -514,6 +555,7 @@ public  final class SharedBall extends
       return this;
     }
 
+    // optional int32 reliability = 4;
     private int reliability_ ;
     /**
      * <code>optional int32 reliability = 4;</code>
@@ -549,47 +591,11 @@ public  final class SharedBall extends
     // @@protoc_insertion_point(builder_scope:messages.SharedBall)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.SharedBall)
-  private static final messages.SharedBall DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.SharedBall();
+    defaultInstance = new SharedBall(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.SharedBall getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<SharedBall>
-      PARSER = new com.google.protobuf.AbstractParser<SharedBall>() {
-    public SharedBall parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new SharedBall(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<SharedBall> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<SharedBall> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.SharedBall getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.SharedBall)
 }
 

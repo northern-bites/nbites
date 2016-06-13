@@ -7,36 +7,35 @@ package messages;
  * Protobuf type {@code messages.Robot}
  */
 public  final class Robot extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Robot)
-    RobotOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements RobotOrBuilder {
   // Use Robot.newBuilder() to construct.
   private Robot(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private Robot() {
-    distance_ = 0F;
-    bearing_ = 0F;
-    bearingDeg_ = 0F;
-    angleXDeg_ = 0F;
-    angleYDeg_ = 0F;
-    x_ = 0;
-    y_ = 0;
-    elevationDeg_ = 0F;
-    on_ = false;
-    height_ = 0;
-    width_ = 0;
+  private Robot(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final Robot defaultInstance;
+  public static Robot getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public Robot getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private Robot(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -113,11 +112,10 @@ public  final class Robot extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -135,7 +133,23 @@ public  final class Robot extends
             messages.Robot.class, messages.Robot.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<Robot> PARSER =
+      new com.google.protobuf.AbstractParser<Robot>() {
+    public Robot parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new Robot(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<Robot> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float distance = 1;
   public static final int DISTANCE_FIELD_NUMBER = 1;
   private float distance_;
   /**
@@ -151,6 +165,7 @@ public  final class Robot extends
     return distance_;
   }
 
+  // optional float bearing = 2;
   public static final int BEARING_FIELD_NUMBER = 2;
   private float bearing_;
   /**
@@ -166,6 +181,7 @@ public  final class Robot extends
     return bearing_;
   }
 
+  // optional float bearing_deg = 3;
   public static final int BEARING_DEG_FIELD_NUMBER = 3;
   private float bearingDeg_;
   /**
@@ -181,6 +197,7 @@ public  final class Robot extends
     return bearingDeg_;
   }
 
+  // optional float angle_x_deg = 4;
   public static final int ANGLE_X_DEG_FIELD_NUMBER = 4;
   private float angleXDeg_;
   /**
@@ -196,6 +213,7 @@ public  final class Robot extends
     return angleXDeg_;
   }
 
+  // optional float angle_y_deg = 5;
   public static final int ANGLE_Y_DEG_FIELD_NUMBER = 5;
   private float angleYDeg_;
   /**
@@ -211,6 +229,7 @@ public  final class Robot extends
     return angleYDeg_;
   }
 
+  // optional sint32 x = 6;
   public static final int X_FIELD_NUMBER = 6;
   private int x_;
   /**
@@ -226,6 +245,7 @@ public  final class Robot extends
     return x_;
   }
 
+  // optional sint32 y = 7;
   public static final int Y_FIELD_NUMBER = 7;
   private int y_;
   /**
@@ -241,6 +261,7 @@ public  final class Robot extends
     return y_;
   }
 
+  // optional float elevation_deg = 8;
   public static final int ELEVATION_DEG_FIELD_NUMBER = 8;
   private float elevationDeg_;
   /**
@@ -256,6 +277,7 @@ public  final class Robot extends
     return elevationDeg_;
   }
 
+  // optional bool on = 9;
   public static final int ON_FIELD_NUMBER = 9;
   private boolean on_;
   /**
@@ -271,6 +293,7 @@ public  final class Robot extends
     return on_;
   }
 
+  // optional sint32 height = 10;
   public static final int HEIGHT_FIELD_NUMBER = 10;
   private int height_;
   /**
@@ -286,6 +309,7 @@ public  final class Robot extends
     return height_;
   }
 
+  // optional sint32 width = 11;
   public static final int WIDTH_FIELD_NUMBER = 11;
   private int width_;
   /**
@@ -301,11 +325,23 @@ public  final class Robot extends
     return width_;
   }
 
+  private void initFields() {
+    distance_ = 0F;
+    bearing_ = 0F;
+    bearingDeg_ = 0F;
+    angleXDeg_ = 0F;
+    angleYDeg_ = 0F;
+    x_ = 0;
+    y_ = 0;
+    elevationDeg_ = 0F;
+    on_ = false;
+    height_ = 0;
+    width_ = 0;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -313,6 +349,7 @@ public  final class Robot extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, distance_);
     }
@@ -346,11 +383,12 @@ public  final class Robot extends
     if (((bitField0_ & 0x00000400) == 0x00000400)) {
       output.writeSInt32(11, width_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -398,12 +436,18 @@ public  final class Robot extends
       size += com.google.protobuf.CodedOutputStream
         .computeSInt32Size(11, width_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.Robot parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -457,17 +501,12 @@ public  final class Robot extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.Robot prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -479,9 +518,8 @@ public  final class Robot extends
    * Protobuf type {@code messages.Robot}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Robot)
-      messages.RobotOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.RobotOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionRobot.internal_static_messages_Robot_descriptor;
@@ -508,6 +546,10 @@ public  final class Robot extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       distance_ = 0F;
@@ -533,6 +575,10 @@ public  final class Robot extends
       width_ = 0;
       bitField0_ = (bitField0_ & ~0x00000400);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -649,8 +695,7 @@ public  final class Robot extends
       if (other.hasWidth()) {
         setWidth(other.getWidth());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -677,6 +722,7 @@ public  final class Robot extends
     }
     private int bitField0_;
 
+    // optional float distance = 1;
     private float distance_ ;
     /**
      * <code>optional float distance = 1;</code>
@@ -709,6 +755,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional float bearing = 2;
     private float bearing_ ;
     /**
      * <code>optional float bearing = 2;</code>
@@ -741,6 +788,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional float bearing_deg = 3;
     private float bearingDeg_ ;
     /**
      * <code>optional float bearing_deg = 3;</code>
@@ -773,6 +821,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional float angle_x_deg = 4;
     private float angleXDeg_ ;
     /**
      * <code>optional float angle_x_deg = 4;</code>
@@ -805,6 +854,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional float angle_y_deg = 5;
     private float angleYDeg_ ;
     /**
      * <code>optional float angle_y_deg = 5;</code>
@@ -837,6 +887,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional sint32 x = 6;
     private int x_ ;
     /**
      * <code>optional sint32 x = 6;</code>
@@ -869,6 +920,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional sint32 y = 7;
     private int y_ ;
     /**
      * <code>optional sint32 y = 7;</code>
@@ -901,6 +953,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional float elevation_deg = 8;
     private float elevationDeg_ ;
     /**
      * <code>optional float elevation_deg = 8;</code>
@@ -933,6 +986,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional bool on = 9;
     private boolean on_ ;
     /**
      * <code>optional bool on = 9;</code>
@@ -965,6 +1019,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional sint32 height = 10;
     private int height_ ;
     /**
      * <code>optional sint32 height = 10;</code>
@@ -997,6 +1052,7 @@ public  final class Robot extends
       return this;
     }
 
+    // optional sint32 width = 11;
     private int width_ ;
     /**
      * <code>optional sint32 width = 11;</code>
@@ -1032,47 +1088,11 @@ public  final class Robot extends
     // @@protoc_insertion_point(builder_scope:messages.Robot)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.Robot)
-  private static final messages.Robot DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.Robot();
+    defaultInstance = new Robot(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.Robot getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<Robot>
-      PARSER = new com.google.protobuf.AbstractParser<Robot>() {
-    public Robot parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new Robot(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<Robot> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<Robot> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.Robot getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.Robot)
 }
 

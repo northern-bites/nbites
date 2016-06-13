@@ -61,43 +61,42 @@ public final class _File_Motion {
       "_MotionP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_messages_WalkProvider_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_messages_WalkProvider_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_WalkProvider_descriptor,
+              new java.lang.String[] { "Active", "IsWalking", "Stopping", "RequestedToStop", "IsStanding", "Calibrated", "CommandType", "Bhdebug", });
+          internal_static_messages_WalkProvider_BHDebug_descriptor =
+            internal_static_messages_WalkProvider_descriptor.getNestedTypes().get(0);
+          internal_static_messages_WalkProvider_BHDebug_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_WalkProvider_BHDebug_descriptor,
+              new java.lang.String[] { "MotionType", "MotionName", "SelectedMotionType", "SelectedMotionName", "Target", "Speeds", "SelectRatios", "GroundContactSafe", "Instable", });
+          internal_static_messages_ScriptedProvider_descriptor =
+            getDescriptor().getMessageTypes().get(1);
+          internal_static_messages_ScriptedProvider_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_ScriptedProvider_descriptor,
+              new java.lang.String[] { "Active", "Stopping", });
+          internal_static_messages_Motion_descriptor =
+            getDescriptor().getMessageTypes().get(2);
+          internal_static_messages_Motion_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_Motion_descriptor,
+              new java.lang.String[] { "Timestamp", "CurrentBodyProvider", "NextBodyProvider", "Odometry", "WalkProvider", "ScriptedProvider", "SupportFoot", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           messages._File_RobotLocation.getDescriptor(),
         }, assigner);
-    internal_static_messages_WalkProvider_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_WalkProvider_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_WalkProvider_descriptor,
-        new java.lang.String[] { "Active", "IsWalking", "Stopping", "RequestedToStop", "IsStanding", "Calibrated", "CommandType", "Bhdebug", });
-    internal_static_messages_WalkProvider_BHDebug_descriptor =
-      internal_static_messages_WalkProvider_descriptor.getNestedTypes().get(0);
-    internal_static_messages_WalkProvider_BHDebug_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_WalkProvider_BHDebug_descriptor,
-        new java.lang.String[] { "MotionType", "MotionName", "SelectedMotionType", "SelectedMotionName", "Target", "Speeds", "SelectRatios", "GroundContactSafe", "Instable", });
-    internal_static_messages_ScriptedProvider_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_messages_ScriptedProvider_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_ScriptedProvider_descriptor,
-        new java.lang.String[] { "Active", "Stopping", });
-    internal_static_messages_Motion_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_messages_Motion_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_Motion_descriptor,
-        new java.lang.String[] { "Timestamp", "CurrentBodyProvider", "NextBodyProvider", "Odometry", "WalkProvider", "ScriptedProvider", "SupportFoot", });
-    messages._File_RobotLocation.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

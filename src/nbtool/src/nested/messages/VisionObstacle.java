@@ -7,37 +7,35 @@ package messages;
  * Protobuf type {@code messages.VisionObstacle}
  */
 public  final class VisionObstacle extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.VisionObstacle)
-    VisionObstacleOrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements VisionObstacleOrBuilder {
   // Use VisionObstacle.newBuilder() to construct.
   private VisionObstacle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private VisionObstacle() {
-    onLeft_ = false;
-    onRight_ = false;
-    offField_ = false;
-    blockLeft_ = 0;
-    blockMid_ = 0;
-    blockRight_ = 0;
-    leftDist_ = 0F;
-    midDist_ = 0F;
-    rightDist_ = 0F;
-    leftBearing_ = 0F;
-    midBearing_ = 0F;
-    rightBearing_ = 0F;
+  private VisionObstacle(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final VisionObstacle defaultInstance;
+  public static VisionObstacle getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public VisionObstacle getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private VisionObstacle(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -119,11 +117,10 @@ public  final class VisionObstacle extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -141,7 +138,23 @@ public  final class VisionObstacle extends
             messages.VisionObstacle.class, messages.VisionObstacle.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<VisionObstacle> PARSER =
+      new com.google.protobuf.AbstractParser<VisionObstacle>() {
+    public VisionObstacle parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new VisionObstacle(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<VisionObstacle> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional bool on_left = 1;
   public static final int ON_LEFT_FIELD_NUMBER = 1;
   private boolean onLeft_;
   /**
@@ -157,6 +170,7 @@ public  final class VisionObstacle extends
     return onLeft_;
   }
 
+  // optional bool on_right = 2;
   public static final int ON_RIGHT_FIELD_NUMBER = 2;
   private boolean onRight_;
   /**
@@ -172,6 +186,7 @@ public  final class VisionObstacle extends
     return onRight_;
   }
 
+  // optional bool off_field = 3;
   public static final int OFF_FIELD_FIELD_NUMBER = 3;
   private boolean offField_;
   /**
@@ -187,6 +202,7 @@ public  final class VisionObstacle extends
     return offField_;
   }
 
+  // optional sint32 block_left = 4;
   public static final int BLOCK_LEFT_FIELD_NUMBER = 4;
   private int blockLeft_;
   /**
@@ -202,6 +218,7 @@ public  final class VisionObstacle extends
     return blockLeft_;
   }
 
+  // optional sint32 block_mid = 5;
   public static final int BLOCK_MID_FIELD_NUMBER = 5;
   private int blockMid_;
   /**
@@ -217,6 +234,7 @@ public  final class VisionObstacle extends
     return blockMid_;
   }
 
+  // optional sint32 block_right = 6;
   public static final int BLOCK_RIGHT_FIELD_NUMBER = 6;
   private int blockRight_;
   /**
@@ -232,6 +250,7 @@ public  final class VisionObstacle extends
     return blockRight_;
   }
 
+  // optional float left_dist = 7;
   public static final int LEFT_DIST_FIELD_NUMBER = 7;
   private float leftDist_;
   /**
@@ -247,6 +266,7 @@ public  final class VisionObstacle extends
     return leftDist_;
   }
 
+  // optional float mid_dist = 8;
   public static final int MID_DIST_FIELD_NUMBER = 8;
   private float midDist_;
   /**
@@ -262,6 +282,7 @@ public  final class VisionObstacle extends
     return midDist_;
   }
 
+  // optional float right_dist = 9;
   public static final int RIGHT_DIST_FIELD_NUMBER = 9;
   private float rightDist_;
   /**
@@ -277,6 +298,7 @@ public  final class VisionObstacle extends
     return rightDist_;
   }
 
+  // optional float left_bearing = 10;
   public static final int LEFT_BEARING_FIELD_NUMBER = 10;
   private float leftBearing_;
   /**
@@ -292,6 +314,7 @@ public  final class VisionObstacle extends
     return leftBearing_;
   }
 
+  // optional float mid_bearing = 11;
   public static final int MID_BEARING_FIELD_NUMBER = 11;
   private float midBearing_;
   /**
@@ -307,6 +330,7 @@ public  final class VisionObstacle extends
     return midBearing_;
   }
 
+  // optional float right_bearing = 12;
   public static final int RIGHT_BEARING_FIELD_NUMBER = 12;
   private float rightBearing_;
   /**
@@ -322,11 +346,24 @@ public  final class VisionObstacle extends
     return rightBearing_;
   }
 
+  private void initFields() {
+    onLeft_ = false;
+    onRight_ = false;
+    offField_ = false;
+    blockLeft_ = 0;
+    blockMid_ = 0;
+    blockRight_ = 0;
+    leftDist_ = 0F;
+    midDist_ = 0F;
+    rightDist_ = 0F;
+    leftBearing_ = 0F;
+    midBearing_ = 0F;
+    rightBearing_ = 0F;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -334,6 +371,7 @@ public  final class VisionObstacle extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, onLeft_);
     }
@@ -370,11 +408,12 @@ public  final class VisionObstacle extends
     if (((bitField0_ & 0x00000800) == 0x00000800)) {
       output.writeFloat(12, rightBearing_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -426,12 +465,18 @@ public  final class VisionObstacle extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(12, rightBearing_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.VisionObstacle parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -485,17 +530,12 @@ public  final class VisionObstacle extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.VisionObstacle prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -507,9 +547,8 @@ public  final class VisionObstacle extends
    * Protobuf type {@code messages.VisionObstacle}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.VisionObstacle)
-      messages.VisionObstacleOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.VisionObstacleOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionRobot.internal_static_messages_VisionObstacle_descriptor;
@@ -536,6 +575,10 @@ public  final class VisionObstacle extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       onLeft_ = false;
@@ -563,6 +606,10 @@ public  final class VisionObstacle extends
       rightBearing_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000800);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -686,8 +733,7 @@ public  final class VisionObstacle extends
       if (other.hasRightBearing()) {
         setRightBearing(other.getRightBearing());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -714,6 +760,7 @@ public  final class VisionObstacle extends
     }
     private int bitField0_;
 
+    // optional bool on_left = 1;
     private boolean onLeft_ ;
     /**
      * <code>optional bool on_left = 1;</code>
@@ -746,6 +793,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional bool on_right = 2;
     private boolean onRight_ ;
     /**
      * <code>optional bool on_right = 2;</code>
@@ -778,6 +826,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional bool off_field = 3;
     private boolean offField_ ;
     /**
      * <code>optional bool off_field = 3;</code>
@@ -810,6 +859,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional sint32 block_left = 4;
     private int blockLeft_ ;
     /**
      * <code>optional sint32 block_left = 4;</code>
@@ -842,6 +892,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional sint32 block_mid = 5;
     private int blockMid_ ;
     /**
      * <code>optional sint32 block_mid = 5;</code>
@@ -874,6 +925,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional sint32 block_right = 6;
     private int blockRight_ ;
     /**
      * <code>optional sint32 block_right = 6;</code>
@@ -906,6 +958,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional float left_dist = 7;
     private float leftDist_ ;
     /**
      * <code>optional float left_dist = 7;</code>
@@ -938,6 +991,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional float mid_dist = 8;
     private float midDist_ ;
     /**
      * <code>optional float mid_dist = 8;</code>
@@ -970,6 +1024,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional float right_dist = 9;
     private float rightDist_ ;
     /**
      * <code>optional float right_dist = 9;</code>
@@ -1002,6 +1057,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional float left_bearing = 10;
     private float leftBearing_ ;
     /**
      * <code>optional float left_bearing = 10;</code>
@@ -1034,6 +1090,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional float mid_bearing = 11;
     private float midBearing_ ;
     /**
      * <code>optional float mid_bearing = 11;</code>
@@ -1066,6 +1123,7 @@ public  final class VisionObstacle extends
       return this;
     }
 
+    // optional float right_bearing = 12;
     private float rightBearing_ ;
     /**
      * <code>optional float right_bearing = 12;</code>
@@ -1101,47 +1159,11 @@ public  final class VisionObstacle extends
     // @@protoc_insertion_point(builder_scope:messages.VisionObstacle)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.VisionObstacle)
-  private static final messages.VisionObstacle DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.VisionObstacle();
+    defaultInstance = new VisionObstacle(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.VisionObstacle getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<VisionObstacle>
-      PARSER = new com.google.protobuf.AbstractParser<VisionObstacle>() {
-    public VisionObstacle parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new VisionObstacle(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<VisionObstacle> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<VisionObstacle> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.VisionObstacle getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.VisionObstacle)
 }
 

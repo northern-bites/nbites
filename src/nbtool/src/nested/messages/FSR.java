@@ -7,33 +7,35 @@ package messages;
  * Protobuf type {@code messages.FSR}
  */
 public  final class FSR extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.FSR)
-    FSROrBuilder {
+    com.google.protobuf.GeneratedMessage
+    implements FSROrBuilder {
   // Use FSR.newBuilder() to construct.
   private FSR(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
+    this.unknownFields = builder.getUnknownFields();
   }
-  private FSR() {
-    lfl_ = 0F;
-    lfr_ = 0F;
-    lrl_ = 0F;
-    lrr_ = 0F;
-    rfl_ = 0F;
-    rfr_ = 0F;
-    rrl_ = 0F;
-    rrr_ = 0F;
+  private FSR(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+  private static final FSR defaultInstance;
+  public static FSR getDefaultInstance() {
+    return defaultInstance;
   }
 
+  public FSR getDefaultInstanceForType() {
+    return defaultInstance;
+  }
+
+  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
+      getUnknownFields() {
     return this.unknownFields;
   }
   private FSR(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-    this();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    initFields();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -95,11 +97,10 @@ public  final class FSR extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw new RuntimeException(e.setUnfinishedMessage(this));
+      throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
-      throw new RuntimeException(
-          new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this));
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e.getMessage()).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -117,7 +118,23 @@ public  final class FSR extends
             messages.FSR.class, messages.FSR.Builder.class);
   }
 
+  public static com.google.protobuf.Parser<FSR> PARSER =
+      new com.google.protobuf.AbstractParser<FSR>() {
+    public FSR parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new FSR(input, extensionRegistry);
+    }
+  };
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<FSR> getParserForType() {
+    return PARSER;
+  }
+
   private int bitField0_;
+  // optional float lfl = 1;
   public static final int LFL_FIELD_NUMBER = 1;
   private float lfl_;
   /**
@@ -141,6 +158,7 @@ public  final class FSR extends
     return lfl_;
   }
 
+  // optional float lfr = 2;
   public static final int LFR_FIELD_NUMBER = 2;
   private float lfr_;
   /**
@@ -164,6 +182,7 @@ public  final class FSR extends
     return lfr_;
   }
 
+  // optional float lrl = 3;
   public static final int LRL_FIELD_NUMBER = 3;
   private float lrl_;
   /**
@@ -187,6 +206,7 @@ public  final class FSR extends
     return lrl_;
   }
 
+  // optional float lrr = 4;
   public static final int LRR_FIELD_NUMBER = 4;
   private float lrr_;
   /**
@@ -210,6 +230,7 @@ public  final class FSR extends
     return lrr_;
   }
 
+  // optional float rfl = 5;
   public static final int RFL_FIELD_NUMBER = 5;
   private float rfl_;
   /**
@@ -233,6 +254,7 @@ public  final class FSR extends
     return rfl_;
   }
 
+  // optional float rfr = 6;
   public static final int RFR_FIELD_NUMBER = 6;
   private float rfr_;
   /**
@@ -256,6 +278,7 @@ public  final class FSR extends
     return rfr_;
   }
 
+  // optional float rrl = 7;
   public static final int RRL_FIELD_NUMBER = 7;
   private float rrl_;
   /**
@@ -279,6 +302,7 @@ public  final class FSR extends
     return rrl_;
   }
 
+  // optional float rrr = 8;
   public static final int RRR_FIELD_NUMBER = 8;
   private float rrr_;
   /**
@@ -302,11 +326,20 @@ public  final class FSR extends
     return rrr_;
   }
 
+  private void initFields() {
+    lfl_ = 0F;
+    lfr_ = 0F;
+    lrl_ = 0F;
+    lrr_ = 0F;
+    rfl_ = 0F;
+    rfr_ = 0F;
+    rrl_ = 0F;
+    rrr_ = 0F;
+  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -314,6 +347,7 @@ public  final class FSR extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, lfl_);
     }
@@ -338,11 +372,12 @@ public  final class FSR extends
     if (((bitField0_ & 0x00000080) == 0x00000080)) {
       output.writeFloat(8, rrr_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
+  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSize;
+    int size = memoizedSerializedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -378,12 +413,18 @@ public  final class FSR extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(8, rrr_);
     }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
+    size += getUnknownFields().getSerializedSize();
+    memoizedSerializedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
+  @java.lang.Override
+  protected java.lang.Object writeReplace()
+      throws java.io.ObjectStreamException {
+    return super.writeReplace();
+  }
+
   public static messages.FSR parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -437,17 +478,12 @@ public  final class FSR extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
+  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
   public static Builder newBuilder(messages.FSR prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    return newBuilder().mergeFrom(prototype);
   }
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
-  }
+  public Builder toBuilder() { return newBuilder(this); }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -459,9 +495,8 @@ public  final class FSR extends
    * Protobuf type {@code messages.FSR}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.FSR)
-      messages.FSROrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.FSROrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_FSR.internal_static_messages_FSR_descriptor;
@@ -488,6 +523,10 @@ public  final class FSR extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
+    private static Builder create() {
+      return new Builder();
+    }
+
     public Builder clear() {
       super.clear();
       lfl_ = 0F;
@@ -507,6 +546,10 @@ public  final class FSR extends
       rrr_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000080);
       return this;
+    }
+
+    public Builder clone() {
+      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -602,8 +645,7 @@ public  final class FSR extends
       if (other.hasRrr()) {
         setRrr(other.getRrr());
       }
-      this.mergeUnknownFields(other.unknownFields);
-      onChanged();
+      this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
 
@@ -630,6 +672,7 @@ public  final class FSR extends
     }
     private int bitField0_;
 
+    // optional float lfl = 1;
     private float lfl_ ;
     /**
      * <code>optional float lfl = 1;</code>
@@ -678,6 +721,7 @@ public  final class FSR extends
       return this;
     }
 
+    // optional float lfr = 2;
     private float lfr_ ;
     /**
      * <code>optional float lfr = 2;</code>
@@ -726,6 +770,7 @@ public  final class FSR extends
       return this;
     }
 
+    // optional float lrl = 3;
     private float lrl_ ;
     /**
      * <code>optional float lrl = 3;</code>
@@ -774,6 +819,7 @@ public  final class FSR extends
       return this;
     }
 
+    // optional float lrr = 4;
     private float lrr_ ;
     /**
      * <code>optional float lrr = 4;</code>
@@ -822,6 +868,7 @@ public  final class FSR extends
       return this;
     }
 
+    // optional float rfl = 5;
     private float rfl_ ;
     /**
      * <code>optional float rfl = 5;</code>
@@ -870,6 +917,7 @@ public  final class FSR extends
       return this;
     }
 
+    // optional float rfr = 6;
     private float rfr_ ;
     /**
      * <code>optional float rfr = 6;</code>
@@ -918,6 +966,7 @@ public  final class FSR extends
       return this;
     }
 
+    // optional float rrl = 7;
     private float rrl_ ;
     /**
      * <code>optional float rrl = 7;</code>
@@ -966,6 +1015,7 @@ public  final class FSR extends
       return this;
     }
 
+    // optional float rrr = 8;
     private float rrr_ ;
     /**
      * <code>optional float rrr = 8;</code>
@@ -1017,47 +1067,11 @@ public  final class FSR extends
     // @@protoc_insertion_point(builder_scope:messages.FSR)
   }
 
-  // @@protoc_insertion_point(class_scope:messages.FSR)
-  private static final messages.FSR DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new messages.FSR();
+    defaultInstance = new FSR(true);
+    defaultInstance.initFields();
   }
 
-  public static messages.FSR getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<FSR>
-      PARSER = new com.google.protobuf.AbstractParser<FSR>() {
-    public FSR parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      try {
-        return new FSR(input, extensionRegistry);
-      } catch (RuntimeException e) {
-        if (e.getCause() instanceof
-            com.google.protobuf.InvalidProtocolBufferException) {
-          throw (com.google.protobuf.InvalidProtocolBufferException)
-              e.getCause();
-        }
-        throw e;
-      }
-    }
-  };
-
-  public static com.google.protobuf.Parser<FSR> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<FSR> getParserForType() {
-    return PARSER;
-  }
-
-  public messages.FSR getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
+  // @@protoc_insertion_point(class_scope:messages.FSR)
 }
 

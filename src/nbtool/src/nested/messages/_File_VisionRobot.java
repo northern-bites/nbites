@@ -63,41 +63,41 @@ public final class _File_VisionRobot {
       "nRobotP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_messages_VisionRobot_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_messages_VisionRobot_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VisionRobot_descriptor,
+              new java.lang.String[] { "Red1", "Red2", "Red3", "Red4", "Red5", "Navy1", "Navy2", "Navy3", "Navy4", "Navy5", });
+          internal_static_messages_Robot_descriptor =
+            getDescriptor().getMessageTypes().get(1);
+          internal_static_messages_Robot_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_Robot_descriptor,
+              new java.lang.String[] { "Distance", "Bearing", "BearingDeg", "AngleXDeg", "AngleYDeg", "X", "Y", "ElevationDeg", "On", "Height", "Width", });
+          internal_static_messages_VisionObstacle_descriptor =
+            getDescriptor().getMessageTypes().get(2);
+          internal_static_messages_VisionObstacle_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VisionObstacle_descriptor,
+              new java.lang.String[] { "OnLeft", "OnRight", "OffField", "BlockLeft", "BlockMid", "BlockRight", "LeftDist", "MidDist", "RightDist", "LeftBearing", "MidBearing", "RightBearing", });
+          internal_static_messages_RobotObstacle_descriptor =
+            getDescriptor().getMessageTypes().get(3);
+          internal_static_messages_RobotObstacle_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_RobotObstacle_descriptor,
+              new java.lang.String[] { "ClosestY", "BoxBottom", "BoxLeft", "BoxRight", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_messages_VisionRobot_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_VisionRobot_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VisionRobot_descriptor,
-        new java.lang.String[] { "Red1", "Red2", "Red3", "Red4", "Red5", "Navy1", "Navy2", "Navy3", "Navy4", "Navy5", });
-    internal_static_messages_Robot_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_messages_Robot_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_Robot_descriptor,
-        new java.lang.String[] { "Distance", "Bearing", "BearingDeg", "AngleXDeg", "AngleYDeg", "X", "Y", "ElevationDeg", "On", "Height", "Width", });
-    internal_static_messages_VisionObstacle_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_messages_VisionObstacle_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VisionObstacle_descriptor,
-        new java.lang.String[] { "OnLeft", "OnRight", "OffField", "BlockLeft", "BlockMid", "BlockRight", "LeftDist", "MidDist", "RightDist", "LeftBearing", "MidBearing", "RightBearing", });
-    internal_static_messages_RobotObstacle_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_messages_RobotObstacle_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_RobotObstacle_descriptor,
-        new java.lang.String[] { "ClosestY", "BoxBottom", "BoxLeft", "BoxRight", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

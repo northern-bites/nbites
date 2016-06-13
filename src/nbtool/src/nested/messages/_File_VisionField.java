@@ -144,59 +144,59 @@ public final class _File_VisionField {
       "istance_r\030\003 \001(\002B\025B\021_File_VisionFieldP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_messages_VisionField_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_messages_VisionField_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VisionField_descriptor,
+              new java.lang.String[] { "Timestamp", "GoalPostL", "GoalPostR", "VisualCorner", "BottomCorner", "VisualLine", "BottomLine", "VisualCross", "VisualFieldEdge", });
+          internal_static_messages_Point_descriptor =
+            getDescriptor().getMessageTypes().get(1);
+          internal_static_messages_Point_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_Point_descriptor,
+              new java.lang.String[] { "X", "Y", "FieldAngle", });
+          internal_static_messages_VisualDetection_descriptor =
+            getDescriptor().getMessageTypes().get(2);
+          internal_static_messages_VisualDetection_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VisualDetection_descriptor,
+              new java.lang.String[] { "Distance", "Bearing", "BearingDeg", "DistanceSd", "BearingSd", "Certainty", "On", "FramesOn", "FramesOff", "ConcreteCoords", "AngleXDeg", "AngleYDeg", "RedGoalie", "NavyGoalie", "Intopcam", "X", "Y", });
+          internal_static_messages_VisualGoalPost_descriptor =
+            getDescriptor().getMessageTypes().get(3);
+          internal_static_messages_VisualGoalPost_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VisualGoalPost_descriptor,
+              new java.lang.String[] { "VisualDetection", "Height", "Width", "LeftTop", "RightTop", "LeftBot", "RightBot", });
+          internal_static_messages_VisualCorner_descriptor =
+            getDescriptor().getMessageTypes().get(4);
+          internal_static_messages_VisualCorner_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VisualCorner_descriptor,
+              new java.lang.String[] { "VisualDetection", "Orientation", "CornerType", "PhysicalOrientation", "PossId", "X", "Y", });
+          internal_static_messages_VisualLine_descriptor =
+            getDescriptor().getMessageTypes().get(5);
+          internal_static_messages_VisualLine_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VisualLine_descriptor,
+              new java.lang.String[] { "VisualDetection", "StartX", "StartY", "StartDist", "StartBearing", "EndX", "EndY", "EndDist", "EndBearing", "Angle", "AvgWidth", "Length", "Slope", "YInt", "Possibilities", });
+          internal_static_messages_VisualFieldEdge_descriptor =
+            getDescriptor().getMessageTypes().get(6);
+          internal_static_messages_VisualFieldEdge_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VisualFieldEdge_descriptor,
+              new java.lang.String[] { "DistanceL", "DistanceM", "DistanceR", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_messages_VisionField_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_VisionField_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VisionField_descriptor,
-        new java.lang.String[] { "Timestamp", "GoalPostL", "GoalPostR", "VisualCorner", "BottomCorner", "VisualLine", "BottomLine", "VisualCross", "VisualFieldEdge", });
-    internal_static_messages_Point_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_messages_Point_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_Point_descriptor,
-        new java.lang.String[] { "X", "Y", "FieldAngle", });
-    internal_static_messages_VisualDetection_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_messages_VisualDetection_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VisualDetection_descriptor,
-        new java.lang.String[] { "Distance", "Bearing", "BearingDeg", "DistanceSd", "BearingSd", "Certainty", "On", "FramesOn", "FramesOff", "ConcreteCoords", "AngleXDeg", "AngleYDeg", "RedGoalie", "NavyGoalie", "Intopcam", "X", "Y", });
-    internal_static_messages_VisualGoalPost_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_messages_VisualGoalPost_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VisualGoalPost_descriptor,
-        new java.lang.String[] { "VisualDetection", "Height", "Width", "LeftTop", "RightTop", "LeftBot", "RightBot", });
-    internal_static_messages_VisualCorner_descriptor =
-      getDescriptor().getMessageTypes().get(4);
-    internal_static_messages_VisualCorner_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VisualCorner_descriptor,
-        new java.lang.String[] { "VisualDetection", "Orientation", "CornerType", "PhysicalOrientation", "PossId", "X", "Y", });
-    internal_static_messages_VisualLine_descriptor =
-      getDescriptor().getMessageTypes().get(5);
-    internal_static_messages_VisualLine_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VisualLine_descriptor,
-        new java.lang.String[] { "VisualDetection", "StartX", "StartY", "StartDist", "StartBearing", "EndX", "EndY", "EndDist", "EndBearing", "Angle", "AvgWidth", "Length", "Slope", "YInt", "Possibilities", });
-    internal_static_messages_VisualFieldEdge_descriptor =
-      getDescriptor().getMessageTypes().get(6);
-    internal_static_messages_VisualFieldEdge_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VisualFieldEdge_descriptor,
-        new java.lang.String[] { "DistanceL", "DistanceM", "DistanceR", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
