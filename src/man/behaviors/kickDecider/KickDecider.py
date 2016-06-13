@@ -74,12 +74,11 @@ class KickDecider(object):
     #     return kickReturned
 
     def frontKicksOrbit(self):
-        print "frontKicksOrbit"
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.M_LEFT_STRAIGHT)
-        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
