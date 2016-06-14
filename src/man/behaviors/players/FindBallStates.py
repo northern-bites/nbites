@@ -99,6 +99,8 @@ def spinToFoundBall(player):
         print "facing ball"
         return player.goLater('playOffBall')
 
+    player.tracker.lookToAngle(0)
+
     # spins the appropriate direction
     if theta < 0.:
         player.brain.nav.walk(0., 0., -1*constants.FIND_BALL_SPIN_SPEED)

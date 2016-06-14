@@ -83,8 +83,9 @@ def gameSet(player):
         player.stand()
         player.brain.nav.stand()
 
-        #player.brain.tracker.performWideSnapPan()
-        player.brain.tracker.lookToAngleWithTime(-75, 1)
+        player.brain.tracker.performGameSetInitialWideSnapPan()
+
+        # player.brain.tracker.lookToAngleWithTime(-75, 1)
 
         if player.wasPenalized:
             player.wasPenalized = False
@@ -93,7 +94,7 @@ def gameSet(player):
 
         print "-----------BRAIN TRACKER STOPPED, GOING TO TRACK BALL-----------------"
 
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(True)
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:

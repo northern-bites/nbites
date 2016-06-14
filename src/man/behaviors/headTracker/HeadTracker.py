@@ -133,6 +133,9 @@ class HeadTracker(FSA.FSA):
     def performWidePan(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
+    def performGameSetInitialWideSnapPan(self):
+        self.performHeadMove(HeadMoves.GAME_SET_INITIAL_WIDE_SNAP_PAN)
+
     def repeatWidePan(self):
         """
         Repeat the wide fixed pitch pan.

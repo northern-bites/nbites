@@ -87,6 +87,48 @@ class HeadTrackingHelper(object):
 
         self.executeHeadMove(newHeadMove)
 
+    #maxRight = maximum negative angle
+    #maxLeft = maximum positive angle
+    #beginDirection: True = right, False = left
+    def boundsSnapPan(self, maxRight, maxLeft, beginDirection = True): #Default right
+        """Generates snap pan betwewn two maxima"""
+
+        SNAP_PAN_PAN_TIME = 0.3
+        SNAP_PAN_WAIT_TIME = 0.4
+        SNAP_TIME_DEGREE_INTERVALS = 25
+
+        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+
+        startingYaw = (curYaw / 12.5) * 25
+
+        newSnapPanHeadMove = ()
+        newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+        newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+
+        if (beginDirection): #Right direction - negative angles
+
+            startingYaw += SNAP_TIME_DEGREE_INTERVALS * -1
+
+            while (startingYaw > maxRight):
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+
+            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+
+        else: #Left direction - positive angles
+
+            startingYaw += SNAP_TIME_DEGREE_INTERVALS
+
+            while (startingYaw < maxLeft):
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+
+            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+
+        self.executeHeadMove(newSnapPanHeadMove)
+
     # Should be generalized.
     def convertKickPan(self, headMove, invert):
         """
