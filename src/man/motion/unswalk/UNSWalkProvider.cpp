@@ -247,9 +247,9 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// request->body.turn = 0.0; 
 
 	std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
-	// request->body.forward = 600.0; //command->x_percent ;
+	// request->body.forward = 300.0; //command->x_percent ;
 	// request->body.left = 00.0; //command->y_percent ;
-	// request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
+	// request->body.turn = UNSWDEG2RAD(45); //UNSWDEG2RAD(90.0); //command->theta_percent ;
 	// request->body.speed = 0.0f;
 
 	// For testing stand action
@@ -547,15 +547,32 @@ void UNSWalkProvider::setCommand(const KickCommand::ptr command) {
 }
 
 void UNSWalkProvider::getOdometryUpdate(portals::OutPortal< ::messages::RobotLocation>& out) const {
+
 	portals::Message< ::messages::RobotLocation> odometryData(0);
-	odometryData.get()->set_x(odometry->forward * MM_TO_CM);
-	odometryData.get()->set_y(odometry->left * MM_TO_CM);
+
+   double dx = odometry->forward*cos(odometry->turn) - odometry->left*sin(odometry->turn);
+   double dy = odometry->forward*sin(odometry->turn) + odometry->left*cos(odometry->turn);
+    std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
+
+	// odometryData.get()->set_x(odometry->forward * MM_TO_CM);
+	odometryData.get()->set_x(dx * MM_TO_CM);
+	// odometryData.get()->set_y(odometry->left * MM_TO_CM);
+	odometryData.get()->set_y(dy * MM_TO_CM);
 	odometryData.get()->set_h(odometry->turn);
 	// std::cout << "MY LEFT ODO: " << odometry->left << std::endl;
 	// std::cout << "MY LEFT ODO IN CM: " << odometry->left * MM_TO_CM << std::endl;
     std::cout << "MY ODO: " << odometry->forward << " Y: " << odometry->left * 100 << " TURN: " << odometry->turn << std::endl;
 
 	out.setMessage(odometryData);
+
+   
+                                                                  
+   // double dx = odometry->forward*cos(odometry->turn) - odometry->left*sin(odometry->turn);
+   // double dy = odometry->forward*sin(odometry->turn) + odometry->left*cos(odometry->turn);
+   //  std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
+
+   // Update the robot pose estimate.
+   // mean(ROBOT_H_DIM, 0) = normaliseTheta(mean(ROBOT_H_DIM, 0) + odometry.turn);
 }
 
 bool UNSWalkProvider::isStanding() const { //is going to stand rather than at complete standstill
