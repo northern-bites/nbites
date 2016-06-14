@@ -54,7 +54,6 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 	@Override
 	public String[] displayableTypes() {
 		return new String[]{"DetectAmplitude", "soundStuff"};
-
 	}
 
 	@Override

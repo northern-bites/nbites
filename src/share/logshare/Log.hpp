@@ -29,9 +29,7 @@
 #include "SExpr.h"
 #include "nblogio.h"
 
-
 #define LOG_VERSION (8)
-
 
 namespace nbl {
 
