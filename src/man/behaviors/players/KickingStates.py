@@ -102,15 +102,17 @@ def afterKick(player):
 
     elif transitions.shouldKickAgain(player):
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
-        if player.motionKick:
-            player.motionKick = False
-            return player.goNow('spinToBall')
-        else:        
-            return player.goNow('positionForKick')
+        # if player.motionKick:
+        #     player.motionKick = False
+        #     return player.goNow('spinToBall')
+        # else:        
+        return player.goNow('positionForKick')
     
     elif player.kickedOut:
         player.kickedOut = False
         return player.goNow('spinSearch')
+
+    player.brain.nav.walk(75, 0, 0)
 
     elif transitions.shouldChaseBall(player):
         return player.goLater('approachBall')
