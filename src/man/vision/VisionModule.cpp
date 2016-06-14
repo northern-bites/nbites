@@ -577,12 +577,24 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
 		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
 		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
+		int filterDark = params->get(1)->find("FilterDark")->get(1)->valueAsInt();
+		int greenDark = params->get(1)->find("GreenDark")->get(1)->valueAsInt();
+		int filterBrite = params->get(1)->find("FilterBrite")->get(1)->valueAsInt();
+		int greenBrite = params->get(1)->find("GreenBrite")->get(1)->valueAsInt();
 		field->setDrawCameraHorizon(cameraHorizon);
 		field->setDrawFieldHorizon(fieldHorizon);
 		field->setDebugHorizon(debugHorizon);
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		ballDetector[0]->setDebugFilterDark(filterDark);
+		ballDetector[1]->setDebugFilterDark(filterDark);
+		ballDetector[0]->setDebugGreenDark(greenDark);
+		ballDetector[1]->setDebugGreenDark(greenDark);
+		ballDetector[0]->setDebugFilterBrite(filterBrite);
+		ballDetector[1]->setDebugFilterBrite(filterBrite);
+		ballDetector[0]->setDebugGreenBrite(greenBrite);
+		ballDetector[1]->setDebugGreenBrite(greenBrite);
 		debugImage[0]->reset();
 		debugImage[1]->reset();
 	}

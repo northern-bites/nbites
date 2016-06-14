@@ -147,6 +147,10 @@ namespace man {
 			const std::vector<Spot>& getWhiteSpots() { return debugWhiteSpots; }
 			const std::vector<Spot>& getBlackSpots() { return debugBlackSpots; }
 			void setDebugBall(bool debug) {debugBall = debug;}
+			void setDebugFilterDark(int fd) { filterThresholdDark = fd; }
+			void setDebugGreenDark(int gd) { greenThresholdDark = gd; }
+			void setDebugFilterBrite(int fb) { filterThresholdBrite = fb; }
+			void setDebugGreenBrite(int gb) { greenThresholdBrite = gb; }
 #endif
 		private:
 			FieldHomography* homography;
@@ -179,8 +183,16 @@ namespace man {
 			std::vector<Ball> candidates;
 #ifdef OFFLINE
 			bool debugBall;
+			int filterThresholdDark;
+			int greenThresholdDark;
+			int filterThresholdBrite;
+			int greenThresholdBrite;
 #else
 			static const bool debugBall = false;
+			static const int filterThresholdDark = 144;
+			static const int greenThresholdDark = 60;
+			static const int filterThresholdBrite = 144;
+			static const int greenThresholdBrite = 120;
 #endif
 		};
 
