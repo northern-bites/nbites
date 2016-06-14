@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import nbtool.data.SExpr;
 import nbtool.data.json.Json;
 import nbtool.data.json.JsonObject;
+import nbtool.data.log.Log;
 import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 import nbtool.util.ToolSettings;
@@ -15,6 +16,10 @@ import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
 public class ColorParam {
+
+	public static final String ORIGINAL_KEY = "OriginalColorParams";
+	public static final String MODIFIED_KEY = "ModifiedColorParams";
+
 	public String name;
 
 	public enum Part {
@@ -179,6 +184,11 @@ public class ColorParam {
 
 	public static Path getPath() {
 		return Paths.get(ToolSettings.NBITES_DIR, SharedConstants.OFFLINE_COLOR_PARAMS_SUFFIX());
+	}
+
+	public static void applyTo(Log tripoint, Camera camera) {
+		assert(tripoint.logClass.equals("tripoint"));
+		tripoint.topLevelDictionary.put(MODIFIED_KEY, camera.serialize());
 	}
 
 	public static void _NBL_ADD_TESTS_() {

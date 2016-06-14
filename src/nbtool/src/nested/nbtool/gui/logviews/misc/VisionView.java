@@ -8,8 +8,10 @@ import java.awt.event.ComponentListener;
 
 import javax.swing.JPanel;
 
+import nbtool.data.calibration.ColorParam;
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
+import nbtool.gui.utilitypanes.UtilityManager;
 import nbtool.images.YUYV8888Image;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
@@ -32,6 +34,12 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 		return DEFAULT_VISION_FUNCTION_NAME;
 	}
 
+	/* if returns true, callVision() will check ColorCalibrationUtility
+	 * and use the most recent ColorParam if such exists (and is global) */
+	protected boolean shouldUseGlobalColorParams() {
+		return true;
+	}
+
 	//Should VisionView call setupVisionDisplay() if no NBCross instance is found?
 	protected boolean continueIfNoNBCross() {
 		return false;
@@ -52,6 +60,23 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 		CrossInstance ci = CrossServer.instanceByIndex(0);
 		if (ci == null) return false;
 
+		final boolean useGlobal = this.shouldUseGlobalColorParams();
+
+		Log sentToNbcross = null;
+
+		if (useGlobal &&
+				UtilityManager.ColorCalibrationUtility.getLatest() != null &&
+				UtilityManager.ColorCalibrationUtility.appliedGlobally() ) {
+			sentToNbcross = this.displayedLog.deepCopy();
+
+			ColorParam.Set latest = UtilityManager.ColorCalibrationUtility.getLatest();
+
+			sentToNbcross.topLevelDictionary.put("ModifiedColorParams",
+					latest.get(this.isTop()).serialize());
+		} else {
+			sentToNbcross = this.displayedLog;
+		}
+
 		assert(ci.tryAddCall(new IOFirstResponder(){
 
 			@Override
@@ -71,7 +96,7 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 				return false;
 			}
 
-		}, functionName(), displayedLog));
+		}, functionName(), sentToNbcross));
 
 		return true;
 	}

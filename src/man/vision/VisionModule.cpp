@@ -38,6 +38,11 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
     NBL_ASSERT_EQ( robotName.find(".local"), std::string::npos )
     name = robotName;
 
+    for (int i = 0; i < 2; ++i) {
+        colorParams[i] = NULL;
+        calibrationParams[i] = NULL;
+    }
+
     reloadColorParams();
     reloadCameraOffsets();
 

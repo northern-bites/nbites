@@ -15,6 +15,7 @@ import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -33,6 +34,8 @@ import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.nio.CrossServer;
 import nbtool.nio.CrossServer.CrossInstance;
+import nbtool.nio.LogRPC;
+import nbtool.nio.RobotConnection;
 import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 
@@ -52,6 +55,10 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 	@Override
 	public ColorParam.Set getLatest() {
 		return color_parameters;
+	}
+
+	public boolean appliedGlobally() {
+		return (display == null) ? false : display.applyGlobally;
 	}
 
 	private static Display display = null;
@@ -117,8 +124,22 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				Debug.notRefactored();
+				RobotConnection robot = RobotConnection.getByIndex(0);
+
+				if (robot == null) {
+					ToolMessage.displayError("CCU: send: no robot connected!");
+					return;
+				}
+
+				if (color_parameters == null) {
+					ToolMessage.displayError("CCU: send: color params!");
+					return;
+				}
+
+				LogRPC.setFileContents(LogRPC.NULL_RESPONDER, robot, "/home/nao/nbites/Config/colorParams.json",
+						color_parameters.serialize().print());
+
+				ToolMessage.displayAndPrint("< params sent to %s >", robot.host());
 			}
 
 		};
@@ -133,6 +154,64 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				}
 
 				applyGlobally = nv;
+			}
+		};
+
+		private LogDNDTarget topCameraTarget = new LogDNDTarget() {
+			@Override
+			public void takeLogsFromDrop(Log[] log) {
+				if (log.length > 0) {
+					Log attempt = log[0];
+
+					if (!attempt.logClass.equals("tripoint")) {
+						ToolMessage.displayError("must use tripoint log for ColorCalibration, not %s!",
+								attempt.logClass);
+						return;
+					}
+
+					String reqFrom = "camera_TOP";
+
+					if (!attempt.blocks.get(0).whereFrom.equals(reqFrom)) {
+						ToolMessage.displayError("tab {%s} must have log from: %s",
+								"TOP", reqFrom);
+						return;
+					}
+
+					for (TabHandler handler : handlers) {
+						if (handler.top) {
+							handler.useLog(attempt);
+						}
+					}
+				}
+			}
+		};
+
+		private LogDNDTarget botCameraTarget = new LogDNDTarget() {
+			@Override
+			public void takeLogsFromDrop(Log[] log) {
+				if (log.length > 0) {
+					Log attempt = log[0];
+
+					if (!attempt.logClass.equals("tripoint")) {
+						ToolMessage.displayError("must use tripoint log for ColorCalibration, not %s!",
+								attempt.logClass);
+						return;
+					}
+
+					String reqFrom = "camera_BOT";
+
+					if (!attempt.blocks.get(0).whereFrom.equals(reqFrom)) {
+						ToolMessage.displayError("tab {%s} must have log from: %s",
+								"BOT", reqFrom);
+						return;
+					}
+
+					for (TabHandler handler : handlers) {
+						if (!handler.top) {
+							handler.useLog(attempt);
+						}
+					}
+				}
 			}
 		};
 
@@ -200,208 +279,274 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 			this.setMinimumSize(minSize);
 		}
 
-	}
+		private class TabHandler {
+			boolean top;
+			ColorParam.Camera.Which camera;
+			ColorCalibrationTab tab;
 
-	private static class TabHandler {
-		boolean top;
-		ColorParam.Camera.Which camera;
-		ColorCalibrationTab tab;
+			ImageDisplay imageDisplay;
 
-		ImageDisplay imageDisplay;
+			Log dropped = null;
+			int dropped_width, dropped_height;
 
-		Log dropped = null;
-		int dropped_width, dropped_height;
-
-		public String title() {
-			return (top ? "top" : "bot") + " " + camera.toString();
-		}
-
-		static class Group {
-			JSlider slider;
-			JSpinner spinner;
-			ColorParam.Part part;
-
-			Group (JSlider slider, JSpinner spinner, ColorParam.Part part) {
-				this.slider = slider; this.spinner = spinner; this.part = part;
-			}
-		}
-
-		private ArrayList<Group> groups = new ArrayList<>();
-
-		private void visionCall() {
-			assert(dropped != null);
-			assert(color_parameters != null);
-
-			dropped.topLevelDictionary.put("ModifiedColorParams", color_parameters.get(top).serialize());
-			debug.info("%s", dropped.topLevelDictionary.get("ModifiedColorParams").print());
-
-			CrossInstance ci = CrossServer.instanceByIndex(0);
-			if (ci == null) {
-				ToolMessage.displayWarn("{%s} cannot call vision, no CrossInstance!", title());
-				return;
+			public String title() {
+				return (top ? "top" : "bot") + " " + camera.toString();
 			}
 
-			assert(ci.tryAddCall(new IOFirstResponder(){
+			class Group {
+				JSlider slider;
+				JSpinner spinner;
+				ColorParam.Part part;
 
-				@Override
-				public void ioFinished(IOInstance instance) { }
+				Group (JSlider slider, JSpinner spinner, ColorParam.Part part) {
+					this.slider = slider; this.spinner = spinner; this.part = part;
+				}
+			}
 
-				@Override
-				public void ioReceived(IOInstance inst, int ret, Log... out) {
-					assert(out.length == 1);
-					assert(out[0].logClass.equals("VisionReturn"));
+			class Change {
+				Group group;
+				int previousValue;
+			}
 
-					String search = camera.toString() + "Ret";
-					debug.info("TabHandler looking for: %s", search);
+			private ArrayList<Group> groups = new ArrayList<>();
+			private ArrayList<Change> undoStack = new ArrayList<>();
+			boolean ignoreChangeEvents = false;
 
-					Block block = out[0].find(search);
-					Y8Image image = new Y8Image(dropped_width / 2, dropped_height / 2, block.data);
+			private void undoTheChange() {
+				if (undoStack.isEmpty()) return;
 
-					if (imageDisplay != null)
-						imageDisplay.setImage(image.toBufferedImage());
-					else debug.error("{%s} null image display!", title());
+				Debug.print("undoing!");
+				ignoreChangeEvents = true;
+
+				Change latest = undoStack.remove(undoStack.size() - 1);
+				latest.group.slider.setValue(latest.previousValue);
+				latest.group.spinner.setValue(latest.previousValue);
+
+				SwingUtilities.invokeLater(new Runnable(){
+					@Override
+					public void run() {
+						Debug.print("undo finished!");
+						ignoreChangeEvents = false;
+					}
+				});
+
+				wasUpdated();
+			}
+
+			private void addChange(Group group, int previous) {
+				Change change = new Change();
+				change.group = group;
+				change.previousValue = previous;
+
+				undoStack.add(change);
+				while(undoStack.size() > 1000) {
+					undoStack.remove(0);
+				}
+			}
+
+			private void visionCall() {
+				assert(dropped != null);
+				assert(color_parameters != null);
+
+				dropped.topLevelDictionary.put("ModifiedColorParams", color_parameters.get(top).serialize());
+				debug.info("%s", dropped.topLevelDictionary.get("ModifiedColorParams").print());
+
+				CrossInstance ci = CrossServer.instanceByIndex(0);
+				if (ci == null) {
+					ToolMessage.displayWarn("{%s} cannot call vision, no CrossInstance!", title());
+					return;
 				}
 
-				@Override
-				public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-					return false;
+				assert(ci.tryAddCall(new IOFirstResponder(){
+
+					@Override
+					public void ioFinished(IOInstance instance) { }
+
+					@Override
+					public void ioReceived(IOInstance inst, int ret, Log... out) {
+						assert(out.length == 1);
+						assert(out[0].logClass.equals("VisionReturn"));
+
+						String search = camera.toString() + "Ret";
+						debug.info("TabHandler looking for: %s", search);
+
+						Block block = out[0].find(search);
+						Y8Image image = new Y8Image(dropped_width / 2, dropped_height / 2, block.data);
+
+						if (imageDisplay != null)
+							imageDisplay.setImage(image.toBufferedImage());
+						else debug.error("{%s} null image display!", title());
+					}
+
+					@Override
+					public boolean ioMayRespondOnCenterThread(IOInstance inst) {
+						return false;
+					}
+
+				}, VisionView.DEFAULT_VISION_FUNCTION_NAME, dropped));
+			}
+
+			private void wasUpdated() {
+
+				setTo(color_parameters);
+
+				if (dropped != null) {
+					debug.info("{%s} making vision call", title());
+					visionCall();
 				}
 
-			}, VisionView.DEFAULT_VISION_FUNCTION_NAME, dropped));
-		}
+				colorParametersUpdated();
+			}
 
-		private void wasUpdated() {
-
-			setTo(color_parameters);
-
-			if (dropped != null) {
-				debug.info("{%s} making vision call", title());
+			public void useLog(Log dropped) {
+				Debug.print("{%s} using log: %s", title(), dropped);
+				this.dropped = dropped;
+				dropped_width = dropped.blocks.get(0).dict.get(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS())
+						.asNumber().asInt();
+				dropped_height = dropped.blocks.get(0).dict.get(SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS())
+							.asNumber().asInt();
 				visionCall();
 			}
 
-			colorParametersUpdated();
-		}
-
-		public void useLog(Log dropped) {
-			Debug.print("{%s} using log: %s", title(), dropped);
-			this.dropped = dropped;
-			dropped_width = dropped.blocks.get(0).dict.get(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS())
-					.asNumber().asInt();
-			dropped_height = dropped.blocks.get(0).dict.get(SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS())
-						.asNumber().asInt();
-			visionCall();
-		}
-
-		public void takeFrom(ColorParam.Set set) {
-			ColorParam.Camera cam = set.get(top);
-			ColorParam param = cam.get(camera);
-			for (Group g : groups) {
-				int val = (int) param.get(g.part);
-				g.slider.setValue(val);
-				g.spinner.setValue(val);
-			}
-		}
-
-		public void setTo(ColorParam.Set set) {
-			ColorParam.Camera cam = set.get(top);
-			ColorParam param = cam.get(camera);
-
-			for (Group g : groups) {
-				param.set(g.part, g.slider.getValue());
-			}
-		}
-
-		private ChangeListener fromSpinner = new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				for (int i = 0; i < groups.size(); ++i) {
-					Group rel = groups.get(i);
-					rel.slider.setValue(
-							(Integer) rel.spinner.getValue()
-							);
+			public void takeFrom(ColorParam.Set set) {
+				ColorParam.Camera cam = set.get(top);
+				ColorParam param = cam.get(camera);
+				for (Group g : groups) {
+					int val = (int) param.get(g.part);
+					g.slider.setValue(val);
+					g.spinner.setValue(val);
 				}
-
-				wasUpdated();
 			}
 
-		};
+			public void setTo(ColorParam.Set set) {
+				ColorParam.Camera cam = set.get(top);
+				ColorParam param = cam.get(camera);
 
-		private ChangeListener fromSlider = new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				for (int i = 0; i < groups.size(); ++i) {
-					Group rel = groups.get(i);
-					rel.spinner.setValue(
-							rel.slider.getValue()
-							);
+				for (Group g : groups) {
+					param.set(g.part, g.slider.getValue());
 				}
-
-				wasUpdated();
-			}
-		};
-
-		protected void installListeners() {
-			for (Group g : groups) {
-				g.slider.addChangeListener(fromSlider);
-				g.spinner.addChangeListener(fromSpinner);
-			}
-		}
-
-		public TabHandler(final boolean top, ColorParam.Camera.Which camera) {
-
-			debug.info("in constructor");
-
-			this.top = top; this.camera = camera;
-			this.tab = new ColorCalibrationTab();
-			this.tab.tabTitle.setText(title());
-
-			groups.add(new Group(tab.Y0USlider, tab.Y0USpinner, ColorParam.Part.uAtY0));
-			groups.add(new Group(tab.Y255USlider, tab.Y255USpinner, ColorParam.Part.uAtY255));
-
-			groups.add(new Group(tab.Y0VSlider, tab.Y0VSpinner, ColorParam.Part.vAtY0));
-			groups.add(new Group(tab.Y255VSlider, tab.Y255VSpinner, ColorParam.Part.vAtY255));
-
-			groups.add(new Group(tab.FuzzyUSlider, tab.FuzzyUSpinner, ColorParam.Part.u_fuzzy_range));
-			groups.add(new Group(tab.FuzzyVSlider, tab.FuzzyVSpinner, ColorParam.Part.v_fuzzy_range));
-
-			for (Group g : groups) {
-				g.spinner.setModel(new SpinnerNumberModel(0,0,255,1));
-				g.slider.setMinimum(0);
-				g.slider.setMaximum(255);
 			}
 
-			imageDisplay = new ImageDisplay();
-			tab.imageTabs.add("result", imageDisplay);
+			private ChangeListener fromSpinner = new ChangeListener() {
 
-			LogDND.makeComponentTarget(tab, new LogDNDTarget(){
-			@Override
-			public void takeLogsFromDrop(Log[] log) {
-					if (log.length > 0) {
-						Log attempt = log[0];
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					if (ignoreChangeEvents) return;
 
-						if (!attempt.logClass.equals("tripoint")) {
-							ToolMessage.displayError("must use tripoint log for ColorCalibration, not %s!",
-									attempt.logClass);
-							return;
+					Group from = null;
+					for (Group g : groups) {
+						if (g.spinner == e.getSource()) {
+							from = g;
+							break;
 						}
-
-						String reqFrom = top ? "camera_TOP" : "camera_BOT";
-
-						if (!attempt.blocks.get(0).whereFrom.equals(reqFrom)) {
-							ToolMessage.displayError("tab {%s} must have log from: %s",
-									title(), reqFrom);
-							return;
-						}
-
-						useLog(log[0]);
 					}
-			}
-			});
 
-			debug.info("leaving constructor");
+					int previous = (Integer) from.spinner.getValue();
+					from.slider.setValue(previous);
+
+					addChange(from, previous);
+					wasUpdated();
+				}
+
+			};
+
+			private ChangeListener fromSlider = new ChangeListener() {
+
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					if (ignoreChangeEvents) return;
+
+					Group from = null;
+					for (Group g : groups) {
+						if (g.slider == e.getSource()) {
+							from = g;
+							break;
+						}
+					}
+
+					int previous = from.slider.getValue();
+					from.spinner.setValue(previous);
+
+					addChange(from, previous);
+					wasUpdated();
+				}
+			};
+
+			private ActionListener undoListener = new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					undoTheChange();
+				}
+			};
+
+			protected void installListeners() {
+				for (Group g : groups) {
+					g.slider.addChangeListener(fromSlider);
+					g.spinner.addChangeListener(fromSpinner);
+				}
+
+				tab.UndoButton.addActionListener(undoListener);
+			}
+
+			public TabHandler(final boolean top, ColorParam.Camera.Which camera) {
+				debug.info("in constructor");
+
+				this.top = top; this.camera = camera;
+				this.tab = new ColorCalibrationTab();
+				this.tab.tabTitle.setText(title());
+
+				tab.SendButton.setText("send to robot");
+				tab.SaveButton.setText("save to config");
+
+				groups.add(new Group(tab.Y0USlider, tab.Y0USpinner, ColorParam.Part.uAtY0));
+				groups.add(new Group(tab.Y255USlider, tab.Y255USpinner, ColorParam.Part.uAtY255));
+
+				groups.add(new Group(tab.Y0VSlider, tab.Y0VSpinner, ColorParam.Part.vAtY0));
+				groups.add(new Group(tab.Y255VSlider, tab.Y255VSpinner, ColorParam.Part.vAtY255));
+
+				groups.add(new Group(tab.FuzzyUSlider, tab.FuzzyUSpinner, ColorParam.Part.u_fuzzy_range));
+				groups.add(new Group(tab.FuzzyVSlider, tab.FuzzyVSpinner, ColorParam.Part.v_fuzzy_range));
+
+				for (Group g : groups) {
+					g.spinner.setModel(new SpinnerNumberModel(0,0,255,1));
+					g.slider.setMinimum(0);
+					g.slider.setMaximum(255);
+				}
+
+				imageDisplay = new ImageDisplay();
+				tab.imageTabs.add("result", imageDisplay);
+
+				LogDND.makeComponentTarget(tab, top ? topCameraTarget : botCameraTarget);
+
+//				LogDND.makeComponentTarget(tab, new LogDNDTarget(){
+//				@Override
+//				public void takeLogsFromDrop(Log[] log) {
+//						if (log.length > 0) {
+//							Log attempt = log[0];
+//
+//							if (!attempt.logClass.equals("tripoint")) {
+//								ToolMessage.displayError("must use tripoint log for ColorCalibration, not %s!",
+//										attempt.logClass);
+//								return;
+//							}
+//
+//							String reqFrom = top ? "camera_TOP" : "camera_BOT";
+//
+//							if (!attempt.blocks.get(0).whereFrom.equals(reqFrom)) {
+//								ToolMessage.displayError("tab {%s} must have log from: %s",
+//										title(), reqFrom);
+//								return;
+//							}
+//
+//							useLog(log[0]);
+//						}
+//				}
+//				});
+
+				debug.info("leaving constructor");
+			}
 		}
+
 	}
 
 }
