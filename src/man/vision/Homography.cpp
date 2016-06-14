@@ -95,7 +95,8 @@ bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) 
   double wz = h31 * cx + h32 * cy + h33 * cz + h34;
   if (fabs(wz) > 1.0e-6) {
     // TODO call exception "Internal error in FieldHomography"
-    throw exception();
+    std::cout<<"[HOMOGRAPHY ] BIG ERROR but not calling stupid exception."<<std::endl;
+    // throw exception();
   }
 
   return cz > 0;
