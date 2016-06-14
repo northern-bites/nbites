@@ -226,10 +226,10 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
     return newY;
 }
 
-void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot, 
-                                            float innerDiam, float altInnerDiam, 
-                                            bool topCamera, int filterThreshold, 
-                                            int greenThreshold, float filterGain) 
+void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
+                                            float innerDiam, float altInnerDiam,
+                                            bool topCamera, int filterThreshold,
+                                            int greenThreshold, float filterGain)
 {
     s.darkSpot(darkSpot);
     s.innerDiamCm(innerDiam);
@@ -896,7 +896,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	// 						 height - horiz);
 
     SpotDetector darkSpotDetector;
-    initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera, 150, 60, 0.5);
+    initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
+							  filterThresholdDark, greenThresholdDark, 0.5);
     darkSpotDetector.spotDetect(yImage, homography, &greenImage);
     SpotList darkSpots = darkSpotDetector.spots();
 
@@ -905,7 +906,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     if(debugBall) {
         for(int z = 0; z < blackSpots.size(); z++) {
             std::pair<int, int> spot = blackSpots[z];
-            std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "<<spot.second<<std::endl; 
+            std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "
+					 <<spot.second<<std::endl;
         }
     }
 
@@ -921,7 +923,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 		blobber.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
 	}
 
-    if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots, actualWhiteSpots, 
+    if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots,
+					actualWhiteSpots,
                  cameraHeight, bottomQuarter)) {
 #ifdef OFFLINE
         foundBall = true;
@@ -931,11 +934,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
     SpotDetector whiteSpotDetector;
-    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f, topCamera, 140, 70, 0.5);
+    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
+							  topCamera, filterThresholdBrite, greenThresholdBrite,
+							  0.5);
     whiteSpotDetector.spotDetect(yImage, homography, &greenImage);
     SpotList whiteSpots = whiteSpotDetector.spots();
 
-    if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots, 
+    if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
                       cameraHeight,foundBall)) {
 #ifdef OFFLINE
         foundBall = true;
