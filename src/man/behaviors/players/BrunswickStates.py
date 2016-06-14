@@ -8,6 +8,7 @@ from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
+from math import fabs, degrees
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -28,6 +29,7 @@ def gameInitial(player):
         player.role = player.brain.playerNumber
         roleConstants.setRoleConstants(player, player.role)
 
+    # print "Current Angle: " + str(degrees(player.brain.interface.joints.head_yaw))
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
         player.stand()
@@ -75,8 +77,6 @@ def gameSet(player):
     if player.firstFrame():
         #The player's currentState = gameSet
 
-        print "--------------GAME SET FIRST FRAME-----------------"
-
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.gainsOn()
@@ -85,17 +85,12 @@ def gameSet(player):
 
         player.brain.tracker.performGameSetInitialWideSnapPan()
 
-        # player.brain.tracker.lookToAngleWithTime(-75, 1)
-
         if player.wasPenalized:
             player.wasPenalized = False
 
     elif player.brain.tracker.isStopped():
-
-        print "-----------BRAIN TRACKER STOPPED, GOING TO TRACK BALL-----------------"
-
         player.brain.tracker.trackBall(True)
-
+        # print "Current Angle: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()

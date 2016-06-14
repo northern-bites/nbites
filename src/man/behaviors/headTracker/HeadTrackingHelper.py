@@ -99,33 +99,42 @@ class HeadTrackingHelper(object):
 
         curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
 
-        startingYaw = (curYaw / 12.5) * 25
+        startingYaw = (((curYaw // 12.5) + 1) // 2) * 25
 
         newSnapPanHeadMove = ()
-        newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
-        newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
         if (beginDirection): #Right direction - negative angles
 
-            startingYaw += SNAP_TIME_DEGREE_INTERVALS * -1
-
             while (startingYaw > maxRight):
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
-            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
-            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+                startingYaw -= SNAP_TIME_DEGREE_INTERVALS
+
+            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
         else: #Left direction - positive angles
 
-            startingYaw += SNAP_TIME_DEGREE_INTERVALS
-
             while (startingYaw < maxLeft):
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
-            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
-            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+                startingYaw += SNAP_TIME_DEGREE_INTERVALS
+
+            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+            startingYaw -= SNAP_TIME_DEGREE_INTERVALS
+
+            while (startingYaw > maxRight):
+
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+                startingYaw -= SNAP_TIME_DEGREE_INTERVALS
 
         self.executeHeadMove(newSnapPanHeadMove)
 
@@ -164,8 +173,6 @@ class HeadTrackingHelper(object):
         """
         # Note: safe to call every frame.
 
-        print "--------------TRACKING AN OBJECT-------------"
-
         target = self.tracker.target
 
         # print "TRACKER TARGET: " + str(target)
@@ -181,8 +188,6 @@ class HeadTrackingHelper(object):
 
         # If we haven't seen the target, look towards loc model.
         if target.vis.frames_off > 3:
-
-            print "-----------------LOOKING TO POINT-------------------"
 
 
 # TODO: use a constant above

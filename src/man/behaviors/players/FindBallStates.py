@@ -12,7 +12,7 @@ def findBall(player):
     Decides what type of search to do.
     """
 
-    print "FIND THE BALL"
+    print "---------TRYING TO FIND BALL-------------\n"
 
     if player.firstFrame():
         player.inKickingState = False
@@ -33,17 +33,15 @@ def findBall(player):
 @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def searchInFront(player):
 
-    print "--------------------- Searching in front ----------------------------"
+    print "-------SEARCHING IN FRONT OF ROBOT-------------\n"
 
     if player.firstFrame():
         player.brain.tracker.performCenterSnapPan()
 
-    playerTracker = player.brain.tracker
+    # playerTracker = player.brain.tracker
 
-    if not playerTracker.brain.motion.head_is_active:
-
-        print "-----------GOING TO SPIN SEARCH----------"
-
+    if not player.brain.tracker.brain.motion.head_is_active:
+        print "-------HEAD IS NOT ACTIVE, GOING TO SPINNING--------------\n"
         return player.goNow('spinSearch')
 
 @superState('gameControllerResponder')
@@ -54,6 +52,7 @@ def spinSearch(player):
     """
     spins and looks to the direction where the ball is thought to be
     """
+
     if player.firstFrame():
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
@@ -67,6 +66,7 @@ def searchAfterFall(player):
     """
     goes into this state only if we saw the ball during the last second before the fall
     """
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
@@ -85,6 +85,7 @@ def spinToFoundBall(player):
     """
     spins to the ball until it is facing the ball 
     """
+
     if player.brain.nav.dodging:
         return player.stay()
 
@@ -99,7 +100,7 @@ def spinToFoundBall(player):
         print "facing ball"
         return player.goLater('playOffBall')
 
-    player.tracker.lookToAngle(0)
+    self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
 
     # spins the appropriate direction
     if theta < 0.:

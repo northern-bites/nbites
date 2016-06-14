@@ -20,11 +20,7 @@ def tracking(tracker):
 
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
 
-    print "--------GOING TO TRACK OBJECT-------"
-
     tracker.helper.trackObject()
-
-    print "---------RETURNING FROM TRACK OBJECT-------"
 
     # If cannot see ball and shared ball is reliable, go to altTrackSharedBallAndPan
     # if (tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on and
@@ -35,17 +31,12 @@ def tracking(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-
-            print "------GOING TO FULL PAN LATER--------"
-
             return tracker.goLater('snapPan')
 
     return tracker.stay()
 
 def gameSetTracking(tracker):
     #SNAP PAN --- MAY CHANGE SNAP PAN BACK TO FULL PAN
-
-    print "--------------IN GAME SET TRACKING-----------------"
 
     tracker.target = tracker.brain.ball
 
@@ -72,8 +63,6 @@ def bounceTracking(tracker):
     return tracker.stay()
 
 def trackingFieldObject(tracker):
-
-    print "--------TRACKING FIELD OBJECT-------------"
 
     tracker.helper.trackStationaryObject()
     if not tracker.target.on and tracker.counter > 15:
@@ -204,8 +193,6 @@ def lookStraightThenTrack(tracker):
 
 def fullPan(tracker):
 
-    print "FULL PAN IN TRACKING STATES"
-
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
     Once the ball is located, switches to tracking.
@@ -233,8 +220,6 @@ def fullPan(tracker):
     return tracker.stay()
 
 def snapPan(tracker):
-
-    print "SNAP PAN IN TRACKING STATES"
 
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
@@ -272,8 +257,7 @@ def gameSetSnapPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
 
-        # tracker.helper.lookToAngleWithTime(-75, 0.3)
-        tracker.helper.startingPan(HeadMoves.GAME_SET_WIDE_SNAP_PAN)
+        tracker.helper.boundsSnapPan(-75, 75, False)
 
     if not tracker.brain.motion.head_is_active:
         tracker.helper.executeHeadMove(HeadMoves.GAME_SET_WIDE_SNAP_PAN)

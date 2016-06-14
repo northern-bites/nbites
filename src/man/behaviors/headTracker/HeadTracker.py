@@ -98,9 +98,6 @@ class HeadTracker(FSA.FSA):
         self.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
     def repeatWideSnapPan(self):
-
-        print "REPEATING WIDE SNAP PAN  --  NOTE"
-
         self.repeatHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
     def performFastSnapPan(self):
@@ -116,9 +113,6 @@ class HeadTracker(FSA.FSA):
         self.repeatHeadMove(HeadMoves.WIDE_FAST_SNAP_PAN)
 
     def performCenterSnapPan(self):
-
-        print "PERFORMING CENTER SNAP PAN"
-
         self.performHeadMove(HeadMoves.CENTER_SNAP_PAN)
 
     def repeatCenterSnapPan(self):
@@ -170,18 +164,11 @@ class HeadTracker(FSA.FSA):
         self.target = self.brain.ball
 
         if (gameSet): # == True
-
-            print "IN GAME SET"
-
             if (self.currentState is not 'gameSetSnapPan' and self.currentState is not 'gameSetTracking'):
                 self.switchTo('gameSetTracking')
                 return
 
-        if (self.currentState is not 'snapPan' and # SNAPPAN -- what is going on here?
-            self.currentState is not 'tracking'):
-
-            print "----------------SWITCHING TO TRACKING-----------------"
-
+        if (self.currentState is not 'snapPan' and self.currentState is not 'tracking'):
             self.switchTo('tracking') # which is in TrackingStates.py
 
     def bounceTrackBall(self):
@@ -203,9 +190,9 @@ class HeadTracker(FSA.FSA):
         Look to the direction we are spinning.
         """
         if direction < 0:
-            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT)
+            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEAST_RIGHT)
         else:
-            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT)
+            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEAST_LEFT)
 
     def lookToAngle(self, yaw):
         """
@@ -214,10 +201,6 @@ class HeadTracker(FSA.FSA):
         self.performHeadMove(self.helper.lookToAngle(yaw))
 
     def lookToAngleWithTime(self, yaw, time):
-
-        print "----------LOOKING TO " + str(yaw) + " WITH TIME " + str(time) + " ------------"
-
-
         self.performHeadMove(self.helper.lookToAngleWithTime(yaw, time))
 
     def trackSharedBall(self):
