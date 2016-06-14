@@ -19,7 +19,6 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
-    print "approachBall"
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
@@ -71,8 +70,8 @@ def walkToWayPoint(player):
 
     if fabs(relH) <= constants.MAX_BEARING_DIFF:
         wayPoint = RobotLocation(ball.x - constants.WAYPOINT_DIST*cos(radians(player.kick.setupH)),
-                                ball.y - constants.WAYPOINT_DIST*sin(radians(player.kick.setupH)),
-                                player.brain.loc.h)
+                                 ball.y - constants.WAYPOINT_DIST*sin(radians(player.kick.setupH)),
+                                 player.brain.loc.h)
 
         player.brain.nav.goTo(wayPoint, Navigator.CLOSE_ENOUGH, speed, True, fast = True)
 
@@ -159,11 +158,11 @@ def prepareForKick(player):
     #     return player.goNow('orbitBall')
     # return player.goNow('followPotentialField')
 
-@superState('gameControllerResponder')
-@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
-@ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
-@ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
-@ifSwitchNow(transitions.shouldFindBall, 'findBall')
+# @superState('gameControllerResponder')
+# @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+# @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
+# @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
+# @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 # def followPotentialField(player):
 #     """
 #     This state is based on electric field potential vector paths. The ball is treated as an
