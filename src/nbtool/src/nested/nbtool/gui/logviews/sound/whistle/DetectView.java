@@ -9,11 +9,13 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JScrollPane;
 
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
 import nbtool.data.log.LogReference;
+import nbtool.gui.ToolMessage;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
@@ -33,16 +35,25 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 	public void setupDisplay() {
 		Debug.info("view!");
 
-		CrossInstance ci = CrossServer.instanceByIndex(0);
+		try {
+			PlaySound.play(displayedLog.blocks.get(0).data);
+		} catch (LineUnavailableException e) {
+			e.printStackTrace();
+			ToolMessage.displayError("couldn't play sound file");
+		}
 
-		if (ci == null) return;
-		ci.tryAddCall(this, "whistle_detect", this.displayedLog);
-		this.add(scroll, BorderLayout.CENTER);
+		if (displayedLog.logClass.equals("DetectAmplitude")) {
+			CrossInstance ci = CrossServer.instanceByIndex(0);
+			if (ci == null) return;
+			ci.tryAddCall(this, "whistle_detect", this.displayedLog);
+			this.add(scroll, BorderLayout.CENTER);
+		}
+
 	}
 
 	@Override
 	public String[] displayableTypes() {
-		return new String[]{"DetectAmplitude"};
+		return new String[]{"DetectAmplitude", "soundStuff"};
 
 	}
 
