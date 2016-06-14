@@ -22,6 +22,7 @@ import nbtool.io.CommonIO.IOInstance;
 import nbtool.nio.CrossServer;
 import nbtool.nio.CrossServer.CrossInstance;
 import nbtool.nio.FileIO;
+import nbtool.util.Center;
 import nbtool.util.Debug;
 import nbtool.util.Utility;
 
@@ -35,12 +36,19 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 	public void setupDisplay() {
 		Debug.info("view!");
 
-		try {
-			PlaySound.play(displayedLog.blocks.get(0).data);
-		} catch (LineUnavailableException e) {
-			e.printStackTrace();
-			ToolMessage.displayError("couldn't play sound file");
-		}
+		final byte[] dataToPlay = displayedLog.blocks.get(0).data;
+
+		Center.addEvent( new Center.EventRunnable() {
+			@Override
+			protected void run() {
+				try {
+					PlaySound.play(dataToPlay);
+				} catch (LineUnavailableException e) {
+					e.printStackTrace();
+					ToolMessage.displayError("couldn't play sound file");
+				}
+			}
+		});
 
 		if (displayedLog.logClass.equals("DetectAmplitude")) {
 			CrossInstance ci = CrossServer.instanceByIndex(0);
