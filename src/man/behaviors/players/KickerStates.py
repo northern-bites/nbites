@@ -33,6 +33,7 @@ def gamePenalized(player):
 def kick(player):
     if player.firstFrame():
         player.brain.nav.callKickEngine(PMotion_proto.messages.Kick.kickForwardRight)
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
 
     return player.stay()
 

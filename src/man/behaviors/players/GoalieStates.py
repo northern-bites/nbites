@@ -132,7 +132,6 @@ def gamePenalized(player):
         player.stopWalking()
         player.penalizeHeads()
         player.penalized = True
-        player.executeMove(SweetMoves.STRETCHED_KNEE_STAND)
 
     # TODO is this actually possible?
     if player.lastDiffState == '':
