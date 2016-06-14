@@ -253,6 +253,16 @@ void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
 
 }
 
+int BallDetector::getAzimuthColumnRestrictions() {
+    double az = homography->azimuth();
+    int startColumn;
+}
+
+int BallDetector::getAzimuthRowRestrictions() {
+    double az = homography->azimuth();
+    int endRow;
+}
+
 /* We have a potential ball on the horizon. Do some checking to
    screen out potential other stuff.
    This is a substantial area of possible improvement - more sanity
