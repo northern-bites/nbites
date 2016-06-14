@@ -232,9 +232,8 @@ void VisionModule::run_()
             homography[i]->roll(calibrationParams[i]->getRoll());
 
             homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
-#ifndef OFFLINE
+
             homography[i]->azimuth(kinematics[i]->azimuth());
-#endif
         }
 
         times[i][1] = timer.end();
