@@ -858,13 +858,6 @@ bool BallDetector::filterWhiteSpot(Spot spot,
 bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
                             EdgeList& edges)
 {
-	int WHITE_CANDIDATE = 1;
-	int WHITE_REJECT = 2;
-	int DARK_CANDIDATE = 3;
-	int DARK_REJECT = 4;
-	int WHITE_BLOB = 5;
-	int WHITE_BLOB_BAD = 6;
-
     Ball reset;
     _best = reset;
     width = white.width();
