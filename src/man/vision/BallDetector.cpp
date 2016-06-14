@@ -890,10 +890,12 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	// if (topCamera) {
 	// 	horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
 	// }
+    //std::cout<<"Height - Horiz = "<<height-horiz<<std::endl;
 	// ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
 	// 						 height - horiz);
 	// ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
 	// 						 height - horiz);
+    //if((height - horiz) > 0) {} //execute all of the below code, else return false
 
     SpotDetector darkSpotDetector;
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera, 150, 60, 0.5);
