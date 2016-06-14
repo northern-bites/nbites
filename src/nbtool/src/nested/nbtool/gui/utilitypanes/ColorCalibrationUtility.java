@@ -135,7 +135,14 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				applyGlobally = nv;
 			}
 		};
-
+		
+		private ChangeListener undoListener = new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				undoTheChanges();
+			}
+		};
+		
 		Display() {
 			super("color calibration utility");
 
@@ -182,6 +189,7 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				th.tab.SaveButton.addActionListener(saveListener);
 				th.tab.SendButton.addActionListener(sendListener);
 				th.tab.globalCheckBox.addChangeListener(globalListener);
+				th.tab.UndoButton.addActionListener(undoListener);
 			}
 
 			for (int i = 0; i < handlers.length; ++i) {
@@ -309,6 +317,13 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 			for (Group g : groups) {
 				param.set(g.part, g.slider.getValue());
 			}
+		}
+		
+		public void undoTheChange() {
+			
+			
+			
+			
 		}
 
 		private ChangeListener fromSpinner = new ChangeListener() {
