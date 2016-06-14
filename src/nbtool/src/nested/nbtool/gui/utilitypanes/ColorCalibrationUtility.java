@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -223,7 +224,7 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 		public String title() {
 			return (top ? "top" : "bot") + " " + camera.toString();
 		}
-
+		
 		static class Group {
 			JSlider slider;
 			JSpinner spinner;
@@ -233,9 +234,11 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				this.slider = slider; this.spinner = spinner; this.part = part;
 			}
 		}
-
+		
 		private ArrayList<Group> groups = new ArrayList<>();
+		private Stack<Group> undoStack = new Stack();
 
+		
 		private void visionCall() {
 			assert(dropped != null);
 			assert(color_parameters != null);
@@ -279,14 +282,13 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 		}
 
 		private void wasUpdated() {
-
+			
 			setTo(color_parameters);
 
 			if (dropped != null) {
 				debug.info("{%s} making vision call", title());
 				visionCall();
 			}
-
 			colorParametersUpdated();
 		}
 
@@ -352,6 +354,7 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 							rel.slider.getValue()
 							);
 				}
+				
 
 				wasUpdated();
 			}
