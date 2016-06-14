@@ -38,6 +38,11 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
     NBL_ASSERT_EQ( robotName.find(".local"), std::string::npos )
     name = robotName;
 
+    for (int i = 0; i < 2; ++i) {
+        colorParams[i] = NULL;
+        calibrationParams[i] = NULL;
+    }
+
     reloadColorParams();
     reloadCameraOffsets();
 
@@ -511,7 +516,8 @@ void VisionModule::outportalVisionField()
     {
         vb->set_distance(best.dist);
 
-        vb->set_radius(best.firstPrincipalLength);
+        vb->set_radius(best.radius);
+
         double bearing = atan(best.x_rel / best.y_rel);
         vb->set_bearing(bearing);
         vb->set_bearing_deg(bearing * TO_DEG);
@@ -526,7 +532,6 @@ void VisionModule::outportalVisionField()
         vb->set_confidence(best.confidence());
         vb->set_x(static_cast<int>(best.centerX));
         vb->set_y(static_cast<int>(best.centerY));
-
     }
 
     visionField.set_horizon_dist(field->horizonDist());

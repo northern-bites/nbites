@@ -13,6 +13,7 @@
 #include "vision/VisionModule.h"
 #include "vision/FrontEnd.h"
 #include "vision/Homography.h"
+#include "vision/Spots.h"
 #include "ParamReader.h"
 #include "NBMath.h"
 
@@ -166,7 +167,6 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     module.run();
 
     std::vector<Block> retVec;
-    json::Object retKeys;
     // -----------
     //   Y IMAGE
     // -----------
@@ -342,29 +342,64 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     //-----------
     //  BALL
     //-----------
+//    man::vision::BallDetector* detector = module.getBallDetector(topCamera);
+//    std::vector<man::vision::Ball> balls = detector->getBalls();
+//
+//    SExpr allBalls;
+//    int count = 0;
+//    for (auto i=balls.begin(); i!=balls.end(); i++) {
+//        SExpr ballTree = treeFromBall(*i, width, height);
+//        SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
+//        allBalls.append(next);
+//        count++;
+//    }
+//    count = 0;
+//    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
+//        if ((*i).firstPrincipalLength() < 8) {
+//            SExpr blobTree = treeFromBlob(*i);
+//            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
+//            allBalls.append(next);
+//            count++;
+//        }
+//    }
+
     man::vision::BallDetector* detector = module.getBallDetector(topCamera);
+
     std::vector<man::vision::Ball> balls = detector->getBalls();
-    std::list<man::vision::Blob> blobs = detector->getBlobber()->blobs;
+	std::vector<man::vision::Spot> whiteSpots = detector->getWhiteSpots();
+	std::vector<man::vision::Spot> blackSpots = detector->getBlackSpots();
 
     SExpr allBalls;
+	SExpr allWhite;
+	SExpr allBlack;
     int count = 0;
     for (auto i=balls.begin(); i!=balls.end(); i++) {
-        SExpr ballTree = treeFromBall(*i);
+        SExpr ballTree = treeFromBall(*i, width, height);
         SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
         allBalls.append(next);
         count++;
     }
-    count = 0;
-    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
-        if ((*i).firstPrincipalLength() < 8) {
-            SExpr blobTree = treeFromBlob(*i);
-            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
-            allBalls.append(next);
-            count++;
-        }
+	count = 0;
+    for (auto i=whiteSpots.begin(); i!=whiteSpots.end(); i++) {
+        SExpr spotTree = treeFromSpot(*i, width, height);
+        SExpr next = SExpr::keyValue("whiteSpot" + std::to_string(count), spotTree);
+        allWhite.append(next);
+        count++;
+    }
+	count = 0;
+    for (auto i=blackSpots.begin(); i!=blackSpots.end(); i++) {
+        SExpr spotTree = treeFromSpot(*i, width, height);
+        SExpr next = SExpr::keyValue("darkSpot" + std::to_string(count), spotTree);
+        allBlack.append(next);
+        count++;
     }
 
-    retVec.push_back(Block{allBalls.serialize(), json::Object{}, SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-ball", 0, 0});
+    retVec.push_back(Block{allBalls.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-ball", 0, 0});
+    retVec.push_back(Block{allWhite.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-spot-white", 0, 0});
+    retVec.push_back(Block{allBlack.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-spot-black", 0, 0});
 
     //---------------
     // Center Circle
@@ -396,12 +431,7 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     int debugImageLength = (width / 2) * (height / 2);
     retVec.push_back(Block{ std::string{ (const char *) module.getDebugImage(topCamera)->pixArray(), debugImageLength}, json::Object{}, "debugImage", "nbcross", 0, 0});
 
-    if (theLog->topLevelDictionary.find("BallTest_Balls") !=
-                theLog->topLevelDictionary.end()) {
-        retKeys["BallTest_Balls"] = theLog->topLevelDictionary["BallTest_Balls"];
-    }
-
-    RETURN(Log::explicitLog(retVec, retKeys, "VisionReturn"));
+    RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));
 }
 
 NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tripoint())
