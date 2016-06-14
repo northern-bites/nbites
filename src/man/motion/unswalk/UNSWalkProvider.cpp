@@ -551,8 +551,10 @@ void UNSWalkProvider::getOdometryUpdate(portals::OutPortal< ::messages::RobotLoc
 	odometryData.get()->set_x(odometry->forward * MM_TO_CM);
 	odometryData.get()->set_y(odometry->left * MM_TO_CM);
 	odometryData.get()->set_h(odometry->turn);
-	std::cout << "MY LEFT ODO: " << odometry->left << std::endl;
-	std::cout << "MY LEFT ODO IN CM: " << odometry->left * MM_TO_CM << std::endl;
+	// std::cout << "MY LEFT ODO: " << odometry->left << std::endl;
+	// std::cout << "MY LEFT ODO IN CM: " << odometry->left * MM_TO_CM << std::endl;
+    std::cout << "MY ODO: " << odometry->forward << " Y: " << odometry->left * 100 << " TURN: " << odometry->turn << std::endl;
+
 	out.setMessage(odometryData);
 }
 
