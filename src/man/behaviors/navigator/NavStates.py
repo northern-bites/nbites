@@ -299,7 +299,6 @@ walking.transitions = {}
 
 ### Stopping States ###
 def stopped(nav):
-    print "'Nav stopped' state"
     return nav.stay()
 
 def atPosition(nav):
