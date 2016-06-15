@@ -96,7 +96,7 @@ def spinToFoundBall(player):
         print "facing ball"
         return player.goLater('playOffBall')
 
-    player.brain.tracker.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+    player.brain.tracker.repeatFixedPitchLookAhead()
 
     # spins the appropriate direction
     if theta < 0.:

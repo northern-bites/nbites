@@ -133,6 +133,9 @@ class HeadTracker(FSA.FSA):
     def performFixedPitchLookAhead(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
 
+    def repeatFixedPitchLookAhead(self):
+        self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+
     def repeatWidePan(self):
         """
         Repeat the wide fixed pitch pan.
