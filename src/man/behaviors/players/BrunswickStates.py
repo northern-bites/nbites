@@ -9,7 +9,7 @@ from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
 
-DEBUG_MANUAL_PLACEMENT = False
+DEBUG_MANUAL_PLACEMENT = True
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
