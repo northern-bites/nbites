@@ -438,6 +438,8 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
    // 8. Odometry update for localisation
    updateOdometry(odometry,bodyModel.isLeftPhase);
+   
+
 
    // 9. Work out joint angles from walk variables above
    // 9.1 Left foot closed form inverse kinematics
@@ -780,7 +782,7 @@ void Walk2014Generator::updateOdometry(Odometry *odometry, bool isLeftSwingFoot)
    //Calibrate odometry to match the actual speed
    forwardOdo *= 1;
    leftOdo    *= 1.23;
-   turnOdo    *= -.53;
+   turnOdo    *= -0.58; // TODO nikki -.53;
    // std::cout << "UNSW WALK ODO " << forwardOdo <<" "<< leftOdo <<" "<< turnOdo << std::endl;
    *odometry = *odometry + Odometry(forwardOdo, leftOdo, turnOdo);
 

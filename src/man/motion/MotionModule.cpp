@@ -91,6 +91,12 @@ void MotionModule::run_()
 
     // (2) If motion is enabled, perform a single iteration
     //     of the main motion loop.
+    if (frameCount % 800 == 0) {
+        std::cout << "RESETTING ODOMETRY oh god! \n";
+        resetOdometry();
+    }
+
+
     if(running)
     {
         // (3) Do any necessary preprocessing of joint angles

@@ -89,6 +89,10 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
 	// Touch* nullTouch = (Touch*) new NullTouch();
 	touch = (Touch*) new FilteredTouch();
     ((FilteredTouch*)touch)->NBSetOptions();
+    savedHeadingOdo = 0.0;
+    slipAverage = 0.0;
+    lastAngleZ = 0.0;
+    angleChanged = 0.0;
 	
 	resetAll();
 }
@@ -220,7 +224,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
 			request->body.forward = command->x_mm;
-			request->body.left = 0.0; //command->y_mm;
+			request->body.left = command->y_mm;
 			request->body.turn = command->theta_rads;
 			std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
 			// TODO incorporate motion kicks
@@ -246,10 +250,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// request->body.left = 0.0; 
 	// request->body.turn = 0.0; 
 
-	std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
-	// request->body.forward = 300.0; //command->x_percent ;
+	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
+	// request->body.forward = 00.0; //command->x_percent ;
 	// request->body.left = 00.0; //command->y_percent ;
-	// request->body.turn = UNSWDEG2RAD(45); //UNSWDEG2RAD(90.0); //command->theta_percent ;
+	// request->body.turn = UNSWDEG2RAD(10); //UNSWDEG2RAD(90.0); //command->theta_percent ;
 	// request->body.speed = 0.0f;
 
 	// For testing stand action
@@ -315,14 +319,11 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     // 	sensors.joints.angles[nb_joint_order[i]] = sensorAngles[i];
     // }
 
-    // Ughhhh idk
 
     sensors.joints.angles[Joints::LShoulderPitch] = sensorAngles[sensors::LShoulderPitch];
     sensors.joints.angles[Joints::LShoulderRoll] = sensorAngles[sensors::LShoulderRoll];
     sensors.joints.angles[Joints::LElbowYaw] = sensorAngles[sensors::LElbowYaw];
     sensors.joints.angles[Joints::LElbowRoll] = sensorAngles[sensors::LElbowRoll];
-    // sensors.joints.angles[Joints::LWristYaw] = sensorAngles[sensors::LShoulderPitch];
-    // sensors.joints.angles[Joints::LHand] = sensorAngles[sensors::LShoulderPitch];
     
     sensors.joints.angles[Joints::LHipYawPitch] = sensorAngles[sensors::LHipYawPitch];
     sensors.joints.angles[Joints::LHipRoll] = sensorAngles[sensors::LHipRoll];
@@ -341,18 +342,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     sensors.joints.angles[Joints::RShoulderRoll] = sensorAngles[sensors::RShoulderRoll];
     sensors.joints.angles[Joints::RElbowYaw] = sensorAngles[sensors::RElbowYaw];
     sensors.joints.angles[Joints::RElbowRoll] = sensorAngles[sensors::RElbowRoll];
-    // sensors.joints.angles[Joints::RWristYaw] = sensorAngles[sensors::LShoulderPitch];
-    // sensors.joints.angles[Joints::RHand] = sensorAngles[sensors::LShoulderPitch];
 
-
-
-
-
-
-
-
-
-    // ughhh
 
     // ((FilteredTouch*)touch)->NBSetOptions();
 
@@ -368,21 +358,6 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
     // sensors.sensors[Sensors::InertialSensor_AccX] = adjAccX * 0.01;
     // sensors.sensors[Sensors::InertialSensor_AccY] = adjAccY * 0.01;
-
-
-
-	// TODO investigate calibrating sensors. . .
-	// if(request.body.actionType == Body::MOTION_CALIBRATE){
- //       // raw sensor values are sent to offnao for calibration
- //       // these values are straight forward copy paste into pos files
- //       sensors = nakedTouch->getSensors(kinematics);
- //       sensors.sensors[Sensors::InertialSensor_AngleX] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleX]);
- //       sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleY]);
- //       sensors.sensors[Sensors::InertialSensor_GyrX] = -sensors.sensors[Sensors::InertialSensor_GyrX];
- //       sensors.sensors[Sensors::InertialSensor_GyrY] = -sensors.sensors[Sensors::InertialSensor_GyrY];
- //   } else {
-    // sensors = touch->getSensors(kinematics);
-
 
 	// Update kinematics TODO sensors lagging ? ?
 	// TODO kinematics parameters? - move these..., also hopefully right units
@@ -419,6 +394,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
     joints = generator->makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
 
+    updateOdometry(sensorInertials.angle_z());
+
     angles = joints.angles;
     hardness = joints.stiffnesses;
 
@@ -443,38 +420,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     			// RHIPYAWPITCH
     			chain_angles.push_back(joints.angles[nb_joint_order[6]]);
     			// logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
-    		} 
-    		// else if (nb_joint_order[j] == Joints::LHipPitch) {
-    		// 	logMsg("Special case! used nod gyro ratio for: " + Joints::jointNames[nb_joint_order[j]]);
-    		// 	std::cout << "adjAngleX: " << adjAngleX << " adjAngleY: " << adjAngleY << std::endl;
-    		// 	std::cout << "LHipPitch: " << joints.angles[nb_joint_order[j]] << std::endl;
-	    	// 	chain_angles.push_back(joints.angles[nb_joint_order[j]] + adjAngleX); // TODO I think this should be a lot more complicated than it seems right now...
-
-    		// }
-    		// else if (nb_joint_order[j] == Joints::RHipPitch) {
-    		// 	logMsg("Special case! used nod gyro ratio for: " + Joints::jointNames[nb_joint_order[j]]);
-	    	// 	chain_angles.push_back(joints.angles[nb_joint_order[j]] + adjAngleX);
-    		// 	std::cout << "RHipPitch: " << joints.angles[nb_joint_order[j]] << std::endl;
-    			
-    		// } 
-    		// else if (nb_joint_order[j] == Joints::LAnklePitch) {
-    		// 	logMsg("Special case! used nod gyro ratio for: " + Joints::jointNames[nb_joint_order[j]]);
-    		// 	std::cout << "adjAngleX: " << adjAngleX << " adjAngleY: " << adjAngleY << std::endl;
-    		// 	std::cout << "LAnklePitch: " << joints.angles[nb_joint_order[j]] << std::endl;
-	    	// 	chain_angles.push_back(joints.angles[nb_joint_order[j]] - adjAngleX); // TODO I think this should be a lot more complicated than it seems right now...
-
-    		// }
-    		// else if (nb_joint_order[j] == Joints::RAnklePitch) {
-    		// 	logMsg("Special case! used nod gyro ratio for: " + Joints::jointNames[nb_joint_order[j]]);
-	    	// 	chain_angles.push_back(joints.angles[nb_joint_order[j]] - adjAngleX);
-    		// 	std::cout << "RAnklePitch: " << joints.angles[nb_joint_order[j]] << std::endl;
-    			
-    		// }
-    		else {
+    		} else {
 	    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); // TODO I think this should be a lot more complicated than it seems right now...
     		}
 
-    		
    //  		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
 			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
 			// // std::cout << (joints.angles[nb_joint_order[j]]);
@@ -512,6 +461,9 @@ void UNSWalkProvider::hardReset() {
 }
 
 void UNSWalkProvider::resetOdometry() {
+	savedHeadingOdo = odometry->turn;
+	lastAngleZ = 0.0;
+	angleChanged = 0.0;
 	odometry->clear();
 }
 
@@ -546,33 +498,76 @@ void UNSWalkProvider::setCommand(const KickCommand::ptr command) {
 	active();
 }
 
+void UNSWalkProvider::updateOdometry(float angleZ) {
+
+#ifdef V5_ROBOT
+    // Calculate odometryOffset.rotation from the filtered Z-axis gyro data
+    // float angleZ = -theSensorDataBH.data[SensorDataBH::angleZ];
+    angleZ = -angleZ;
+    if (angleChanged == 0.0 && lastAngleZ == 0.0) {
+    	// First one
+    	lastAngleZ = angleZ;
+    	std::cout << "Initting the angle changing!\n";
+    	return;
+    }
+    std::cout << "Angle Z: " << angleZ << std::endl;
+    angleChanged += angleZ - lastAngleZ;
+    lastAngleZ = angleZ;
+    // odometry->turn = angleChanged;
+// #else
+    // odometryOffset.rotation = odometryOffset3D.rotation.getZAngle();
+#endif
+
+    // if (abs(gyroZ) > 0) {
+    // 	std::cout << "[GYROZ] the abs gyroz was: " << gyroZ << std::endl;
+    //     // convert to radians per frame, same direction as walkChange
+    //     gyroZ *= -0.01f * 0.95f;
+
+    //     float slipError = gyroZ - odometry->turn;
+    //     slipAverage = 0.3f*slipError + (1.f - 0.3f)*slipAverage;
+
+    //     // use gyroZ if there is sufficient difference, don't always use it due to gyro drift skewing the result
+    //     if (fabs(slipAverage) > 0.005f){
+    //     	std::cout << "USING GYRO!!!\n";
+    //         odometry->turn = gyroZ;
+    //     }
+    // }
+    
+}
+
 void UNSWalkProvider::getOdometryUpdate(portals::OutPortal< ::messages::RobotLocation>& out) const {
 
 	portals::Message< ::messages::RobotLocation> odometryData(0);
 
    double dx = odometry->forward*cos(odometry->turn) - odometry->left*sin(odometry->turn);
    double dy = odometry->forward*sin(odometry->turn) + odometry->left*cos(odometry->turn);
-    std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
 
 	// odometryData.get()->set_x(odometry->forward * MM_TO_CM);
-	odometryData.get()->set_x(dx * MM_TO_CM);
+   float FORWARD_SCALE = 1.0;
+	odometryData.get()->set_x(dx * FORWARD_SCALE * MM_TO_CM);
 	// odometryData.get()->set_y(odometry->left * MM_TO_CM);
-	odometryData.get()->set_y(dy * MM_TO_CM);
-	odometryData.get()->set_h(odometry->turn);
+	odometryData.get()->set_y(dy * FORWARD_SCALE * MM_TO_CM);
+	odometryData.get()->set_h(angleChanged);
+
+
 	// std::cout << "MY LEFT ODO: " << odometry->left << std::endl;
 	// std::cout << "MY LEFT ODO IN CM: " << odometry->left * MM_TO_CM << std::endl;
     std::cout << "MY ODO: " << odometry->forward << " Y: " << odometry->left * 100 << " TURN: " << odometry->turn << std::endl;
+    std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
+    std::cout << "AngledChanged: " << angleChanged << std::endl << std::endl;
+		// std::cout << "My turn: " << odometry->turn << " My adjusted turn: " << savedHeadingOdo + odometry->turn << std::endl;
+
 
 	out.setMessage(odometryData);
+}
 
-   
-                                                                  
-   // double dx = odometry->forward*cos(odometry->turn) - odometry->left*sin(odometry->turn);
-   // double dy = odometry->forward*sin(odometry->turn) + odometry->left*cos(odometry->turn);
-   //  std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
-
-   // Update the robot pose estimate.
-   // mean(ROBOT_H_DIM, 0) = normaliseTheta(mean(ROBOT_H_DIM, 0) + odometry.turn);
+double normaliseTheta(double theta) {
+   double r = fmod(theta - M_PI, 2.0*M_PI);
+   if (r > 0) {
+      return r - M_PI;
+   } else {
+      return r + M_PI;
+   }
 }
 
 bool UNSWalkProvider::isStanding() const { //is going to stand rather than at complete standstill

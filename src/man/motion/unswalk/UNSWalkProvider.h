@@ -107,6 +107,9 @@ private:
 	bool requestedToStop;
 	bool standby;
 	bool tryingToWalk;
+
+	void updateOdometry(float gyroZ);
+
 	MotionCommand::ptr currentCommand;
 	Touch *touch;
 	ClippedGenerator *generator;
@@ -118,6 +121,11 @@ private:
 
 	JointValues joints;
 	IMUAdjuster* imuAdjuster;
+
+	float savedHeadingOdo;
+	float slipAverage;
+	float lastAngleZ;
+	float angleChanged;
 
 	void logMsg(std::string msg) { std::cout << "[UNSW WALK DEBUG] " << msg << std::endl; }
 	void logMsgNoEL(std::string msg) { std::cout << "[UNSW WALK DEBUG] " << msg; }

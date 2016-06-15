@@ -68,9 +68,11 @@ def goToPosition(nav):
 
     dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
     print("Distance: ", dist)
-    if dist < 50:
+    if dist < 30:
         print("I'm close enough ! I will not go fast anymore")
         goToPosition.fast = False
+
+    print("My reldest: ", str(relDest))
 
     # Why would you move like this? This should be refactored,
     # in the mean time never go fast and also never dodge
@@ -84,7 +86,6 @@ def goToPosition(nav):
             relDest = nav.brain.loc.relativeRobotLocationOf(fieldDest)
             relDest.relH = nav.brain.loc.getRelativeBearing(fieldDest)
 
-        print("My reldest: ", str(relDest))
 
         HEADING_ADAPT_CUTOFF = 103
         DISTANCE_ADAPT_CUTOFF = 10
