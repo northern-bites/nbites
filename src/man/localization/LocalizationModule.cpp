@@ -134,6 +134,7 @@ void LocalizationModule::update()
 
 void LocalizationModule::run_()
 {
+    std::cout<<"[LOCALIZATION MODULE] run enter"<<std::endl;
     PROF_ENTER(P_SELF_LOC);
     motionInput.latch();
     visionInput.latch();
@@ -146,6 +147,7 @@ void LocalizationModule::run_()
 
     update();
     PROF_EXIT(P_SELF_LOC);
+    std::cout<<"[LOCALIZATION MODULE] run enter"<<std::endl;
 }
 
 } // namespace localization

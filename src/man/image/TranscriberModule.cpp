@@ -624,6 +624,7 @@ void logThumbnail(messages::YUVImage& image, std::string& ifrom, size_t iindex);
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
+    std::cout<<"[TRANSCRIBER MODULE] run enter"<<std::endl;
     struct stat file_stats;
     std::string filepath;
 #ifdef V5_ROBOT
@@ -724,6 +725,7 @@ void TranscriberModule::run_()
 //                   contents, nb_buf);
 //    }
 #endif
+    std::cout<<"[TRANSCRIBER MODULE] run exit"<<std::endl;
 }
     
 void logThumbnail(messages::YUVImage& image, std::string& ifrom, size_t iindex)

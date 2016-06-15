@@ -289,10 +289,15 @@ void Man::preClose()
 
 void Man::startSubThreads()
 {
+    std::cout<<"BEFORE RUNNING SENSORS THREAD"<<std::endl;
     startAndCheckThread(sensorsThread);
+    std::cout<<"BEFORE RUNNING GUARDIAN THREAD"<<std::endl;
     startAndCheckThread(guardianThread);
+    std::cout<<"BEFORE RUNNING COMM THREAD"<<std::endl;
     startAndCheckThread(commThread);
+    std::cout<<"BEFORE RUNNING COGNITION THREAD"<<std::endl;
     startAndCheckThread(cognitionThread);
+    std::cout<<"DONE THREADS"<<std::endl;
 }
 
 void Man::startAndCheckThread(DiagramThread& thread)

@@ -145,6 +145,7 @@ VisionModule::~VisionModule()
 // TODO use horizon on top image
 void VisionModule::run_()
 {
+    std::cout<<"[VISION MODULE] vision module enter\n";
     PROF_ENTER(P_VISION)
     // Get messages from inPortals
     topIn.latch();
@@ -383,6 +384,7 @@ void VisionModule::run_()
     PROF_EXIT(P_OBSTACLE)
 
     PROF_EXIT(P_VISION);
+    std::cout<<"[VISION MODULE] vision module exit\n";
 }
 
 void VisionModule::outportalVisionField()

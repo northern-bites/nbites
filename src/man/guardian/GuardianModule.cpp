@@ -64,6 +64,7 @@ GuardianModule::~GuardianModule()
 
 void GuardianModule::run_()
 {
+    std::cout<<"[GUARDIAN MODULE] run enter"<<std::endl;
     temperaturesInput.latch();
     chestButtonInput.latch();
     footBumperInput.latch();
@@ -87,6 +88,7 @@ void GuardianModule::run_()
     frameCount++;
 
     PROF_EXIT(P_GUARDIAN);
+    std::cout<<"[GUARDIAN MODULE] run exit"<<std::endl;
 }
 
 void GuardianModule::countButtonPushes()

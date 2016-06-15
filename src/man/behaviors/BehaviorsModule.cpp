@@ -174,6 +174,7 @@ void BehaviorsModule::getBrainInstance ()
 
 void BehaviorsModule::run_ ()
 {
+    std::cout<<"[BEHAVIORS MODULE] run enter"<<std::endl;
     PROF_ENTER(P_BEHAVIORS);
     static unsigned int num_crashed = 0;
     if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
@@ -211,6 +212,7 @@ void BehaviorsModule::run_ ()
     sendMessages();
 
     PROF_EXIT(P_BEHAVIORS);
+    std::cout<<"[BEHAVIORS MODULE] run exit"<<std::endl;
 }
 
 void BehaviorsModule::prepareMessages()

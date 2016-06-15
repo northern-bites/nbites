@@ -47,6 +47,7 @@ void MotionModule::stop()
 
 void MotionModule::run_()
 {
+    std::cout<<"[MOTION MODULE] run enter"<<std::endl;
     PROF_ENTER(P_MOTION);
     // (1) Before anything else happens, it is important to
     //     retrieve the correct current joint angles.
@@ -97,6 +98,7 @@ void MotionModule::run_()
     }
 
     PROF_EXIT(P_MOTION);
+    std::cout<<"[MOTION MODULE] run exit"<<std::endl;
 }
 
 void MotionModule::resetOdometry()

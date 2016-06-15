@@ -181,10 +181,12 @@ void Boss::listener()
 }
 
 int Boss::startMan() {
+    std::cout<<"[BOSS] start man enter"<<std::endl;
     // TODO make extra sure man isn't running yet?
     // Man uses a lock file so it shouldn't be necessary..
     if (manRunning) {
         std::cout << "Man is already running. Will not start." << std::endl;
+        std::cout<<"[BOSS] start man exit"<<std::endl;
         return -1;
     }
 
@@ -199,20 +201,25 @@ int Boss::startMan() {
         //replace this child process with an instance of man.
         execl("/home/nao/nbites/lib/man", "", NULL);
         printf("CHILD PROCESS FAILED TO EXECL MAN!\n");
+        std::cout<<"[BOSS] start man exit"<<std::endl;
         ::exit(1);
     }
     else {
         std::cout << "COULD NOT DETACH MAN" << std::endl;
         manRunning = false;
+        std::cout<<"[BOSS] start man exit"<<std::endl;
         return -1;
     }
+    std::cout<<"[BOSS] start man exit"<<std::endl;
     return 1;
 }
 
 int Boss::killMan() {
+    std::cout<<"[BOSS] kill man enter"<<std::endl;
     // TODO make sure man is actually running. Necessary?
     if (!manRunning) {
         std::cout << "BOSS: Man is not running. Cannot kill" << std::endl;
+        std::cout<<"[BOSS] kill man exit"<<std::endl;
         return -1;
     }
 
@@ -245,6 +252,8 @@ int Boss::killMan() {
     pthread_mutex_destroy((pthread_mutex_t *) &shared->cmnd_mutex);
     pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex, &shared_mutex_attr);
     pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, &shared_mutex_attr);
+
+    std::cout<<"[BOSS] kill man exit"<<std::endl;
 
     return 0; // TODO actually return something. Necessary?
 }
