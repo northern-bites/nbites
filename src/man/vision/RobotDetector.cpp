@@ -58,17 +58,33 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
 
     int startCol = 1;
     int endCol = img_wd - 1;
+    int bottomRow = .9 * img_ht;
     if (!is_top) {
         int val = findAzimuthRestrictions(hom);
+        std::cout<<"Az column: "<<val<<", w = "<<img_wd<<std::endl;
         if (val < 0) { endCol = -val; }
         else if (val > 1) { startCol = val; }
+        startCol -= 15;
+        if (startCol < 1) { startCol = 1; }
+        endCol += 15;
+        if (endCol > img_wd - 1) { endCol = img_wd - 1; }
+        std::cout<<"Start col: "<<startCol<<", end col: "<<endCol<<std::endl;
     }
     // std::cout<<"Start col: "<<startCol<<", endCol = "<<endCol<<", wd = "<<img_wd<<std::endl;
 
     // std::cout<<"[ ROBOT DETECTOR] Az = "<<hom->azimuth()<<std::endl;
 
     for (int j = 1; j < img_ht-1; ++j) {
-        for (int i = startCol; i < endCol; ++i) {
+        if (j > bottomRow) {
+            for (int i = 1; i < img_wd -1; ++i)
+                *WGImage.pixelAddr(i,j) = 0;
+            continue;
+        }
+        for (int i = 1; i < img_wd -1; ++i) {
+            if (i < startCol || i >= endCol) {
+                *WGImage.pixelAddr(i,j) = 0;
+                continue;
+            }
             uint8_t grad = ed->mag(i-1,j-1);
             uint8_t fuzzy = getFuzzyValue(grad);
             uint8_t whiteVal = *(whiteImage.pixelAddr(i,j));
@@ -83,8 +99,8 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
         }
     }
 
-    removeHoughLines(edges);
-    findCandidates(is_top);
+    // removeHoughLines(edges);
+    // findCandidates(is_top);
 }
 
 uint8_t RobotDetector::getFuzzyValue(uint8_t gradientValue)
@@ -102,31 +118,55 @@ int RobotDetector::findAzimuthRestrictions(FieldHomography* hom)
     // A little hacky: TODO make function / calculate better values / use constants
     // HACK US OPEN 2016 SORRY!!
     double az = hom->azimuth();
-    int val = 1;
 
-    // if abs(az) 1.3, too great to detect obstacle: return width
-    if (az > 1.3 || az < -1.3) { return img_wd-1; }
+    // printAz(0);
+    // printAz(1.21028);
+    // printAz(-1.21028);
+    // printAz(1.19341);
+    // printAz(-1.19341);
+    // printAz(1.04154);
+    std::cout<<"Azimuth: "<<az<<std::endl;
+    // A function predetermined from a wide range of values + line of best fit
 
-    // if abs(az) is > 1.15 and <= 1.3, ignore 2/3
-    if (az > 1.15 || az < -1.15) { val = (int)(.6666 * (double)img_wd); }
+    float percentOfImage;
+    if (az > 0) {
+        percentOfImage = 0.8994*az*az - 0.0036*az - 0.5767;
+    } else {
+        percentOfImage = 0.8994*az*az + 0.0036*az - 0.5767;
+    }
 
-    // if abs(az) is > 1.05 and <= 1.15, ignore 1/2
-    else if (az > 1.05 || az < -1.05) { val = (int)(.5 * (double)img_wd); }
+    // float percentOfImage = 2.125*(abs(az)) - 1.769;
+    std::cout<<"Percent of image: "<<percentOfImage<<std::endl;
+    int val = percentOfImage * img_wd;
+    std::cout<<"Val: "<<val<<std::endl;
 
-    // if abs(az) is > 0.95 and <= 1.05, ignore 1/3
-    else if (az > 0.95 || az < -0.95) { val = (int)(.3333 * (double)img_wd); }
+    // detect everything
+    if (val <= 0) { return 0; }
 
-    // if abs(az) is > 0.91 and <= 0.95, ignore 1/4
-    else if (az > 0.91 || az < -0.91) { val = (int)(.25 * (double)img_wd); }
+    // detect nothing
+    if (val >= img_wd -1) { return img_wd-1; }
 
-    // else, no shoulder obstacle! return 0 to detect everything
-    else { return 0; }
+    if (az > 0) { std::cout<<"Val return 1: "<<-1*(img_wd - val)<<std::endl; return -1*(img_wd - val); } // right side
+    else { std::cout<<"Val return 2: "<<val<<std::endl; return val; } // left side (negative lets us know it is the "end col")
+}
 
-    // if we've gotten to this point, we want to ignore part of the
-    // image. Side of image depends on sign of azimuth.
-    if (az > 0) { return -1*(img_wd - val); } // right side
-    else { return val; } // left side (negative lets us know it is the "end col")
+void RobotDetector::printAz(double az)
+{
+    std::cout<<"Azimuth: "<<az<<std::endl;
+    // A function predetermined from a wide range of values + line of best fit
+    float percentOfImage;
+    if (az > 0) {
+        percentOfImage = 2.125*az - 1.769;
+    } else {
+        percentOfImage = 2.125*(-az) - 1.769;
+    }
+    // float percentOfImage = 2.125*(abs(az)) - 1.769;
+    std::cout<<"Percent of image: "<<percentOfImage<<std::endl;
+    int val = percentOfImage * img_wd;
+    std::cout<<"Val: "<<val<<std::endl;
 
+    if (az > 0) { std::cout<<"Val return 1: "<<-1*(img_wd - val)<<std::endl; } // right side
+    else { std::cout<<"Val return 2: "<<val<<std::endl; } // left side (negative lets us know it is the "end col")
 }
 
 void RobotDetector::getCurrentDirection(FieldHomography* hom)

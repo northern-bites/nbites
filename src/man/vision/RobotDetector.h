@@ -44,6 +44,7 @@ public:
     void getCurrentDirection(FieldHomography* hom);
     void getDetectedRobots(bool* detectedObstacles, int size);
     void printCandidates(std::string message);
+    void printAz(double az);
 
     struct box {
         int left;
