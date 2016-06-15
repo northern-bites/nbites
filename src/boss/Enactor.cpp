@@ -5,6 +5,8 @@
 #include "SensorTypes.h"
 #include <alerror/alerror.h>
 
+#include "utilities-pp.hpp"
+
 namespace boss {
 namespace enactor {
 
@@ -29,11 +31,15 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
 
     jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
     jointStiffnesses.erase(jointStiffnesses.begin() + Kinematics::R_HIP_YAW_PITCH);
+
     for (unsigned int i = 0; i < jointAngles.size(); ++i) {
+        NBL_ASSERT(i < 21);
+        lastSet[i] = jointAngles[i];
+
         jointCommand[5][i][0] = jointAngles[i];
         stiffnessCommand[5][i][0] = jointStiffnesses[i];
-
     }
+
     try
     {
         jointCommand[4][0] = dcm->getTime(0);
@@ -70,54 +76,44 @@ void Enactor::noStiff()
 
 }
 
+double interp(double start, double end, int index, int outof) {
+    double diff = end - start;
+    double frac = ((double) index) / ((double) outof);
+    double ret = start + (diff * frac);
+//    printf("%lf -> %lf @ %lf == %lf\n", start, end, frac, ret);
+    return ret;
+}
+
 long nextFrame = 0;
 bool Enactor::manDied() {
-    static const int num_joints = 21;
     static const int num_frames_interpolate = 1000;
-
     bool is_finished = true;
-    static double startPosition[num_joints];
-    double jointCrash1[num_joints] = {0.00762796,-0.00157595, 0.253068, 0.185572, 0.00149202,-0.0152981, -0.078192, 0.00464392, 
+
+    double jointCrash1[numJoints] = {0.00762796,-0.00157595, 0.253068, 0.185572, 0.00149202,-0.0152981, -0.078192, 0.00464392,
                         -0.308292, 1.3192, -0.78545, 0.0399261, 0.04913, -0.277696, 1.27633, -0.76389, -0.032172, 
                         0.204064, -0.26389, -4.19617e-05,  0.0383921};
 
-    double jointCrash2[num_joints] = { -0.214802, 0.35, 1.57538, 0.131882, -1.56165, -0.0229681, -0.0475121, -0.0137641,
+    double jointCrash2[numJoints] = { -0.214802, 0.35, 1.57538, 0.131882, -1.56165, -0.0229681, -0.0475121, -0.0137641,
                         -0.811444, 2.16443, -1.22111, 0.00771189,  0.0261199, -0.81613, 2.17986, -1.23023, 
                         -0.0352399, 1.58466, -0.046062, 1.5631, 0.0353239};
 
-    
-    double diff1[num_joints];
-    double diff2[num_joints];
-    
-
-    if (nextFrame == 0) {
-        for (unsigned int i = 0; i < num_joints; i++) {
-            startPosition[i] = jointCommand[5][i][0];
-        }
-        //calc difference interpolation
-        for (unsigned int i = 0; i < num_joints; ++i) {
-            diff1[i] = (startPosition[i] - jointCrash1[i])/num_frames_interpolate;
-            diff2[i] =(jointCrash1[i] -  jointCrash2[i])/num_frames_interpolate;
-        }
-
-    }
-
     if (nextFrame >= 0 && nextFrame < 1000) {
-        for (unsigned int i = 0; i < num_joints; ++i) {
-            jointCommand[5][i][0] = startPosition[i] + diff1[i];
-            startPosition[i] += diff1[i];
+        for (unsigned int i = 0; i < numJoints; ++i) {
+            double value = interp(lastSet[i], jointCrash1[i], nextFrame, num_frames_interpolate);
+            jointCommand[5][i][0] = value;
         }
     }
     else if (nextFrame >= 1000 && nextFrame <= 2000) {
-        for (unsigned int i = 0; i < num_joints; ++i) {
-            jointCommand[5][i][0]  = startPosition[i] + diff2[i];
-            startPosition[i] += diff2[i];
+        for (unsigned int i = 0; i < numJoints; ++i) {
+            double value = interp(lastSet[i], jointCrash2[i], nextFrame - 1000, num_frames_interpolate);
+            jointCommand[5][i][0] = value;
         }
-    }
-    else {
+    } else {
         noStiff();
         is_finished = false;
+        nextFrame = 0;
     }
+
     nextFrame++;
     
     try
@@ -136,6 +132,7 @@ bool Enactor::manDied() {
     catch (AL::ALError e) {
         std::cout << "Couldn't set stiffness because: " << e.toString() << std::endl;
     }
+
     return is_finished;
 }
 // Based on (stolen from) the original JointEnactorModule by Ellis Ratner

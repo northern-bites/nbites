@@ -23,6 +23,10 @@ private:
 
     AL::ALValue jointCommand;
     AL::ALValue stiffnessCommand;
+
+    static const int numJoints = 21;
+    double lastSet[numJoints];
 };
+    
 }
 }
