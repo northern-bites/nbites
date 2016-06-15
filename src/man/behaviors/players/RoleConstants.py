@@ -148,7 +148,7 @@ if NogginConstants.RIGHT_FORWARD_DEFENSE:
 else:
     oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
-                                0)
+                                45)
     oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)

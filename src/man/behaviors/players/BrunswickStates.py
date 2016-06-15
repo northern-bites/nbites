@@ -104,6 +104,8 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
+    #HACKKKKKKK FOR THESSSEEEE
+    return player.goNow('positionAtHome')
 
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
