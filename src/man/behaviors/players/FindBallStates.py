@@ -11,7 +11,6 @@ def findBall(player):
     """
     Decides what type of search to do.
     """
-
     print "---------TRYING TO FIND BALL-------------\n"
 
     if player.firstFrame():
@@ -40,7 +39,7 @@ def searchInFront(player):
 
     # playerTracker = player.brain.tracker
 
-    if not player.brain.tracker.brain.motion.head_is_active:
+    if not player.brain.tracker.brain.motion.head_is_active and player.brain.tracker.isStopped():
         print "-------HEAD IS NOT ACTIVE, GOING TO SPINNING--------------\n"
         return player.goNow('spinSearch')
 
@@ -100,7 +99,7 @@ def spinToFoundBall(player):
         print "facing ball"
         return player.goLater('playOffBall')
 
-    self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+    player.brain.tracker.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
 
     # spins the appropriate direction
     if theta < 0.:
@@ -121,15 +120,23 @@ def scrumStrategy(player):
 @stay
 def backPedal(player):
     if player.firstFrame():
+
+        print "----------BACK PEDALING-----------\n"
+
         player.setWalk(constants.BACK_PEDAL_SPEED, 0., 0.)
-        player.brain.tracker.repeatWideSnapPan()
+        player.brain.tracker.performFixedPitchLookAhead()
+        # player.brain.tracker.repeatWideSnapPan()
 
     elif player.stateTime > constants.BACK_PEDAL_TIME:
-        return player.goLater('spinSearch')
+
+        print "No longer backing up\n"
+
+        return player.goLater('searchInFront')
 
 @superState('scrumStrategy')
 @stay
 def spinForwardSearch(player):
+
     if player.firstFrame():
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)

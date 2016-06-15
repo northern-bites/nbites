@@ -18,6 +18,8 @@ def tracking(tracker):
     # makes sure ball is default target when entering tracking
     tracker.target = tracker.brain.ball
 
+    # print "------------IsN TRACKING---------"
+
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
 
     tracker.helper.trackObject()
@@ -38,9 +40,10 @@ def tracking(tracker):
 def gameSetTracking(tracker):
     #SNAP PAN --- MAY CHANGE SNAP PAN BACK TO FULL PAN
 
+    # print "---------GAME SET TRACKING-------------"
+
     tracker.target = tracker.brain.ball
 
-    # if not tracker.brain.motion.head_is_active:
     tracker.helper.trackObject()
 
     if not tracker.target.vis.on and tracker.counter > 15:
@@ -221,11 +224,16 @@ def fullPan(tracker):
 
 def snapPan(tracker):
 
+    # print "----------------IN SNAP PAN-----------------\n"
+
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
     Once the ball is located, switches to tracking.
     """
     if tracker.firstFrame():
+
+        # print "-----------------FIRST FRAME IN SNAP PAN--------------------\n"
+
         # Send the motion request message to stop
         request = tracker.brain.interface.motionRequest
         request.stop_head = True
@@ -237,7 +245,7 @@ def snapPan(tracker):
         # tracker.lookToAngleWithTime(-75,1)
         # tracker.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
-    if not tracker.brain.motion.head_is_active:
+    if not tracker.brain.motion.head_is_active or tracker.isStopped():
         tracker.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
@@ -257,7 +265,7 @@ def gameSetSnapPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
 
-        tracker.helper.boundsSnapPan(-75, 75, False)
+        tracker.helper.executeHeadMove(tracker.helper.boundsSnapPan(-90, 90, False))
 
     if not tracker.brain.motion.head_is_active:
         tracker.helper.executeHeadMove(HeadMoves.GAME_SET_WIDE_SNAP_PAN)

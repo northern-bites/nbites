@@ -93,11 +93,14 @@ class HeadTracker(FSA.FSA):
 
     def performWideSnapPan(self):
 
-        # print "PERFORMING WIDE SNAP PAN WITH NEW TIMES"
+        print "-----------PERFORMING WIDE SNAP PAN----------"
 
         self.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
     def repeatWideSnapPan(self):
+
+        print "---------REPEATING WIDE SNAP PAN------------"
+
         self.repeatHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
     def performFastSnapPan(self):
@@ -127,8 +130,14 @@ class HeadTracker(FSA.FSA):
     def performWidePan(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
+    def performGameSetWideSnapPan(self):
+        self.performHeadMove(HeadMoves.GAME_SET_WIDE_SNAP_PAN)
+
     def performGameSetInitialWideSnapPan(self):
         self.performHeadMove(HeadMoves.GAME_SET_INITIAL_WIDE_SNAP_PAN)
+
+    def performFixedPitchLookAhead(self):
+        self.performHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
 
     def repeatWidePan(self):
         """
@@ -164,6 +173,9 @@ class HeadTracker(FSA.FSA):
         self.target = self.brain.ball
 
         if (gameSet): # == True
+
+            print "IN GAME SET\n"
+
             if (self.currentState is not 'gameSetSnapPan' and self.currentState is not 'gameSetTracking'):
                 self.switchTo('gameSetTracking')
                 return

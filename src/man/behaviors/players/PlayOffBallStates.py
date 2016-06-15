@@ -15,8 +15,6 @@ import random
 # IMPORTANT China 2015 bug found
 # TODO fix oscillation between positionAtHome and positionAsSupporter
 
-
-
 @defaultState('branchOnRole')
 @superState('gameControllerResponder')
 @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
@@ -225,7 +223,7 @@ def searchFieldByQuad(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.tracker.repeatWideSnapPan()
+        # player.brain.tracker.repeatWideSnapPan()
         searchFieldByQuad.dest = min(points, key=lambda x:fabs(player.brain.loc.distTo(x)))
         player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,

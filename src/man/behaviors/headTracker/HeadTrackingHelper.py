@@ -93,13 +93,15 @@ class HeadTrackingHelper(object):
     def boundsSnapPan(self, maxRight, maxLeft, beginDirection = True): #Default right
         """Generates snap pan betwewn two maxima"""
 
+        print "Bounds Snap Pan\n"
+
         SNAP_PAN_PAN_TIME = 0.3
-        SNAP_PAN_WAIT_TIME = 0.4
-        SNAP_TIME_DEGREE_INTERVALS = 25
+        SNAP_PAN_WAIT_TIME = 0.2
+        SNAP_TIME_DEGREE_INTERVALS = 45
 
         curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
 
-        startingYaw = (((curYaw // 12.5) + 1) // 2) * 25
+        startingYaw = (((curYaw // (SNAP_TIME_DEGREE_INTERVALS / 2)) + 1) // 2) * SNAP_TIME_DEGREE_INTERVALS
 
         newSnapPanHeadMove = ()
 
@@ -136,7 +138,9 @@ class HeadTrackingHelper(object):
 
                 startingYaw -= SNAP_TIME_DEGREE_INTERVALS
 
-        self.executeHeadMove(newSnapPanHeadMove)
+        print "New Snap Pan: " + str(newSnapPanHeadMove)
+
+        return newSnapPanHeadMove
 
     # Should be generalized.
     def convertKickPan(self, headMove, invert):
@@ -175,7 +179,7 @@ class HeadTrackingHelper(object):
 
         target = self.tracker.target
 
-        # print "TRACKER TARGET: " + str(target)
+        # print "-------------Tracking Target------------"
 
         changeX, changeY = 0.0, 0.0
 
