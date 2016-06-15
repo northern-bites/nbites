@@ -781,6 +781,56 @@ GOALIE_TEST_CENTER_SAVE = ( ((0, -5, -90, 0),
 #       KICKS         *
 #                     *
 #**********************
+
+# This is a relatively stable straight kick for arms back
+LEFT_SHORT_STRAIGHT_KICK = (
+    #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (-0.2,5,-25,43.5,-21.2, 0.0),
+     (-0.2,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     0.3,0,stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((20.,30.,0.,0.),
+     (0.,20.,-30,70,-40,-25.),
+     (0.,20.,-22.3,50,-22.5,-17),
+     (100.,-30.,0.,0),
+     0.6,0, stiff.NORMAL_STIFFNESSES),
+
+    #kick
+    ((43.,30.,0.,0.),
+     (0.,19.,-60,50,3,-19.),
+     (0.,17,-22.3,43,-23,-17),
+     (40.,-30.,0.,0),
+     0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    #recover
+    ((35.,30.,0.,0.),
+     (0.,25.,-35,65,-30,-25.),
+     (0.,10.,-22.3,45,-22.5,-17),
+     (90.,-30.,0.,0),
+     0.6,0, stiff.NORMAL_STIFFNESSES),
+
+    #back to normal
+    ((40, 9, -80, -9),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (40, -9, 80, -9),
+     .7,0,stiff.NORMAL_STIFFNESSES),
+
+    #stand for a bit
+    ((90., 10., -90., -3.),
+      (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+      (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+      (90., -10., 90., 3.),
+      1,0,stiff.NORMAL_STIFFNESSES),
+    )
+
+RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
+
+# =========================================================================
+
 def DREW_KICK(y,dist):
     if y<0:
         return mirrorMove(LEFT_D_KICK(-1*y,dist))
@@ -1037,53 +1087,6 @@ LEFT_STRAIGHT_KICK = (
     )
 
 RIGHT_STRAIGHT_KICK = mirrorMove(LEFT_STRAIGHT_KICK)
-
-# This is a relatively stable straight kick for arms back
-LEFT_SHORT_STRAIGHT_KICK = (
-    #stand for a bit
-    ((90.,10.,-90.,-10.),
-     (-0.2,5,-25,43.5,-21.2, 0.0),
-     (-0.2,0.0,-22.3,43.5,-21.2, 0.0),
-     (90.,-10.,82.,13.2),
-     0.3,0,stiff.NORMAL_STIFFNESSES),
-
-    #lean right/lift leg
-    ((20.,30.,0.,0.),
-     (0.,20.,-30,70,-40,-25.),
-     (0.,20.,-22.3,50,-22.5,-17),
-     (100.,-30.,0.,0),
-     0.6,0, stiff.NORMAL_STIFFNESSES),
-
-    #kick
-    ((43.,30.,0.,0.),
-     (0.,19.,-60,50,3,-19.),
-     (0.,17,-22.3,43,-23,-17),
-     (40.,-30.,0.,0),
-     0.2,0, stiff.NORMAL_STIFFNESSES),
-
-    #recover
-    ((35.,30.,0.,0.),
-     (0.,25.,-35,65,-30,-25.),
-     (0.,10.,-22.3,45,-22.5,-17),
-     (90.,-30.,0.,0),
-     0.6,0, stiff.NORMAL_STIFFNESSES),
-
-    #back to normal
-    ((40, 9, -80, -9),
-     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
-     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
-     (40, -9, 80, -9),
-     .7,0,stiff.NORMAL_STIFFNESSES),
-
-    #stand for a bit
-    ((90., 10., -90., -3.),
-      (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-      (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-      (90., -10., 90., 3.),
-      1,0,stiff.NORMAL_STIFFNESSES),
-    )
-
-RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
 
 # Stands for the Dans; Zeller and Navarro
 ZELLVARRO_LEFT_KICK = (

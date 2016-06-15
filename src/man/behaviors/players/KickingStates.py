@@ -112,6 +112,12 @@ def afterKick(player):
         player.kickedOut = False
         return player.goNow('spinSearch')
 
+    # Walk forward 75 centimeters after kicking.
+    # Shouldn't be necessary, but we end up kicking the ball outside our field
+    # of view. If this code executes, we've successfully kicked it forward (as
+    # in not whiffed), and we should walk forward with the hopes of kicking it 
+    # again. 75 centimeters is a guess, but it shouldn't be too far or too
+    # short.
     player.brain.nav.walk(75, 0, 0)
 
     elif transitions.shouldChaseBall(player):

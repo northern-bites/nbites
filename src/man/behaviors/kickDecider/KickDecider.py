@@ -296,13 +296,12 @@ class KickDecider(object):
     #     except:
     #         return None
 
-    """ THIS GETS USED A BUNCH """
-    def kicksBeforeBallIsFree(self):
-        asap = self.new2016KickStrategy()
-        if asap:
-            return asap
+    # def kicksBeforeBallIsFree(self):
+    #     asap = self.new2016KickStrategy()
+    #     if asap:
+    #         return asap
 
-        return self.frontKickCrosses()
+    #     return self.frontKickCrosses()
 
     # def kickOutOfBounds(self):
     #     print "kickOutOfBounds"
