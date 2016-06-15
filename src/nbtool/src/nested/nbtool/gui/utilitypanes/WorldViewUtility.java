@@ -37,15 +37,13 @@ public class WorldViewUtility extends UtilityParent {
 		private TeamBroadcastInstance broadcastListener = null;
 
 		@Override
-		public void componentResized(ComponentEvent e) {}
+		public void componentResized(ComponentEvent e) { }
 
 		@Override
-		public void componentMoved(ComponentEvent e) {}
+		public void componentMoved(ComponentEvent e) { }
 
 		@Override
-		public void componentShown(ComponentEvent e) {
-
-		}
+		public void componentShown(ComponentEvent e) { }
 
 		@Override
 		public void componentHidden(ComponentEvent e) {
