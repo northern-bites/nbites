@@ -2,6 +2,8 @@
 Game controller states for pBrunswick, our soccer player.
 """
 
+from ..Say import *
+
 import noggin_constants as nogginConstants
 from math import fabs
 from ..util import *
@@ -104,8 +106,9 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
+    
     #HACKKKKKKK FOR THESSSEEEE
-    return player.goNow('positionAtHome')
+    say(Say.IN_SCRIMMAGE,"Going to Home Position")
 
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and

@@ -119,13 +119,16 @@ strikerBottom = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
 strikerTop = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                 NogginConstants.MIDFIELD_Y + 60,
                                 0)
-
+#NEW MOVESSS
+strikerTriangle = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
+                                NogginConstants.MIDFIELD_Y - 200,
+                                135)
 ## SUMMER 2016 CHANGES ##
 
 if NogginConstants.LEFT_FORWARD_DEFENSE:
-    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 300,
-                                    NogginConstants.MY_GOALBOX_TOP_Y + 10,
-                                    0)
+    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 330,
+                                    NogginConstants.MY_GOALBOX_TOP_Y + 120,
+                                    -35)
     evenDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 200,
                                     NogginConstants.MY_GOALBOX_TOP_Y + 10,
                                     0)
@@ -146,9 +149,9 @@ if NogginConstants.RIGHT_FORWARD_DEFENSE:
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
 else:
-    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
-                                45)
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 160,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 100,
+                                35)
     oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
@@ -253,7 +256,7 @@ def setRoleConstants(player, role):
         player.box = chaserBox
         player.isKickingOff = False
     elif isStriker(role):
-        player.homePosition = strikerForward
+        player.homePosition = strikerTriange
         player.kickoffPosition = oddChaserKickoff
         player.box = strikerBox
         player.isKickingOff = False
