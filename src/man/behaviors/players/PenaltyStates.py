@@ -12,6 +12,7 @@ from ..navigator import Navigator
 from ..util import *
 
 DEBUG_PENALTY_STATES = True
+DEBUG_MANUAL_PLACEMENT = True
 CHECK_VALS_EACH_PAN = True
 SCRIMMAGE = True
 angle = 80
@@ -33,27 +34,24 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
-
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
 
         # count the number of times we see the goalbox and L-Corners on the right
         afterPenalty.innerLCornerRight = 0
         afterPenalty.outerLCornerRight = 0
-        afterPenalty.goalboxRight = 0
 
         # count the number of times we see the CC and T-Corner on the left
         afterPenalty.tCornerLeft = 0
-        afterPenalty.CenterCircleLeft = 0
 
-        ## VARS FROM 2015 AFTERPENALTY ##
+        # Looking to the right, whether we've determined what side we're on
         afterPenalty.right = True
         afterPenalty.decidedSide = False
-        player.brain.tracker.lookToAngle(-1 * angle)
-
-        # number of times we see the horizon on either side - if corner check fails, try using this.
+        # player.brain.tracker.lookToAngle(-1 * angle) #todo try taking this first pan out...
         afterPenalty.leftHorizSum = 0
         afterPenalty.rightHorizSum = 0
+        afterPenalty.averageLeftHorizon = 0
+        afterPenalty.averageRightHorizon = 0
 
         # Keep track of frames since player was penalized
         afterPenalty.frameCount = 0
@@ -73,7 +71,6 @@ def afterPenalty(player):
             if DEBUG_PENALTY_STATES and CHECK_VALS_EACH_PAN:
                 print "Looking to my right! Angle:", angle
                 print "I've seen an inside L-Corner", afterPenalty.innerLCornerRight, "outer L-Corner", afterPenalty.outerLCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
-                print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
                 print "Cumulative horizon distance on this side is", afterPenalty.leftHorizSum
 
         # LOOK LEFT
@@ -83,13 +80,10 @@ def afterPenalty(player):
             if DEBUG_PENALTY_STATES and CHECK_VALS_EACH_PAN:
                 print "Looking to my left! Angle:", otherAngle
                 print "I've seen an inside L-Corner", afterPenalty.innerLCornerRight, "outer L-Corner", afterPenalty.outerLCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
-                print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
                 print "Cumulative horizon distance on this side is", afterPenalty.rightHorizSum
 
         afterPenalty.lookRight = not afterPenalty.lookRight
-
-        if DEBUG_PENALTY_STATES:
-            afterPenalty.numOfPans += 1
+        afterPenalty.numOfPans += 1
 
     # Look for landmarks after we've panned.
     # Corner IDs:
@@ -113,8 +107,6 @@ def afterPenalty(player):
                     afterPenalty.outerLCornerRight += 1
                 if corner.id == 2:
                     afterPenalty.tCornerLeft -= 1
-                if corner.id == 3: 
-                    afterPenalty.CenterCircleLeft -= 1
 
         else:
             afterPenalty.leftHorizSum += vis.horizon_dist
@@ -126,11 +118,7 @@ def afterPenalty(player):
                     afterPenalty.outerLCornerRight -=1
                 if corner.id == 2:
                     afterPenalty.tCornerLeft += 1
-                if corner.id == 3:
-                    afterPenalty.CenerCircleLeft += 1
 
-    # TODO define thresholds and hierarchy. If all numbers are negaive, the goalbox is on our left.
-    # TODO need to switch 'decidedSide'... should we keep panning until we've decided, or proceed when we're unsure?
     if afterPenalty.frameCount > 200:
 
         # arbitrary thresholds for now!
@@ -154,13 +142,15 @@ def afterPenalty(player):
                 print("THRESHOLDS WERE NOT MET! Rely on Horizons!")
                 # TODO test if horizons are actually more reliable.
                 # See if this helps if we're blocking corners
-            player.brain.resetLocalizationFromPenalty(afterPenalty.leftHorizSum > afterPenalty.rightHorizSum)
+                afterPenalty.averageLeftHorizon = afterPenalty.leftHorizSum / (afterPenalty.numOfPans / 2.0)
+                afterPenalty.averageRightHorizon = afterPenalty.rightHorizSum / (afterPenalty.numOfPans / 2.0)
+                print("computed avg left horizon", afterPenalty.averageLeftHorizon, "avg right horizon", afterPenalty.averageRightHorizon)
+            player.brain.resetLocalizationFromPenalty(afterPenalty.averageLeftHorizon > afterPenalty.averageRightHorizon)
 
         if DEBUG_PENALTY_STATES:
             print ("\n-------------------------------------------------------------")
             print("COUNTER TOTALS: ")
-            print ("innerLCornerRight:", afterPenalty.innerLCornerRight, "outerLCornerRight:", afterPenalty.outerLCornerRight, "goalboxRight:", \
-                afterPenalty.goalboxRight, "tCornerLeft:", afterPenalty.tCornerLeft, "CenterCircleLeft:", afterPenalty.CenterCircleLeft)
+            print ("innerLCornerRight:", afterPenalty.innerLCornerRight, "outerLCornerRight:", afterPenalty.outerLCornerRight, "tCornerLeft:", afterPenalty.tCornerLeft)
             print("HORIZON DISTANCE TOTALS:")
             print ("left horizon:", afterPenalty.leftHorizSum, "right horizon", afterPenalty.rightHorizSum)
             print ("-------------------------------------------------------------\n")
@@ -182,13 +172,65 @@ def manualPlacement(player):
     We shouldn't go into after penalty in this case, but the GameController can still penalize us in
     GameReady, so this could be useful.
 
+    Based check for if we were placed at kickoff position on the afterPenalty checks above.
+
     """
 
     if player.firstFrame() and (player.lastDiffState == 'GameReady' or player.lastDiffState == 'GameSet'):
         print "Going into after penalty from ready or set; am I being manually placed?"
         player.wasPenalized = False
-        return player.goLater(player.gameState)
 
+        manualPlacement.frameCounter = 0
+        manualPlacement.atKickoffPos = False
+        
+        manualPlacement.tCornerLeft = 0
+        manualPlacement.tCornerRight = 0
+        manualPlacement.centerCircle = 0
+
+        manualPlacement.lookRight = True
+        manualPlacement.lookForward = False
+
+
+    if player.brain.interface.vision.circle.on and DEBUG_MANUAL_PLACEMENT:
+        print "I can see the center circle!"
+
+    manualPlacement.frameCounter += 1
+    vis = player.brain.vision
+
+    if manualPlacement.frameCounter % 50 == 0:
+        if manualPlacement.lookRight:
+            player.brain.tracker.lookToAngle(angle)
+        elif manualPlacement.lookForward:
+            player.brain.tracker.lookToAngle(0)
+        else:
+            player.brain.tracker.lookToAngle(-1 * angle)
+            manualPlacement.lookForward = True
+        manualPlacement.lookRight = not manualPlacement.lookRight
+
+    if player.brain.tracker.isStopped():
+        if manualPlacement.lookRight:
+            for i in range(0, vis.corner_size()):  
+                if corner.id == 2:
+                    manualPlacement.tCornerRight += 1
+        else:
+            for i in range(0, vis.corner_size()):
+                if corner.id == 2:
+                    manualPlacement.tCornerLeft += 1
+
+    if manualPlacement.frameCounter > 150:
+        if DEBUG_MANUAL_PLACEMENT:
+            if abs(manualPlacement.tCornerLeft - manualPlacement.tCornerRight) < 5:
+                print("Player thinks they're near the center line!")
+            if manualPlacement.centerCircle > 5:
+                print("Player saw the center circle in front at least 5 times!")
+        if abs(manualPlacement.tCornerLeft - manualPlacement.tCornerRight) < 5 and manualPlacement.centerCircle > 5:
+            manualPlacement.atKickoffPos = True
+
+    if manualPlacement.atKickoffPos or manualPlacement.frameCounter > 150:
+        if DEBUG_MANUAL_PLACEMENT:
+            player.goNow('gamePenalized')
+        # reset loc
+        return player.goLater(player.gameState)
 
     return player.stay()
 
