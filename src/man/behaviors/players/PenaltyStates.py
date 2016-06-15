@@ -16,6 +16,7 @@ DEBUG_MANUAL_PLACEMENT = True
 CHECK_VALS_EACH_PAN = True
 SCRIMMAGE = True
 angle = 80
+manualPlacement_angle = 65
 
 # So this entire state is cobbled together in the rush of China 2015.
 # *IDEALLY* we would use exclusively corners and actively track them,
@@ -47,7 +48,7 @@ def afterPenalty(player):
         # Looking to the right, whether we've determined what side we're on
         afterPenalty.right = True
         afterPenalty.decidedSide = False
-        # player.brain.tracker.lookToAngle(-1 * angle) #todo try taking this first pan out...
+        player.brain.tracker.lookToAngle(-1 * angle) # pan immediately
         afterPenalty.leftHorizSum = 0
         afterPenalty.rightHorizSum = 0
         afterPenalty.averageLeftHorizon = 0
@@ -176,7 +177,7 @@ def manualPlacement(player):
 
     """
 
-    if player.firstFrame() and (player.lastDiffState == 'GameReady' or player.lastDiffState == 'GameSet'):
+    if player.firstFrame():
         print "Going into after penalty from ready or set; am I being manually placed?"
         player.wasPenalized = False
 
@@ -190,36 +191,52 @@ def manualPlacement(player):
         manualPlacement.lookRight = True
         manualPlacement.lookForward = False
 
+        player.brain.tracker.lookToAngle(0)
 
-    if player.brain.interface.vision.circle.on and DEBUG_MANUAL_PLACEMENT:
+
+    if player.brain.interface.vision.circle.on  and DEBUG_MANUAL_PLACEMENT:
         print "I can see the center circle!"
+
+    if player.brain.tracker.isStopped() and player.brain.interface.vision.circle.on:
+        manualPlacement.centerCircle += 1
 
     manualPlacement.frameCounter += 1
     vis = player.brain.vision
 
     if manualPlacement.frameCounter % 50 == 0:
         if manualPlacement.lookRight:
-            player.brain.tracker.lookToAngle(angle)
+            player.brain.tracker.lookToAngle(manualPlacement_angle)
+            if DEBUG_MANUAL_PLACEMENT:
+                print("Looking right!")
+            manualPlacement.lookRight = not manualPlacement.lookRight
         elif manualPlacement.lookForward:
             player.brain.tracker.lookToAngle(0)
+            if DEBUG_MANUAL_PLACEMENT:
+                print("Looking forward!")
         else:
-            player.brain.tracker.lookToAngle(-1 * angle)
+            player.brain.tracker.lookToAngle(-1 * manualPlacement_angle)
             manualPlacement.lookForward = True
-        manualPlacement.lookRight = not manualPlacement.lookRight
+            if DEBUG_MANUAL_PLACEMENT:
+                print("Looking left!")
 
     if player.brain.tracker.isStopped():
         if manualPlacement.lookRight:
-            for i in range(0, vis.corner_size()):  
+            for i in range(0, vis.corner_size()):
+                corner = vis.corner(i)  
                 if corner.id == 2:
                     manualPlacement.tCornerRight += 1
+        elif manualPlacement.lookForward:
+            if player.brain.interface.vision.circle.on:
+                manualPlacement.centerCircle += 1
         else:
             for i in range(0, vis.corner_size()):
+                corner = vis.corner(i)
                 if corner.id == 2:
                     manualPlacement.tCornerLeft += 1
 
     if manualPlacement.frameCounter > 150:
         if DEBUG_MANUAL_PLACEMENT:
-            if abs(manualPlacement.tCornerLeft - manualPlacement.tCornerRight) < 5:
+            if manualPlacement.tCornerLeft > 0 and manualPlacement.tCornerRight > 0 and abs(manualPlacement.tCornerLeft - manualPlacement.tCornerRight) < 5:
                 print("Player thinks they're near the center line!")
             if manualPlacement.centerCircle > 5:
                 print("Player saw the center circle in front at least 5 times!")
@@ -228,7 +245,11 @@ def manualPlacement(player):
 
     if manualPlacement.atKickoffPos or manualPlacement.frameCounter > 150:
         if DEBUG_MANUAL_PLACEMENT:
-            player.goNow('gamePenalized')
+            print("TOTAL COUNT")
+            print("Total count for right T-Corner", manualPlacement.tCornerRight)
+            print("Total count for left T-Corner", manualPlacement.tCornerLeft)
+            print("Saw center circle", manualPlacement.centerCircle, "times.")
+            return player.goNow('gamePenalized')
         # reset loc
         return player.goLater(player.gameState)
 

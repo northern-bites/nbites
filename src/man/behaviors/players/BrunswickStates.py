@@ -9,6 +9,8 @@ from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
 
+DEBUG_MANUAL_PLACEMENT = False
+
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -116,6 +118,8 @@ def gamePlaying(player):
     if player.wasPenalized:
         player.wasPenalized = False
         if player.lastDiffState != 'gameSet': 
+            if DEBUG_MANUAL_PLACEMENT:
+                return player.goNow('manualPlacement')
             return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
