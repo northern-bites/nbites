@@ -12,6 +12,7 @@ Enactor::Enactor(boost::shared_ptr<AL::DCMProxy> dcm_) :
     dcm(dcm_)
 {
     initEnactor();
+
 }
 
 Enactor::~Enactor()
@@ -28,17 +29,11 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
 
     jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
     jointStiffnesses.erase(jointStiffnesses.begin() + Kinematics::R_HIP_YAW_PITCH);
-    if (tester < 500) {
-        for (unsigned int i = 0; i < jointAngles.size(); ++i) {
+    for (unsigned int i = 0; i < jointAngles.size(); ++i) {
         jointCommand[5][i][0] = jointAngles[i];
         stiffnessCommand[5][i][0] = jointStiffnesses[i];
 
-        }
     }
-    else {
-        manDied(jointAngles, jointStiffnesses);
-    }
-    tester++;
     try
     {
         jointCommand[4][0] = dcm->getTime(0);
@@ -76,7 +71,8 @@ void Enactor::noStiff()
 }
 
 long nextFrame = 0;
-void Enactor::manDied(std::vector<float> jointAngles, std::vector<float> jointStiffnesses) {
+bool Enactor::manDied(messages::JointAngles angles, messages::JointAngles stiffness) {
+    bool is_finished = true;
 
     double jointCrash1[21] = {0.00762796,-0.00157595, 0.253068, 0.185572, 0.00149202,-0.0152981, -0.078192, 0.00464392, 
                         -0.308292, 1.3192, -0.78545, 0.0399261, 0.04913, -0.277696, 1.27633, -0.76389, -0.032172, 
@@ -86,24 +82,45 @@ void Enactor::manDied(std::vector<float> jointAngles, std::vector<float> jointSt
                         -0.811444, 2.16443, -1.22111, 0.00771189,  0.0261199, -0.81613, 2.17986, -1.23023, 
                         -0.0352399, 1.58466, -0.046062, 1.5631, 0.0353239};
 
+    std::vector<float> jointAngles = Kinematics::toJointAngles(angles);
+    std::vector<float> jointStiffnesses = Kinematics::toJointAngles(stiffness);
+
+    jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
+    jointStiffnesses.erase(jointStiffnesses.begin() + Kinematics::R_HIP_YAW_PITCH);
+
     if (nextFrame >= 0 && nextFrame < 100) {
-        jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
         for (unsigned int i = 0; i < jointAngles.size(); ++i) {
             jointCommand[5][i][0] = jointCrash1[i];
-            //stiffnessCommand[5][i][0] = jointStiffnesses[i];
         }
     }
     else if (nextFrame >= 100 && nextFrame <= 200) {
-        jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
         for (unsigned int i = 0; i < jointAngles.size(); ++i) {
             jointCommand[5][i][0] = jointCrash2[i];
-            //stiffnessCommand[5][i][0] = jointStiffnesses[i];
         }
     }
     else {
         noStiff();
+        is_finished = false;
     }
     nextFrame++;
+    
+    try
+    {
+        jointCommand[4][0] = dcm->getTime(0);
+        dcm->setAlias(jointCommand);
+    }
+    catch (AL::ALError e) {
+        std::cout << "Couldn't set joint angles because: " << e.toString() << std::endl;
+    }
+    try
+    {
+        stiffnessCommand[4][0] = dcm->getTime(0);
+        dcm->setAlias(stiffnessCommand);
+    }
+    catch (AL::ALError e) {
+        std::cout << "Couldn't set stiffness because: " << e.toString() << std::endl;
+    }
+    return is_finished;
 }
 // Based on (stolen from) the original JointEnactorModule by Ellis Ratner
 void Enactor::initEnactor()

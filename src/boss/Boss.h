@@ -46,6 +46,7 @@ private:
     int startMan();
     int killMan();
 
+
     // To handle naoqi stuff
     boost::shared_ptr<AL::ALBroker> broker;
     boost::shared_ptr<AL::DCMProxy> dcm;
@@ -60,6 +61,7 @@ private:
     // Vars relating to Man
     pid_t manPID;
     bool manRunning;
+    bool manDiedOverride;
 
     int shared_fd;
     volatile SharedData* shared;

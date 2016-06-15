@@ -13,7 +13,7 @@ public:
 
     void command(messages::JointAngles angles, messages::JointAngles stiffness);
     void noStiff();
-    void manDied(std::vector<float> jointAngles, std::vector<float> jointStiffnesses);
+    void manDied(messages::JointAngles angles, messages::JointAngles stiffness);
 
 
 private:

@@ -8,7 +8,10 @@
 #include <string.h>
 #include <cstdlib>
 #include <chrono>
+#include <sys/wait.h>
 #include <errno.h>
+#include <signal.h>
+#include <assert.h>
 
 #define MAN_RESTART 'r'
 #define MAN_KILL    'k'
@@ -16,6 +19,55 @@
 #define BOSS_PRINT  'p'
 
 //#define DCM_DEBUG
+boss::Boss * instance = NULL;
+
+typedef void handler_t(int);
+
+handler_t* Signal(int signum, handler_t* handler) {
+    struct sigaction action, old_action;
+    
+    action.sa_handler = handler;
+    sigemptyset(&action.sa_mask); /* block sigs of type being handled */
+    action.sa_flags = SA_RESTART; /* restart syscalls if possible */
+    
+    if (sigaction(signum, &action, &old_action) < 0) {
+        printf("Signal error");
+    }
+    return (old_action.sa_handler);
+}
+
+void man_dead_handler(int sig) {
+    assert(sig == SIGCHLD); //make sure the signal is the correct one
+  
+    int status; //will be filled in with child's status by waitpid
+    pid_t child;
+    
+    //waits for state change in child and obtains info about child, reaps if child is terminated
+    while ((child = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0) {
+        
+    	if (child != manPID) {
+    		printf("boss got sigchild from non man");
+    		continue;
+    	}
+
+        if (WIFEXITED(status)) { //child exited normally
+			instance->manDiedOverride = true;
+            printf("Man was handled by signal %d \n", WEXITSTATUS(status));
+        }
+
+        if (WIFSIGNALED(status)) { //child was terminated by uncaught signal
+        	instance->manDiedOverride = true;
+            printf("Man was handled by signal %d \n",WTERMSIG(status));
+        }
+
+    }
+    //process does not exist or is not a child of the calling process
+    if (child < 0 && errno != ECHILD) {
+        printf("Bad argument passed to waitpid \n");
+    }
+    printf("sigchld_handler: exiting\n");
+    return;
+}
 
 #ifdef DCM_DEBUG
 #define DCM_TIMING_DEBUG_ALWAYS false
@@ -95,6 +147,18 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
 {
     printf("\t\tBOSS VERSION == %d\n", BOSS_VERSION);
     
+    //for when man dies
+    manDiedOverride = false;
+
+    if (instance == NULL) {
+    	instance = this;
+    } else {
+    	std::cout<<"ERROR: two instances of singleton boss detected."<< std::endl;
+    	::exit(1);
+    }
+
+    Signal(SIGCHLD, man_dead_handler); 
+
     std::cout << "Boss Constructor" << std::endl;
     bool success = true;
     
@@ -343,7 +407,16 @@ void Boss::DCMPreProcessCallback()
             ledResults.ParseFromString(leds);
 
             // Now pass mans commands to the DCM
-            enactor.command(results.jointsCommand, results.stiffnessCommand);
+            if (manDiedOverride) {
+            	bool statusMan = enactor.manDied(results.jointsCommand, results.stiffnessCommand);
+            	if (!statusMan) {
+            		manDiedOverride = false;
+            		manRunning = false;
+            	}
+            } else {
+            	enactor.command(results.jointsCommand, results.stiffnessCommand);
+            }
+            
             led.setLeds(ledResults);
 
         } else {
@@ -466,4 +539,5 @@ void Boss::print_info() {
     
     fflush(stdout);
 }
+
 }
