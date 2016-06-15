@@ -11,7 +11,6 @@ def findBall(player):
     """
     Decides what type of search to do.
     """
-    print "---------TRYING TO FIND BALL-------------\n"
 
     if player.firstFrame():
         player.inKickingState = False
@@ -31,8 +30,6 @@ def findBall(player):
 @stay
 @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def searchInFront(player):
-
-    print "-------SEARCHING IN FRONT OF ROBOT-------------\n"
 
     if player.firstFrame():
         player.brain.tracker.performCenterSnapPan()
@@ -119,18 +116,13 @@ def scrumStrategy(player):
 @superState('scrumStrategy')
 @stay
 def backPedal(player):
+
     if player.firstFrame():
-
-        print "----------BACK PEDALING-----------\n"
-
         player.setWalk(constants.BACK_PEDAL_SPEED, 0., 0.)
         player.brain.tracker.performFixedPitchLookAhead()
         # player.brain.tracker.repeatWideSnapPan()
 
     elif player.stateTime > constants.BACK_PEDAL_TIME:
-
-        print "No longer backing up\n"
-
         return player.goLater('searchInFront')
 
 @superState('scrumStrategy')

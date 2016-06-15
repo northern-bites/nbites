@@ -93,8 +93,6 @@ class HeadTrackingHelper(object):
     def boundsSnapPan(self, maxRight, maxLeft, beginDirection = True): #Default right
         """Generates snap pan betwewn two maxima"""
 
-        print "Bounds Snap Pan\n"
-
         SNAP_PAN_PAN_TIME = 0.3
         SNAP_PAN_WAIT_TIME = 0.2
         SNAP_TIME_DEGREE_INTERVALS = 45
@@ -137,10 +135,6 @@ class HeadTrackingHelper(object):
                 newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
                 startingYaw -= SNAP_TIME_DEGREE_INTERVALS
-
-        print "New Snap Pan: " + str(newSnapPanHeadMove)
-
-        return newSnapPanHeadMove
 
     # Should be generalized.
     def convertKickPan(self, headMove, invert):
@@ -306,8 +300,6 @@ class HeadTrackingHelper(object):
 
     def lookToAngleWithTime(self, yaw, time):
 
-        
-        
         if yaw > 55 or yaw < -55:
             pitch = 11.0
         else:
