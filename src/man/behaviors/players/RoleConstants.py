@@ -238,7 +238,7 @@ def setRoleConstants(player, role):
     if isLeftDefender(role):
         player.homePosition = evenDefenderHome
         player.kickoffPosition = evenDefenderKickoff
-        player.box = evenDefenderBox
+        player.box = evenDefenderBoxgit 
         player.isKickingOff = False
     elif isRightDefender(role):
         player.homePosition = oddDefenderHome
@@ -256,7 +256,7 @@ def setRoleConstants(player, role):
         player.box = chaserBox
         player.isKickingOff = False
     elif isStriker(role):
-        player.homePosition = strikerTriange
+        player.homePosition = strikerTriangle
         player.kickoffPosition = oddChaserKickoff
         player.box = strikerBox
         player.isKickingOff = False
