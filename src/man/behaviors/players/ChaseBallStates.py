@@ -64,6 +64,7 @@ def walkToWayPoint(player):
     ball = player.brain.ball
 
     if transitions.shouldDecelerate(player):
+        print "I should decelerate"
         speed = MIN_SPEED
     else:
         speed = MAX_SPEED
@@ -229,6 +230,7 @@ def lineUp(player):
     State to line up for orbit. Uses two PID controllers!
     """
     if player.firstFrame():
+        print "Lining up to orbit"
         lineUp.xController.reset()
         lineUp.hController.reset()
 
@@ -273,6 +275,8 @@ def orbitBall(player):
 
     if player.brain.nav.dodging:
         return player.stay()
+
+    print "Orbiting"
 
     # Calculate relative heading every frame
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
