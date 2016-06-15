@@ -75,7 +75,7 @@ public class AutomaticCrossTester <K, R> {
 
 	private CrossInstance theInstance = null;
 
-	public final synchronized void runTest() {
+	public final synchronized void runTests() {
 
 		if (state != IOState.STARTING) {
 			throw new RuntimeException("cannot start from state: " + state);
