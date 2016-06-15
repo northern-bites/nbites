@@ -158,7 +158,7 @@ class HeadTracker(FSA.FSA):
     def performKickPan(self, invert = False):
         self.performHeadMove(self.helper.convertKickPan(HeadMoves.FIXED_PITCH_KICK_PAN, invert))
 
-    def trackBall(self, gameSet = False):
+    def trackBall(self, gameSet = False, gamePlaying = False):
         """
         Enters a state cycle:
         When ball is in view, tracks via vision values.
@@ -180,7 +180,13 @@ class HeadTracker(FSA.FSA):
                 self.switchTo('gameSetTracking')
                 return
 
-        if (self.currentState is not 'snapPan' and self.currentState is not 'tracking'):
+        if (gamePlaying):
+
+            if (self.currentState is not 'goalieSnapPan' and self.currentState is not 'goalieTracking'):
+                self.switchTo('goalieTracking')
+                return
+
+        if (self.currentState is not 'gamePlayingSnapPan' and self.currentState is not 'tracking'):
             self.switchTo('tracking') # which is in TrackingStates.py
 
     def bounceTrackBall(self):

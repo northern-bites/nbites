@@ -10,8 +10,8 @@ import math
 import noggin_constants as nogginConstants
 
 #TestingChange
-SAVING = True
-DIVING = True
+SAVING = False
+DIVING = False
 savedebug = False
 
 @superState('gameControllerResponder')
@@ -330,7 +330,7 @@ def faceBall(player):
 def watch(player):
     if player.firstFrame():
         player.brain.fallController.enabled = True
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
         # player.brain.tracker.repeatWideSnapPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False

@@ -136,6 +136,8 @@ class HeadTrackingHelper(object):
 
                 startingYaw -= SNAP_TIME_DEGREE_INTERVALS
 
+        return newSnapPanHeadMove
+
     # Should be generalized.
     def convertKickPan(self, headMove, invert):
         """
