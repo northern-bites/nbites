@@ -75,6 +75,11 @@ void FieldHomography::panAzimuth(double iy, double x, double y, double& xp, doub
 
 bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) const
 {
+  double init_ix = ix;
+  double init_iy = iy;
+  double init_wx = wx;
+  double init_wy = wy;
+
   compute();
 
   // Image coordinates
@@ -95,8 +100,13 @@ bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) 
   double wz = h31 * cx + h32 * cy + h33 * cz + h34;
   if (fabs(wz) > 1.0e-6) {
     // TODO call exception "Internal error in FieldHomography"
-    std::cout<<"[HOMOGRAPHY ] BIG ERROR but not calling stupid exception."<<std::endl;
-    // throw exception();
+    // std::cout<<"[HOMOGRAPHY ] BIG ERROR but not calling stupid exception."<<std::endl;
+    std::cout<<"\nHOMOGRAPHY EXCEPTION: "<<std::endl;
+    std::cout<<"       Params -> ix = "<<init_ix<<", iy = "<<init_iy<<", wx = "<<init_wx<<", wy = "<<init_wy<<std::endl;
+    std::cout<<"       After -> ix = "<<ix<<", iy = "<<iy<<", wx = "<<wx<<", wy = "<<wy<<", wz = "<<wz<<std::endl;
+    std::cout<<"       Camera -> cz = "<<cz<<", cx = "<<cx<<", cy = "<<cy<<std::endl;
+
+    throw exception();
   }
 
   return cz > 0;
