@@ -125,8 +125,10 @@ bool DCM_TIMING_DEBUG_END() {
 #define DCM_TIMING_DEBUG_END() false
 
 #endif
+//original
+//#define MAN_DEAD_THRESHOLD 2000
+#define MAN_DEAD_THRESHOLD 1000
 
-#define MAN_DEAD_THRESHOLD 2000
 #define BOSS_MAIN_LOOP_US 500000
 
 namespace boss {

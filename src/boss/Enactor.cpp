@@ -73,8 +73,10 @@ void Enactor::noStiff()
 long nextFrame = 0;
 bool Enactor::manDied() {
     static const int num_joints = 21;
-    bool is_finished = true;
+    static const int num_frames_interpolate = 1000;
 
+    bool is_finished = true;
+    static double startPosition[num_joints];
     double jointCrash1[num_joints] = {0.00762796,-0.00157595, 0.253068, 0.185572, 0.00149202,-0.0152981, -0.078192, 0.00464392, 
                         -0.308292, 1.3192, -0.78545, 0.0399261, 0.04913, -0.277696, 1.27633, -0.76389, -0.032172, 
                         0.204064, -0.26389, -4.19617e-05,  0.0383921};
@@ -83,14 +85,33 @@ bool Enactor::manDied() {
                         -0.811444, 2.16443, -1.22111, 0.00771189,  0.0261199, -0.81613, 2.17986, -1.23023, 
                         -0.0352399, 1.58466, -0.046062, 1.5631, 0.0353239};
 
-    if (nextFrame >= 0 && nextFrame < 100) {
+    
+    double diff1[num_joints];
+    double diff2[num_joints];
+    
+
+    if (nextFrame == 0) {
+        for (unsigned int i = 0; i < num_joints; i++) {
+            startPosition[i] = jointCommand[5][i][0];
+        }
+        //calc difference interpolation
         for (unsigned int i = 0; i < num_joints; ++i) {
-            jointCommand[5][i][0] = jointCrash1[i];
+            diff1[i] = (startPosition[i] - jointCrash1[i])/num_frames_interpolate;
+            diff2[i] =(jointCrash1[i] -  jointCrash2[i])/num_frames_interpolate;
+        }
+
+    }
+
+    if (nextFrame >= 0 && nextFrame < 1000) {
+        for (unsigned int i = 0; i < num_joints; ++i) {
+            jointCommand[5][i][0] = startPosition[i] + diff1[i];
+            startPosition[i] += diff1[i];
         }
     }
-    else if (nextFrame >= 100 && nextFrame <= 200) {
+    else if (nextFrame >= 1000 && nextFrame <= 2000) {
         for (unsigned int i = 0; i < num_joints; ++i) {
-            jointCommand[5][i][0] = jointCrash2[i];
+            jointCommand[5][i][0]  = startPosition[i] + diff2[i];
+            startPosition[i] += diff2[i];
         }
     }
     else {
