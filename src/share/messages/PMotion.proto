@@ -25,6 +25,7 @@ message MotionCommand
         SCRIPTED_MOVE = 2;
         ODOMETRY_WALK = 3;
         KICK = 4;
+        STAND = 5;
     }
 
     optional CommandType type = 1;

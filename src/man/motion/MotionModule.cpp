@@ -721,6 +721,7 @@ int MotionModule::realityCheckJoints(){
 
 void MotionModule::sendMotionCommand(const WalkCommand::ptr command)
 {
+    std::cout << "here in sendmotion command \n";
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }

@@ -176,6 +176,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// else {logMsg("calibrated!!!"); }
 
 
+
 	if (standby) {
 		tryingToWalk = false;
 	} else {
@@ -212,6 +213,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 			std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
+			std::cout << "Walk Command Scaled: " << command->x_percent * WALK_SPEED_SCALE << "," << command->y_percent * WALK_SPEED_SCALE << ") \n";
 			request->body.forward = command->x_percent * WALK_SPEED_SCALE ;
 			request->body.left = command->y_percent * WALK_SPEED_SCALE;
 			request->body.turn = command->theta_percent ;
@@ -221,12 +223,14 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
 			logMsg("Destination command - Destination Walking!");
 			tryingToWalk = true;
+			float DEST_SCALE = 0.01;
 
 			DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
-			request->body.forward = command->x_mm;
-			request->body.left = command->y_mm;
+			request->body.forward = command->x_mm * DEST_SCALE;
+			request->body.left = command->y_mm * DEST_SCALE;
 			request->body.turn = command->theta_rads;
 			std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
+			std::cout << "Scaled Dest Command: " << command->x_mm * DEST_SCALE << "," << command->y_mm * DEST_SCALE << ") \n";
 			// TODO incorporate motion kicks
 
 
@@ -407,17 +411,13 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     // THIS IS WHERE WE ACTUALLY SET THE NEXT JOINTS AND STIFFNESSES
     // Ignore the first chain bc it's the head
 
-    const float NOD_GYRO_RATIO = 0.04f;
-    // THIS is better off.... do not turn this adjustment thing on... makes it worse
-    float adjAngleX = 0.0; //adjGyrX * 0.01 * NOD_GYRO_RATIO;
-    float adjAngleY = 0.0; //adjGyrY * 0.01 * NOD_GYRO_RATIO;
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
     	std::vector<float> chain_angles;
     	std::vector<float> chain_hardness;
     	for (unsigned j = Kinematics::chain_first_joint_UNSWALK[i]; j <= Kinematics::chain_last_joint_UNSWALK[i]; j++) {
 
     		if ((Kinematics::ChainID)i == Kinematics::RLEG_CHAIN && j == 11) {
-    			// RHIPYAWPITCH
+    			// RHIPYAWPITCH -- technically doesn't exist but in all our infinite grace and wisdom we have a variable for it anyway
     			chain_angles.push_back(joints.angles[nb_joint_order[6]]);
     			// logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
     		} else {
@@ -428,16 +428,14 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
 			// // std::cout << (joints.angles[nb_joint_order[j]]);
 
-
-
     		if (hardness[nb_joint_order[j]] == 0) {
 				// JUST PUSH BACK 1 so arms move
+    			// TODO maybe take this out so the limp arm things is implemented
 				chain_hardness.push_back(1.0);
     			// chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
     		} else {
     			chain_hardness.push_back(joints.stiffnesses[nb_joint_order[j]]);
     		}
-    		// std::cout << " STIFFNESS: " << joints.stiffnesses[nb_joint_order[j]] << std::endl;
     	}
 
     	this->setNextChainJoints((Kinematics::ChainID)i, chain_angles);
@@ -505,17 +503,17 @@ void UNSWalkProvider::updateOdometry(float angleZ) {
     // float angleZ = -theSensorDataBH.data[SensorDataBH::angleZ];
     angleZ = -angleZ;
     if (angleChanged == 0.0 && lastAngleZ == 0.0) {
-    	// First one
+    	// First change, so there's not a big jump in the angle and we don't think we've turned
     	lastAngleZ = angleZ;
-    	std::cout << "Initting the angle changing!\n";
+    	// std::cout << "Initting the angle changing!\n";
     	return;
     }
-    std::cout << "Angle Z: " << angleZ << std::endl;
+    // std::cout << "Angle Z: " << angleZ << std::endl;
     angleChanged += angleZ - lastAngleZ;
     lastAngleZ = angleZ;
     // odometry->turn = angleChanged;
-// #else
-    // odometryOffset.rotation = odometryOffset3D.rotation.getZAngle();
+#else
+    angleChanged = odometry->turn;
 #endif
 
     // if (abs(gyroZ) > 0) {
@@ -539,24 +537,17 @@ void UNSWalkProvider::getOdometryUpdate(portals::OutPortal< ::messages::RobotLoc
 
 	portals::Message< ::messages::RobotLocation> odometryData(0);
 
-   double dx = odometry->forward*cos(odometry->turn) - odometry->left*sin(odometry->turn);
-   double dy = odometry->forward*sin(odometry->turn) + odometry->left*cos(odometry->turn);
+    double dx = odometry->forward*cos(odometry->turn) - odometry->left*sin(odometry->turn);
+    double dy = odometry->forward*sin(odometry->turn) + odometry->left*cos(odometry->turn);
 
-	// odometryData.get()->set_x(odometry->forward * MM_TO_CM);
-   float FORWARD_SCALE = 1.0;
-	odometryData.get()->set_x(dx * FORWARD_SCALE * MM_TO_CM);
-	// odometryData.get()->set_y(odometry->left * MM_TO_CM);
-	odometryData.get()->set_y(dy * FORWARD_SCALE * MM_TO_CM);
+	odometryData.get()->set_x(dx * MM_TO_CM);
+	odometryData.get()->set_y(dy * MM_TO_CM);
 	odometryData.get()->set_h(angleChanged);
 
 
-	// std::cout << "MY LEFT ODO: " << odometry->left << std::endl;
-	// std::cout << "MY LEFT ODO IN CM: " << odometry->left * MM_TO_CM << std::endl;
-    std::cout << "MY ODO: " << odometry->forward << " Y: " << odometry->left * 100 << " TURN: " << odometry->turn << std::endl;
-    std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
-    std::cout << "AngledChanged: " << angleChanged << std::endl << std::endl;
-		// std::cout << "My turn: " << odometry->turn << " My adjusted turn: " << savedHeadingOdo + odometry->turn << std::endl;
-
+    // std::cout << "MY ODO: " << odometry->forward << " Y: " << odometry->left * 100 << " TURN: " << odometry->turn << std::endl;
+    // std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
+    // std::cout << "AngledChanged: " << angleChanged << std::endl << std::endl;
 
 	out.setMessage(odometryData);
 }
@@ -579,6 +570,7 @@ bool UNSWalkProvider::isWalkActive() const {
 }
 
 void UNSWalkProvider::stand() {
+	std::cout << "STAND IS BEING CALLED!!\n";
 
 }
 

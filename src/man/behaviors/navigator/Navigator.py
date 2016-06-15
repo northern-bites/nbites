@@ -268,6 +268,7 @@ class Navigator(FSA.FSA):
         walking/executing a sweet move.
         """
         self.destination = None
+        print("I'm in stand!")
 
         self.switchTo('stand')
 
