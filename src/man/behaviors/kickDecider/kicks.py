@@ -36,8 +36,8 @@ class Kick(object):
                 self is RIGHT_SHORT_BACK_KICK)
 
     def isStraightKick(self):
-        return (self is LEFT_STRAIGHT_KICK or
-                self is RIGHT_STRAIGHT_KICK or
+        return (#self is LEFT_STRAIGHT_KICK or
+                #self is RIGHT_STRAIGHT_KICK or
                 self is LEFT_SHORT_STRAIGHT_KICK or
                 self is RIGHT_SHORT_STRAIGHT_KICK)
 

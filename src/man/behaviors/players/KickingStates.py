@@ -11,34 +11,34 @@ from objects import Location, RelRobotLocation
 
 # TODO refactor, super state?
 
-@superState('gameControllerResponder')
-@ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
-@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
-def executeMotionKick(player):
-    """
-    Do a motion kick.
-    """
-    ball = player.brain.ball
-    executeMotionKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
-                                                  ball.rel_y - player.kick.setupY,
-                                                  0)
+# @superState('gameControllerResponder')
+# @ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
+# @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+# def executeMotionKick(player):
+#     """
+#     Do a motion kick.
+#     """
+#     ball = player.brain.ball
+#     executeMotionKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
+#                                                   ball.rel_y - player.kick.setupY,
+#                                                   0)
 
-    if player.firstFrame():
-        player.brain.nav.destinationWalkTo(executeMotionKick.kickPose,
-                                           nav.CAREFUL_SPEED,
-                                           player.kick)
-    elif player.brain.ball.vis.on: # don't update if we don't see the ball
-        player.brain.nav.updateDestinationWalkDest(executeMotionKick.kickPose)
-    elif player.kickedOut and not player.brain.ball.vis.on:
-        player.kickedOut = False
-        return player.goNow('spinSearch')
+#     if player.firstFrame():
+#         player.brain.nav.destinationWalkTo(executeMotionKick.kickPose,
+#                                            nav.CAREFUL_SPEED,
+#                                            player.kick)
+#     elif player.brain.ball.vis.on: # don't update if we don't see the ball
+#         player.brain.nav.updateDestinationWalkDest(executeMotionKick.kickPose)
+#     elif player.kickedOut and not player.brain.ball.vis.on:
+#         player.kickedOut = False
+#         return player.goNow('spinSearch')
 
-    # TODO not ideal at all!
-    if player.counter > 40:
-        player.inKickingState = False
-        return player.goNow('afterKick')
+#     # TODO not ideal at all!
+#     if player.counter > 40:
+#         player.inKickingState = False
+#         return player.goNow('afterKick')
 
-    return player.stay()
+#     return player.stay()
 
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
@@ -65,24 +65,24 @@ def executeSweetKick(player):
 
 executeSweetKick.sweetMove = None
 
-@superState('gameControllerResponder')
-@ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
-@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
-def executeBHKick(player):
-    """
-    Kick the ball using BH kick engine.
-    """
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        return player.stay()
+# @superState('gameControllerResponder')
+# @ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
+# @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+# def executeBHKick(player):
+#     """
+#     Kick the ball using BH kick engine.
+#     """
+#     if player.firstFrame():
+#         player.brain.tracker.trackBall()
+#         return player.stay()
 
-    if player.counter > 30:
-        player.brain.nav.callKickEngine(player.kick.bhKickType)
+#     if player.counter > 30:
+#         player.brain.nav.callKickEngine(player.kick.bhKickType)
 
-    if player.counter > 130:
-        return player.goNow('afterKick')
+#     if player.counter > 130:
+#         return player.goNow('afterKick')
 
-    return player.stay()
+#     return player.stay()
 
 @superState('gameControllerResponder')
 def afterKick(player):
@@ -120,6 +120,7 @@ def afterKick(player):
     # short.
 
     if player.kick.isStraightKick():
+    # should have something like "and if too far away from home base"
         player.brain.nav.walk(75, 0, 0)
 
     elif transitions.shouldChaseBall(player):
@@ -142,6 +143,7 @@ def spinAfterBackKick(player):
     State to spin to the ball after we kick it behind us.
     """
     # TODO This is essentially spinFindBall... maybe we go straight to that.
+    # We also never go to this state.
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()
