@@ -105,9 +105,9 @@ def afterKick(player):
         # if player.motionKick:
         #     player.motionKick = False
         #     return player.goNow('spinToBall')
-        # else:        
+        # else:
         return player.goNow('positionForKick')
-    
+
     elif player.kickedOut:
         player.kickedOut = False
         return player.goNow('spinSearch')
@@ -118,7 +118,9 @@ def afterKick(player):
     # in not whiffed), and we should walk forward with the hopes of kicking it 
     # again. 75 centimeters is a guess, but it shouldn't be too far or too
     # short.
-    player.brain.nav.walk(75, 0, 0)
+
+    if player.kick.isStraightKick():
+        player.brain.nav.walk(75, 0, 0)
 
     elif transitions.shouldChaseBall(player):
         return player.goLater('approachBall')
