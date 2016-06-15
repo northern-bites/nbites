@@ -4,6 +4,8 @@
 #include "SensorTypes.h"
 #include "JointNames.h"
 
+#include "TextToSpeech.h"
+
 #include <iostream>
 #include <string.h>
 #include <cstdlib>
@@ -231,6 +233,8 @@ void Boss::listener()
         if (manRunning && !manDiedOverride) {
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
                 std::cout << "Boss::listener() killing man due to inactivity" << std::endl;
+                man::tts::say(IN_SCRIMMAGE, "man has crashed!");
+
                 print_info();
                 manDiedOverride = true;
                 continue;
