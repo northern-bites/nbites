@@ -127,7 +127,7 @@ bool DCM_TIMING_DEBUG_END() {
 #endif
 //original
 //#define MAN_DEAD_THRESHOLD 2000
-#define MAN_DEAD_THRESHOLD 1000
+#define MAN_DEAD_THRESHOLD 500
 
 #define BOSS_MAIN_LOOP_US 500000
 

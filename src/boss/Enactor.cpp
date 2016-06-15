@@ -86,26 +86,33 @@ double interp(double start, double end, int index, int outof) {
 
 long nextFrame = 0;
 bool Enactor::manDied() {
-    static const int num_frames_interpolate = 1000;
+    static const int num_frames_interpolate = 400;
     bool is_finished = true;
 
-    double jointCrash1[numJoints] = {0.00762796,-0.00157595, 0.253068, 0.185572, 0.00149202,-0.0152981, -0.078192, 0.00464392,
-                        -0.308292, 1.3192, -0.78545, 0.0399261, 0.04913, -0.277696, 1.27633, -0.76389, -0.032172, 
-                        0.204064, -0.26389, -4.19617e-05,  0.0383921};
+//    double jointCrash1[numJoints] = {0.00762796,-0.00157595, 0.253068, 0.185572, 0.00149202,-0.0152981, -0.078192, 0.00464392,
+//                        -0.308292, 1.3192, -0.78545, 0.0399261, 0.04913, -0.277696, 1.27633, -0.76389, -0.032172, 
+//                        0.204064, -0.26389, -4.19617e-05,  0.0383921};
 
     double jointCrash2[numJoints] = { -0.214802, 0.35, 1.57538, 0.131882, -1.56165, -0.0229681, -0.0475121, -0.0137641,
                         -0.811444, 2.16443, -1.22111, 0.00771189,  0.0261199, -0.81613, 2.17986, -1.23023, 
                         -0.0352399, 1.58466, -0.046062, 1.5631, 0.0353239};
 
-    if (nextFrame >= 0 && nextFrame < 1000) {
+//    if (nextFrame >= 0 && nextFrame < 1000) {
+//        for (unsigned int i = 0; i < numJoints; ++i) {
+//            double value = interp(lastSet[i], jointCrash1[i], nextFrame, num_frames_interpolate);
+//            jointCommand[5][i][0] = value;
+//        }
+//    }
+//    else if (nextFrame >= 1000 && nextFrame <= 2000) {
+//        for (unsigned int i = 0; i < numJoints; ++i) {
+//            double value = interp(lastSet[i], jointCrash2[i], nextFrame - 1000, num_frames_interpolate);
+//            jointCommand[5][i][0] = value;
+//        }
+//    } else {
+
+    if (nextFrame >= 0 && nextFrame < num_frames_interpolate) {
         for (unsigned int i = 0; i < numJoints; ++i) {
-            double value = interp(lastSet[i], jointCrash1[i], nextFrame, num_frames_interpolate);
-            jointCommand[5][i][0] = value;
-        }
-    }
-    else if (nextFrame >= 1000 && nextFrame <= 2000) {
-        for (unsigned int i = 0; i < numJoints; ++i) {
-            double value = interp(lastSet[i], jointCrash2[i], nextFrame - 1000, num_frames_interpolate);
+            double value = interp(lastSet[i], jointCrash2[i], nextFrame, num_frames_interpolate);
             jointCommand[5][i][0] = value;
         }
     } else {
