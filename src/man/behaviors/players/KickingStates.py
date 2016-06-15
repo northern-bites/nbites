@@ -120,7 +120,9 @@ def afterKick(player):
     # short.
 
     if player.kick.isStraightKick():
-    # should have something like "and if too far away from home base"
+    # should have something like "and if not too far away from home base"
+    # or if another robot hasn't claimed the ball
+    # This needs to be rethought
         player.brain.nav.walk(75, 0, 0)
 
     elif transitions.shouldChaseBall(player):

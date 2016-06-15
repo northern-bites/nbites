@@ -19,6 +19,7 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
+    # print "approachBall"
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
@@ -64,7 +65,7 @@ def walkToWayPoint(player):
     ball = player.brain.ball
 
     if transitions.shouldDecelerate(player):
-        print "I should decelerate"
+        # print "I should decelerate"
         speed = MIN_SPEED
     else:
         speed = MAX_SPEED
@@ -93,6 +94,7 @@ def spinToKickHeading(player):
     spins to the ball until it is facing the ball 
     """
     if player.firstFrame():
+        # print "spinToKickHeading"
         player.brain.tracker.trackBall()
 
     if player.brain.nav.dodging:
@@ -132,6 +134,7 @@ def positionAndKickBall(player):
 @superState('positionAndKickBall')
 def prepareForKick(player):
     if player.firstFrame():
+        # print "Prepare for Kick"
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
 
@@ -150,7 +153,7 @@ def prepareForKick(player):
         player.inKickOffPlay = False
 
 #Josh's code
-    player.motionKick = True
+    # player.motionKick = True
     return player.goNow('lineUp')
 #dans potential field stuff
     # # only orbit is small orbit
@@ -230,7 +233,7 @@ def lineUp(player):
     State to line up for orbit. Uses two PID controllers!
     """
     if player.firstFrame():
-        print "Lining up to orbit"
+        # print "Lining up to orbit"
         lineUp.xController.reset()
         lineUp.hController.reset()
 
@@ -276,7 +279,7 @@ def orbitBall(player):
     if player.brain.nav.dodging:
         return player.stay()
 
-    print "Orbiting"
+    # print "Orbiting"
 
     # Calculate relative heading every frame
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
