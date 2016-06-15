@@ -13,7 +13,7 @@ public:
 
     void command(messages::JointAngles angles, messages::JointAngles stiffness);
     void noStiff();
-    bool manDied(messages::JointAngles angles, messages::JointAngles stiffness);
+    bool manDied();
 
 
 private:

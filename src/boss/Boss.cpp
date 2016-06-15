@@ -37,6 +37,7 @@ handler_t* Signal(int signum, handler_t* handler) {
 }
 
 void man_dead_handler(int sig) {
+    std::cout<<"\nIN man_dead_handler!!!!!!!!!!!!!!!!!\n"<<std::endl;
     assert(sig == SIGCHLD); //make sure the signal is the correct one
   
     int status; //will be filled in with child's status by waitpid
@@ -46,7 +47,7 @@ void man_dead_handler(int sig) {
     while ((child = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0) {
         
     	if (child != instance->manPID) {
-    		printf("boss got sigchild from non man");
+    		std::cout<<"boss got sigchild from non man"<<std::endl;
     		continue;
     	}
 
@@ -146,7 +147,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     fifo_fd(-1)
 {
     printf("\t\tBOSS VERSION == %d\n", BOSS_VERSION);
-    
+    printf("\nSigChld Testing\n");
     //for when man dies
     manDiedOverride = false;
 
@@ -156,8 +157,6 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     	std::cout<<"ERROR: two instances of singleton boss detected."<< std::endl;
     	::exit(1);
     }
-
-    Signal(SIGCHLD, man_dead_handler); 
 
     std::cout << "Boss Constructor" << std::endl;
     bool success = true;
@@ -226,14 +225,12 @@ Boss::~Boss()
 
 void Boss::listener()
 {
-    while(true)
-    {
-        if (manRunning) {
-            
+    while(true) {
+        if (manRunning && !manDiedOverride) {
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
                 std::cout << "Boss::listener() killing man due to inactivity" << std::endl;
                 print_info();
-                killMan();
+                manDiedOverride = true;
                 continue;
             }
         }
@@ -369,6 +366,16 @@ bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
 void Boss::DCMPreProcessCallback()
 {
     DCM_TIMING_DEBUG_PRE1();
+
+    if (manDiedOverride) {
+        bool statusMan = enactor.manDied();
+        if (!statusMan) {
+            manDiedOverride = false;
+            manRunning = false;
+        }
+        return;
+    }
+            
     // Make sure that we ONLY enact legitimate commands from Man
     if (!manRunning || shared->latestCommandWritten == 0) {
         enactor.noStiff();
@@ -407,18 +414,8 @@ void Boss::DCMPreProcessCallback()
             ledResults.ParseFromString(leds);
 
             // Now pass mans commands to the DCM
-            if (manDiedOverride) {
-            	bool statusMan = enactor.manDied(results.jointsCommand, results.stiffnessCommand);
-            	if (!statusMan) {
-            		manDiedOverride = false;
-            		manRunning = false;
-            	}
-            } else {
-            	enactor.command(results.jointsCommand, results.stiffnessCommand);
-            }
-            
+            enactor.command(results.jointsCommand, results.stiffnessCommand);
             led.setLeds(ledResults);
-
         } else {
             ++cmndLockMiss;
         }

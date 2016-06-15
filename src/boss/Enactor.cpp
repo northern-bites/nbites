@@ -71,30 +71,25 @@ void Enactor::noStiff()
 }
 
 long nextFrame = 0;
-bool Enactor::manDied(messages::JointAngles angles, messages::JointAngles stiffness) {
+bool Enactor::manDied() {
+    static const int num_joints = 21;
     bool is_finished = true;
 
-    double jointCrash1[21] = {0.00762796,-0.00157595, 0.253068, 0.185572, 0.00149202,-0.0152981, -0.078192, 0.00464392, 
+    double jointCrash1[num_joints] = {0.00762796,-0.00157595, 0.253068, 0.185572, 0.00149202,-0.0152981, -0.078192, 0.00464392, 
                         -0.308292, 1.3192, -0.78545, 0.0399261, 0.04913, -0.277696, 1.27633, -0.76389, -0.032172, 
                         0.204064, -0.26389, -4.19617e-05,  0.0383921};
 
-    double jointCrash2[21] = { -0.214802, 0.35, 1.57538, 0.131882, -1.56165, -0.0229681, -0.0475121, -0.0137641,
+    double jointCrash2[num_joints] = { -0.214802, 0.35, 1.57538, 0.131882, -1.56165, -0.0229681, -0.0475121, -0.0137641,
                         -0.811444, 2.16443, -1.22111, 0.00771189,  0.0261199, -0.81613, 2.17986, -1.23023, 
                         -0.0352399, 1.58466, -0.046062, 1.5631, 0.0353239};
 
-    std::vector<float> jointAngles = Kinematics::toJointAngles(angles);
-    std::vector<float> jointStiffnesses = Kinematics::toJointAngles(stiffness);
-
-    jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
-    jointStiffnesses.erase(jointStiffnesses.begin() + Kinematics::R_HIP_YAW_PITCH);
-
     if (nextFrame >= 0 && nextFrame < 100) {
-        for (unsigned int i = 0; i < jointAngles.size(); ++i) {
+        for (unsigned int i = 0; i < num_joints; ++i) {
             jointCommand[5][i][0] = jointCrash1[i];
         }
     }
     else if (nextFrame >= 100 && nextFrame <= 200) {
-        for (unsigned int i = 0; i < jointAngles.size(); ++i) {
+        for (unsigned int i = 0; i < num_joints; ++i) {
             jointCommand[5][i][0] = jointCrash2[i];
         }
     }
