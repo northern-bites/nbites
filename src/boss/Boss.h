@@ -34,6 +34,9 @@ class Boss : public AL::ALModule
 public:
     Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name);
     ~Boss();
+    bool manDiedOverride;
+    pid_t manPID;
+    bool manRunning;
 
 private:
     void DCMPreProcessCallback();
@@ -59,9 +62,7 @@ private:
     led::LedEnactor led;
 
     // Vars relating to Man
-    pid_t manPID;
-    bool manRunning;
-    bool manDiedOverride;
+    
 
     int shared_fd;
     volatile SharedData* shared;

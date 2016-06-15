@@ -45,7 +45,7 @@ void man_dead_handler(int sig) {
     //waits for state change in child and obtains info about child, reaps if child is terminated
     while ((child = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0) {
         
-    	if (child != manPID) {
+    	if (child != instance->manPID) {
     		printf("boss got sigchild from non man");
     		continue;
     	}
