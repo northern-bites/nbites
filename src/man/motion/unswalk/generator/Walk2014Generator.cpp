@@ -121,7 +121,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       // Calculate the current hip height by checking how bent the knee is 
       hiph = sensors.joints.angles[LKneePitch] / KNEE_PITCH_RANGE * (WALK_HIP_HEIGHT - STAND_HIP_HEIGHT) + STAND_HIP_HEIGHT;
    }
-   // std::cout << "IN WALK2014 GENERATOR\n";
+   // //std::cout << "IN WALK2014 GENERATOR\n";
 
    // 1. Read in new walk values (forward, left, turn, power) only at the start of a walk step cycle, ie when t = 0
    if (t == 0) {
@@ -136,7 +136,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       speed         = active.speed;                      // used to distinguish between jabKick and walkKick
       foot          = active.foot;                       // kicking foot
       isFast        = active.isFast;
-      std::cout << "[WALK GEN DEBUG] Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
+      //std::cout << "[WALK GEN DEBUG] Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
       if (stopping) {                                    // not used at present
       }
       else {
@@ -147,11 +147,11 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       speed = 0.0;
       if (forward < .01 && forward != 0.0) { 
          forward = .05; 
-         std::cout << "Adjust forward to bigger!" << std::endl;
+         //std::cout << "Adjust forward to bigger!" << std::endl;
       }
        else if (forward < .1 && forward != 0.0) {
          // forward = .1;
-         std::cout << "Forward is less than .1!! bad \n";
+         //std::cout << "Forward is less than .1!! bad \n";
       }
 
       // 1.1 Scale back values to try to ensure stability. Just clipped for now (see wiki)
@@ -168,7 +168,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
       // 1.5 ratchet forward by FORWARD_CHANGE (uncomment to limit absolute change in "forward" to FORWARD_CHANGE)
       		 if (!exactStepsRequested && abs(forward-lastForward)>FORWARD_CHANGE) {                // ie greater than a FORWARD_CHANGE / sec change
-      			std::cout << "LIMITING FORWARD CHANGE\n\n";
+      			//std::cout << "LIMITING FORWARD CHANGE\n\n";
                forward = lastForward + (forward-lastForward)/abs(forward-lastForward)*FORWARD_CHANGE;
       		}
       		lastForward   = forward;                           // back up old value in m/s
@@ -287,7 +287,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
    // 4. Execute Walk2014 Option
    if (walk2014Option == STAND) {                             // Place CoM over ankle and turn set power to motors
-      std::cout << "EXECUTING STAND\n";
+      //std::cout << "EXECUTING STAND\n";
       hiph = STAND_HIP_HEIGHT;
       forward = left = turn = 0;
       t = nextFootSwitchT = 0;
@@ -791,7 +791,7 @@ void Walk2014Generator::updateOdometry(Odometry *odometry, bool isLeftSwingFoot)
    forwardOdo *= 1;
    leftOdo    *= 1.23;
    turnOdo    *= -0.58; // TODO nikki -.53;
-   // std::cout << "UNSW WALK ODO " << forwardOdo <<" "<< leftOdo <<" "<< turnOdo << std::endl;
+   // //std::cout << "UNSW WALK ODO " << forwardOdo <<" "<< leftOdo <<" "<< turnOdo << std::endl;
    *odometry = *odometry + Odometry(forwardOdo, leftOdo, turnOdo);
 
    // backup odometry values

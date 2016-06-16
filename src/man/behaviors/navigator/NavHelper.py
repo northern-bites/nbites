@@ -10,7 +10,7 @@ def stand(nav):
     Makes the motion engine stand.
     Right now this is done by sending a (0, 0, 0) velocity vector.
     """
-    print("In stand in nav!")
+    # print("In stand in nav!")
 
     createAndSendWalkVector(nav, 0, 0, 0)
 
@@ -145,7 +145,7 @@ def createAndSendWalkVector(nav, x, y, theta):
     """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.WALK_COMMAND #Walk Command
-    print("Sending walk vector", x, y, theta)
+    # print("Sending walk vector", x, y, theta)
     command.speed.x_percent = x
     command.speed.y_percent = y
     command.speed.h_percent = theta
