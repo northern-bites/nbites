@@ -64,6 +64,10 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots, intPairVector & blac
         (*i).rawY = midY;
         if (filterWhiteSpot((*i), blackSpots, badBlackSpots)) {
             actualWhiteSpots.push_back((*i));
+                if(debugBall) {
+                    std::cout<<"filterWhiteSpot returned true\n";
+                    debugDraw.drawPoint((*i).ix() + width / 2, -(*i).iy() + height / 2, RED);
+                }
             makeBall((*i), cameraHeight, 0.75, foundBall, false);
 #ifdef OFFLINE
             foundBall = true;
@@ -89,6 +93,8 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
     for (auto i = blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
         int diam = (*i).firstPrincipalLength();
         int diam2 = (*i).secondPrincipalLength();
+        // std::cout<<"Diam: "<<diam<<std::endl;
+        // std::cout<<"Diam2: "<<diam2<<std::endl;
         if (diam < 25 && diam >= 6 && diam2 >= 5) {
             // convert this blob to a Spot
             int cx = (*i).centerX();
@@ -103,6 +109,9 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
                 s.spotType = WHITE_BLOB;
                 actualWhiteSpots.push_back(s);
                 makeBall(s, cameraHeight, 0.75, foundBall, false);
+                if(debugBall) {
+                    std::cout<<"Blobber returning true\n";
+                }
 #ifdef OFFLINE
                 foundBall = true;
 #else
@@ -246,6 +255,16 @@ void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
     s.greenThreshold(greenThreshold);
     s.filterGain(filterGain);
 
+}
+
+int BallDetector::getAzimuthColumnRestrictions() {
+    double az = homography->azimuth();
+    int startColumn;
+}
+
+int BallDetector::getAzimuthRowRestrictions() {
+    double az = homography->azimuth();
+    int endRow;
 }
 
 /* We have a potential ball on the horizon. Do some checking to
@@ -467,6 +486,8 @@ bool BallDetector::blobsAreClose(std::pair<int,int> first,
    is one such method. It looks at our filtered list of black blobs
    and tries to find groups of them that are near each other. If there
    are enough of them then it is strong evidence of a ball.
+
+   @TODO: This method has become so ugly. Needs clean up.
 */
 bool BallDetector::findCorrelatedBlackSpots
 (std::vector<std::pair<int,int>> & blackSpots,
@@ -1021,13 +1042,6 @@ bool BallDetector::filterWhiteSpot(Spot spot,
 bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
                             EdgeList& edges)
 {
-	int WHITE_CANDIDATE = 1;
-	int WHITE_REJECT = 2;
-	int DARK_CANDIDATE = 3;
-	int DARK_REJECT = 4;
-	int WHITE_BLOB = 5;
-	int WHITE_BLOB_BAD = 6;
-
     Ball reset;
     _best = reset;
     width = white.width();
@@ -1038,6 +1052,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     bool foundBall = false;
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
+
+    std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
 
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
@@ -1053,10 +1069,12 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	// if (topCamera) {
 	// 	horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
 	// }
+    //std::cout<<"Height - Horiz = "<<height-horiz<<std::endl;
 	// ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
 	// 						 height - horiz);
 	// ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
 	// 						 height - horiz);
+    //if((height - horiz) > 0) {} //execute all of the below code, else return false
 
     SpotDetector darkSpotDetector;
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
