@@ -109,7 +109,6 @@ def gamePlaying(player):
     
     #HACKKKKKKK FOR THESSSEEEE
     say(Say.IN_SCRIMMAGE,"Going to Home Position")
-    return player.goNow('positionAtHome')
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
     #     player.brain.play.isChaser()):
