@@ -897,8 +897,6 @@ bool BallDetector::whiteNoBlack(Spot spot) {
     int midY = -spot.iy() + height / 2;
 	int spotHeight = bottomY - topY + 2;
 
-	std::cout << "Checking no black " << midX << " " << midY << " " << spotHeight << std::endl;
-	debugDraw.drawPoint(midX, midY, BLACK);
 	// The biggest thing is there should be no white and at least
 	// some green above the ball
 	int total = 0;
