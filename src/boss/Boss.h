@@ -62,8 +62,6 @@ private:
     led::LedEnactor led;
 
     // Vars relating to Man
-    
-
     int shared_fd;
     volatile SharedData* shared;
     pthread_mutexattr_t shared_mutex_attr;

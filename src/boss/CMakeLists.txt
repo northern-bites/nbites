@@ -83,6 +83,11 @@ include_directories( ${Boost_INCLUDE_DIR} )
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )
 
+# Compile logshare
+add_subdirectory( ${SHARE_DIR}/logshare ${CMAKE_CURRENT_BINARY_DIR}/logshare/ )
+# Make logshare available to everything
+include_directories( ${SHARE_DIR}/logshare )
+
 # Compile messages
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
@@ -111,6 +116,7 @@ add_library(
 target_link_libraries( boss
   messages
   led
+  logshare
   ${ALCOMMON_LIBRARIES}
 )
 
