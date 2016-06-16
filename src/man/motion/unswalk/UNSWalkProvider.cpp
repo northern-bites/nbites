@@ -81,7 +81,7 @@ static const Joints::JointCode nb_joint_order[] {
 UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER), 
  									 requestedToStop(false), tryingToWalk(false) 
 {
-	//std::cout << "Constructing walk provider!\n";
+	std::cout << "Constructing walk provider!\n";
 	generator =  new ClippedGenerator((Generator*) new DistributedGenerator());
 	odometry = new Odometry();
 	joints = new JointValues();
@@ -115,7 +115,7 @@ void UNSWalkProvider::resetAll() {
 }
 
 bool UNSWalkProvider::calibrated() const {
-	// //std::cout << "not calibrated!!" << std::endl;
+	// std::cout << "not calibrated!!" << std::endl;
 	// imuAdjuster->findAvgOffset(sensorInertials.gyr_x(), sensorInertials.gyr_y());
 	return imuAdjuster->isDone();
 	// return false;
@@ -166,24 +166,24 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	) 
 {
 	PROF_ENTER(P_WALK);
-	// //logMsg("\n");
+	// logMsg("\n");
 
 	ActionCommand::All* request = new ActionCommand::All();
 	request->body.actionType = ActionCommand::Body::WALK;
 
 
-	// if (!calibrated()) { //logMsg("not calibrated");} 
-	// else {//logMsg("calibrated!!!"); }
-	// //std::cout << "" << std::endl;
+	// if (!calibrated()) { logMsg("not calibrated");} 
+	// else {logMsg("calibrated!!!"); }
+	// std::cout << "" << std::endl;
 
 	if (standby) {
 		tryingToWalk = false;
 	} else {
 		if (requestedToStop || !isActive()) {
 			tryingToWalk = false;
-			//logMsg("requested to stop or is not active");
+			logMsg("requested to stop or is not active");
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
-			//logMsg("STEP command! Odometry walk!");
+			logMsg("STEP command! Odometry walk!");
 
 			StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
 			Odometry deltaOdometry = odometry - startOdometry;
@@ -205,23 +205,23 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			// TODO odometry, handle
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
-			//logMsg("Walk command - Walking!");
+			logMsg("Walk command - Walking!");
 		 	float WALK_SPEED_SCALE_X = 1000.0;
 		 	float WALK_SPEED_SCALE_Y = 100.0;
 			// HANDLE
 			tryingToWalk = true;
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
-			//std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
-			//std::cout << "Walk Command Scaled: " << command->x_percent * WALK_SPEED_SCALE_X << "," << command->y_percent * WALK_SPEED_SCALE_Y << ") \n";
+			std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
+			std::cout << "Walk Command Scaled: " << command->x_percent * WALK_SPEED_SCALE_X << "," << command->y_percent * WALK_SPEED_SCALE_Y << ") \n";
 			request->body.forward = command->x_percent * WALK_SPEED_SCALE_X ;
 			request->body.left = command->y_percent * WALK_SPEED_SCALE_Y;
 			request->body.turn = command->theta_percent ;
-			//std::cout << "FORWARD: " << request->body.forward << std::endl;
+			std::cout << "FORWARD: " << request->body.forward << std::endl;
 			request->body.speed = 0.0f;
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
-			//logMsg("\n\nDestination command - Destination Walking!");
+			logMsg("\n\nDestination command - Destination Walking!");
 			tryingToWalk = true;
 			float DEST_SCALE = 1;
 
@@ -232,18 +232,18 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			request->body.speed = command->gain;
 
-			//std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
-			//std::cout << "Scaled Dest Command: " << command->x_mm * DEST_SCALE << "," << command->y_mm * DEST_SCALE << ") \n";
-			//std::cout << "Dest gain: " << command->gain << std::endl;
+			std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
+			std::cout << "Scaled Dest Command: " << command->x_mm * DEST_SCALE << "," << command->y_mm * DEST_SCALE << ") \n";
+			std::cout << "Dest gain: " << command->gain << std::endl;
 			// TODO incorporate motion kicks
 
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::KICK) {
-			//logMsg("Kick command sent now!");
+			logMsg("Kick command sent now!");
 			tryingToWalk = false;
 
 		} else if (!currentCommand.get()) {
-			// //logMsg("Can't get current command! Requesting stand");
+			// logMsg("Can't get current command! Requesting stand");
 			tryingToWalk = false;
 			// call stand
 			request->body.actionType = ActionCommand::Body::STAND;
@@ -254,14 +254,14 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	request->body.speed = 0.0f;
 	adjustIMU(sensorInertials);
 
-	// //std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
-	// request->body.forward = 300.0; //command->x_percent ;
-	// request->body.left = 00.0; //command->y_percent ;
-	// request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
-	// request->body.speed = 0.0f;
+	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
+	request->body.forward = 00.0; //command->x_percent ;
+	request->body.left = 00.0; //command->y_percent ;
+	request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
+	request->body.speed = 0.0f;
 
 	// For testing stand action
-	// //logMsg("Can't get current command! Requesting stand");
+	// logMsg("Can't get current command! Requesting stand");
 	// request->body.actionType = ActionCommand::Body::STAND;
 
 	// Update sensor values
@@ -285,12 +285,12 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     float adjGyrX = imuAdjuster->getGyrX();
     float adjGyrY = imuAdjuster->getGyrY();
 
-    // //std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
-    // //std::cout << "ADJUSTED InertialSensor_AccX: " << adjAccX << ", InertialSensor_AccY: " << adjAccY << ", InertialSensor_AccZ: " << adjAccZ << std::endl;
+    // std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
+    // std::cout << "ADJUSTED InertialSensor_AccX: " << adjAccX << ", InertialSensor_AccY: " << adjAccY << ", InertialSensor_AccZ: " << adjAccZ << std::endl;
 
-    // //std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << std::endl;
+    // std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << std::endl;
     
-    // //std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
+    // std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
     // sensors.sensors[Sensors::angleZ] = sensorInertials.angle_z(); // this either
 
     sensors.sensors[Sensors::LFoot_FSR_FrontLeft] = sensorFSRs.lfl();
@@ -389,14 +389,14 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     		if ((Kinematics::ChainID)i == Kinematics::RLEG_CHAIN && j == 11) {
     			// RHIPYAWPITCH -- technically doesn't exist but in all our infinite grace and wisdom we have a variable for it anyway
     			chain_angles.push_back(joints.angles[nb_joint_order[6]]);
-    			// //logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
+    			// logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
     		} else {
 	    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); 
     		}
 
-   //  		//logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
-			// // //std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
-			// //std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;
+   //  		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
+			// // std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
+			// std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;
 
     		if (hardness[nb_joint_order[j]] == 0) {
 				// JUST PUSH BACK 1 so arms move
@@ -415,7 +415,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
     // We only leave when we do a sweet move, so request a special action
     if (requestedToStop) {
-    	//logMsg("Requested to stop");
+    	logMsg("Requested to stop");
     	inactive();
     	requestedToStop = false;
     	resetOdometry();
@@ -437,7 +437,7 @@ void UNSWalkProvider::resetOdometry() {
 
 void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
 	if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
-		//std::cout << "Stand command!\n";
+		std::cout << "Stand command!\n";
 		this->stand();
 		return;
 	}
@@ -474,10 +474,10 @@ void UNSWalkProvider::updateOdometry(float angleZ) {
     if (angleChanged == 0.0 && lastAngleZ == 0.0) {
     	// First change, so there's not a big jump in the angle and we don't think we've turned
     	lastAngleZ = angleZ;
-    	// //std::cout << "Initting the angle changing!\n";
+    	// std::cout << "Initting the angle changing!\n";
     	return;
     }
-    // //std::cout << "Angle Z: " << angleZ << std::endl;
+    // std::cout << "Angle Z: " << angleZ << std::endl;
     angleChanged += angleZ - lastAngleZ;
     lastAngleZ = angleZ;
     // odometry->turn = angleChanged;
@@ -486,7 +486,7 @@ void UNSWalkProvider::updateOdometry(float angleZ) {
 #endif
 
     // if (abs(gyroZ) > 0) {
-    // 	//std::cout << "[GYROZ] the abs gyroz was: " << gyroZ << std::endl;
+    // 	std::cout << "[GYROZ] the abs gyroz was: " << gyroZ << std::endl;
     //     // convert to radians per frame, same direction as walkChange
     //     gyroZ *= -0.01f * 0.95f;
 
@@ -495,7 +495,7 @@ void UNSWalkProvider::updateOdometry(float angleZ) {
 
     //     // use gyroZ if there is sufficient difference, don't always use it due to gyro drift skewing the result
     //     if (fabs(slipAverage) > 0.005f){
-    //     	//std::cout << "USING GYRO!!!\n";
+    //     	std::cout << "USING GYRO!!!\n";
     //         odometry->turn = gyroZ;
     //     }
     // }
@@ -514,9 +514,9 @@ void UNSWalkProvider::getOdometryUpdate(portals::OutPortal< ::messages::RobotLoc
 	odometryData.get()->set_h(angleChanged);
 
 
-    // //std::cout << "MY ODO: " << odometry->forward << " Y: " << odometry->left * 100 << " TURN: " << odometry->turn << std::endl;
-    // //std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
-    // //std::cout << "AngledChanged: " << angleChanged << std::endl << std::endl;
+    // std::cout << "MY ODO: " << odometry->forward << " Y: " << odometry->left * 100 << " TURN: " << odometry->turn << std::endl;
+    // std::cout << "MY DX: " << dx << " MY DY: " << dy << std::endl;
+    // std::cout << "AngledChanged: " << angleChanged << std::endl << std::endl;
 
 	out.setMessage(odometryData);
 }
@@ -539,7 +539,7 @@ bool UNSWalkProvider::isWalkActive() const {
 }
 
 void UNSWalkProvider::stand() {
-	//std::cout << "STAND IS BEING CALLED!!\n";
+	std::cout << "STAND IS BEING CALLED!!\n";
 	currentCommand = MotionCommand::ptr();
 }
 

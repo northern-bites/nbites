@@ -10,7 +10,7 @@ def stand(nav):
     Makes the motion engine stand.
     Right now this is done by sending a (0, 0, 0) velocity vector.
     """
-    # print("In stand in nav!")
+    print("In stand in nav!")
 
     createAndSendWalkVector(nav, 0, 0, 0)
 

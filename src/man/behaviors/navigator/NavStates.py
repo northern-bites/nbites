@@ -141,7 +141,7 @@ def goToPosition(nav):
         helper.setSpeed(nav, goToPosition.speeds)
 
     else:
-        # print("Was not fase!")
+        print("Was not fase!")
         if goToPosition.adaptive:
             #reduce the speed if we're close to the target
             speed = helper.adaptSpeed(relDest.dist,
