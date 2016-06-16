@@ -176,7 +176,6 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// else {logMsg("calibrated!!!"); }
 
 
-
 	if (standby) {
 		tryingToWalk = false;
 	} else {
@@ -207,7 +206,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			// TODO odometry, handle
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
 			logMsg("Walk command - Walking!");
-		 	float WALK_SPEED_SCALE = 1000.0;
+		 	float WALK_SPEED_SCALE = 100.0;
 			// HANDLE
 			tryingToWalk = true;
 
@@ -221,16 +220,20 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			request->body.speed = 0.0f;
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
-			logMsg("Destination command - Destination Walking!");
+			logMsg("\n\nDestination command - Destination Walking!");
 			tryingToWalk = true;
-			float DEST_SCALE = 0.01;
+			float DEST_SCALE = 1;
 
 			DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
 			request->body.forward = command->x_mm * DEST_SCALE;
 			request->body.left = command->y_mm * DEST_SCALE;
 			request->body.turn = command->theta_rads;
+
+			request->body.speed = command->gain;
+
 			std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
 			std::cout << "Scaled Dest Command: " << command->x_mm * DEST_SCALE << "," << command->y_mm * DEST_SCALE << ") \n";
+			std::cout << "Dest gain: " << command->gain << std::endl;
 			// TODO incorporate motion kicks
 
 
@@ -239,7 +242,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			tryingToWalk = false;
 
 		} else if (!currentCommand.get()) {
-			logMsg("Can't get current command! Requesting stand");
+			// logMsg("Can't get current command! Requesting stand");
 			tryingToWalk = false;
 			// call stand
 			request->body.actionType = ActionCommand::Body::STAND;
@@ -255,10 +258,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// request->body.turn = 0.0; 
 
 	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
-	// request->body.forward = 00.0; //command->x_percent ;
-	// request->body.left = 00.0; //command->y_percent ;
-	// request->body.turn = UNSWDEG2RAD(10); //UNSWDEG2RAD(90.0); //command->theta_percent ;
-	// request->body.speed = 0.0f;
+	request->body.forward = 300.0; //command->x_percent ;
+	request->body.left = 00.0; //command->y_percent ;
+	request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
+	request->body.speed = 0.0f;
 
 	// For testing stand action
 	// logMsg("Can't get current command! Requesting stand");
@@ -425,8 +428,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     		}
 
    //  		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
-			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
-			// // std::cout << (joints.angles[nb_joint_order[j]]);
+			// // std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
+			// std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;
 
     		if (hardness[nb_joint_order[j]] == 0) {
 				// JUST PUSH BACK 1 so arms move
@@ -467,6 +470,7 @@ void UNSWalkProvider::resetOdometry() {
 
 void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
 	if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
+		std::cout << "Stand command!\n";
 		this->stand();
 		return;
 	}
@@ -571,7 +575,7 @@ bool UNSWalkProvider::isWalkActive() const {
 
 void UNSWalkProvider::stand() {
 	std::cout << "STAND IS BEING CALLED!!\n";
-
+	currentCommand = MotionCommand::ptr();
 }
 
 

@@ -18,7 +18,7 @@ ActionGenerator::ActionGenerator(std::string filename) : file_name(filename) {
 };
 
 ActionGenerator::~ActionGenerator() {
-   std::cout << "ActionGenerator destroyed" << std::endl;
+   //std::cout << "ActionGenerator destroyed" << std::endl;
 };
 
 bool ActionGenerator::isActive() {
@@ -30,44 +30,44 @@ void ActionGenerator::reset() {
 }
 
 void ActionGenerator::NBSetStand() {
-   std::cout << "Action Gen CONSTRUCTING STAND POSE!\n";
+   //std::cout << "Action Gen CONSTRUCTING STAND POSE!\n";
    setStand = true;
    JointValues newJoint;
    newJoint.angles[Joints::HeadYaw] = 0.0;
    newJoint.angles[Joints::HeadPitch] = 0.0;
 
-   newJoint.angles[Joints::LShoulderPitch] = 92.0;
-   newJoint.angles[Joints::LShoulderRoll] = 0.3;
-   newJoint.angles[Joints::LElbowYaw] = -0.8;
-   newJoint.angles[Joints::LElbowRoll] = -1.7;
+   newJoint.angles[Joints::LShoulderPitch] = 1.57f;
+   newJoint.angles[Joints::LShoulderRoll] = 0.17f;
+   newJoint.angles[Joints::LElbowYaw] = -1.57f;
+   newJoint.angles[Joints::LElbowRoll] = -0.05f;
    newJoint.angles[Joints::LWristYaw] = 0.0;
    newJoint.angles[Joints::LHand] = 0.0;
 
-   newJoint.angles[Joints::LHipYawPitch] = 0.0;
+   newJoint.angles[Joints::LHipYawPitch] = -0.1;
    newJoint.angles[Joints::LHipRoll] = 0.0;
-   newJoint.angles[Joints::LHipPitch] = -0.2;
-   newJoint.angles[Joints::LKneePitch] = -0.1;
-   newJoint.angles[Joints::LAnklePitch] = -0.2;
-   newJoint.angles[Joints::LAnkleRoll] = -0.2;
+   newJoint.angles[Joints::LHipPitch] = -0.3f;
+   newJoint.angles[Joints::LKneePitch] = 0.98f;
+   newJoint.angles[Joints::LAnklePitch] = -0.55f;
+   newJoint.angles[Joints::LAnkleRoll] =  0.0f;
 
    newJoint.angles[Joints::RHipRoll] = 0.0;
-   newJoint.angles[Joints::RHipPitch] = 0.0;
-   newJoint.angles[Joints::RKneePitch] = -0.1;
-   newJoint.angles[Joints::RAnklePitch] = -0.1;
+   newJoint.angles[Joints::RHipPitch] = -0.3f;
+   newJoint.angles[Joints::RKneePitch] = 0.98f;
+   newJoint.angles[Joints::RAnklePitch] = -0.55f;
    newJoint.angles[Joints::RAnkleRoll] = 0.0;
 
-   newJoint.angles[Joints::RShoulderPitch] = 92.0;
-   newJoint.angles[Joints::RShoulderRoll] = -1.2;
-   newJoint.angles[Joints::RElbowYaw] = 0.7;
-   newJoint.angles[Joints::RElbowRoll] = 2.2;
+   newJoint.angles[Joints::RShoulderPitch] = 1.57f;
+   newJoint.angles[Joints::RShoulderRoll] = -0.17f;
+   newJoint.angles[Joints::RElbowYaw] = 1.57f;
+   newJoint.angles[Joints::RElbowRoll] = 0.05f;
    newJoint.angles[Joints::RWristYaw] = 0.0;
    newJoint.angles[Joints::RHand] = 0.0;
 
    for (int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
       newJoint.stiffnesses[i] = 1.0;
-      newJoint.angles[i] = UNSWDEG2RAD(newJoint.angles[i]);
+      // newJoint.angles[i] = UNSWDEG2RAD(newJoint.angles[i]);
    }
-   int duration = 1;
+   int duration = 3;
    interpolate(newJoint);
 
 }
@@ -83,20 +83,17 @@ JointValues ActionGenerator::makeJoints(ActionCommand::All* request,
                                         float ballY) {
 
    if (request->body.actionType = ActionCommand::Body::STAND) {
-      std::cout << "Actiongen Stand requested! " << std::endl;
+      //std::cout << "Actiongen Stand requested! " << std::endl;
       NBSetStand();
-
    }
 
-   std::cout << "Joint size: " << joints.size() << std::endl;
+   //std::cout << "Joint size: " << joints.size() << std::endl;
    JointValues j;
    if (current_time == NOT_RUNNING) {
-      std::cout << "[ACTION GEN] NOT RUNNING it says \n";
       // current_time = 0;
       active = request->body;
       j = joints[joints.size() - 1];
    } else {
-      std::cout << "[ACTION GEN RUNNING it says \n";
       JointValues newJoints = sensors.joints;
       for (int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
          newJoints.stiffnesses[i] = 1.0f;
@@ -111,25 +108,19 @@ JointValues ActionGenerator::makeJoints(ActionCommand::All* request,
 };
 
 void ActionGenerator::interpolate(JointValues newJoint, int duration) {
-   std::cout << "[INTERPOLATE] in interpolate\n";
    if (joints.empty()) {
-   std::cout << "[INTERPOLATE] joints empty \n";
       max_iter = duration / 10;
       // Reserve space for the interpolation when the generator
       // first called
       for (int i = 0; i < max_iter; i++) {
          joints.push_back(newJoint);
-         std::cout << "ACTIONGEN adding joint" << std::endl;
       }
       joints.push_back(newJoint);
-         std::cout << "ACTIONGEN adding joint" << std::endl;
    } else {
-   std::cout << "[INTERPOLATE] joints NOT empty\n";
       int inTime = 0;
       float offset[Joints::NUMBER_OF_JOINTS];
 
       if (duration != 0) {
-   std::cout << "[INTERPOLATE] duration is not zero!\n";
 
          inTime = duration / 10;
          JointValues currentJoint = joints.back();
@@ -138,7 +129,6 @@ void ActionGenerator::interpolate(JointValues newJoint, int duration) {
          for (int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
             offset[i] = (newJoint.angles[i] - currentJoint.angles[i]) / inTime;
          }
-   std::cout << "[INTERPOLATE] calculated the offset!\n";
 
 
          for (int i = 0; i < inTime; i++) {
@@ -148,10 +138,8 @@ void ActionGenerator::interpolate(JointValues newJoint, int duration) {
                inJoint.stiffnesses[j] = newJoint.stiffnesses[j];
             }
             joints.push_back(inJoint);
-         std::cout << "ACTIONGEN adding joint" << std::endl;
          }
       } else {
-   std::cout << "[INTERPOLATE] duration IS zero!\n";
 
          JointValues firstJoint = joints.at(max_iter);
          // Calculate the difference between the joint at MAX_ITER position
@@ -173,10 +161,10 @@ void ActionGenerator::interpolate(JointValues newJoint, int duration) {
 
 void ActionGenerator::constructPose(std::string path) {
    ifstream in(string(path + "/" + file_name + ".pos").c_str());
-   std::cout << "ActionGenerator(" << file_name << ") creating" << endl;
+   //std::cout << "ActionGenerator(" << file_name << ") creating" << endl;
 
    if (!in.is_open()) {
-      std::cout << "ActionGenerator can not open " << file_name << endl;
+      //std::cout << "ActionGenerator can not open " << file_name << endl;
    } else {
       int duration = 0;
       float stiffness = 1.0;
@@ -197,7 +185,7 @@ void ActionGenerator::constructPose(std::string path) {
                in.ignore();
             }
             if (in.peek() == '#' || in.peek() == '$' || in.peek() == '\n' || in.peek() == EOF) {
-               std::cout << "You're missing a joint value in " << file_name << ".pos" << std::endl;
+               //std::cout << "You're missing a joint value in " << file_name << ".pos" << std::endl;
                exit(1);
             }
             in >> angles;
@@ -212,7 +200,7 @@ void ActionGenerator::constructPose(std::string path) {
             in.ignore();
          }
          if (in.peek() == '#' || in.peek() == '$' || in.peek() == '\n' || in.peek() == EOF) {
-            std::cout << "You're missing a duration in " << file_name << ".pos" << std::endl;
+            //std::cout << "You're missing a duration in " << file_name << ".pos" << std::endl;
             exit(1);
          }
          in >> duration;
@@ -236,7 +224,7 @@ void ActionGenerator::constructPose(std::string path) {
                   in.ignore();
                }
                if (in.peek() == '#' || in.peek() == '\n' || in.peek() == EOF) {
-                  std::cout << "You're missing a stiffness value in " << file_name << ".pos" << std::endl;
+                  //std::cout << "You're missing a stiffness value in " << file_name << ".pos" << std::endl;
                   exit(1);
                }
                in >> stiffness;
@@ -260,7 +248,7 @@ void ActionGenerator::constructPose(std::string path) {
       }
       in.close();
    }
-   std::cout << "ActionGenerator(" << file_name << ") created" << endl;
+   //std::cout << "ActionGenerator(" << file_name << ") created" << endl;
 }
 
 // void ActionGenerator::readOptions(const boost::program_options::variables_map &config) {

@@ -268,6 +268,9 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    //    requestedDive = Body::NONE;
    // }
 
+   current_generator = request->body.actionType;
+   // std::cout << "setting current generator!\n";
+
    switch (current_generator) {
    case Body::NONE:             usesHead = false; break;
    case Body::STAND:            usesHead = false; break;

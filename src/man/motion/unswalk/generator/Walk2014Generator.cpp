@@ -45,7 +45,7 @@ const float STAND_HIP_HEIGHT = 0.248;                      // for tall power sav
 const float KNEE_PITCH_RANGE = UNSWDEG2RAD(60);                // the knee pitch range from standing to crouching
 const float BASE_WALK_PERIOD = .23; //.25;                 // seconds to walk one step, ie 1/2 walk cycle
 const float WALK_HIP_HEIGHT = .23;                         // Walk hip height - seems to work from .2 to .235
-const float MAX_FORWARD = .2; //.3;                              // meters
+const float MAX_FORWARD = .25; //.3;                              // meters
 const float MAX_LEFT = .1; //.2;                                 // meters
 const float MAX_TURN = .87;                                // radians
 const float BASE_LEG_LIFT = 0.02; //0.010;                         // meters
@@ -183,6 +183,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       }
       turn *= -1;   // reverses sign
    }
+   std::cout << "[WALK GEN DEBUG] t NOT zero!! : Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
 
    // 2. Update timer
    t += dt;
