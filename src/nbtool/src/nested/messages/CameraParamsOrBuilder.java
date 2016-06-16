@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface CameraParamsOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.CameraParams)
-    com.google.protobuf.MessageOrBuilder {
+public interface CameraParamsOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional string whichCamera = 1;
   /**
    * <code>optional string whichCamera = 1;</code>
    */
@@ -21,6 +21,7 @@ public interface CameraParamsOrBuilder extends
   com.google.protobuf.ByteString
       getWhichCameraBytes();
 
+  // optional int32 H_FLIP = 2;
   /**
    * <code>optional int32 H_FLIP = 2;</code>
    */
@@ -30,6 +31,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getHFLIP();
 
+  // optional int32 V_FLIP = 3;
   /**
    * <code>optional int32 V_FLIP = 3;</code>
    */
@@ -39,6 +41,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getVFLIP();
 
+  // optional int32 auto_exposure = 4;
   /**
    * <code>optional int32 auto_exposure = 4;</code>
    */
@@ -48,6 +51,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getAutoExposure();
 
+  // optional int32 brightness = 5;
   /**
    * <code>optional int32 brightness = 5;</code>
    */
@@ -57,6 +61,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getBrightness();
 
+  // optional int32 contrast = 6;
   /**
    * <code>optional int32 contrast = 6;</code>
    */
@@ -66,6 +71,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getContrast();
 
+  // optional int32 saturation = 7;
   /**
    * <code>optional int32 saturation = 7;</code>
    */
@@ -75,6 +81,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getSaturation();
 
+  // optional int32 hue = 8;
   /**
    * <code>optional int32 hue = 8;</code>
    */
@@ -84,6 +91,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getHue();
 
+  // optional int32 sharpness = 9;
   /**
    * <code>optional int32 sharpness = 9;</code>
    */
@@ -93,6 +101,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getSharpness();
 
+  // optional int32 gamma = 10;
   /**
    * <code>optional int32 gamma = 10;</code>
    */
@@ -102,6 +111,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getGamma();
 
+  // optional int32 autoWhiteBalance = 11;
   /**
    * <code>optional int32 autoWhiteBalance = 11;</code>
    */
@@ -111,6 +121,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getAutoWhiteBalance();
 
+  // optional int32 exposure = 12;
   /**
    * <code>optional int32 exposure = 12;</code>
    */
@@ -120,6 +131,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getExposure();
 
+  // optional int32 gain = 13;
   /**
    * <code>optional int32 gain = 13;</code>
    */
@@ -129,6 +141,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getGain();
 
+  // optional int32 whiteBalance = 14;
   /**
    * <code>optional int32 whiteBalance = 14;</code>
    */
@@ -138,6 +151,7 @@ public interface CameraParamsOrBuilder extends
    */
   int getWhiteBalance();
 
+  // optional int32 fadeToBlack = 15;
   /**
    * <code>optional int32 fadeToBlack = 15;</code>
    */

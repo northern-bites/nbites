@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface MotionStatusOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.MotionStatus)
-    com.google.protobuf.MessageOrBuilder {
+public interface MotionStatusOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional bool standing = 1;
   /**
    * <code>optional bool standing = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface MotionStatusOrBuilder extends
    */
   boolean getStanding();
 
+  // optional bool body_is_active = 2;
   /**
    * <code>optional bool body_is_active = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface MotionStatusOrBuilder extends
    */
   boolean getBodyIsActive();
 
+  // optional bool walk_is_active = 3;
   /**
    * <code>optional bool walk_is_active = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface MotionStatusOrBuilder extends
    */
   boolean getWalkIsActive();
 
+  // optional bool head_is_active = 4;
   /**
    * <code>optional bool head_is_active = 4;</code>
    */
@@ -43,6 +46,7 @@ public interface MotionStatusOrBuilder extends
    */
   boolean getHeadIsActive();
 
+  // optional bool calibrated = 5;
   /**
    * <code>optional bool calibrated = 5;</code>
    */
@@ -52,6 +56,7 @@ public interface MotionStatusOrBuilder extends
    */
   boolean getCalibrated();
 
+  // optional bool upright = 6;
   /**
    * <code>optional bool upright = 6;</code>
    */

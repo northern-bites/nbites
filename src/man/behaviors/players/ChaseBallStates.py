@@ -64,8 +64,10 @@ def walkToWayPoint(player):
 
     ball = player.brain.ball
 
+    print("In walkToWayPoint")
+
     if transitions.shouldDecelerate(player):
-        # print "I should decelerate"
+        print "I should decelerate"
         speed = MIN_SPEED
     else:
         speed = MAX_SPEED
@@ -382,7 +384,10 @@ def positionForKick(player):
         player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
     player.ballBeforeKick = player.brain.ball
+    print("Kickpose: ", str(positionForKick.kickPose))
+
     if transitions.ballInPosition(player, positionForKick.kickPose):
+        print("The ball is in position! CHASEBALL")
         print player.kick
         return player.goLater('executeSweetKick')
         if player.motionKick or True:

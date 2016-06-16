@@ -14,7 +14,7 @@
 #include "MotionConstants.h"
 
 // Motion providers
-#include "bhwalk/BHWalkProvider.h"
+// #include "unswalk/UNSWalkProvider.h"
 #include "ScriptedProvider.h"
 #include "NullBodyProvider.h"
 #include "HeadProvider.h"
@@ -162,18 +162,18 @@ public:
     void stopHeadMoves() { headProvider.requestStop(); }
     void stopBodyMoves() { curProvider->requestStop(); }
 
-    bool isWalkActive() { return walkProvider.isWalkActive(); }
-    bool isStanding()   { return walkProvider.isStanding(); }
+    bool isWalkActive();// { return walkProvider.isWalkActive(); }
+    bool isStanding();//   { return walkProvider.isStanding(); }
     bool isHeadActive() { return headProvider.isActive(); }
     bool isBodyActive() { return curProvider->isActive();}
 
-    void resetWalkProvider()     { walkProvider.hardReset(); }
+    void resetWalkProvider();//     { walkProvider.hardReset(); }
     void resetScriptedProvider() { scriptedProvider.hardReset(); }
 
     int getFrameCount() const { return frameCount; }
 
-    bool calibrated() { return walkProvider.calibrated(); }
-    bool upright() { return walkProvider.upright(); }
+    bool calibrated(); // { return walkProvider.calibrated(); }
+    bool upright(); // { return walkProvider.upright(); }
 
     /**
      * @brief Generates a JointAngles message from a series
@@ -249,6 +249,7 @@ private:
     void swapBodyProvider();
     void swapHeadProvider();
     int realityCheckJoints();
+    void adjustIMU();
 
     void processMotionInput();
 
@@ -274,7 +275,7 @@ private:
     // Update the hand speeds
     void updateHandSpeeds();
 
-    BHWalkProvider          walkProvider;
+    // UNSWalkProvider        walkProvider;
     ScriptedProvider        scriptedProvider;
     HeadProvider            headProvider;
     NullHeadProvider        nullHeadProvider;
