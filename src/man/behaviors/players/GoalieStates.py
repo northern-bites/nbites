@@ -10,8 +10,8 @@ import math
 import noggin_constants as nogginConstants
 
 #TestingChange
-SAVING = True
-DIVING = True
+SAVING = False
+DIVING = False
 savedebug = False
 
 @superState('gameControllerResponder')
@@ -212,7 +212,9 @@ def watchWithLineChecks(player):
         and not watchWithLineChecks.looking
         and not watchWithLineChecks.hasPanned):
         watchWithLineChecks.looking = True
-        player.brain.tracker.performBasicPan()
+
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.performGoalieWideSnapPan()
         watchWithLineChecks.hasPanned = True
 
     if player.brain.tracker.isStopped():
@@ -274,7 +276,8 @@ def returnUsingLoc(player):
     if (player.counter % 90 == 0):
         print("Switching headtracker")
         if not returnUsingLoc.panning:
-            player.brain.tracker.repeatBasicPan()
+            # @SNAPPAN-CHANGE
+            player.brain.tracker.repeatGoalieWideSnapPan()
         else:
             player.brain.tracker.trackBall
 
@@ -327,8 +330,8 @@ def faceBall(player):
 def watch(player):
     if player.firstFrame():
         player.brain.fallController.enabled = True
-        player.brain.tracker.trackBall()
-        # player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.trackBall(False, True)
+        # player.brain.tracker.repeatWideSnapPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
         if (player.lastState is not 'shiftPosition'

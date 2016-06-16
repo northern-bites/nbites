@@ -87,6 +87,57 @@ class HeadTrackingHelper(object):
 
         self.executeHeadMove(newHeadMove)
 
+    #maxRight = maximum negative angle
+    #maxLeft = maximum positive angle
+    #beginDirection: True = right, False = left
+    def boundsSnapPan(self, maxRight, maxLeft, beginDirection = True): #Default right
+        """Generates snap pan betwewn two maxima"""
+
+        SNAP_PAN_PAN_TIME = 0.3
+        SNAP_PAN_WAIT_TIME = 0.2
+        SNAP_TIME_DEGREE_INTERVALS = 45
+
+        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+
+        startingYaw = (((curYaw // (SNAP_TIME_DEGREE_INTERVALS / 2)) + 1) // 2) * SNAP_TIME_DEGREE_INTERVALS
+
+        newSnapPanHeadMove = ()
+
+        if (beginDirection): #Right direction - negative angles
+
+            while (startingYaw > maxRight):
+
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+                startingYaw -= SNAP_TIME_DEGREE_INTERVALS
+
+            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+        else: #Left direction - positive angles
+
+            while (startingYaw < maxLeft):
+
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+                startingYaw += SNAP_TIME_DEGREE_INTERVALS
+
+            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+            startingYaw -= SNAP_TIME_DEGREE_INTERVALS
+
+            while (startingYaw > maxRight):
+
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+                startingYaw -= SNAP_TIME_DEGREE_INTERVALS
+
+        return newSnapPanHeadMove
+
     # Should be generalized.
     def convertKickPan(self, headMove, invert):
         """
@@ -123,6 +174,9 @@ class HeadTrackingHelper(object):
         # Note: safe to call every frame.
 
         target = self.tracker.target
+
+        # print "-------------Tracking Target------------"
+
         changeX, changeY = 0.0, 0.0
 
         # If we cannot see the target, abort.
@@ -134,6 +188,8 @@ class HeadTrackingHelper(object):
 
         # If we haven't seen the target, look towards loc model.
         if target.vis.frames_off > 3:
+
+
 # TODO: use a constant above
             self.lookToPoint(target)
 # TODO: safeguard above call from errors due to calling every frame
@@ -244,6 +300,16 @@ class HeadTrackingHelper(object):
         else:
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
+    def lookToAngleWithTime(self, yaw, time):
+
+        if yaw > 55 or yaw < -55:
+            pitch = 11.0
+        else:
+            pitch = 17.0
+
+        return (((yaw, pitch),
+                 .5, time, StiffnessModes.LOW_HEAD_STIFFNESSES),)
+
     def lookToAngle(self, yaw):
         """
         Returns a headmove that will make the robot
@@ -258,8 +324,6 @@ class HeadTrackingHelper(object):
 
         return (((yaw, pitch),
                  .5, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
-
-
 
         # TODO: use constants above
 
