@@ -59,7 +59,7 @@ public class FileIO {
 	}
 	
 	public static Path getPath(String first, String ... parts) {
-		return FileSystems.getDefault().getPath(parts[0], parts);
+		return FileSystems.getDefault().getPath(first, parts);
 	}
 	
 	public static void sizeCheck(Path containsLog) throws IOException {
