@@ -403,7 +403,7 @@ public:
   int pitch() const { return _pitch; }
 
   // Check whether width & height of the image are legal, i.e. > 0
-  bool hasProperDimensions() { return _wd > 0 && _ht > 0; }
+  bool hasProperDimensions() const { return _wd > 0 && _ht > 0; }
 
   // Default construct zero size image
   ImageLiteBase() { _wd = _ht = 0; }

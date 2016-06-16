@@ -42,14 +42,27 @@ SpotDetector::~SpotDetector()
 
 bool SpotDetector::alloc(const ImageLiteBase& src)
 {
-  if (src.width() > _filteredImage.width())
+  std::cout<<"Spots Alloc Enter\n";
+  if(!src.hasProperDimensions()) {
+    std::cout<<"SRC Does not have proper dimensions\n";
+    delete[] innerColumns;
+    delete[] outerColumns;
+    delete[] filteredImageMemory;
+    _spots.clear();
+    return false;
+  }
+
+  if (src.width() >= _filteredImage.width())
   {
+    // std::cout<<"src.width() > _filteredImage.width()\n";
     delete[] innerColumns;
     delete[] outerColumns;
     int n = (src.width() + 15 ) & ~15;
     outerColumns = new int[n];
     innerColumns = new int[n];
+    std::cout<<"Exit 1\n";
   }
+  std::cout<<"Passed First if Statement\n";
 
   enum
   {
@@ -59,19 +72,26 @@ bool SpotDetector::alloc(const ImageLiteBase& src)
   int pitchNeeded = (src.width() + rowAlignMask) & ~rowAlignMask;
   int maxHeightNeeded = src.height() - initialOuterDiam() + 2;  // one extra for peak detect
   size_t sizeNeeded = pitchNeeded * maxHeightNeeded;
-  if (sizeNeeded > filteredSize)
+  std::cout<<"Approaching Second if Statement\n";
+  if (sizeNeeded >= filteredSize)
   {
+    // std::cout<<"sizeNeeded > filteredSize\n";
     delete[] filteredImageMemory;
     filteredPixels = (uint8_t*)alignedAlloc(sizeNeeded, 4, filteredImageMemory);
     filteredSize = sizeNeeded;
+    std::cout<<"Exit 2\n";
   }
+  std::cout<<"Passed Second if Statement\n";
   int width = src.width();
   int height = maxHeightNeeded;
+  std::cout<<"Approaching Third if Statement\n";
   if(width > 0 && height > 0) {
     _filteredImage = ImageLiteU8(src.x0() + ((initialOuterDiam() + 1) & 1), src.y0() - initialOuterDiam() + 1,
-                               src.width(), maxHeightNeeded, pitchNeeded, filteredPixels);
+                               width, height, pitchNeeded, filteredPixels);
+    std::cout<<"Spots Alloc Returning True\n";
     return true;
   } else {
+    std::cout<<"Spots Alloc Returning False\n";
     return false;
   }
 }

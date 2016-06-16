@@ -1034,13 +1034,10 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 							 height - horiz);
 
     if(!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions()) {
-        std::cout<<"SmallerY Height: "<<smallerY.height()<<std::endl;
-        std::cout<<"SmallerY Width: "<<smallerY.width()<<std::endl;
-        std::cout<<"SmallerGreen Height"<<smallerGreen.height()<<std::endl;
-        std::cout<<"SmallerGreen Width: "<<smallerGreen.width()<<std::endl;
+        std::cout<<"Smaller Y or Smaller Green Does not have proper dimensions\n";
         return false;
     }
-
+    std::cout<<"Top Camera: "<<topCamera<<std::endl;
     SpotDetector darkSpotDetector;
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
