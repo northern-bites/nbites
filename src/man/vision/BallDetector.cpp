@@ -910,7 +910,7 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	for (int i = leftX; i < rightX; i+=2) {
 		for (int j = max(0, topY - 2 * spotHeight); j < topY - spotHeight; j+=2) {
 			getColor(i, j);
-			debugDraw.drawDot(i, j, BLUE);
+			//debugDraw.drawDot(i, j, BLUE);
 			if (isWhite()) {
 				whites++;
 				if (whites > 1) {
@@ -936,7 +936,7 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	for (int i = leftX; i < rightX; i+=2) {
 		for (int j = topY; j < bottomY; j+=2) {
 			getColor(i, j);
-			debugDraw.drawDot(i, j, BLUE);
+			//debugDraw.drawDot(i, j, BLUE);
 			if (isGreen()) {
 				greens++;
 			}
@@ -944,8 +944,11 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 			total++;
 		}
 	}
-	std::cout << "Whites " << whiteTotal << " " << total << std::endl;
 	if (whiteTotal  < 110 * total) {
+		if (debugBall) {
+			std::cout << "Rejecting ball because not white enough " << midX <<
+				" " << midY << std::endl;
+		}
 		return false;
 	}
 	return true;
