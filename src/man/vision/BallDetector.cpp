@@ -763,6 +763,9 @@ bool BallDetector::filterWhiteBlob(Spot spot,
 			return false;
 		}
     }
+	if (spots == 1 && !checkGradientInSpot(spot)) {
+		return false;
+	}
 
     // count up how many bad black spots are inside
     int badspots = 0;
@@ -781,6 +784,37 @@ bool BallDetector::filterWhiteBlob(Spot spot,
     }
 }
 
+bool BallDetector::checkGradientInSpot(Spot spot) {
+    int midX = spot.ix() + width / 2;
+    int midY = -spot.iy() + height / 2;
+	int diam = spot.innerDiam / 2;
+    int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
+    int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
+    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
+    int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
+	uint8_t gradient;
+	int total = 0;
+	int pixels = 0;
+
+	for (int i = leftX; i < rightX; i+=2) {
+		for (int j = topY; j < bottomY; j+=2) {
+			gradient = edgeDetector->mag(i, j);
+			total += gradient;
+			pixels++;
+		}
+	}
+	if (total  < pixels * 10) {
+		if (debugBall) {
+			std::cout << "Rejecting based on gradient " << midX << " " << midY <<
+				" " << total << " " << pixels << std::endl;
+		}
+		return false;
+	} else if (total > pixels * 50) {
+		return false;
+	}
+	return true;
+}
+
 bool BallDetector::checkDiagonalCircle(Spot spot) {
     int midX = spot.ix() + width / 2;
     int midY = -spot.iy() + height / 2;
@@ -793,6 +827,9 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	int x = rightX;
 	int y = topY;
 	getColor(x, y);
+	if (!checkGradientInSpot(spot)) {
+		return false;
+	}
 	// top right corner
 	for ( ; x < width && y >= 0 && !isGreen(); x++, y--) {
 		getColor(x, y);
@@ -932,7 +969,11 @@ bool BallDetector::filterWhiteSpot(Spot spot,
 		if (!whiteNoBlack(spot)) {
 			return false;
 		}
-    }
+    } else if (spots == 1) {
+		if (!checkGradientInSpot(spot)) {
+			return false;
+		}
+	}
 
     // count up how many bad black spots are inside
     int badspots = 0;
@@ -1127,11 +1168,13 @@ bool BallDetector::isBlack() {
 
 void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
                              ImageLiteU8 black,
-                             ImageLiteU16 yImg) {
+                             ImageLiteU16 yImg,
+							 EdgeDetector * edgeD) {
     whiteImage = white;
     greenImage = green;
     blackImage = black;
     yImage = yImg;
+	edgeDetector = edgeD;
 }
 
 /* Ball functions.
