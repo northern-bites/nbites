@@ -238,11 +238,11 @@ inline void columnMove<uint16_t>(const uint16_t* posRow, const uint16_t* negRow,
 // ***********************************
 
 template <class T>
-void SpotDetector::spotFilter(const ImageLite<T>& src)
+bool SpotDetector::spotFilter(const ImageLite<T>& src)
 {
   if(!alloc(src)) {
     _spots.clear();
-    return;
+    return false;
   }
 
   // Start diameters two smaller because we're going to trigger a grow immediatly.
@@ -379,6 +379,7 @@ void SpotDetector::spotFilter(const ImageLite<T>& src)
     pDst[x] = 0;
 
   _filteredImage = ImageLiteU8(_filteredImage, 0, 0, _filteredImage.width(), yFilt);
+  return true;
 }
 
 // *************************************
@@ -388,12 +389,12 @@ void SpotDetector::spotFilter(const ImageLite<T>& src)
 // *************************************
 
 template <class T>
-void SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green)
+bool SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green)
 {
   // Don't time this, since it will generally only do the allocation once
   if(!alloc(src)) {
     _spots.clear();
-    return;
+    return false;
   }
 
   TickTimer timer;
@@ -413,7 +414,10 @@ void SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h,
     od += (id ^ od) & 1;
     initialInnerDiam(id);
     initialOuterDiam(od);
-    spotFilter(src);
+    if(!spotFilter(src)) {
+      _spots.clear();
+      return false;
+    }
   }
   else
   {
@@ -422,12 +426,16 @@ void SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h,
     initialOuterDiam(5);
     int y0 = (int)round(0.5 * src.y0() - (ct * h.flen() - initialInnerDiam() * h.wz0() / innerDiamCm()) / st);
     y0 = max(y0 - (initialOuterDiam() >> 1), 0);
-    spotFilter(ImageLite<T>(src, 0, y0, src.width(), src.height() - y0));
+    if(!spotFilter(ImageLite<T>(src, 0, y0, src.width(), src.height() - y0))) {
+      _spots.clear();
+      return false;
+    }
   }
 
   spotDetect(green);
 
   _ticks = timer.time32();
+  return true;
 }
 
 }
