@@ -588,18 +588,6 @@ public class ToolDisplayHandler implements IOFirstResponder, Events.LogsFound, E
 		return refs;
 	}
 
-	private boolean resemblesGeneratedFilename(String name, LogReference ref) {
-		String[] checks = new String[] { String.format("%s_%s_v%d", ref.host_name, ref.logClass, ToolSettings.VERSION),
-				String.format("temp_log_id"), String.format("log_%s_", ref.logClass) };
-
-		for (String check : checks) {
-			if (name.startsWith(check))
-				return true;
-		}
-
-		return false;
-	}
-
 	private class LogTreeModel implements TreeModel, TreeSelectionListener, LogDNDSource, TreeCellRenderer {
 
 		private final DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
@@ -619,8 +607,9 @@ public class ToolDisplayHandler implements IOFirstResponder, Events.LogsFound, E
 				if (!reference.temporary()) {
 					Path lp = reference.loadPath();
 					String last = lp.getFileName().toString();
-
-					if (last.length() < 20 || !resemblesGeneratedFilename(last, reference)) {
+					String check = String.format("%s_%s_v%d", reference.host_name, reference.logClass,
+							ToolSettings.VERSION);
+					if (last.length() < 20 || !(last.startsWith(check))) {
 						rendered.setText(last);
 					} else {
 						rendered.setText(reference.guiString());

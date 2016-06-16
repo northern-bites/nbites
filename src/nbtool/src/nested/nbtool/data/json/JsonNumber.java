@@ -1,20 +1,11 @@
 package nbtool.data.json;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 import nbtool.data.json.Json.JsonValue;
 import nbtool.data.json.Json.JsonValueType;
 
 public class JsonNumber extends Number implements JsonValue {
 	
 	private String representation;
-	private static final DecimalFormat df = new DecimalFormat("0", 
-			DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-	static {
-		df.setMaximumFractionDigits(340); //340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
-	}
 	
 	public JsonNumber(int val) {
 		this.representation = Integer.toString(val);
@@ -25,15 +16,11 @@ public class JsonNumber extends Number implements JsonValue {
 	}
 	
 	public JsonNumber(double val) {
-//		this.representation = Double.toString(val);
-//		this.representation = String.format("%f", val);
-		this.representation = df.format(val);
+		this.representation = Double.toString(val);
 	}
 	
 	public JsonNumber(float val) {
-//		this.representation = Float.toString(val);
-//		this.representation = String.format("%f", val);
-		this.representation = df.format(val);
+		this.representation = Float.toString(val);
 	}
 	
 	public JsonNumber(String text) {
