@@ -2,9 +2,9 @@
   ( ( Top
       ( ( White
           ( (dark_u -0.025)
-            (dark_v 0.04)
+            (dark_v 0.015)
             (light_u 0.17)
-            (light_v -0.105)
+            (light_v -0.1)
             (fuzzy_u -0.025)
             (fuzzy_v 0.005)
           )

@@ -139,6 +139,8 @@ namespace man {
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
 						   ImageLiteU16 yImg, EdgeDetector * edgeD);
 			void getColor(int x, int y);
+			int  getGreen();
+			int  getWhite();
 			bool isGreen();
 			bool isWhite();
 			bool isBlack();

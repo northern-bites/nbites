@@ -780,7 +780,7 @@ bool BallDetector::filterWhiteBlob(Spot spot,
     }
     // for now, if there are no black spots then it is too dangerous
     if (spots < 1) {
-		if (!topCamera || !whiteNoBlack(spot)) {
+		if (!whiteNoBlack(spot)) {
 			return false;
 		}
     }
@@ -884,7 +884,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 			" " << length4 << std::endl;
 	}
-	return maxl - minl < 3;
+	return maxl - minl < 4;
 }
 
 bool BallDetector::whiteNoBlack(Spot spot) {
@@ -904,6 +904,7 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	int total = 0;
 	int greens = 0;
 	int whites = 0;
+	int bigGreen = 0;
 	// TO DO: Per Bill's suggestion, just sum up the green values and use a gross
 	// threshold rather than individual pixel values
 	for (int i = leftX; i < rightX; i+=2) {
@@ -916,38 +917,35 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 					return false;
 				}
 			}
-			if (isGreen()) {
-				greens++;
-			}
+			bigGreen += getGreen();
 			total++;
 		}
 	}
-	std::cout << "Green total " << greens << " " << total << std::endl;
-	if (greens * 2 < total) {
+
+	if (total * 110 > bigGreen) {
 		return false;
 	}
 	// check the diagonals
-	if (!checkDiagonalCircle(spot)) {
-		return false;
-	}
+	//if (!checkDiagonalCircle(spot)) {
+	//	return false;
+	//}
 	greens = 0;
-	whites = 0;
 	total = 0;
+	int whiteTotal = 0;
 	// To Do: See previous suggestion
 	for (int i = leftX; i < rightX; i+=2) {
 		for (int j = topY; j < bottomY; j+=2) {
 			getColor(i, j);
 			debugDraw.drawDot(i, j, BLUE);
-			if (isWhite()) {
-				whites++;
-			}
 			if (isGreen()) {
 				greens++;
 			}
+			whiteTotal += getWhite();
 			total++;
 		}
 	}
-	if (whites * 2 < total) {
+	std::cout << "Whites " << whiteTotal << " " << total << std::endl;
+	if (whiteTotal  < 110 * total) {
 		return false;
 	}
 	return true;
@@ -1053,7 +1051,9 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
 
-    std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
+	if (debugBall) {
+		std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
+	}
 
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
@@ -1093,20 +1093,20 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
 	// run blobber on parts of the image where spot detector won't work
-	int bottomQuarter = height * 3/4;
+	int bottomThird = height * 2 / 3;
 	if (topCamera) {
-		ImageLiteU8 bottomWhite(whiteImage, 0, bottomQuarter, whiteImage.width(),
-								height - bottomQuarter);
+		ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
+								height - bottomThird);
 		blobber.run(bottomWhite.pixelAddr(), bottomWhite.width(),
 					bottomWhite.height(), bottomWhite.pitch());
 	} else {
-		bottomQuarter = 0;
+		bottomThird = 0;
 		blobber.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
 	}
 
     if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots,
 					actualWhiteSpots,
-                 cameraHeight, bottomQuarter)) {
+                 cameraHeight, bottomThird)) {
 #ifdef OFFLINE
         foundBall = true;
 #else
@@ -1161,11 +1161,20 @@ void BallDetector::getColor(int x, int y) {
     }
 }
 
+int BallDetector::getGreen() {
+	return *(greenImage.pixelAddr(currentX, currentY));
+}
+
 bool BallDetector::isGreen() {
     if (*(greenImage.pixelAddr(currentX, currentY)) > 158) {
         return true;
     }
     return false;
+}
+
+
+int BallDetector::getWhite() {
+	return *(whiteImage.pixelAddr(currentX, currentY));
 }
 
 bool BallDetector::isWhite() {
