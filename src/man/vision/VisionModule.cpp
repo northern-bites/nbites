@@ -316,7 +316,7 @@ void VisionModule::run_()
         PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
 			//ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 		ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
-                                   frontEnd[i]->orangeImage(), yImage);
+                                   frontEnd[i]->orangeImage(), yImage, edgeDetector[i]);
 		ballDetected |= ballDetector[i]->findBall(whiteImage,
                                                   kinematics[i]->wz0(), *(edges[i]));
         PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
