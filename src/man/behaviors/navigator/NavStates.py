@@ -28,6 +28,7 @@ def kickEngine(nav):
     State that we stay in while calling kick engine
     """
     if nav.firstFrame():
+        print "First frame of kick engine"
         helper.executeKickEngine(nav, kickEngine.kickType)
         return nav.stay()
 

@@ -54,7 +54,8 @@ def ballForNFramesAndMFar(atleastThisManyFrames, atleastThisFar):
 
 def ballMovedNCMsFromWhereSeenLast(ballMovedTolerance):
     """
-    The ball is atleast N cms from where it was seen when ballBeforeCheck was set.
+    The ball is atleast N centimeters from where it was seen when 
+    ballBeforeCheck was set.
 
     @requires player.ballBeforeCheck to be set to a tuple of filtered ball
               relative coordinates for comparision,
