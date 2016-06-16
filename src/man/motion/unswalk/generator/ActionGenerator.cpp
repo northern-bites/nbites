@@ -67,6 +67,23 @@ void ActionGenerator::NBSetStand() {
       newJoint.stiffnesses[i] = 1.0;
       // newJoint.angles[i] = UNSWDEG2RAD(newJoint.angles[i]);
    }
+
+   newJoint.stiffnesses[Joints::LShoulderPitch] = 0.0;
+   newJoint.stiffnesses[Joints::LShoulderRoll] = 0.0;
+   newJoint.stiffnesses[Joints::LElbowYaw] =  0.0;
+   newJoint.stiffnesses[Joints::LElbowRoll] =  0.0;
+   newJoint.stiffnesses[Joints::LWristYaw] = 0.0;
+   newJoint.stiffnesses[Joints::LHand] = 0.0;
+
+   newJoint.stiffnesses[Joints::RShoulderPitch] = 0.0;
+   newJoint.stiffnesses[Joints::RShoulderRoll] = 0.0;
+   newJoint.stiffnesses[Joints::RElbowYaw] = 0.0;
+   newJoint.stiffnesses[Joints::RElbowRoll] = 0.0;
+   newJoint.stiffnesses[Joints::RWristYaw] = 0.0;
+   newJoint.stiffnesses[Joints::RHand] = 0.0;
+
+
+
    int duration = 3;
    interpolate(newJoint);
 
@@ -161,7 +178,7 @@ void ActionGenerator::interpolate(JointValues newJoint, int duration) {
 
 void ActionGenerator::constructPose(std::string path) {
    ifstream in(string(path + "/" + file_name + ".pos").c_str());
-   //std::cout << "ActionGenerator(" << file_name << ") creating" << endl;
+   std::cout << "ActionGenerator(" << file_name << ") creating" << endl;
 
    if (!in.is_open()) {
       //std::cout << "ActionGenerator can not open " << file_name << endl;
@@ -251,7 +268,7 @@ void ActionGenerator::constructPose(std::string path) {
    //std::cout << "ActionGenerator(" << file_name << ") created" << endl;
 }
 
-// void ActionGenerator::readOptions(const boost::program_options::variables_map &config) {
-//    std::string path = config["motion.path"].as<std::string>();
-//    constructPose(path);
-// }
+void ActionGenerator::readOptions(std::string path) {
+   // std::string path = config["motion.path"].as<std::string>();
+   constructPose(path);
+}

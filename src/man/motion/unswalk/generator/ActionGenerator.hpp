@@ -59,4 +59,5 @@ class ActionGenerator : Generator {
        * @param path the directory to read the pose file
        */
       void constructPose(std::string path);
+      void readOptions(std::string path);
 };

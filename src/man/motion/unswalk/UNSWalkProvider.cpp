@@ -174,7 +174,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	// if (!calibrated()) { logMsg("not calibrated");} 
 	// else {logMsg("calibrated!!!"); }
-
+	// std::cout << "" << std::endl;
 
 	if (standby) {
 		tryingToWalk = false;
@@ -206,15 +206,16 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			// TODO odometry, handle
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
 			logMsg("Walk command - Walking!");
-		 	float WALK_SPEED_SCALE = 100.0;
+		 	float WALK_SPEED_SCALE_X = 1000.0;
+		 	float WALK_SPEED_SCALE_Y = 100.0;
 			// HANDLE
 			tryingToWalk = true;
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 			std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
-			std::cout << "Walk Command Scaled: " << command->x_percent * WALK_SPEED_SCALE << "," << command->y_percent * WALK_SPEED_SCALE << ") \n";
-			request->body.forward = command->x_percent * WALK_SPEED_SCALE ;
-			request->body.left = command->y_percent * WALK_SPEED_SCALE;
+			std::cout << "Walk Command Scaled: " << command->x_percent * WALK_SPEED_SCALE_X << "," << command->y_percent * WALK_SPEED_SCALE_Y << ") \n";
+			request->body.forward = command->x_percent * WALK_SPEED_SCALE_X ;
+			request->body.left = command->y_percent * WALK_SPEED_SCALE_Y;
 			request->body.turn = command->theta_percent ;
 			std::cout << "FORWARD: " << request->body.forward << std::endl;
 			request->body.speed = 0.0f;
@@ -258,10 +259,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// request->body.turn = 0.0; 
 
 	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
-	request->body.forward = 300.0; //command->x_percent ;
-	request->body.left = 00.0; //command->y_percent ;
-	request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
-	request->body.speed = 0.0f;
+	// request->body.forward = 300.0; //command->x_percent ;
+	// request->body.left = 00.0; //command->y_percent ;
+	// request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
+	// request->body.speed = 0.0f;
 
 	// For testing stand action
 	// logMsg("Can't get current command! Requesting stand");

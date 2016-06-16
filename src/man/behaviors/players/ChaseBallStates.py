@@ -67,7 +67,7 @@ def walkToWayPoint(player):
     print("In walkToWayPoint")
 
     if transitions.shouldDecelerate(player):
-        # print "I should decelerate"
+        print "I should decelerate"
         speed = MIN_SPEED
     else:
         speed = MAX_SPEED
