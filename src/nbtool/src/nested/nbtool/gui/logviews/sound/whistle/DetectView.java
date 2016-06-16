@@ -38,6 +38,8 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 		final byte[] dataToPlay = displayedLog.blocks.get(0).data;
 
+
+
 		Center.addEvent( new Center.EventRunnable() {
 			@Override
 			protected void run() {
