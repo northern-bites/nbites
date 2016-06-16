@@ -402,6 +402,9 @@ public:
   // Amount to add to an address to move +1 in y, in units of pixel size
   int pitch() const { return _pitch; }
 
+  // Check whether width & height of the image are legal, i.e. > 0
+  bool hasProperDimensions() { return _wd > 0 && _ht > 0; }
+
   // Default construct zero size image
   ImageLiteBase() { _wd = _ht = 0; }
 

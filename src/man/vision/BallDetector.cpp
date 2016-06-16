@@ -1024,16 +1024,23 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	debugBlackSpots.clear();
 	debugWhiteSpots.clear();
 
-	// int horiz = 0;
-	// if (topCamera) {
-	// 	horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
-	// }
-    //std::cout<<"Height - Horiz = "<<height-horiz<<std::endl;
-	// ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
-	// 						 height - horiz);
-	// ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
-	// 						 height - horiz);
-    //if((height - horiz) > 0) {} //execute all of the below code, else return false
+	int horiz = 0;
+	if (topCamera) {
+		horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
+	}
+    std::cout<<"Height - Horiz = "<<height-horiz<<std::endl;
+	ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
+							 height - horiz);
+	ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
+							 height - horiz);
+
+    if(!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions()) {
+        std::cout<<"SmallerY Height: "<<smallerY.height()<<std::endl;
+        std::cout<<"SmallerY Width: "<<smallerY.width()<<std::endl;
+        std::cout<<"SmallerGreen Height"<<smallerGreen.height()<<std::endl;
+        std::cout<<"SmallerGreen Width: "<<smallerGreen.width()<<std::endl;
+        return false;
+    }
 
     SpotDetector darkSpotDetector;
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
