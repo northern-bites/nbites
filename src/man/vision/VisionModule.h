@@ -18,8 +18,6 @@
 #include "InertialState.pb.h"
 #include "VisionRobot.pb.h"
 
-#include "json.hpp"
-#include "nblogio.h"
 
 namespace man {
 namespace vision {
@@ -60,14 +58,13 @@ public:
     
     // For use by vision_defs
     void setColorParams(Colors* colors, bool topCamera);
+    const std::string getStringFromTxtFile(std::string path);
+    Colors* getColorsFromLisp(nbl::SExpr* colors, int camera);
+    void setCalibrationParams(std::string robotName);
+    void setCalibrationParams(int camera, std::string robotName);
     void setCalibrationParams(CalibrationParams* params, bool topCamera);
-
     void blackStar(bool blackStar) { blackStar_ = blackStar; }
     bool blackStar() const {return blackStar_;}
-
-    json::Object latestUsedColorParams[2];
-    Colors* colorParams[2];
-    CalibrationParams* calibrationParams[2];
 
 protected:
     virtual void run_();
@@ -79,17 +76,14 @@ private:
     void outportalVisionField();
     void updateObstacleBox();
 
-    nbl::io::FileMonitor colorParamsMonitor;
-    nbl::io::FileMonitor camOffsetsMonitor;
-    void reloadColorParams();
-    void reloadCameraOffsets();
-
+    Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];
     EdgeList* edges[2];
     EdgeList* rejectedEdges[2];
     HoughLineList* houghLines[2];
     HoughSpace* hough[2];
+    CalibrationParams* calibrationParams[2];
     Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
@@ -103,6 +97,9 @@ private:
     bool blackStar_;
 
     std::string name;
+    
+    // Lisp tree with color params saved
+    nbl::SExpr colors;
 
     // Tracking ball stuff
     bool ballOn;
@@ -111,6 +108,7 @@ private:
 
 	uint8_t * debugSpace[2];
 
+    nbl::SExpr* calibrationLisp;
     size_t image_index;
 
     // Constants for tilt azimuth adjustment hack

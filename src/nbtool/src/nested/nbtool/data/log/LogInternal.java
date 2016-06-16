@@ -560,6 +560,7 @@ public class LogInternal extends Log {
 		assert(calParamsFound);
 		JsonObject top = Json.object();
 
+
 		top.put(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY(), 7);
 		top.put("OriginalCameraOffsets",
 				co.toObject());

@@ -7,7 +7,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import nbtool.util.Debug;
 import nbtool.util.Utility;
 
 public abstract class TestBase {
@@ -38,12 +37,7 @@ public abstract class TestBase {
 	}
 	
 	public static void requireEqual(Object a, Object b) {
-		if (a.equals(b)) {
-			return;
-		} else {
-			Debug.error("! {%s} equals {%s} ", a, b);
-			assert(a.equals(b));
-		}
+		assert(a.equals(b));
 	}
 	
 	public static void failed(String msg) throws TestFailedException {

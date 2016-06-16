@@ -29,11 +29,8 @@ import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
 
 import nbtool.data.SExpr;
-import nbtool.data.calibration.CameraOffset;
 import nbtool.data.group.AllGroups;
 import nbtool.data.group.Group;
-import nbtool.data.json.Json;
-import nbtool.data.json.JsonParser.JsonParseException;
 import nbtool.data.log.Log;
 import nbtool.data.log.LogReference;
 import nbtool.gui.ToolMessage;
@@ -50,7 +47,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 	/* utility parent implementation code */
 	/**************************************/
 
-	 
+	
 	private static Display display = null;
 	
 	@Override
@@ -69,10 +66,10 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 	@Override
 	public char preferredMemnonic() {
-		return 'o';
+		return 'c';
 	}
 	
-	/* actual offset code */
+	/* actual calibration code */
 	/***************************/
 
 	private static class Row {
@@ -84,11 +81,11 @@ public class CameraOffsetsUtility extends UtilityParent {
 		boolean status = true;
 		String getStatus() {return status ? "good" : "failed";}
 		
-		CameraOffset offset;
+		double d_roll = 0;
+		String getRoll() {return d_roll + " rads";}
 		
-		String getRoll() {return offset.d_roll + " rads";}
-		
-		String getTilt() {return offset.d_tilt + " rads";}
+		double d_tilt = 0;
+		String getTilt() {return d_tilt + " rads";}
 		
 		int given = -1;
 		String getGiven() {return "" + given;}
@@ -140,10 +137,12 @@ public class CameraOffsetsUtility extends UtilityParent {
 				
 				if (successes >= 7) {
 					row.status = true;
-					row.offset = new CameraOffset(droll, dtilt);
+					row.d_roll = droll;
+					row.d_tilt = dtilt;
 				} else {
 					row.status = false;
-					row.offset = new CameraOffset(Double.NaN, Double.NaN);
+					row.d_roll = Double.NaN;
+					row.d_tilt = Double.NaN;
 				}
 				
 				if (display != null)
@@ -287,27 +286,24 @@ public class CameraOffsetsUtility extends UtilityParent {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					Debug.plain("saving parameters...");
-					Path offsetsPath = CameraOffset.getPath();
-		            assert(Files.exists(offsetsPath) && Files.isRegularFile(offsetsPath));
+					String filePath = System.getenv().get("NBITES_DIR");
+		            filePath += "/src/man/config/calibrationParams.txt";
+		            Path configPath = Paths.get(filePath);
+		            assert(Files.exists(configPath) && Files.isRegularFile(configPath));
 		            
-		            CameraOffset.Set offsets = null;
+		            SExpr config = null;
 		            
 		            try {
-		            	String contents = new String(Files.readAllBytes(offsetsPath));
-		            	offsets = CameraOffset.Set.parse(Json.parse(contents).asObject());
+		            	String contents = new String(Files.readAllBytes(configPath));
+		            	config = SExpr.deserializeFrom(contents);
 		            } catch (IOException ie) {
 		            	ie.printStackTrace();
 		            	Debug.error("IOException: %s", ie.getMessage());
-		            	ToolMessage.displayError("error reading %s!", offsetsPath);
+		            	ToolMessage.displayError("error reading src/man/config/CalibrationParams.txt !");
 		            	return;
-		            } catch (JsonParseException e1) {
-						e1.printStackTrace();
-						Debug.error("JsonParseException: %s", e1.getMessage());
-		            	ToolMessage.displayError("error parsing json file %s !", offsetsPath);
-		            	return;
-					}
+		            }
 		            
-		            assert(offsets != null);
+		            assert(config != null);
 		            
 		            if (rows == null) {
 		            	ToolMessage.displayError("calculate offsets before saving!");
@@ -325,18 +321,27 @@ public class CameraOffsetsUtility extends UtilityParent {
 		            		
 		            		Debug.info("replacing offsets for: %s %s", r.name, r.getCamera());
 		            		
-		            		if (r.top) {
-		            			offsets.get(r.name).top = r.offset;
-		            		} else {
-		            			offsets.get(r.name).bot = r.offset;
-		            		}
+		            		SExpr list = config.get(1);
+		            		SExpr line = list.find(r.name);
+		            		assert(line.exists());
 		            		
+		            		String cameraString = r.top ? "TOP" : "BOT";
+		   
+		            		SExpr part = line.find(cameraString);
+		            		assert(part.exists());
+		            		assert(part.get(0).value().equals(cameraString));
+		            		
+		            		String repString = String.format("(%s %f %f)", 
+		            				cameraString, r.d_roll, r.d_tilt);
+		            		SExpr repSp = SExpr.deserializeFrom(repString);
+		            		
+		            		line.replace(part, repSp);
 		            		written += String.format("{%s, %s}", r.name, r.getCamera());
 		            	}
 		            }
 		            
 		            try {
-						Files.write(offsetsPath, offsets.serialize().print().getBytes(StandardCharsets.UTF_8));
+						Files.write(configPath, config.print().getBytes(StandardCharsets.UTF_8));
 					} catch (IOException e1) {
 						e1.printStackTrace();
 						ToolMessage.displayError("couldn't write to config file: %s", e1.getMessage());
