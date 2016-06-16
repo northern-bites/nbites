@@ -40,7 +40,7 @@ SpotDetector::~SpotDetector()
   delete[] filteredImageMemory;
 }
 
-void SpotDetector::alloc(const ImageLiteBase& src)
+bool SpotDetector::alloc(const ImageLiteBase& src)
 {
   if (src.width() > _filteredImage.width())
   {
@@ -65,8 +65,15 @@ void SpotDetector::alloc(const ImageLiteBase& src)
     filteredPixels = (uint8_t*)alignedAlloc(sizeNeeded, 4, filteredImageMemory);
     filteredSize = sizeNeeded;
   }
-  _filteredImage = ImageLiteU8(src.x0() + ((initialOuterDiam() + 1) & 1), src.y0() - initialOuterDiam() + 1,
+  int width = src.width();
+  int height = maxHeightNeeded;
+  if(width > 0 && height > 0) {
+    _filteredImage = ImageLiteU8(src.x0() + ((initialOuterDiam() + 1) & 1), src.y0() - initialOuterDiam() + 1,
                                src.width(), maxHeightNeeded, pitchNeeded, filteredPixels);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void SpotDetector::spotDetect(const ImageLiteU8* green)

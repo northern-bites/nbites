@@ -98,7 +98,7 @@ class SpotDetector
   int* innerColumns;          //   of 16 for ASM code
 
   // Allocate (or grow) above memory buffers based on source image size
-  void alloc(const ImageLiteBase&);
+  bool alloc(const ImageLiteBase&);
 
   // Find spots in filteredImage by peak detection, rejecting green spots if
   // green image is supplied.
@@ -240,7 +240,10 @@ inline void columnMove<uint16_t>(const uint16_t* posRow, const uint16_t* negRow,
 template <class T>
 void SpotDetector::spotFilter(const ImageLite<T>& src)
 {
-  alloc(src);
+  if(!alloc(src)) {
+    _spots.clear();
+    return;
+  }
 
   // Start diameters two smaller because we're going to trigger a grow immediatly.
   // This prevents copy/paste  duplication of initialization code
@@ -388,7 +391,10 @@ template <class T>
 void SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green)
 {
   // Don't time this, since it will generally only do the allocation once
-  alloc(src);
+  if(!alloc(src)) {
+    _spots.clear();
+    return;
+  }
 
   TickTimer timer;
 

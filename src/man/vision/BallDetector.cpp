@@ -1028,7 +1028,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	if (topCamera) {
 		horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
 	}
-    std::cout<<"Height - Horiz = "<<height-horiz<<std::endl;
 	ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
 							 height - horiz);
 	ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
@@ -1045,7 +1044,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     SpotDetector darkSpotDetector;
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
-    darkSpotDetector.spotDetect(yImage, homography, &greenImage);
+    darkSpotDetector.spotDetect(smallerY, homography, &smallerGreen);
     SpotList darkSpots = darkSpotDetector.spots();
 
     processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
@@ -1084,7 +1083,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
-    whiteSpotDetector.spotDetect(yImage, homography, &greenImage);
+    whiteSpotDetector.spotDetect(smallerY, homography, &smallerGreen);
     SpotList whiteSpots = whiteSpotDetector.spots();
 
     if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
