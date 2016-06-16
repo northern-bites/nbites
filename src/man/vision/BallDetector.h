@@ -111,6 +111,9 @@ namespace man {
                                 	spotVector & actualWhiteSpots, double cameraHeight,
                                 	int bottomQuarer);
 
+			bool whiteNoBlack(Spot spot);
+			bool checkDiagonalCircle(Spot spot);
+
             bool filterBlackSpots(Spot currentBlob);
             bool filterWhiteBlob(Spot spot, intPairVector & blackSpots,
             						intPairVector & badBlackSpots);

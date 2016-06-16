@@ -143,7 +143,7 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 bool BallDetector::filterBlackSpots(Spot currentSpot)
 {
     int WHITE_JUMP = 40;
-    int MIN_CENTER_Y = 100;
+    int MIN_CENTER_Y = 110;
 	// Some ideas: spots on the ball should have white in at least two directions
     int buff = 0;
     int leftX = currentSpot.xLo() + width / 2 - buff;
@@ -151,13 +151,17 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
     int topY = currentSpot.yLo() + height / 2 - buff;
     int bottomY = currentSpot.yHi() + height / 2 + buff;
 	int scan = currentSpot.innerDiam / 2;
-    if (scan < 2) {
-        scan = 2;
+    if (scan < 4) {
+        scan = 4;
     }
     int midY = *(yImage.pixelAddr(currentSpot.ix() + width / 2,
                                   -currentSpot.iy() + height / 2)) / 4;
     // spots in robots are often actually bright, just surrounded by brighter
     if (midY > MIN_CENTER_Y) {
+		if (debugBall) {
+			std::cout << "Rejecting black for being too light " << leftX <<
+				" " << midY << std::endl;
+		}
         return false;
     }
     int currentY = 0;
@@ -776,7 +780,9 @@ bool BallDetector::filterWhiteBlob(Spot spot,
     }
     // for now, if there are no black spots then it is too dangerous
     if (spots < 1) {
-        return false;
+		if (!topCamera || !whiteNoBlack(spot)) {
+			return false;
+		}
     }
 
     // count up how many bad black spots are inside
@@ -794,6 +800,120 @@ bool BallDetector::filterWhiteBlob(Spot spot,
     if (badspots > 1) {
         return false;
     }
+}
+
+bool BallDetector::checkDiagonalCircle(Spot spot) {
+    int midX = spot.ix() + width / 2;
+    int midY = -spot.iy() + height / 2;
+	int diam = spot.innerDiam / 2;
+    int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
+    int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
+    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
+    int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
+	// scan each diagonal
+	int x = rightX;
+	int y = topY;
+	getColor(x, y);
+	// top right corner
+	for ( ; x < width && y >= 0 && !isGreen(); x++, y--) {
+		getColor(x, y);
+	}
+	int length1 = x - rightX;
+	// top left corner
+	getColor(leftX, topY);
+	for (x = leftX, y = topY; x >= 0 && y >= 0 && !isGreen(); x--, y--) {
+		getColor(x, y);
+	}
+	int length2 = leftX - x;
+	int minl = min(length1, length2);
+	int maxl = max(length1, length2);
+	// bottom right corner
+	getColor(rightX, bottomY);
+	for (x = rightX, y = bottomY; x < width && y < height && !isGreen(); x++, y++) {
+		getColor(x, y);
+	}
+	int length3 = x - rightX;
+	minl = min(length3, minl);
+	maxl = max(length3, maxl);
+	// bottom left
+	getColor(leftX, bottomY);
+	for (x = leftX, y = bottomY; x >= 0 && y < height && !isGreen(); x--, y++) {
+		getColor(x, y);
+	}
+	int length4 = leftX - x;
+	minl = min(length4, minl);
+	maxl = max(length4, maxl);
+	if (debugBall) {
+		std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
+			" " << length4 << std::endl;
+	}
+	return maxl - minl < 3;
+}
+
+bool BallDetector::whiteNoBlack(Spot spot) {
+    // convert back to raw coordinates
+    int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
+    int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
+    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
+    int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
+    int midX = spot.ix() + width / 2;
+    int midY = -spot.iy() + height / 2;
+	int spotHeight = bottomY - topY + 2;
+
+	std::cout << "Checking no black " << midX << " " << midY << " " << spotHeight << std::endl;
+	debugDraw.drawPoint(midX, midY, BLACK);
+	// The biggest thing is there should be no white and at least
+	// some green above the ball
+	int total = 0;
+	int greens = 0;
+	int whites = 0;
+	// TO DO: Per Bill's suggestion, just sum up the green values and use a gross
+	// threshold rather than individual pixel values
+	for (int i = leftX; i < rightX; i+=2) {
+		for (int j = max(0, topY - 2 * spotHeight); j < topY - spotHeight; j+=2) {
+			getColor(i, j);
+			debugDraw.drawDot(i, j, BLUE);
+			if (isWhite()) {
+				whites++;
+				if (whites > 1) {
+					return false;
+				}
+			}
+			if (isGreen()) {
+				greens++;
+			}
+			total++;
+		}
+	}
+	std::cout << "Green total " << greens << " " << total << std::endl;
+	if (greens * 2 < total) {
+		return false;
+	}
+	// check the diagonals
+	if (!checkDiagonalCircle(spot)) {
+		return false;
+	}
+	greens = 0;
+	whites = 0;
+	total = 0;
+	// To Do: See previous suggestion
+	for (int i = leftX; i < rightX; i+=2) {
+		for (int j = topY; j < bottomY; j+=2) {
+			getColor(i, j);
+			debugDraw.drawDot(i, j, BLUE);
+			if (isWhite()) {
+				whites++;
+			}
+			if (isGreen()) {
+				greens++;
+			}
+			total++;
+		}
+	}
+	if (whites * 2 < total) {
+		return false;
+	}
+	return true;
 }
 
 bool BallDetector::filterWhiteSpot(Spot spot,
@@ -829,8 +949,10 @@ bool BallDetector::filterWhiteSpot(Spot spot,
         }
     }
     // for now, if there are no black spots then it is too dangerous
-    if (spots < 1) { //when the ball is in motion, black spots get smothered
-        return false; //so we'd want to trust this more.
+    if (spots < 1) {
+		if (!whiteNoBlack(spot)) {
+			return false;
+		}
     }
 
     // count up how many bad black spots are inside
