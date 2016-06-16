@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for var in "$@"
+do
+    echo "cp " "$var"
+    cp "$var" src_ext/
+done

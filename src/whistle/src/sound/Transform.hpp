@@ -9,33 +9,31 @@
 #define __xcode_sound2__Transform__
 
 #include <stdio.h>
-#include "Sound.h"
+#include "Sound.hpp"
 
-#include "Transform.h"
-#ifndef __APPLE__
+#include "Transform.hpp"
+
 #include <fftw3.h>
-#else
-#include "fftw3.h"
-#endif
 
 namespace nbsound {
     class Transform {
     public:
-        Transform(parameter_t sound_param);
-        void transform(void * data, int channel);
+        Transform(int frames);
+        void transform(SampleBuffer& buffer, int channel);
         int get_freq_len() {return frequency_length;}
+        float get(int f) { return outputmag[f]; }
+
+        std::string get_all();
+
         ~Transform();
-        
-        float * outputmag;
-                
+
     private:
-        parameter_t params;
         int frequency_length;
-        
-        float * inputd;
-        
-        fftwf_complex * output;
-        fftwf_plan transform_plan;
+        float * outputmag;
+
+        float * _the_input;
+        fftwf_complex * _the_output;
+        fftwf_plan _the_plan;
     };
 }
 
