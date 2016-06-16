@@ -151,7 +151,6 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     fifo_fd(-1)
 {
     printf("\t\tBOSS VERSION == %d\n", BOSS_VERSION);
-    printf("\nSigChld Testing\n");
     //for when man dies
     manDiedOverride = false;
 
