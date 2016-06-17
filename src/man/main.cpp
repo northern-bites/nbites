@@ -104,11 +104,11 @@ int main() {
     // Constructs an instance of man. If we get here we have a lock
     instance = new man::Man();
 
-    while (1) {
-        // Hack so that I don't have to modify DiagramThread
-        // (Diagram threads are daemon threads, and man will exit if they're the
-        // only ones left)
-        sleep(10);
-    }
+    // while (1) {
+    //     // Hack so that I don't have to modify DiagramThread
+    //     // (Diagram threads are daemon threads, and man will exit if they're the
+    //     // only ones left)
+    //     sleep(10);
+    // }
     return 1;
 }
