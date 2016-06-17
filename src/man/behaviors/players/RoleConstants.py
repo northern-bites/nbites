@@ -1,6 +1,47 @@
 import noggin_constants as NogginConstants
 from objects import RobotLocation
 
+
+### SETS PLAYER STATE PER ROLE
+def setRoleConstants(player, role):
+    player.role = role
+    if isLeftDefender(role):
+        player.homePosition = evenDefenderHome
+        player.kickoffPosition = evenDefenderKickoff
+        player.box = evenDefenderBoxgit 
+        player.isKickingOff = False
+    elif isRightDefender(role):
+        player.homePosition = oddDefenderHome
+        player.kickoffPosition = oddDefenderHome
+        #player.kickoffPosition = oddDefenderKickoff
+        player.box = oddDefenderBox
+        player.isKickingOff = False
+    elif isFirstChaser(role):
+        player.homePosition = evenChaserHome
+        player.kickoffPosition = theirKickoff
+        player.box = chaserBox
+        player.isKickingOff = True
+    elif isSecondChaser(role):
+        player.homePosition = oddChaserHome
+        player.kickoffPosition = oddChaserKickoff
+        player.box = chaserBox
+        player.isKickingOff = False
+    elif isStriker(role):
+        player.homePosition = strikerTriangle
+        player.kickoffPosition = oddChaserKickoff
+        player.box = strikerBox
+        player.isKickingOff = False
+    elif isCherryPicker(role):
+        player.homePosition = cherryPickerHome
+        if role == 2: # if there are two chasers
+            player.kickoffPosition = cherryPickerKickoff
+        else:         # if there is only one chaser, role (should) == 5
+            player.kickoffPosition = oddChaserKickoff
+        player.box = cherryPickerBox
+        player.isKickingOff = False
+
+
+
 ### ROLE CONFIGURATION
 # Possibilites are the following:
 # Goalie, LeftDefender, RightDefender, FirstChaser, SecondChaser, CherryPicker, Striker
@@ -149,8 +190,8 @@ if NogginConstants.RIGHT_FORWARD_DEFENSE:
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
 else:
-    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 160,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 100,
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 110,
                                 35)
     oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
@@ -232,39 +273,3 @@ cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstant
                     0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 
                     NogginConstants.FIELD_HEIGHT)
 
-### SETS PLAYER STATE PER ROLE
-def setRoleConstants(player, role):
-    player.role = role
-    if isLeftDefender(role):
-        player.homePosition = evenDefenderHome
-        player.kickoffPosition = evenDefenderKickoff
-        player.box = evenDefenderBoxgit 
-        player.isKickingOff = False
-    elif isRightDefender(role):
-        player.homePosition = oddDefenderHome
-        player.kickoffPosition = oddDefenderKickoff
-        player.box = oddDefenderBox
-        player.isKickingOff = False
-    elif isFirstChaser(role):
-        player.homePosition = evenChaserHome
-        player.kickoffPosition = theirKickoff
-        player.box = chaserBox
-        player.isKickingOff = True
-    elif isSecondChaser(role):
-        player.homePosition = oddChaserHome
-        player.kickoffPosition = oddChaserKickoff
-        player.box = chaserBox
-        player.isKickingOff = False
-    elif isStriker(role):
-        player.homePosition = strikerTriangle
-        player.kickoffPosition = oddChaserKickoff
-        player.box = strikerBox
-        player.isKickingOff = False
-    elif isCherryPicker(role):
-        player.homePosition = cherryPickerHome
-        if role == 2: # if there are two chasers
-            player.kickoffPosition = cherryPickerKickoff
-        else:         # if there is only one chaser, role (should) == 5
-            player.kickoffPosition = oddChaserKickoff
-        player.box = cherryPickerBox
-        player.isKickingOff = False
