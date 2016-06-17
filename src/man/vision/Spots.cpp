@@ -96,8 +96,12 @@ bool SpotDetector::alloc(const ImageLiteBase& src)
   }
 }
 
-void SpotDetector::spotDetect(const ImageLiteU8* green)
+bool SpotDetector::spotDetect(const ImageLiteU8* green)
 {
+  if(!green->hasProperDimensions()) {
+    _spots.clear();
+    return false;
+  }
   _spots.clear();
   int p = filteredImage().pitch();
   int spotThreshold = (int)(filterThreshold() * filterGain()) - 1;
@@ -180,6 +184,7 @@ void SpotDetector::spotDetect(const ImageLiteU8* green)
       else
         ++i;
   }
+  return true;
 }
 
 }

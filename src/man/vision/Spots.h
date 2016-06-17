@@ -102,7 +102,7 @@ class SpotDetector
 
   // Find spots in filteredImage by peak detection, rejecting green spots if
   // green image is supplied.
-  void spotDetect(const ImageLiteU8* green);
+  bool spotDetect(const ImageLiteU8* green);
 
   // Vector of all spots found
   std::list<Spot> _spots;
@@ -169,7 +169,7 @@ public:
   // can be obtained with the filteredImage member function.
   // The template type T must be an integer type of no more than 32 bits
   template <class T>
-  void spotFilter(const ImageLite<T>& src);
+  bool spotFilter(const ImageLite<T>& src);
 
   // Using the specified homography and innerDiamCm, compute reasonable values
   // for the initial diameters and the grow amounts. Then run the spot filter
@@ -178,7 +178,7 @@ public:
   // to detect spots and put them in a list that can be fetched by the
   // spots member function. If a green image is specified, reject green spots.
   template <class T>
-  void spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green = NULL);
+  bool spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green = NULL);
 
   // Get the filtered image from the last run of spotFilter (and spotDetect, which
   // calls it).
@@ -432,7 +432,9 @@ bool SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h,
     }
   }
 
-  spotDetect(green);
+  if(!spotDetect(green)) {
+    return false;
+  }
 
   _ticks = timer.time32();
   return true;
