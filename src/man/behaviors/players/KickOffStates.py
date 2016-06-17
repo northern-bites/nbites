@@ -23,7 +23,7 @@ def passToCorner(player):
             player.inKickingState = True
             return player.goNow('approachBall')
         elif roleConstants.isSecondChaser(player.role) or roleConstants.isCherryPicker(player.role):
-            player.brain.tracker.repeatFastNarrowPan()
+            player.brain.tracker.repeatFastTwoIntervalPan()
             passDestination = Location(nogginC.OPP_GOALBOX_LEFT_X, 60.)
             player.brain.nav.goTo(passDestination, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
@@ -49,7 +49,7 @@ def passToFieldCross(player):
     if player.firstFrame():
         player.passBack = False
         if roleConstants.isFirstChaser(player.role):
-            player.brain.tracker.repeatFastNarrowPan()
+            player.brain.tracker.repeatFastTwoIntervalPan()
             fieldCross = Location(nogginC.LANDMARK_OPP_FIELD_CROSS[0], nogginC.LANDMARK_OPP_FIELD_CROSS[1])
             player.brain.nav.goTo(fieldCross, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
