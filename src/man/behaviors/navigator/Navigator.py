@@ -10,16 +10,17 @@ from ..util import Transition
 import PMotion_proto
 
 #speed gains
-FULL_SPEED = 1.0
-HASTY_SPEED = 0.9
-FAST_SPEED = 0.8
-QUICK_SPEED = 0.7
-BRISK_SPEED = 0.6
-MEDIUM_SPEED = 0.5
-GRADUAL_SPEED = 0.4
-CAREFUL_SPEED = 0.3
-SLOW_SPEED = 0.2
-SLUGGISH_SPEED = 0.1
+FULL_SPEED = 0.2
+HASTY_SPEED = 0.19
+FAST_SPEED = 0.18
+QUICK_SPEED = 0.16
+BRISK_SPEED = 0.15
+MEDIUM_SPEED = 0.14
+GRADUAL_SPEED = 0.12
+CAREFUL_SPEED = 0.11
+SLOW_SPEED = 0.1
+SLUGGISH_SPEED = 0.08
+HESITANT_BUT_HOPEFUL_SPEED = SLUGGISH_SPEED
 KEEP_SAME_SPEED = -1
 #walk speed adapt
 ADAPTIVE = True
@@ -169,6 +170,8 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.adaptive = adaptive
         NavStates.goToPosition.fast = fast
         NavStates.goToPosition.pb = pb
+
+        print speed
 
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')

@@ -166,6 +166,7 @@ class HeadTrackingHelper(object):
         return newHeadMove
 
     def trackObject(self):
+        print "tracking object"
         """
         Method to actually perform the tracking.
         Should only be called explicitly from state

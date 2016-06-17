@@ -20,7 +20,7 @@ def positionReady(player):
 
         player.brain.nav.goTo(player.kickoffPosition,
                               precision = Navigator.PLAYBOOK,
-                              speed = Navigator.QUICK_SPEED,
+                              speed = Navigator.GRADUAL_SPEED,
                               avoidObstacles = True,
                               fast = True, pb = False)
 
