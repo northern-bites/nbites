@@ -40,6 +40,9 @@ void ColorParams::load(float darkU0, float darkV0, float lightU0, float lightV0,
   darkV0  -= 0.5f * fuzzyV;
   lightU0 -= 0.5f * fuzzyU;
   lightV0 -= 0.5f * fuzzyV;
+
+//    printf("IN FRONTEND.CPP darkU0: %f\n", darkU0);
+
   int du0 = fix(darkU0       , UVZero, false  );
   int dv0 = fix(darkV0       , UVZero, invertV);
   int lu0 = fix(lightU0      , UVZero, false  );
