@@ -45,6 +45,10 @@ const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] {
 
 // Runswift takes walk commands in MM, we use CM
 const float MM_PER_CM  = 10.0;
+const float MAX_FORWARD = .25;
+const float MAX_LEFT = .1; //.2;                                 // meters
+const float MAX_TURN = .87;                                // radians
+
 
 /*
 *NBites joint order. commented out joints are the ones that UNSW has but we dont use
@@ -93,6 +97,8 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
     slipAverage = 0.0;
     lastAngleZ = 0.0;
     angleChanged = 0.0;
+
+    counter = 0;
 	
 	resetAll();
 }
@@ -166,24 +172,27 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	) 
 {
 	PROF_ENTER(P_WALK);
-	// //logMsg("\n");
+	// logMsg("\n");
 
 	ActionCommand::All* request = new ActionCommand::All();
 	request->body.actionType = ActionCommand::Body::WALK;
 
 
-	// if (!calibrated()) { //logMsg("not calibrated");} 
-	// else {//logMsg("calibrated!!!"); }
+	// if (!calibrated()) { logMsg("not calibrated");} 
+	// else {logMsg("calibrated!!!"); }
 	// //std::cout << "" << std::endl;
 
+	logMsg("Calculating next joints and stiffnesses \n");
+
 	if (standby) {
+		logMsg("in standby");
 		tryingToWalk = false;
 	} else {
 		if (requestedToStop || !isActive()) {
 			tryingToWalk = false;
-			//logMsg("requested to stop or is not active");
+			logMsg("requested to stop or is not active");
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
-			//logMsg("STEP command! Odometry walk!");
+			logMsg("STEP command! Odometry walk!");
 
 			StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
 			Odometry deltaOdometry = odometry - startOdometry;
@@ -205,7 +214,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			// TODO odometry, handle
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
-			//logMsg("Walk command - Walking!");
+			logMsg("Walk command - Walking!");
 		 	float WALK_SPEED_SCALE_X = 1000.0;
 		 	float WALK_SPEED_SCALE_Y = 100.0;
 			// HANDLE
@@ -214,14 +223,19 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 			//std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
 			//std::cout << "Walk Command Scaled: " << command->x_percent * WALK_SPEED_SCALE_X << "," << command->y_percent * WALK_SPEED_SCALE_Y << ") \n";
-			request->body.forward = command->x_percent * WALK_SPEED_SCALE_X ;
-			request->body.left = command->y_percent * WALK_SPEED_SCALE_Y;
-			request->body.turn = command->theta_percent ;
+			// request->body.forward = command->x_percent * WALK_SPEED_SCALE_X ;
+			// request->body.left = command->y_percent * WALK_SPEED_SCALE_Y;
+			// request->body.turn = command->theta_percent ;
 			//std::cout << "FORWARD: " << request->body.forward << std::endl;
 			request->body.speed = 0.0f;
 
+
+			request->body.forward = command->x_percent * MAX_FORWARD * WALK_SPEED_SCALE_X;
+			request->body.left = command->y_percent * MAX_LEFT * WALK_SPEED_SCALE_X;
+			request->body.turn = command->theta_percent * MAX_TURN;
+
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
-			//logMsg("\n\nDestination command - Destination Walking!");
+			logMsg("\n\nDestination command - Destination Walking!");
 			tryingToWalk = true;
 			float DEST_SCALE = 1;
 
@@ -239,11 +253,32 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::KICK) {
-			//logMsg("Kick command sent now!");
-			tryingToWalk = false;
+			logMsg("Kick command sent now!");
+			// tryingToWalk = false;
+			////std::cout << "Kick Command" << std::endl;
+            // kickCommand = boost::shared_static_cast<KickCommand>(currentCommand);
 
-		} else if (!currentCommand.get()) {
-			// //logMsg("Can't get current command! Requesting stand");
+            // // Only set kicking to true once
+            // if (kickCommand->timeStamp != kickIndex) {
+            //     //std::cout << "Sent" << std::endl;
+            //     kickIndex = kickCommand->timeStamp;
+            //     // kickOut = KickEngineOutput();
+            //     kicking = true;
+            // }
+            // else if (!kicking) { // Ignore the command if we've finished kicking
+            //     //std::cout << "!kicking" << std::endl;
+            //     stand();
+            // }
+
+		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK_IN_PLACE) {
+			//std::cout << "Walking in place! " << std::endl;
+			request->body.forward = 00.0; //command->x_percent ;
+			request->body.left = 00.0; //command->y_percent ;
+			request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
+			request->body.speed = 0.0f;
+		}
+		else if (!currentCommand.get()) {
+			logMsg("Can't get current command! Requesting stand");
 			tryingToWalk = false;
 			// call stand
 			request->body.actionType = ActionCommand::Body::STAND;
@@ -254,14 +289,18 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	request->body.speed = 0.0f;
 	adjustIMU(sensorInertials);
 
+
+	// Testing kick
+	// request->body.actionType = ActionCommand::Body::KICK;
+
 	// //std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
-	// request->body.forward = 300.0; //command->x_percent ;
+	// request->body.forward = 00.0; //command->x_percent ;
 	// request->body.left = 00.0; //command->y_percent ;
 	// request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
 	// request->body.speed = 0.0f;
 
 	// For testing stand action
-	// //logMsg("Can't get current command! Requesting stand");
+	// logMsg("Can't get current command! Requesting stand");
 	// request->body.actionType = ActionCommand::Body::STAND;
 
 	// Update sensor values
@@ -353,8 +392,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	// Get the position of the ball in robot relative cartesian coordinates
 	// Is this necessary for our system? 
-	float ballX = 5.0;
-	float ballY = 5.0;
+	float ballX = 1.0;
+	float ballY = 1.0;
 
     // Update the body model
     bodyModel.kinematics = &kinematics;
@@ -389,12 +428,12 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     		if ((Kinematics::ChainID)i == Kinematics::RLEG_CHAIN && j == 11) {
     			// RHIPYAWPITCH -- technically doesn't exist but in all our infinite grace and wisdom we have a variable for it anyway
     			chain_angles.push_back(joints.angles[nb_joint_order[6]]);
-    			// //logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
+    			// logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
     		} else {
 	    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); 
     		}
 
-   //  		//logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
+   //  		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
 			// // //std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
 			// //std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;
 
@@ -415,7 +454,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
     // We only leave when we do a sweet move, so request a special action
     if (requestedToStop) {
-    	//logMsg("Requested to stop");
+    	logMsg("Requested to stop");
     	inactive();
     	requestedToStop = false;
     	resetOdometry();
@@ -463,6 +502,11 @@ void UNSWalkProvider::setCommand(const StepCommand::ptr command) {
 }
 
 void UNSWalkProvider::setCommand(const KickCommand::ptr command) {
+	currentCommand = command;
+	active();
+}
+
+void UNSWalkProvider::setCommand(const WalkInPlaceCommand::ptr command) {
 	currentCommand = command;
 	active();
 }
@@ -535,12 +579,17 @@ bool UNSWalkProvider::isStanding() const { //is going to stand rather than at co
 }
 
 bool UNSWalkProvider::isWalkActive() const {
-	return generator->isActive();
+	// TODO check this!
+	return generator->isStanding();
 }
 
 void UNSWalkProvider::stand() {
 	//std::cout << "STAND IS BEING CALLED!!\n";
-	currentCommand = MotionCommand::ptr();
+	// currentCommand = MotionCommand::ptr();
+
+	// UNTIL STAND IS WORKED OUT, JUST WALK IN PLACE
+	// CHANGE THIS BEFORE COMPETITION
+	currentCommand = WalkInPlaceCommand::ptr(new WalkInPlaceCommand());
 }
 
 

@@ -20,8 +20,8 @@
 
 #define SHIFT_PERIOD 2.0 // time to shift weight on to one leg
 #define SHIFT_END_PERIOD 2.5 // time to shift weight back from one leg
-#define KICK_LEAN 22.2 // sideways lean while kicking
-#define KICK_STEP_HEIGHT 0.03 // how far to lift kicking foot
+#define KICK_LEAN 42.2 // sideways lean while kicking
+#define KICK_STEP_HEIGHT 0.05 // how far to lift kicking foot
 #define BACK_PHASE 0.65 // time to move kick foot back
 #define MIN_KICK_PHASE 0.5 // time to swing kick foot
 #define MAX_KICK_PHASE 0.2 // time to swing kick foot
@@ -121,7 +121,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       // Calculate the current hip height by checking how bent the knee is 
       hiph = sensors.joints.angles[LKneePitch] / KNEE_PITCH_RANGE * (WALK_HIP_HEIGHT - STAND_HIP_HEIGHT) + STAND_HIP_HEIGHT;
    }
-   // //std::cout << "IN WALK2014 GENERATOR\n";
+   // std::cout << "IN WALK2014 GENERATOR\n";
 
    // 1. Read in new walk values (forward, left, turn, power) only at the start of a walk step cycle, ie when t = 0
    if (t == 0) {
@@ -136,7 +136,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       speed         = active.speed;                      // used to distinguish between jabKick and walkKick
       foot          = active.foot;                       // kicking foot
       isFast        = active.isFast;
-      //std::cout << "[WALK GEN DEBUG] Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
+      std::cout << "[WALK GEN DEBUG] Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
       if (stopping) {                                    // not used at present
       }
       else {
@@ -147,11 +147,11 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       speed = 0.0;
       if (forward < .01 && forward != 0.0) { 
          forward = .05; 
-         //std::cout << "Adjust forward to bigger!" << std::endl;
+         std::cout << "Adjust forward to bigger!" << std::endl;
       }
        else if (forward < .1 && forward != 0.0) {
          // forward = .1;
-         //std::cout << "Forward is less than .1!! bad \n";
+         std::cout << "Forward is less than .1!! bad \n";
       }
 
       // 1.1 Scale back values to try to ensure stability. Just clipped for now (see wiki)
@@ -165,10 +165,11 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       // 1.3 jabKick - removed
 
       // 1.4 walkKick - removed
+      // walkKick(ballX, bodyModel);
 
       // 1.5 ratchet forward by FORWARD_CHANGE (uncomment to limit absolute change in "forward" to FORWARD_CHANGE)
       		 if (!exactStepsRequested && abs(forward-lastForward)>FORWARD_CHANGE) {                // ie greater than a FORWARD_CHANGE / sec change
-      			//std::cout << "LIMITING FORWARD CHANGE\n\n";
+      			std::cout << "LIMITING FORWARD CHANGE\n\n";
                forward = lastForward + (forward-lastForward)/abs(forward-lastForward)*FORWARD_CHANGE;
       		}
       		lastForward   = forward;                           // back up old value in m/s
@@ -199,6 +200,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
    // 3. Determine Walk2014 Option
    if (request->body.actionType != ActionCommand::Body::KICK && kickT > 0 && request->body.actionType != ActionCommand::Body::REF_PICKUP) { 
+      std::cout << "WALK GEN Kick!!" << std::endl;
       // We want to stop kicking, but we also don't want to let ref pick up take over during kick **HACK ALERT** this is particularly for mario whose foot sensor dies while kicking
       // Finish transition out if in the middle of a kick by skipping to the end phase
       if (kickT < BACK_PHASE + kickPhase + THROUGH_PHASE) {
@@ -214,6 +216,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
          kickT = BACK_PHASE + kickPhase + THROUGH_PHASE;
       }
    } else if (active.actionType == ActionCommand::Body::KICK) {
+      std::cout << "Walk gen KICK!!" << std::endl;
       // This makes sure that the action type gets set back to walk just after a kick is finished.
       // If we don't leave enough time for this to happen, motion moves back into a kick before behaviour
       // can change its mind.
@@ -287,7 +290,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
    // 4. Execute Walk2014 Option
    if (walk2014Option == STAND) {                             // Place CoM over ankle and turn set power to motors
-      //std::cout << "EXECUTING STAND\n";
+      std::cout << "EXECUTING STAND\n";
       hiph = STAND_HIP_HEIGHT;
       forward = left = turn = 0;
       t = nextFootSwitchT = 0;
@@ -386,6 +389,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       shoulderPitchR = -forwardR * 6;                     // forwardR is in meters, 10 is an arbitrary scale factor to match previous walk
       shoulderPitchL = -forwardL * 6;
    } else if (walk2014Option == KICK) { // Kicking
+      std::cout << "KICK!\n";
       if (active.foot == ActionCommand::Body::LEFT) {
          makeForwardKickJoints(KICK_LEAN, KICK_STEP_HEIGHT, SHIFT_PERIOD, foothL, forwardL, leftL, kneePitchL, shoulderRollL, anklePitchL, ballY, request);
          leftR = leftL * 0.1; // Balance slightly more over support foot if need be
@@ -727,6 +731,9 @@ void Walk2014Generator::addKickJoints(JointValues &j){
    j.angles[Joints::RKneePitch] += kneePitchR;
    j.angles[Joints::RAnklePitch] += anklePitchR + shoulderRollR;
    j.angles[Joints::RShoulderPitch] -= kneePitchR;
+
+   j.angles[Joints::RShoulderRoll] += UNSWDEG2RAD(20);
+   j.angles[Joints::LShoulderRoll] += UNSWDEG2RAD(20);
 }
 
 float Walk2014Generator::leftAngle()
@@ -791,7 +798,7 @@ void Walk2014Generator::updateOdometry(Odometry *odometry, bool isLeftSwingFoot)
    forwardOdo *= 1;
    leftOdo    *= 1.23;
    turnOdo    *= -0.58; // TODO nikki -.53;
-   // //std::cout << "UNSW WALK ODO " << forwardOdo <<" "<< leftOdo <<" "<< turnOdo << std::endl;
+   // std::cout << "UNSW WALK ODO " << forwardOdo <<" "<< leftOdo <<" "<< turnOdo << std::endl;
    *odometry = *odometry + Odometry(forwardOdo, leftOdo, turnOdo);
 
    // backup odometry values
@@ -1013,3 +1020,39 @@ Walk2014Generator::Hpr Walk2014Generator::hipAngles(float Hyp, float Hp,
    return result;
 }
 
+void Walk2014Generator::walkKick(float ballX, BodyModel &bodyModel) {
+   // plan forward
+   float delta = 0.05; // meters
+   float ballDistX = ballX/MM_PER_M;
+   if(ActionCommand::Body::LEFT) { // left foot walk-kick
+      //cout <<"forward-0 "<< ballX <<" "<< forward << endl;
+      if(bodyModel.isLeftPhase and (ballDistX-delta+forwardL0)<forward) {
+         forward = (ballDistX-delta-forwardL0)/2;
+         //cout <<"forward-1 "<< ballX <<" "<< forward <<" "<< forwardL0 <<" "<< delta << endl;
+      }
+      if(!bodyModel.isLeftPhase and (ballDistX-delta-forwardR0)<forward/2) {
+         forward = ballDistX-delta-forwardR0;
+         //cout <<"forward-2 "<< ballX <<" "<< forward <<" "<< forwardR0 <<" "<< delta << endl;
+      }
+      if(bodyModel.isLeftPhase and (ballDistX-delta+forwardL0)<delta)  forward = abs(power)*MAX_FORWARD;
+       if(!bodyModel.isLeftPhase and (ballDistX-delta-forwardR0)<delta) forward = abs(power)*MAX_FORWARD;
+      //cout <<"forward-3 "<< ballX <<" "<< forward << endl;
+   }
+   if(ActionCommand::Body::RIGHT) { // left foot walk-kick
+      //cout <<"forward-0 "<< ballX <<" "<< forward << endl;
+      if(!bodyModel.isLeftPhase and (ballDistX-delta+forwardR0)<forward) {
+         forward = (ballDistX-delta-forwardR0)/2;
+         //cout <<"forward-1 "<< ballX <<" "<< forward <<" "<< forwardL0 <<" "<< delta << endl;
+      }
+      if(bodyModel.isLeftPhase and (ballDistX-delta-forwardL0)<forward/2) {
+         forward = ballDistX-delta-forwardL0;
+         //cout <<"forward-2 "<< ballX <<" "<< forward <<" "<< forwardR0 <<" "<< delta << endl;
+      }
+      if(!bodyModel.isLeftPhase and (ballDistX-delta+forwardR0)<delta)  forward = abs(power)*MAX_FORWARD;
+       if(bodyModel.isLeftPhase and (ballDistX-delta-forwardL0)<delta) forward = abs(power)*MAX_FORWARD;
+      //cout <<"forward-3 "<< ballX <<" "<< forward << endl;
+   }
+    if(forward>MAX_FORWARD) forward = MAX_FORWARD; // in case things go wrong
+    if(forward>MAX_FORWARD) forward = MAX_FORWARD; // in case things go wrong
+   //cout <<"forward-4 "<< ballX <<" "<< forward << endl;
+}

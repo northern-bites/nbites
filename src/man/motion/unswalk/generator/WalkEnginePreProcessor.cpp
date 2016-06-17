@@ -27,7 +27,6 @@ int sign(float num) {
 }
 
 void toWalkRequest(ActionCommand::All* request) {
-   std::cout << "[PREPROCESS DEBUG] Converting walk request!" << std::endl;
    request->body.actionType = Body::WALK;
    request->body.power = 0;
    request->body.bend = 1;
@@ -57,6 +56,8 @@ bool WalkEnginePreProcessor::isStanding() {
 
 bool WalkEnginePreProcessor::LineUpEngine::hasEnded(ActionCommand::All* request, float ballX, float ballY) {
    // Calculate required left gap (needs to be further out for kicks)
+   std::cout << "In line up engine" << std::endl;
+   return true;
    int leftGap = LEFT_GAP_DRIBBLE;
    if (request->body.actionType == Body::KICK) {
       leftGap = LEFT_GAP_KICK;
@@ -118,6 +119,7 @@ void WalkEnginePreProcessor::DribbleEngine::reset() {
 }
 
 bool WalkEnginePreProcessor::DribbleEngine::hasEnded() {
+   return true;
    return (dribbleState == DribbleEngine::END);
 }
 

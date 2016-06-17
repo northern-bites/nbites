@@ -15,6 +15,7 @@
 #include "../DestinationCommand.h"
 #include "../KickCommand.h"
 #include "../BodyJointCommand.h"
+#include "../WalkInPlaceCommand.h"
 #include "../MotionProvider.h"
 
 #include "RoboGrams.h"
@@ -57,6 +58,7 @@ public:
 
 	float leftHandSpeed() const;
     float rightHandSpeed() const;
+    bool kicking;
 
 	void requestStopFirstInstance();
 	void calculateNextJointsAndStiffnesses(
@@ -70,6 +72,7 @@ public:
 	void resetOdometry();
 
 	void setCommand(const WalkCommand::ptr command);
+	void setCommand(const WalkInPlaceCommand::ptr command);
     void setCommand(const DestinationCommand::ptr command);
     void setCommand(const KickCommand::ptr command);
     // StepCommand (currently not used) is actually an odometry destination walk
@@ -98,12 +101,18 @@ public:
 	void resetAll();
 
 	JointValues walkOutput;
+	
+	int counter;
+	// KickCommand::ptr kickCommand;
+	// int kickIndex;
+
 
 protected:
 	void stand();
     void setActive() {}
 
 private:
+
 	bool requestedToStop;
 	bool standby;
 	bool tryingToWalk;
