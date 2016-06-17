@@ -71,11 +71,19 @@ bool SpotDetector::alloc(const ImageLiteBase& src)
   };
   int pitchNeeded = (src.width() + rowAlignMask) & ~rowAlignMask;
   int maxHeightNeeded = src.height() - initialOuterDiam() + 2;  // one extra for peak detect
-  size_t sizeNeeded = pitchNeeded * maxHeightNeeded;
+  std::cout<<"maxHeightNeeded = "<<maxHeightNeeded<<std::endl;
+  if(maxHeightNeeded <= 0) {
+    std::cout<<"maxHeightNeeded has size <= 0\n";
+    _spots.clear();
+    return false;
+  }
+  size_t sizeNeeded = pitchNeeded * maxHeightNeeded; //is sizeNeeded good?
+  std::cout<<"sizeNeeded = "<<sizeNeeded<<std::endl;
   std::cout<<"Approaching Second if Statement\n";
   if (sizeNeeded >= filteredSize)
   {
-    // std::cout<<"sizeNeeded > filteredSize\n";
+    std::cout<<"sizeNeeded > filteredSize"<<std::endl;
+    std::cout<<"sizeNeeded = "<<sizeNeeded<<std::endl;
     delete[] filteredImageMemory;
     filteredPixels = (uint8_t*)alignedAlloc(sizeNeeded, 4, filteredImageMemory);
     filteredSize = sizeNeeded;
