@@ -21,56 +21,6 @@
 #define BOSS_PRINT  'p'
 
 //#define DCM_DEBUG
-boss::Boss * instance = NULL;
-
-typedef void handler_t(int);
-
-handler_t* Signal(int signum, handler_t* handler) {
-    struct sigaction action, old_action;
-    
-    action.sa_handler = handler;
-    sigemptyset(&action.sa_mask); /* block sigs of type being handled */
-    action.sa_flags = SA_RESTART; /* restart syscalls if possible */
-    
-    if (sigaction(signum, &action, &old_action) < 0) {
-        printf("Signal error");
-    }
-    return (old_action.sa_handler);
-}
-
-void man_dead_handler(int sig) {
-    std::cout<<"\nIN man_dead_handler!!!!!!!!!!!!!!!!!\n"<<std::endl;
-    assert(sig == SIGCHLD); //make sure the signal is the correct one
-  
-    int status; //will be filled in with child's status by waitpid
-    pid_t child;
-    
-    //waits for state change in child and obtains info about child, reaps if child is terminated
-    while ((child = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0) {
-        
-    	if (child != instance->manPID) {
-    		std::cout<<"boss got sigchild from non man"<<std::endl;
-    		continue;
-    	}
-
-        if (WIFEXITED(status)) { //child exited normally
-			instance->manDiedOverride = true;
-            printf("Man was handled by signal %d \n", WEXITSTATUS(status));
-        }
-
-        if (WIFSIGNALED(status)) { //child was terminated by uncaught signal
-        	instance->manDiedOverride = true;
-            printf("Man was handled by signal %d \n",WTERMSIG(status));
-        }
-
-    }
-    //process does not exist or is not a child of the calling process
-    if (child < 0 && errno != ECHILD) {
-        printf("Bad argument passed to waitpid \n");
-    }
-    printf("sigchld_handler: exiting\n");
-    return;
-}
 
 #ifdef DCM_DEBUG
 #define DCM_TIMING_DEBUG_ALWAYS false
@@ -128,7 +78,7 @@ bool DCM_TIMING_DEBUG_END() {
 
 #endif
 //original
-#define MAN_DEAD_THRESHOLD 2000
+#define MAN_DEAD_THRESHOLD 1000
 //#define MAN_DEAD_THRESHOLD 500
 
 #define BOSS_MAIN_LOOP_US 500000
@@ -153,13 +103,6 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     printf("\t\tBOSS VERSION == %d\n", BOSS_VERSION);
     //for when man dies
     manDiedOverride = false;
-
-    if (instance == NULL) {
-    	instance = this;
-    } else {
-    	std::cout<<"ERROR: two instances of singleton boss detected."<< std::endl;
-    	::exit(1);
-    }
 
     std::cout << "Boss Constructor" << std::endl;
     bool success = true;
@@ -253,6 +196,8 @@ int Boss::startMan() {
         std::cout << "Man is already running. Will not start." << std::endl;
         return -1;
     }
+
+    manDiedOverride = false;    
 
     std::cout << "Starting man!" << std::endl;
     pid_t child = fork();
