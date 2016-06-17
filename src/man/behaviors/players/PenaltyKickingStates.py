@@ -59,7 +59,7 @@ def penaltyKickSpin(player):
         #variable Assignment
         penaltyKickSpin.threshCount = 0
 
-        penaltyKickSpin.speed = Navigator.MEDIUM_SPEED
+        penaltyKickSpin.speed = speeds.SPEED_FIVE
         if player.penaltyKickRight:
             penaltyKickSpin.speed *= -1
 
@@ -118,7 +118,7 @@ def positionForPenaltyKick(player):
     if player.firstFrame():
         positionForPenaltyKick.position = True
         player.brain.nav.destinationWalkTo(positionForPenaltyKick.kickPose,
-                                           Navigator.GRADUAL_SPEED)
+                                           speeds.SPEED_THREE)
     else:
         #print "Updating our destination to be in the kickpose"
         player.brain.nav.updateDest(positionForPenaltyKick.kickPose)
