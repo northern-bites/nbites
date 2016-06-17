@@ -5,6 +5,8 @@
 #include "Man.h"
 #include "SharedData.h"
 
+#include "TextToSpeech.h"
+
 
 #include <sys/file.h>
 #include <errno.h>
@@ -48,7 +50,12 @@ void error_signal_handler(int signal) {
     fflush(stdout);
     fflush(stderr);
 
-    cleanup();
+    while(1) {
+    	man::tts::say(IN_GAME, "g d b me");
+    	sleep(10);
+    }
+
+    //cleanup();
 
     exit(-1);
 }
