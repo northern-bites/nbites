@@ -1,30 +1,23 @@
 package nbtool.gui.logviews.sound.whistle;
 
 import java.awt.BorderLayout;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 
-import javax.sound.sampled.LineUnavailableException;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
-import nbtool.data.log.LogReference;
 import nbtool.gui.ToolMessage;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.nio.CrossServer;
 import nbtool.nio.CrossServer.CrossInstance;
-import nbtool.nio.FileIO;
-import nbtool.util.Center;
 import nbtool.util.Debug;
-import nbtool.util.Utility;
 
 public class DetectView extends ViewParent implements IOFirstResponder {
 
@@ -32,33 +25,48 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 	SoundPane pane = null;
 	JScrollPane scroll = new JScrollPane();
 
+	JCheckBox containsBox = new JCheckBox("annotate:");
+	JLabel detection = new JLabel();
+
 	@Override
 	public void setupDisplay() {
 		Debug.info("view!");
+		this.setLayout(new BorderLayout());
 
 		final byte[] dataToPlay = displayedLog.blocks.get(0).data;
-
-
-
-		Center.addEvent( new Center.EventRunnable() {
-			@Override
-			protected void run() {
-				try {
-					PlaySound.play(dataToPlay);
-				} catch (LineUnavailableException e) {
-					e.printStackTrace();
-					ToolMessage.displayError("couldn't play sound file");
-				}
-			}
-		});
+		PlaySound.play(dataToPlay);
 
 		if (displayedLog.logClass.equals("DetectAmplitude")) {
 			CrossInstance ci = CrossServer.instanceByIndex(0);
 			if (ci == null) return;
 			ci.tryAddCall(this, "whistle_detect", this.displayedLog);
 			this.add(scroll, BorderLayout.CENTER);
-		}
+			scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+			JPanel container = new JPanel(new BorderLayout());
+			container.add(detection, BorderLayout.CENTER);
+			container.add(containsBox, BorderLayout.WEST);
+
+			this.add(container, BorderLayout.NORTH);
+//			this.add(heardBox, BorderLayout.NORTH);
+
+			containsBox.setSelected(displayedLog.topLevelDictionary.get("WhistleHeard").asBoolean().bool());
+			containsBox.addChangeListener(new ChangeListener() {
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					displayedLog.topLevelDictionary.put("WhistleHeard", containsBox.isSelected());
+					if (!displayedLog.temporary()) {
+						try {
+							displayedLog.saveChangesToLoadFile();
+						} catch (Exception e1) {
+							e1.printStackTrace();
+							ToolMessage.displayError("could not write log!!");
+						}
+					}
+				}
+			});
+		}
 	}
 
 	@Override
@@ -91,6 +99,8 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 			scroll.remove(pane);
 		}
 
+		detection.setText("detect: " + out[0].topLevelDictionary.get("WhistleHeard").asBoolean().bool());
+
 		pane = new SoundPane(out[0].blocks.size(), 1024) {
 
 			@Override
@@ -119,58 +129,5 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 	public boolean ioMayRespondOnCenterThread(IOInstance inst) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-
-	/***************/
-	//MASS ANNOTATION STUFF
-
-	private static final Path heard = Paths.get("/Users/pkoch/Robotics/LOG/whistle_HEARD/");
-	private static final Path nheard = Paths.get("/Users/pkoch/Robotics/LOG/whistle_NHEARD/");
-
-	public static void main(String[] args) throws IOException {
-
-		assert(Files.exists(heard));
-		assert(Files.exists(nheard));
-
-
-
-		if (args.length != 2) {
-			Debug.error("needs two args: whistle_true path_base");
-			return;
-		}
-		final boolean hb = Boolean.valueOf(args[0]);
-		final Path toPath = hb ? heard : nheard;
-		Path path = Paths.get(args[1]);
-
-		if (!Files.exists(path) || !Files.isDirectory(path)) {
-			Debug.error("bad path %s", args[1]);
-			return;
-		}
-
-		Files.walkFileTree(path, new SimpleFileVisitor<Path>(){
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-
-				if (file.toString().endsWith(".nblog")) {
-					Debug.info("found nblog");
-					LogReference ref = FileIO.readRefFromPath(file);
-
-					if (ref.logClass.equals("soundStuff")) {
-						Log lg = ref.get();
-
-						lg.logClass = "DetectAmplitude";
-						lg.topLevelDictionary.put("WhistleHeard", hb);
-						lg.blocks.get(0).type = "SoundAmplitude";
-
-						Debug.info("copy...");
-						FileIO.writeLogToPath(toPath.resolve(
-								Utility.getRandomHexString(20) + ".nblog"), lg);
-					}
-				}
-
-				return FileVisitResult.CONTINUE;
-			}
-		});
 	}
 }
