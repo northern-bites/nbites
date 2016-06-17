@@ -8,6 +8,7 @@ from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
+from math import fabs, degrees
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -28,6 +29,7 @@ def gameInitial(player):
         player.role = player.brain.playerNumber
         roleConstants.setRoleConstants(player, player.role)
 
+    # print "Current Angle: " + str(degrees(player.brain.interface.joints.head_yaw))
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
         player.stand()
@@ -45,7 +47,7 @@ def gameReady(player):
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.repeatWideSnapPan()
 
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
@@ -72,20 +74,32 @@ def gameSet(player):
     """
     Fixate on the ball, or scan to look for it
     """
+
     if player.firstFrame():
+        #The player's currentState = gameSet
+
+        print "GAME SET FIRST FRAME"
+
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.gainsOn()
         player.stand()
         player.brain.nav.stand()
-        player.brain.tracker.performWidePan()
+
+        # player.brain.tracker.helper.boundsSnapPan(-90, 90, False)
+        player.brain.tracker.performGameSetInitialWideSnapPan()
+        # player.brain.tracker.helper.startingPan(Head)
+        # player.brain.tracker.helper.executeHeadMove(player.brain.tracker.helper.boundsSnapPan(-90, 90, False))
 
         if player.wasPenalized:
             player.wasPenalized = False
 
     elif player.brain.tracker.isStopped():
-        player.brain.tracker.trackBall()
 
+        print "TRUE"
+
+        player.brain.tracker.trackBall(True)
+        # print "Current Angle: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
