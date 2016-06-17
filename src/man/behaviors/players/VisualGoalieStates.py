@@ -26,7 +26,7 @@ def walkToGoal(player):
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.repeatWideSnapPan()
         player.returningFromPenalty = False
         player.brain.nav.goTo(RobotLocation(FIELD_WHITE_LEFT_SIDELINE_X,
                                        CENTER_FIELD_Y, 0.0))

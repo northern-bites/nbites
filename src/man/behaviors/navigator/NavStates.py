@@ -192,7 +192,7 @@ def dodge(nav):
 
     if navTrans.doneDodging(nav):
         nav.dodging = False
-        nav.brain.tracker.repeatBasicPan()
+        nav.brain.tracker.repeatWideSnapPan()
         return nav.goLater('briefStand')
 
     return nav.stay()

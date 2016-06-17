@@ -18,7 +18,10 @@ def tracking(tracker):
     # makes sure ball is default target when entering tracking
     tracker.target = tracker.brain.ball
 
+    # print "------------IsN TRACKING---------"
+
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
+
     tracker.helper.trackObject()
 
     # If cannot see ball and shared ball is reliable, go to altTrackSharedBallAndPan
@@ -30,7 +33,41 @@ def tracking(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-            return tracker.goLater('fullPan')
+            return tracker.goLater('gamePlayingSnapPan')
+
+    return tracker.stay()
+
+def gameSetTracking(tracker):
+    #SNAP PAN --- MAY CHANGE SNAP PAN BACK TO FULL PAN
+
+    # print "---------GAME SET TRACKING-------------"
+
+    tracker.target = tracker.brain.ball
+
+    tracker.helper.trackObject()
+
+    if not tracker.target.vis.on and tracker.counter > 15:
+        if DEBUG : tracker.printf("Missing object this frame",'cyan')
+        if (tracker.target.vis.frames_off >
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
+            return tracker.goLater('gameSetSnapPan')
+
+    return tracker.stay()
+
+def goalieTracking(tracker):
+    #SNAP PAN --- MAY CHANGE SNAP PAN BACK TO FULL PAN
+
+    # print "---------GAME SET TRACKING-------------"
+
+    tracker.target = tracker.brain.ball
+
+    tracker.helper.trackObject()
+
+    if not tracker.target.vis.on and tracker.counter > 15:
+        if DEBUG : tracker.printf("Missing object this frame",'cyan')
+        if (tracker.target.vis.frames_off >
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
+            return tracker.goLater('goalieSnapPan')
 
     return tracker.stay()
 
@@ -46,6 +83,7 @@ def bounceTracking(tracker):
     return tracker.stay()
 
 def trackingFieldObject(tracker):
+
     tracker.helper.trackStationaryObject()
     if not tracker.target.on and tracker.counter > 15:
         if (tracker.target.frames_off >
@@ -174,6 +212,7 @@ def lookStraightThenTrack(tracker):
     return tracker.stay()
 
 def fullPan(tracker):
+
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
     Once the ball is located, switches to tracking.
@@ -184,10 +223,10 @@ def fullPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
+
         tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 
     if not tracker.brain.motion.head_is_active:
-        # Repeat the pan
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
@@ -199,6 +238,144 @@ def fullPan(tracker):
         return tracker.goLater('tracking')
 
     return tracker.stay()
+
+def gameSetSnapPan(tracker):
+
+    if tracker.firstFrame():
+        request = tracker.brain.interface.motionRequest
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
+
+        tracker.helper.executeHeadMove(tracker.helper.boundsSnapPan(-90, 90, False))
+
+    if not tracker.brain.motion.head_is_active:
+        tracker.helper.executeHeadMove(HeadMoves.GAME_SET_WIDE_SNAP_PAN)
+
+    if not isinstance(tracker.target, Vision.messages.FilteredBall):
+        if tracker.target.on:
+            return tracker.goLater('trackingFieldObject')
+
+    if (isinstance(tracker.target, Vision.messages.FilteredBall) and
+        tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+        return tracker.goLater('gameSetTracking')
+
+    return tracker.stay()
+
+def gamePlayingSnapPan(tracker):
+
+    # print "----------------IN SNAP PAN-----------------\n"
+
+    """
+    Repeatedly executes the headMove FIXED_PITCH_PAN.
+    Once the ball is located, switches to tracking.
+    """
+    if tracker.firstFrame():
+
+        # print "-----------------FIRST FRAME IN SNAP PAN--------------------\n"
+
+        # Send the motion request message to stop
+        request = tracker.brain.interface.motionRequest
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
+        # Smartly start the pan
+
+        tracker.helper.startingPan(HeadMoves.WIDE_SNAP_PAN)
+        # tracker.lookToAngleWithTime(-75, 0.75)
+        # tracker.lookToAngleWithTime(-75,1)
+        # tracker.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    if not tracker.brain.motion.head_is_active or tracker.isStopped():
+        tracker.helper.executeHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    if not isinstance(tracker.target, Vision.messages.FilteredBall):
+        if tracker.target.on:
+            return tracker.goLater('trackingFieldObject')
+
+    if (isinstance(tracker.target, Vision.messages.FilteredBall) and
+        tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+        return tracker.goLater('tracking')
+
+    return tracker.stay()
+
+def goalieSnapPan(tracker):
+
+    # print "----------------IN SNAP PAN-----------------\n"
+
+    """
+    Repeatedly executes the headMove FIXED_PITCH_PAN.
+    Once the ball is located, switches to tracking.
+    """
+    if tracker.firstFrame():
+
+        # print "-----------------FIRST FRAME IN SNAP PAN--------------------\n"
+
+        # Send the motion request message to stop
+        request = tracker.brain.interface.motionRequest
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
+        # Smartly start the pan
+
+        tracker.helper.startingPan(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+        # tracker.lookToAngleWithTime(-75, 0.75)
+        # tracker.lookToAngleWithTime(-75,1)
+        # tracker.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    if not tracker.brain.motion.head_is_active or tracker.isStopped():
+        tracker.helper.executeHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+
+    if not isinstance(tracker.target, Vision.messages.FilteredBall):
+        if tracker.target.on:
+            return tracker.goLater('trackingFieldObject')
+
+    if (isinstance(tracker.target, Vision.messages.FilteredBall) and
+        tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+        return tracker.goLater('tracking')
+
+    return tracker.stay()
+
+# @SNAPPAN-CHANGE - We don't use this state anymore; instead, we use head tracking
+# states paired with specialized head moves.
+"""
+def snapPan(tracker):  
+    print "Entering SnapPan function"
+
+    if tracker.firstFrame():
+        print "First Frame"
+        request = tracker.brain.interface.motionRequest
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
+        # Smartly start the pan
+        tracker.performHeadMove(tracker.helper.lookToAngle(tracker.currentYaw))
+
+    if not tracker.brain.motion.head_is_active:
+        if tracker.lastMovement == 0: # If the head should stay still rn
+            print "Staying still"
+            tracker.performHeadMove(tracker.lookToAngle(tracker.currentYaw))
+            tracker.lastMovement = 1
+            return tracker.stay()
+        else:
+            print "Let's change up the view"
+            tracker.currentYaw += 90 * tracker.direction # 30 degrees of motion for each pan
+            print "Current yaw: " + str(tracker.currentYaw)
+            tracker.performHeadMove(tracker.lookToAngle(tracker.currentYaw))
+
+            if tracker.currentYaw >= 90:
+                tracker.direction = -1
+            if tracker.currentYaw <= -90:
+                tracker.direction = 1
+
+            tracker.lastMovement = 0
+
+    if not isinstance(tracker.target, Vision.messages.FilteredBall):
+        if tracker.target.on:
+            return tracker.goLater('trackingFieldObject')
+
+    if (isinstance(tracker.target, Vision.messages.FilteredBall) and
+        tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+        return tracker.goLater('tracking')
+
+    return tracker.stay()
+"""
 
 def bounceFullPan(tracker):
     """
