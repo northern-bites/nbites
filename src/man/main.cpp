@@ -55,7 +55,7 @@ void error_signal_handler(int signal) {
     	sleep(10);
     }
 
-    //cleanup();
+    cleanup();
 
     exit(-1);
 }
