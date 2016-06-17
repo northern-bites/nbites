@@ -5,7 +5,7 @@
 #include "Man.h"
 #include "SharedData.h"
 
-#include "TextToSpeech.h"
+//#include "TextToSpeech.h"
 
 
 #include <sys/file.h>
@@ -51,7 +51,7 @@ void error_signal_handler(int signal) {
     fflush(stderr);
 
     while(1) {
-    	man::tts::say(IN_GAME, "g d b me");
+    	//man::tts::say(IN_GAME, "g d b me");
     	sleep(10);
     }
 
