@@ -98,11 +98,11 @@ class SpotDetector
   int* innerColumns;          //   of 16 for ASM code
 
   // Allocate (or grow) above memory buffers based on source image size
-  void alloc(const ImageLiteBase&);
+  bool alloc(const ImageLiteBase&);
 
   // Find spots in filteredImage by peak detection, rejecting green spots if
   // green image is supplied.
-  void spotDetect(const ImageLiteU8* green);
+  bool spotDetect(const ImageLiteU8* green);
 
   // Vector of all spots found
   std::list<Spot> _spots;
@@ -169,7 +169,7 @@ public:
   // can be obtained with the filteredImage member function.
   // The template type T must be an integer type of no more than 32 bits
   template <class T>
-  void spotFilter(const ImageLite<T>& src);
+  bool spotFilter(const ImageLite<T>& src);
 
   // Using the specified homography and innerDiamCm, compute reasonable values
   // for the initial diameters and the grow amounts. Then run the spot filter
@@ -178,7 +178,7 @@ public:
   // to detect spots and put them in a list that can be fetched by the
   // spots member function. If a green image is specified, reject green spots.
   template <class T>
-  void spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green = NULL);
+  bool spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green = NULL);
 
   // Get the filtered image from the last run of spotFilter (and spotDetect, which
   // calls it).
@@ -238,9 +238,12 @@ inline void columnMove<uint16_t>(const uint16_t* posRow, const uint16_t* negRow,
 // ***********************************
 
 template <class T>
-void SpotDetector::spotFilter(const ImageLite<T>& src)
+bool SpotDetector::spotFilter(const ImageLite<T>& src)
 {
-  alloc(src);
+  if(!alloc(src)) {
+    _spots.clear();
+    return false;
+  }
 
   // Start diameters two smaller because we're going to trigger a grow immediatly.
   // This prevents copy/paste  duplication of initialization code
@@ -376,6 +379,7 @@ void SpotDetector::spotFilter(const ImageLite<T>& src)
     pDst[x] = 0;
 
   _filteredImage = ImageLiteU8(_filteredImage, 0, 0, _filteredImage.width(), yFilt);
+  return true;
 }
 
 // *************************************
@@ -385,10 +389,13 @@ void SpotDetector::spotFilter(const ImageLite<T>& src)
 // *************************************
 
 template <class T>
-void SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green)
+bool SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green)
 {
   // Don't time this, since it will generally only do the allocation once
-  alloc(src);
+  if(!alloc(src)) {
+    _spots.clear();
+    return false;
+  }
 
   TickTimer timer;
 
@@ -407,7 +414,10 @@ void SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h,
     od += (id ^ od) & 1;
     initialInnerDiam(id);
     initialOuterDiam(od);
-    spotFilter(src);
+    if(!spotFilter(src)) {
+      _spots.clear();
+      return false;
+    }
   }
   else
   {
@@ -416,12 +426,18 @@ void SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h,
     initialOuterDiam(5);
     int y0 = (int)round(0.5 * src.y0() - (ct * h.flen() - initialInnerDiam() * h.wz0() / innerDiamCm()) / st);
     y0 = max(y0 - (initialOuterDiam() >> 1), 0);
-    spotFilter(ImageLite<T>(src, 0, y0, src.width(), src.height() - y0));
+    if(!spotFilter(ImageLite<T>(src, 0, y0, src.width(), src.height() - y0))) {
+      _spots.clear();
+      return false;
+    }
   }
 
-  spotDetect(green);
+  if(!spotDetect(green)) {
+    return false;
+  }
 
   _ticks = timer.time32();
+  return true;
 }
 
 }

@@ -258,14 +258,33 @@ void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
 
 }
 
-int BallDetector::getAzimuthColumnRestrictions() {
-    double az = homography->azimuth();
-    int startColumn;
+int BallDetector::getAzimuthColumnRestrictions(double az) {
+    float percentOfImage;
+
+    if(az >= 0) {
+        percentOfImage = 0.8994*az*az - 0.0036*az - 0.5767;
+    } else {
+        percentOfImage = 0.8994*az*az + 0.0036*az - 0.5767;
+    }
+    
+    int val = percentOfImage * width;
+    if(val <= 0) { return 0; }
+    if(val >= width) { return width; }
+    if(az > 0) { return -1*(width - val); }
+    else { return val; }
 }
 
-int BallDetector::getAzimuthRowRestrictions() {
-    double az = homography->azimuth();
-    int endRow;
+int BallDetector::getAzimuthRowRestrictions(double az) {
+    float percentOfImage;
+    //percentOfImage = -0.356*az*az - 0.025*az + 1.044; //lower
+    //percentOfImage = -0.396*az*az - 0.015*az + 1.144; //upper
+    //percentOfImage = -0.376*az*az - 0.015*az + 1.084;   //average
+    percentOfImage = -0.376*az*az - 0.015*az + 1.104; //little higher than average
+
+    int val = percentOfImage * height;
+    if(val <= 0) { return 0; }
+    if(val >= height) { return height; }
+    return val;
 }
 
 /* We have a potential ball on the horizon. Do some checking to
@@ -1122,9 +1141,36 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
 
-	if (debugBall) {
-		std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
-	}
+    int startCol = 0; 
+    int endCol = width;
+    int endRow = width;
+    if(!topCamera) {
+        int c = getAzimuthColumnRestrictions(homography->azimuth());
+        if(c < 0) {
+            endCol = -c;
+        } else {
+            startCol = c;
+        }
+        if(startCol < 0) { startCol = 0; }
+        if(endCol >= width) { endCol = width; }
+
+        int r = getAzimuthRowRestrictions(homography->azimuth());
+        if(r < 0) {
+            endRow = 0;
+        } else {
+            endRow = r;
+        }
+        if(endRow > width) {endRow = height; }
+    }
+
+    if(debugBall) {
+        std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
+        std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
+        debugDraw.drawPoint(startCol, 10, MAROON);
+        std::cout<<"EndRow: "<<endRow<<std::endl;
+        debugDraw.drawPoint(50, endRow, RED);
+        debugDraw.drawPoint(endCol, 10, BLUE);
+    }
 
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
@@ -1136,25 +1182,31 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	debugBlackSpots.clear();
 	debugWhiteSpots.clear();
 
-	// int horiz = 0;
-	// if (topCamera) {
-	// 	horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
-	// }
-    //std::cout<<"Height - Horiz = "<<height-horiz<<std::endl;
-	// ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
-	// 						 height - horiz);
-	// ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
-	// 						 height - horiz);
-    //if((height - horiz) > 0) {} //execute all of the below code, else return false
+    ImageLiteU16 smallerY;
+    ImageLiteU8 smallerGreen;
 
+	int horiz = 0;
+	if (topCamera) {
+		horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
+        smallerY = ImageLiteU16(yImage, 0, horiz, yImage.width(), height - horiz);
+        smallerGreen = ImageLiteU8(greenImage, 0, horiz, greenImage.width(), height - horiz);
+	} else {
+        smallerY = ImageLiteU16(yImage, startCol, 0, endCol, height);
+        smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, height);
+    }
+
+    if(!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions()) {
+        return false;
+    }
     SpotDetector darkSpotDetector;
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
-    darkSpotDetector.spotDetect(yImage, homography, &greenImage);
-    SpotList darkSpots = darkSpotDetector.spots();
 
-    processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
-
+    if(darkSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
+        SpotList darkSpots = darkSpotDetector.spots();
+        processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
+    }
+    
     if(debugBall) {
         for(int z = 0; z < blackSpots.size(); z++) {
             std::pair<int, int> spot = blackSpots[z];
@@ -1189,18 +1241,17 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
-    whiteSpotDetector.spotDetect(yImage, homography, &greenImage);
-    SpotList whiteSpots = whiteSpotDetector.spots();
-
-    if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
-                      cameraHeight,foundBall)) {
+    if(whiteSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
+        SpotList whiteSpots = whiteSpotDetector.spots();
+        if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
+                             cameraHeight,foundBall)) {
 #ifdef OFFLINE
-        foundBall = true;
+            foundBall = true;
 #else
-        return true;
+            return true;
 #endif
+        }
     }
-    
 
     if(blackSpots.size() != 0) {
         if (findCorrelatedBlackSpots(blackSpots, actualBlackSpots, cameraHeight, foundBall)) {
