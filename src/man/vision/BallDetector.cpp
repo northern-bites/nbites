@@ -93,9 +93,10 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
     for (auto i = blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
         int diam = (*i).firstPrincipalLength();
         int diam2 = (*i).secondPrincipalLength();
-		std::cout<<"Diam: "<<diam<<std::endl;
-		std::cout<<"Diam2: "<<diam2<<std::endl;
-        if (diam < 25 && diam >= 6 && diam2 >= 5 && diam2 > diam * 0.6) {
+		//std::cout<<"Diam: "<<diam<<std::endl;
+		//std::cout<<"Diam2: "<<diam2<<std::endl;
+        if (diam < 26 && diam >= 6 && diam2 >= 5 &&
+			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
             // convert this blob to a Spot
             int cx = (*i).centerX();
             int cy = (*i).centerY();
@@ -811,10 +812,11 @@ bool BallDetector::checkGradientInSpot(Spot spot) {
     int midX = spot.ix() + width / 2;
     int midY = -spot.iy() + height / 2;
 	int diam = spot.innerDiam / 2;
-    int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
-    int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
-    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
-    int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
+	int radius = spot.innerDiam / 4;
+    int leftX = max(0, (int)(spot.ix()) + width / 2 - radius);
+    int rightX = min(width -1, (int)(spot.ix()) + width / 2 + radius);
+    int topY = max(0, (int)(-spot.iy()) + height / 2 - radius);
+    int bottomY = min(height - 1, (int)(-spot.iy() + height / 2) + radius);
 	uint8_t gradient;
 	int total = 0;
 	int pixels = 0;
@@ -858,52 +860,56 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	for ( ; x < width && y >= 0 && getGreen() < THRESHOLD; x++, y--) {
 		getColor(x, y);
 	}
+	if (debugBall) {
+		debugDraw.drawPoint(x, y, RED);
+	}
 	int length1 = x - rightX;
 	// top left corner
 	getColor(leftX, topY);
 	for (x = leftX, y = topY; x >= 0 && y >= 0 && getGreen() < THRESHOLD; x--, y--) {
 		getColor(x, y);
 	}
-	int length2 = leftX - x;
-	int minl = min(length1, length2);
-	int maxl = max(length1, length2);
-	if (maxl - minl >= 4) {
-		return false;
+	if (debugBall) {
+		debugDraw.drawPoint(x, y, RED);
 	}
+	int length2 = leftX - x;
 	// bottom right corner
 	getColor(rightX, bottomY);
 	for (x = rightX, y = bottomY; x < width && y < height && getGreen() < THRESHOLD; x++, y++) {
 		getColor(x, y);
 	}
-	int length3 = x - rightX;
-	minl = min(length3, minl);
-	maxl = max(length3, maxl);
-	if (maxl - minl >= 4) {
-		return false;
+	if (debugBall) {
+		debugDraw.drawPoint(x, y, RED);
 	}
+	int length3 = x - rightX;
 	// bottom left
 	getColor(leftX, bottomY);
 	for (x = leftX, y = bottomY; x >= 0 && y < height && getGreen() < THRESHOLD; x--, y++) {
 		getColor(x, y);
 	}
-	int length4 = leftX - x;
-	minl = min(length4, minl);
-	maxl = max(length4, maxl);
-	if (maxl - minl >= 4) {
-		return false;
+	if (debugBall) {
+		debugDraw.drawPoint(x, y, RED);
 	}
+	int length4 = leftX - x;
 	if (debugBall) {
 		std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 			" " << length4 << std::endl;
 	}
-	if (maxl < 4) {
+	if (abs(length1 + length2 - length3 - length4) > 4) {
 		return false;
 	}
-	if (bottomY < height - 5 && topY > 5) {
+	if (max(length1, length2) < 4 && max(length3, length4) < 4) {
+		return false;
+	}
+
+	if (bottomY < height - 8 && topY > 5) {
 		// straight up
 		getColor(midX, topY);
 		for (x = midX, y = topY; y > 0 && getGreen() < THRESHOLD; y--) {
 			getColor(x, y);
+		}
+		if (debugBall) {
+			debugDraw.drawPoint(x, y, RED);
 		}
 		int length5 = topY - y;
 		// straight down
@@ -911,11 +917,17 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		for (x = midX, y = bottomY; y < height && getGreen() < THRESHOLD; y++) {
 			getColor(x, y);
 		}
+		if (debugBall) {
+			debugDraw.drawPoint(x, y, RED);
+		}
 		length5 += y - bottomY;
 		// left
 		getColor(leftX, midY);
 		for (x = leftX, y = midY; x > 0 && getGreen() < THRESHOLD; x--) {
 			getColor(x, y);
+		}
+		if (debugBall) {
+			debugDraw.drawPoint(x, y, RED);
 		}
 		int length6 = leftX - x;
 		// right
@@ -923,11 +935,15 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		for (x = rightX, y = midY; x < width && getGreen() < THRESHOLD; x++) {
 			getColor(x, y);
 		}
+		if (debugBall) {
+			debugDraw.drawPoint(x, y, RED);
+		}
 		length6 += x - rightX;
 		// allow extra leeway because bottom is generally really dark
 		if (abs(length6 - length5) > 6) {
 			if (debugBall) {
-				std::cout << "Bad axis " << length5 << " " << length6 << std::endl;
+				std::cout << "Bad axis " << length5 << " " << length6 <<
+					" " << bottomY << std::endl;
 			}
 			return false;
 		}
@@ -986,7 +1002,9 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	for (int i = leftX; i < rightX; i+=2) {
 		for (int j = topY; j < bottomY; j+=2) {
 			getColor(i, j);
-			debugDraw.drawDot(i, j, BLUE);
+			if (debugBall) {
+				debugDraw.drawDot(i, j, BLUE);
+			}
 			if (isGreen()) {
 				greens++;
 			}
