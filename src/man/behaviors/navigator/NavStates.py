@@ -68,14 +68,13 @@ def goToPosition(nav):
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
     dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
-    #print("Distance: ", dist)
+    print("Distance: ", dist)
     if dist < 30:
-        #print("I'm close enough ! I should not go fast anymore")
+        print("I'm close enough ! I should not go fast anymore")
         goToPosition.fast = False
         goToPosition.speeds = (0.1, 0.1, 0.1)
 
-    #print("My reldest: ", str(relDest))
-    goToPosition.fast = True
+    print("My reldest: ", str(relDest))
 
     if goToPosition.fast:
         # print("goToPosition fast")
@@ -135,6 +134,11 @@ def goToPosition(nav):
                 goToPosition.bookingIt = True
         else:
             goToPosition.close = True
+
+
+        # TODO nikki walk unsw hack
+        if relDest.relY < DISTANCE_ADAPT_CUTOFF:
+            velY = 0.0
 
         goToPosition.speeds = (velX, velY, velH)
         helper.setSpeed(nav, goToPosition.speeds)
