@@ -171,7 +171,7 @@ if NogginConstants.LEFT_FORWARD_DEFENSE:
                                     NogginConstants.MY_GOALBOX_TOP_Y + 120,
                                     -35)
     evenDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 200,
-                                    NogginConstants.MY_GOALBOX_TOP_Y + 10,
+                                    NogginConstants.MY_GOALBOX_TOP_Y + 60,
                                     0)
     
 else:
