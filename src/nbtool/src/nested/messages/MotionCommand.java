@@ -388,6 +388,7 @@ public  final class MotionCommand extends
     return odometryDest_;
   }
 
+  // optional .messages.Kick kick = 6;
   public static final int KICK_FIELD_NUMBER = 6;
   private messages.Kick kick_;
   /**
@@ -409,6 +410,7 @@ public  final class MotionCommand extends
     return kick_;
   }
 
+  // optional int64 timestamp = 7;
   public static final int TIMESTAMP_FIELD_NUMBER = 7;
   private long timestamp_;
   /**
@@ -1302,7 +1304,7 @@ public  final class MotionCommand extends
       return odometryDestBuilder_;
     }
 
-
+    // optional .messages.Kick kick = 6;
     private messages.Kick kick_ = messages.Kick.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Kick, messages.Kick.Builder, messages.KickOrBuilder> kickBuilder_;
@@ -1411,7 +1413,7 @@ public  final class MotionCommand extends
       if (kickBuilder_ == null) {
         kickBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Kick, messages.Kick.Builder, messages.KickOrBuilder>(
-                getKick(),
+                kick_,
                 getParentForChildren(),
                 isClean());
         kick_ = null;
@@ -1419,6 +1421,7 @@ public  final class MotionCommand extends
       return kickBuilder_;
     }
 
+    // optional int64 timestamp = 7;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 7;</code>

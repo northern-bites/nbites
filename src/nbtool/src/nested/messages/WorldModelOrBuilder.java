@@ -216,6 +216,7 @@ public interface WorldModelOrBuilder
    */
   boolean getClaimedBall();
 
+  // optional int32 intention = 22;
   /**
    * <code>optional int32 intention = 22;</code>
    */
@@ -225,6 +226,7 @@ public interface WorldModelOrBuilder
    */
   int getIntention();
 
+  // optional bool alive = 23;
   /**
    * <code>optional bool alive = 23;</code>
    */

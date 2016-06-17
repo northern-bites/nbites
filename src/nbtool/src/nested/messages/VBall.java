@@ -259,6 +259,7 @@ public  final class VBall extends
     return bearingSd_;
   }
 
+  // optional bool in_top_cam = 6;
   public static final int IN_TOP_CAM_FIELD_NUMBER = 6;
   private boolean inTopCam_;
   /**

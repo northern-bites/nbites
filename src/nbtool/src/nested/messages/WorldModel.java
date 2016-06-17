@@ -545,6 +545,7 @@ public  final class WorldModel extends
     return claimedBall_;
   }
 
+  // optional int32 intention = 22;
   public static final int INTENTION_FIELD_NUMBER = 22;
   private int intention_;
   /**
@@ -560,6 +561,7 @@ public  final class WorldModel extends
     return intention_;
   }
 
+  // optional bool alive = 23;
   public static final int ALIVE_FIELD_NUMBER = 23;
   private boolean alive_;
   /**
@@ -1869,6 +1871,7 @@ public  final class WorldModel extends
       return this;
     }
 
+    // optional int32 intention = 22;
     private int intention_ ;
     /**
      * <code>optional int32 intention = 22;</code>
@@ -1901,6 +1904,7 @@ public  final class WorldModel extends
       return this;
     }
 
+    // optional bool alive = 23;
     private boolean alive_ ;
     /**
      * <code>optional bool alive = 23;</code>

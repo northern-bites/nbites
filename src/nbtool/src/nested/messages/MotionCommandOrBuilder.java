@@ -86,6 +86,7 @@ public interface MotionCommandOrBuilder
    */
   messages.KickOrBuilder getKickOrBuilder();
 
+  // optional int64 timestamp = 7;
   /**
    * <code>optional int64 timestamp = 7;</code>
    */

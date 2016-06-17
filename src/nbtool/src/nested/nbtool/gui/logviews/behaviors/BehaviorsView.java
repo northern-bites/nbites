@@ -1,4 +1,4 @@
-package nbtool.gui.logviews.images;
+package nbtool.gui.logviews.behaviors;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -20,18 +20,54 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
+import nbtool.gui.logviews.images.*;
 
 public class BehaviorsView extends ViewParent {
 	
+	/**
+	 * Behaviors Message Variable
+	 * be.getValue()
+	 */
 	Behaviors be;
-	static ArrayList<String> brunswickHistory = new ArrayList<String>();
-	static ArrayList<String> headTrackerHistory = new ArrayList<String>();
-	static ArrayList<String> navigatorHistory = new ArrayList<String>();
-	
 
-	@Override
-	public void setupDisplay() {
-		// Silence is golden
+	BehaviorState behavior = new BehaviorState();
+
+	/**
+	 * We have three FSAs in our code: one for pBrunswick, one for the head
+	 * tracker, and one for the navigator. These array lists are capped at 
+	 * HISTORY_LENGTH items and store the past n states we've switched into.
+	 * The first item in the array list will always be the most recent state.
+	 */
+	private static final int HISTORY_LENGTH = 20;
+	static ArrayList<BehaviorState> brunswickHistory = new ArrayList<BehaviorState>();
+	static ArrayList<BehaviorState> headTrackerHistory = new ArrayList<BehaviorState>();
+	static ArrayList<BehaviorState> navigatorHistory = new ArrayList<BehaviorState>();
+
+	String[] gcStates = {"gameInitial", "gameReady", "gameSet", "gamePlaying", 
+			"gamePenalized", "gameFinished"};
+	static String gcState = "";
+
+	/**
+	 * Check to see if the first item in an array list is equal to the string
+	 * we want to compare it to. Accounts for array lists that might have
+	 * length 0.
+	 * @param  list       The array list whose first item we're testing
+	 * @param  comparison The comparison string
+	 * @return            Boolean: true if the first item matches, false if it 
+	 *                             doesn't
+	 */
+	private boolean recentHistoryEquals(ArrayList<String> list, String comparison) {
+		return list.size() > 0 && list.get(0).getName().equals(comparison);
+	}
+
+	private void addItemToHistory(ArrayList<String> list, String input) {
+		if (list.size() == 0 || !recentHistoryEquals(list, input)) {
+			list.add(0, new BehaviorState(input));
+		}
+
+		while (list.size() > 20) {
+			list.remove(20);
+		}
 	}
 
 	@Override
@@ -39,47 +75,31 @@ public class BehaviorsView extends ViewParent {
 		return new String[]{"behaviors"};
 	}
 
-	public void paintComponent(Graphics g) {
-
-		super.paintComponent(g);
-
+	@Override
+	public void setupDisplay() {
 		try{
 			be = Behaviors.parseFrom(displayedLog.blocks.get(0).data);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 
-		if (this.brunswickHistory.size() == 0 || !this.brunswickHistory.get(0).equals(be.getGcstatestr())) {
-			this.brunswickHistory.add(0, be.getGcstatestr());
-			if (this.brunswickHistory.get(0) == "") {
-				
+		addItemToHistory(this.brunswickHistory, be.getGcstatestr());
+		addItemToHistory(this.headTrackerHistory, be.getHeadtrackerstr());
+		addItemToHistory(this.navigatorHistory, be.getNavigatorstr());
+
+		for (int i=0; i<this.gcStates.length; i++) {
+			if (recentHistoryEquals(this.brunswickHistory, this.gcStates[i])) {
+				this.gcState = this.gcStates[i];
 			}
 		}
+	}
 
-		if (this.headTrackerHistory.size() == 0 || !this.headTrackerHistory.get(0).equals(be.getHeadtrackerstr())) {
-			this.headTrackerHistory.add(0, be.getHeadtrackerstr());
-		}
+	public void paintComponent(Graphics g) {
 
-		if (this.navigatorHistory.size() == 0 || !this.navigatorHistory.get(0).equals(be.getNavigatorstr())) {
-			this.navigatorHistory.add(0, be.getNavigatorstr());
-		}
-
-		// This part assumes we're only going to be adding one thing to any
-		// arraylist per frame, which is a hella dangerous assumption to make.
-		// But I don't want to change it rn.
-		if (brunswickHistory.size() > 20) {
-			brunswickHistory.remove(20);
-		}
-
-		if (headTrackerHistory.size() > 20) {
-			headTrackerHistory.remove(20);
-		}
-
-		if (navigatorHistory.size() > 20) {
-			navigatorHistory.remove(20);
-		}
+		super.paintComponent(g);
 
 		Graphics2D g2d = (Graphics2D) g;
+
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
         	RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
@@ -91,7 +111,6 @@ public class BehaviorsView extends ViewParent {
 
 		int pageWidth = 800;
 
-		// http://clrs.cc
 		Color red = new Color(255, 65, 54);
 		Color blue = new Color(0, 116, 217);
 		Color navy = new Color(0, 31, 63);
@@ -108,18 +127,18 @@ public class BehaviorsView extends ViewParent {
 		g.drawString("BehaviorsView 0.1", 20, 20);
 		g.setFont(info);
 		g.setColor(black);
-		g.drawString("Last updated by James Little on June 8, 2016", 20, 35);
+		g.drawString("Last updated by James Little on June 17, 2016", 20, 35);
 		g.drawLine(20, 40, pageWidth, 40);
 		g.setFont(body);
 		
 		g.drawLine(350, 5, 350, 35);
 
-		String lowerCaseName = be.getRobotName();
+		String lowerCaseName = this.be.getRobotName();
 		lowerCaseName = lowerCaseName.substring(0, 1).toUpperCase() + lowerCaseName.substring(1);
 		g.drawString(lowerCaseName + "", 375, 20);
-		g.drawString(be.getTeam() + "", 500, 20);
-		g.drawString(be.getPlayer() + "", 600, 20);
-		g.drawString(be.getRole() + "", 700, 20);
+		g.drawString(this.be.getTeam() + "", 500, 20);
+		g.drawString(this.be.getPlayer() + "", 600, 20);
+		g.drawString(this.be.getRole() + "", 700, 20);
 		g.setFont(info);
 		g.drawString("Name", 375, 35);
 		g.drawString("Team", 500, 35);
@@ -134,17 +153,13 @@ public class BehaviorsView extends ViewParent {
 		String[] gcStateStrs = {
 			"Initial", "Ready", "Set", "Playing", "Penalty", "Finished"};
 
-		String[] gcStates = {
-			"gameInitial", "gameReady", "gameSet", "gamePlaying", 
-			"gamePenalized", "gameFinished"
-		};
 
 		Color[] gcStrColors = {blue, blue, orange, green, red, blue};
 
-		int gcStateWidth = pageWidth / gcStateStrs.length;
+		int gcStateWidth = pageWidth / this.gcStates.length;
 
-		for (int i=0; i<gcStateStrs.length; i++) {
-			if(be.getGcstatestr().equals(gcStates[i])) {
+		for (int i=0; i<this.gcStates.length; i++) {
+			if(this.gcState.equals(gcStates[i])) {
 				g.setColor(gcStrColors[i]);
 			}
 
@@ -164,22 +179,22 @@ public class BehaviorsView extends ViewParent {
 
 		
 
-		g.drawString("brunswickHistory (" + brunswickHistory.size() + ")", 300, 140);
-		g.drawString("headTrackerHistory (" + headTrackerHistory.size() + ")", 500, 140);
-		g.drawString("navigatorHistory (" + navigatorHistory.size() + ")", 700, 140);
+		g.drawString("brunswickHistory (" + brunswickHistory.size() + ")", 300, 240);
+		g.drawString("headTrackerHistory (" + headTrackerHistory.size() + ")", 500, 240);
+		g.drawString("navigatorHistory (" + navigatorHistory.size() + ")", 800, 240);
 
 		g.setFont(info);
 
 		for (int i=0; i<this.brunswickHistory.size(); i++) {
-			g.drawString(this.brunswickHistory.get(i), 300, 150 + 10*i);
+			g.drawString(this.brunswickHistory.get(i).getName(), 300, 250 + 10*i);
 		}
 
 		for(int i=0; i<this.headTrackerHistory.size(); i++) {
-			g.drawString(this.headTrackerHistory.get(i), 500, 150 + 10*i);
+			g.drawString(this.headTrackerHistory.get(i).getName(), 500, 250 + 10*i);
 		}
 
 		for (int i=0; i<this.navigatorHistory.size(); i++) {
-			g.drawString(this.navigatorHistory.get(i), 700, 150 + 10*i);
+			g.drawString(this.navigatorHistory.get(i).getName(), 800, 250 + 10*i);
 		}
 			
 	}
