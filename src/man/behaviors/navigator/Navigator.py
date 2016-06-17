@@ -172,7 +172,7 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.fast = fast
         NavStates.goToPosition.pb = pb
 
-        print speed
+        # print speed
 
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
@@ -272,7 +272,7 @@ class Navigator(FSA.FSA):
         walking/executing a sweet move.
         """
         self.destination = None
-        print("I'm in stand!")
+        # print("I'm in stand!")
 
         self.switchTo('stand')
 

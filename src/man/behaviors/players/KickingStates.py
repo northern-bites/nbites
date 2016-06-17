@@ -129,13 +129,13 @@ def afterKick(player):
     # elif player.stateTime > 2:
     destinationOfKick = Location(player.kick.destinationX,
                                  player.kick.destinationY)
-    print "Let's go to the kick destination: " + str(destinationOfKick)
+    # print "Let's go to the kick destination: " + str(destinationOfKick)
     player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
                           speed = speeds.SPEED_EIGHT, avoidObstacles = True,
                           fast = True, pb = False)
 
     if player.stateTime > 12: # https://www.youtube.com/watch?v=YMufkQo5pvA
-        print "goLater: approachBall -- from afterKick"
+        # print "goLater: approachBall -- from afterKick"
         return player.goLater('approachBall')
 
     return player.stay()

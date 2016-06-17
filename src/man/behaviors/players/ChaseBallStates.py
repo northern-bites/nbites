@@ -20,7 +20,7 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
-    print "approachBall"
+    # print "approachBall"
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
@@ -65,10 +65,10 @@ def walkToWayPoint(player):
 
     ball = player.brain.ball
 
-    print "In walkToWayPoint"
+    # print "In walkToWayPoint"
 
     if transitions.shouldDecelerate(player):
-        print "I should decelerate"
+        # print "I should decelerate"
         speed = speeds.SPEED_THREE
     else:
         speed = speeds.SPEED_EIGHT
@@ -103,7 +103,7 @@ def spinToKickHeading(player):
     if player.brain.nav.dodging:
         return player.stay()
 
-    print "spinToKickHeading"
+    # print "spinToKickHeading"
 
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
@@ -142,7 +142,7 @@ def prepareForKick(player):
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
 
-    print "prepareForKick"
+    # print "prepareForKick"
 
     if not player.inKickOffPlay:
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
@@ -252,7 +252,7 @@ def lineUp(player):
     if player.brain.nav.dodging:
         return player.stay()
 
-    print "lining up to orbit"
+    # print "lining up to orbit"
 
     # Calculate corrections in x and h using PID controller 
     xError = player.brain.ball.distance - constants.LINE_UP_X
@@ -267,7 +267,7 @@ def lineUp(player):
         hSpeedCorrect /= 2
 
     # Set walk vector
-    print "xSpeedCorrect: " + str(xSpeedCorrect)
+    # print "xSpeedCorrect: " + str(xSpeedCorrect)
     player.setWalk(xSpeedCorrect, 0, hSpeedCorrect)
 
     # If close enough to ball, go orbit
@@ -385,7 +385,7 @@ def spinToBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
-    print "spinToBall"
+    # print "spinToBall"
 
     theta = degrees(player.brain.ball.bearing)
     spinToBall.isFacingBall = fabs(theta) <= 2*constants.FACING_KICK_ACCEPTABLE_BEARING
@@ -426,17 +426,17 @@ def positionForKick(player):
                                             positionForKick.speed)
 
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
-        print "positionForKick -- we don't see it"
+        # print "positionForKick -- we don't see it"
         player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
-    print "positionForKick"
+    # print "positionForKick"
 
     player.ballBeforeKick = player.brain.ball
     print("Kickpose: ", str(positionForKick.kickPose))
 
     if transitions.ballInPosition(player, positionForKick.kickPose):
-        print("The ball is in position! CHASEBALL")
-        print player.kick
+        # print("The ball is in position! CHASEBALL")
+        # print player.kick
         return player.goLater('executeSweetKick')
         # if player.motionKick or True:
         #    return player.goNow('executeMotionKick')
