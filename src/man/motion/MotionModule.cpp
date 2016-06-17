@@ -421,6 +421,14 @@ void MotionModule::processMotionInput()
             sendMotionCommand(bodyCommandInput_.message().speed());
         }
         else if (bodyCommandInput_.message().type() ==
+                 messages::MotionCommand::WALK_IN_PLACE)
+        {
+            WalkInPlaceCommand::ptr newCommand(new WalkInPlaceCommand());
+            nextProvider = &walkProvider;
+            walkProvider.setCommand(newCommand);
+
+        }
+        else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::KICK)
         {
               sendMotionCommand(bodyCommandInput_.message().kick(), bodyCommandInput_.message().timestamp());
@@ -721,7 +729,6 @@ int MotionModule::realityCheckJoints(){
 
 void MotionModule::sendMotionCommand(const WalkCommand::ptr command)
 {
-    std::cout << "here in sendmotion command \n";
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }
@@ -964,6 +971,12 @@ void MotionModule::sendMotionCommand(const StepCommand::ptr command)
 }
 
 void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
+{
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
+}
+
+void MotionModule::sendMotionCommand(const WalkInPlaceCommand::ptr command)
 {
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);

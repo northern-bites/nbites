@@ -14,6 +14,12 @@ def stand(nav):
 
     createAndSendWalkVector(nav, 0, 0, 0)
 
+def walkInPlace(nav):
+    """
+    Makes the motion engine walk in place. 
+    """
+
+
 def getRelativeDestination(my, dest):
     """
     Takes in a dest that can be of various types and
@@ -130,12 +136,6 @@ def setSpeed(nav, speeds):
     """
     Wrapper method to easily change the walk vector of the robot
     """
-    # if speeds == constants.ZERO_SPEEDS:
-    #     nav.printf("!!!!!! USE player.stopWalking() NOT walk(0,0,0)!!!!!")
-    #     return
-
-    # print("STOP TRYING TO CREATE AND SEND WALK VECTORS!")
-
     createAndSendWalkVector(nav, *speeds)
 
 def createAndSendWalkVector(nav, x, y, theta):
@@ -145,11 +145,9 @@ def createAndSendWalkVector(nav, x, y, theta):
     """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.WALK_COMMAND #Walk Command
-    # print("Sending walk vector", x, y, theta)
     command.speed.x_percent = x
     command.speed.y_percent = y
     command.speed.h_percent = theta
-
 
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)

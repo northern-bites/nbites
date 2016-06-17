@@ -242,7 +242,14 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			logMsg("Kick command sent now!");
 			tryingToWalk = false;
 
-		} else if (!currentCommand.get()) {
+		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK_IN_PLACE) {
+			std::cout << "Walking in place! " << std::endl;
+			request->body.forward = 00.0; //command->x_percent ;
+			request->body.left = 00.0; //command->y_percent ;
+			request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
+			request->body.speed = 0.0f;
+		}
+		else if (!currentCommand.get()) {
 			// logMsg("Can't get current command! Requesting stand");
 			tryingToWalk = false;
 			// call stand
@@ -255,10 +262,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	adjustIMU(sensorInertials);
 
 	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
-	request->body.forward = 00.0; //command->x_percent ;
-	request->body.left = 00.0; //command->y_percent ;
-	request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
-	request->body.speed = 0.0f;
+	// request->body.forward = 00.0; //command->x_percent ;
+	// request->body.left = 00.0; //command->y_percent ;
+	// request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
+	// request->body.speed = 0.0f;
 
 	// For testing stand action
 	// logMsg("Can't get current command! Requesting stand");
@@ -467,6 +474,11 @@ void UNSWalkProvider::setCommand(const KickCommand::ptr command) {
 	active();
 }
 
+void UNSWalkProvider::setCommand(const WalkInPlaceCommand::ptr command) {
+	currentCommand = command;
+	active();
+}
+
 void UNSWalkProvider::updateOdometry(float angleZ) {
 
 #ifdef V5_ROBOT
@@ -535,12 +547,17 @@ bool UNSWalkProvider::isStanding() const { //is going to stand rather than at co
 }
 
 bool UNSWalkProvider::isWalkActive() const {
-	return generator->isActive();
+	// TODO check this!
+	return generator->isStanding();
 }
 
 void UNSWalkProvider::stand() {
 	std::cout << "STAND IS BEING CALLED!!\n";
-	currentCommand = MotionCommand::ptr();
+	// currentCommand = MotionCommand::ptr();
+
+	// UNTIL STAND IS WORKED OUT, JUST WALK IN PLACE
+	// CHANGE THIS BEFORE COMPETITION
+	currentCommand = WalkInPlaceCommand::ptr(new WalkInPlaceCommand());
 }
 
 

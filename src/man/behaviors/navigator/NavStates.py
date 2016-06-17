@@ -304,7 +304,6 @@ def walking(nav):
     """
     State to be used for velocity walking.
     """
-    print("Walking!")
     helper.setSpeed(nav, walking.speeds)
 
     # if navTrans.shouldDodge(nav):

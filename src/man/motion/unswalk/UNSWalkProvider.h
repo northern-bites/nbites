@@ -15,6 +15,7 @@
 #include "../DestinationCommand.h"
 #include "../KickCommand.h"
 #include "../BodyJointCommand.h"
+#include "../WalkInPlaceCommand.h"
 #include "../MotionProvider.h"
 
 #include "RoboGrams.h"
@@ -70,6 +71,7 @@ public:
 	void resetOdometry();
 
 	void setCommand(const WalkCommand::ptr command);
+	void setCommand(const WalkInPlaceCommand::ptr command);
     void setCommand(const DestinationCommand::ptr command);
     void setCommand(const KickCommand::ptr command);
     // StepCommand (currently not used) is actually an odometry destination walk
