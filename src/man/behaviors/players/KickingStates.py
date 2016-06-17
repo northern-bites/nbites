@@ -105,9 +105,12 @@ def afterKick(player):
     elif transitions.shouldKickAgain(player):
         destinationOfKick = Location(player.kick.destinationX,
                                      player.kick.destinationY)
+        if player.kick.destinationX == 0 and player.kick.destinationY == 0:
+            player.goNow('spinSearch')
+
         if not player.brain.ball.vis.frames_on > 5:
             player.brain.nav.goTo(destinationOfKick, precision = nav.PLAYBOOK,
-                          speed = speeds.SPEED_SEVEN, avoidObstacles = True,
+                          speed = speeds.SPEED_SIX, avoidObstacles = True,
                           fast = True, pb = False)
 
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
