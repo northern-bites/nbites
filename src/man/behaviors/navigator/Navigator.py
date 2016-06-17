@@ -1,6 +1,7 @@
 from ..util import FSA
 from . import NavStates
 from . import NavConstants as constants
+from . import BrunswickSpeeds as speeds
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation, RelLocation, RelRobotLocation
@@ -10,17 +11,17 @@ from ..util import Transition
 import PMotion_proto
 
 #speed gains
-FULL_SPEED = 0.2
-HASTY_SPEED = 0.19
-FAST_SPEED = 0.18
-QUICK_SPEED = 0.16
-BRISK_SPEED = 0.15
-MEDIUM_SPEED = 0.14
-GRADUAL_SPEED = 0.12
-CAREFUL_SPEED = 0.11
-SLOW_SPEED = 0.1
-SLUGGISH_SPEED = 0.08
-HESITANT_BUT_HOPEFUL_SPEED = SLUGGISH_SPEED
+# FULL_SPEED = 0.2
+# HASTY_SPEED = 0.19
+# FAST_SPEED = 0.18
+# QUICK_SPEED = 0.16
+# BRISK_SPEED = 0.15
+# MEDIUM_SPEED = 0.14
+# GRADUAL_SPEED = 0.12
+# CAREFUL_SPEED = 0.11
+# SLOW_SPEED = 0.1
+# SLUGGISH_SPEED = 0.08
+# HESITANT_BUT_HOPEFUL_SPEED = SLUGGISH_SPEED
 KEEP_SAME_SPEED = -1
 #walk speed adapt
 ADAPTIVE = True
@@ -99,7 +100,7 @@ class Navigator(FSA.FSA):
         NavStates.kickEngine.kickType = kickType
         self.switchTo('kickEngine')
 
-    def chaseBall(self, speed = FAST_SPEED, fast = False):
+    def chaseBall(self, speed = speeds.SPEED_EIGHT, fast = False):
         """
         Calls goTo on ball, which should be a RobotLocation.
 
@@ -109,7 +110,7 @@ class Navigator(FSA.FSA):
 
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
-    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
+    def goTo(self, dest, precision = GENERAL_AREA, speed = speeds.SPEED_EIGHT,
              avoidObstacles = False, adaptive = False, fast = False, pb = False):
         """
         General go to method.
@@ -187,7 +188,7 @@ class Navigator(FSA.FSA):
         if fast:
             NavStates.goToPosition.fast = fast
 
-    def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, kick = None):
+    def destinationWalkTo(self, walkToDest, speed = speeds.SPEED_EIGHT, kick = None):
         """
         Walks to a RelRobotLocation via B-Human destination walking.
         Doesn't avoid obstacles!
@@ -220,7 +221,7 @@ class Navigator(FSA.FSA):
 
         NavStates.destinationWalkingTo.destQueue.append(dest)
 
-    def walkTo(self, walkToDest, speed = FULL_SPEED):
+    def walkTo(self, walkToDest, speed = speeds.SPEED_EIGHT):
         """
         Walks to a RelRobotLocation while checking odometry to see if
         we reached the destination.

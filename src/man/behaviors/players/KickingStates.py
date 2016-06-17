@@ -7,6 +7,7 @@ from . import ChaseBallConstants as constants
 from ..util import *
 from ..kickDecider import kicks
 from ..navigator import Navigator as nav
+from ..navigator import BrunswickSpeeds as speeds
 from objects import Location, RelRobotLocation
 
 # TODO refactor, super state?
@@ -131,7 +132,7 @@ def afterKick(player):
         destinationOfKick = Location(player.kick.destinationX,
                                      player.kick.destinationY)
         player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
-                              speed = nav.QUICK_SPEED, avoidObstacles = True,
+                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
                               fast = True, pb = False)
 
     if player.stateTime > 4:

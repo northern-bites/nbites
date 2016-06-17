@@ -7,9 +7,10 @@ import RoleConstants as roleConstants
 import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
 from ..navigator import PID
+from ..navigator import BrunswickSpeeds as speeds
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
-from noggin_constants import MAX_SPEED, MIN_SPEED
+# from noggin_constants import MAX_SPEED, MIN_SPEED
 from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
 from math import fabs, degrees, radians, cos, sin, pi, copysign
@@ -68,9 +69,9 @@ def walkToWayPoint(player):
 
     if transitions.shouldDecelerate(player):
         print "I should decelerate"
-        speed = MIN_SPEED
+        speed = speeds.SPEED_THREE
     else:
-        speed = MAX_SPEED
+        speed = speeds.SPEED_EIGHT
 
     if fabs(relH) <= constants.MAX_BEARING_DIFF:
         wayPoint = RobotLocation(ball.x - constants.WAYPOINT_DIST*cos(radians(player.kick.setupH)),
@@ -110,12 +111,12 @@ def spinToKickHeading(player):
         return player.goNow('positionForKick')
 
     if fabs(relH) <= constants.FACING_BALL_ACCEPTABLE_BEARING:
-        speed = Navigator.GRADUAL_SPEED
+        speed = speeds.SPEED_FOUR
     elif fabs(relH) >= constants.MAX_BEARING_DIFF:
-        speed = Navigator.FAST_SPEED
+        speed = speeds.SPEED_EIGHT
     else:
-        slope = (Navigator.FAST_SPEED - Navigator.GRADUAL_SPEED) / (constants.MAX_BEARING_DIFF - constants.FACING_BALL_ACCEPTABLE_BEARING)
-        intercept = Navigator.FAST_SPEED - slope*constants.MAX_BEARING_DIFF
+        slope = (speeds.SPEED_EIGHT - speeds.SPEED_FOUR) / (constants.MAX_BEARING_DIFF - constants.FACING_BALL_ACCEPTABLE_BEARING)
+        intercept = speeds.SPEED_EIGHT - slope*constants.MAX_BEARING_DIFF
         speed = slope*fabs(relH) + intercept
 
     # spins the appropriate direction
@@ -419,7 +420,7 @@ def positionForKick(player):
         # if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
         #     positionForKick.speed = Navigator.GRADUAL_SPEED
         # else:
-        positionForKick.speed = MIN_SPEED
+        positionForKick.speed = speeds.SPEED_TWO
 
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)

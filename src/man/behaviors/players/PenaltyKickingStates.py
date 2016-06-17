@@ -1,5 +1,6 @@
 import ChaseBallTransitions as transitions
 from ..navigator import Navigator
+from ..navigator import BrunswickSpeeds as speeds
 from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation
@@ -32,7 +33,7 @@ def prepareForPenaltyKick(player):
         else:
             location = RelRobotLocation(ball.rel_x - 20, ball.rel_y - 10, 0)
         
-        player.brain.nav.destinationWalkTo(location, Navigator.MEDIUM_SPEED)
+        player.brain.nav.destinationWalkTo(location, speeds.SPEED_FIVE)
     else:
         if player.penaltyKickRight:
             location = RelRobotLocation(ball.rel_x - 20, ball.rel_y + 10, 0)
