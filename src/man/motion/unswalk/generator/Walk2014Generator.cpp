@@ -199,6 +199,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
    // 3. Determine Walk2014 Option
    if (request->body.actionType != ActionCommand::Body::KICK && kickT > 0 && request->body.actionType != ActionCommand::Body::REF_PICKUP) { 
+      std::cout << "WALK GEN Kick!!\n";
       // We want to stop kicking, but we also don't want to let ref pick up take over during kick **HACK ALERT** this is particularly for mario whose foot sensor dies while kicking
       // Finish transition out if in the middle of a kick by skipping to the end phase
       if (kickT < BACK_PHASE + kickPhase + THROUGH_PHASE) {
@@ -214,6 +215,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
          kickT = BACK_PHASE + kickPhase + THROUGH_PHASE;
       }
    } else if (active.actionType == ActionCommand::Body::KICK) {
+      std::cout << "Walk gen KICK!!\n";
       // This makes sure that the action type gets set back to walk just after a kick is finished.
       // If we don't leave enough time for this to happen, motion moves back into a kick before behaviour
       // can change its mind.
@@ -386,6 +388,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       shoulderPitchR = -forwardR * 6;                     // forwardR is in meters, 10 is an arbitrary scale factor to match previous walk
       shoulderPitchL = -forwardL * 6;
    } else if (walk2014Option == KICK) { // Kicking
+      std::cout << "KICK!\n";
       if (active.foot == ActionCommand::Body::LEFT) {
          makeForwardKickJoints(KICK_LEAN, KICK_STEP_HEIGHT, SHIFT_PERIOD, foothL, forwardL, leftL, kneePitchL, shoulderRollL, anklePitchL, ballY, request);
          leftR = leftL * 0.1; // Balance slightly more over support foot if need be
@@ -1013,3 +1016,39 @@ Walk2014Generator::Hpr Walk2014Generator::hipAngles(float Hyp, float Hp,
    return result;
 }
 
+void Walk2014Generator::walkKick(float ballX, BodyModel &bodyModel) {
+   // plan forward
+   float delta = 0.05; // meters
+   float ballDistX = ballX/MM_PER_M;
+   if(ActionCommand::Body::LEFT) { // left foot walk-kick
+      //cout <<"forward-0 "<< ballX <<" "<< forward << endl;
+      if(bodyModel.isLeftPhase and (ballDistX-delta+forwardL0)<forward) {
+         forward = (ballDistX-delta-forwardL0)/2;
+         //cout <<"forward-1 "<< ballX <<" "<< forward <<" "<< forwardL0 <<" "<< delta << endl;
+      }
+      if(!bodyModel.isLeftPhase and (ballDistX-delta-forwardR0)<forward/2) {
+         forward = ballDistX-delta-forwardR0;
+         //cout <<"forward-2 "<< ballX <<" "<< forward <<" "<< forwardR0 <<" "<< delta << endl;
+      }
+      if(bodyModel.isLeftPhase and (ballDistX-delta+forwardL0)<delta)  forward = abs(power)*MAX_FORWARD;
+       if(!bodyModel.isLeftPhase and (ballDistX-delta-forwardR0)<delta) forward = abs(power)*MAX_FORWARD;
+      //cout <<"forward-3 "<< ballX <<" "<< forward << endl;
+   }
+   if(ActionCommand::Body::RIGHT) { // left foot walk-kick
+      //cout <<"forward-0 "<< ballX <<" "<< forward << endl;
+      if(!bodyModel.isLeftPhase and (ballDistX-delta+forwardR0)<forward) {
+         forward = (ballDistX-delta-forwardR0)/2;
+         //cout <<"forward-1 "<< ballX <<" "<< forward <<" "<< forwardL0 <<" "<< delta << endl;
+      }
+      if(bodyModel.isLeftPhase and (ballDistX-delta-forwardL0)<forward/2) {
+         forward = ballDistX-delta-forwardL0;
+         //cout <<"forward-2 "<< ballX <<" "<< forward <<" "<< forwardR0 <<" "<< delta << endl;
+      }
+      if(!bodyModel.isLeftPhase and (ballDistX-delta+forwardR0)<delta)  forward = abs(power)*MAX_FORWARD;
+       if(bodyModel.isLeftPhase and (ballDistX-delta-forwardL0)<delta) forward = abs(power)*MAX_FORWARD;
+      //cout <<"forward-3 "<< ballX <<" "<< forward << endl;
+   }
+    if(forward>MAX_FORWARD) forward = MAX_FORWARD; // in case things go wrong
+    if(forward>MAX_FORWARD) forward = MAX_FORWARD; // in case things go wrong
+   //cout <<"forward-4 "<< ballX <<" "<< forward << endl;
+}

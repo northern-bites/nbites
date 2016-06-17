@@ -93,6 +93,8 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
     slipAverage = 0.0;
     lastAngleZ = 0.0;
     angleChanged = 0.0;
+
+    counter = 0;
 	
 	resetAll();
 }
@@ -240,7 +242,21 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::KICK) {
 			logMsg("Kick command sent now!");
-			tryingToWalk = false;
+			// tryingToWalk = false;
+			//std::cout << "Kick Command" << std::endl;
+            // kickCommand = boost::shared_static_cast<KickCommand>(currentCommand);
+
+            // // Only set kicking to true once
+            // if (kickCommand->timeStamp != kickIndex) {
+            //     std::cout << "Sent" << std::endl;
+            //     kickIndex = kickCommand->timeStamp;
+            //     // kickOut = KickEngineOutput();
+            //     kicking = true;
+            // }
+            // else if (!kicking) { // Ignore the command if we've finished kicking
+            //     std::cout << "!kicking" << std::endl;
+            //     stand();
+            // }
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK_IN_PLACE) {
 			std::cout << "Walking in place! " << std::endl;
@@ -260,6 +276,14 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	}
 	request->body.speed = 0.0f;
 	adjustIMU(sensorInertials);
+
+	// Testing kick
+	// counter++;
+	// if (counter > 1000) {
+	// 	std::cout << "KICKING OH NOOOOOO\n";
+	// 	request->body.actionType = ActionCommand::Body::KICK;
+
+	// }
 
 	// std::cout << "[WALK PROVIDER] Odometry: forward: " << odometry->forward << " left: " << odometry->left << " turn: " << odometry->turn << std::endl;
 	// request->body.forward = 00.0; //command->x_percent ;

@@ -58,6 +58,7 @@ public:
 
 	float leftHandSpeed() const;
     float rightHandSpeed() const;
+    bool kicking;
 
 	void requestStopFirstInstance();
 	void calculateNextJointsAndStiffnesses(
@@ -100,6 +101,11 @@ public:
 	void resetAll();
 
 	JointValues walkOutput;
+	
+	int counter;
+	// KickCommand::ptr kickCommand;
+	// int kickIndex;
+
 
 protected:
 	void stand();
