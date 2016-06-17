@@ -113,29 +113,18 @@ def afterKick(player):
         player.kickedOut = False
         return player.goNow('spinSearch')
 
-    # Walk forward 75 centimeters after kicking.
-    # Shouldn't be necessary, but we end up kicking the ball outside our field
-    # of view. If this code executes, we've successfully kicked it forward (as
-    # in not whiffed), and we should walk forward with the hopes of kicking it 
-    # again. 75 centimeters is a guess, but it shouldn't be too far or too
-    # short.
+    # elif transitions.shouldChaseBall(player):
+    #     return player.goLater('approachBall')
+    # elif player.stateTime > 2:
+    destinationOfKick = Location(player.kick.destinationX,
+                                 player.kick.destinationY)
+    print "Let's go to the kick destination: " + str(destinationOfKick)
+    player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
+                          speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                          fast = True, pb = False)
 
-    if player.kick.isStraightKick():
-    # should have something like "and if not too far away from home base"
-    # or if another robot hasn't claimed the ball
-    # This needs to be rethought
-        player.brain.nav.walk(75, 0, 0)
-
-    elif transitions.shouldChaseBall(player):
-        return player.goLater('approachBall')
-    elif player.stateTime > 2:
-        destinationOfKick = Location(player.kick.destinationX,
-                                     player.kick.destinationY)
-        player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
-                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
-                              fast = True, pb = False)
-
-    if player.stateTime > 4:
+    if player.stateTime > 12: # https://www.youtube.com/watch?v=YMufkQo5pvA
+        print "goLater: approachBall -- from afterKick"
         return player.goLater('approachBall')
 
     return player.stay()
