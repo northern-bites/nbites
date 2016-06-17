@@ -1,5 +1,9 @@
 package nbtool.data.calibration;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,6 +14,9 @@ import nbtool.data.json.Json.JsonValue;
 import nbtool.data.json.JsonArray;
 import nbtool.data.json.JsonObject;
 import nbtool.data.json.JsonString;
+import nbtool.util.Debug;
+import nbtool.util.SharedConstants;
+import nbtool.util.ToolSettings;
 import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
@@ -24,7 +31,7 @@ public class CameraOffset {
 		return ret;
 	}
 	
-	private CameraOffset(double r, double t) {
+	public CameraOffset(double r, double t) {
 		this.d_roll = r; this.d_tilt = t;
 	}
 	
@@ -40,8 +47,8 @@ public class CameraOffset {
 	}
 	
 	public static class Pair {
-		CameraOffset top;
-		CameraOffset bot;
+		public CameraOffset top;
+		public CameraOffset bot;
 		
 		public Pair(CameraOffset t, CameraOffset b) {
 			this.top = t; this.bot = b;
@@ -50,7 +57,7 @@ public class CameraOffset {
 	
 	public static class Set extends HashMap<String, Pair> {
 		
-		public static Set parseFrom(JsonObject obj) {
+		public static Set parse(JsonObject obj) {
 			Set ret = new Set();
 			
 			for (Entry<JsonString, JsonValue> entry : obj.entrySet()) {
@@ -84,6 +91,10 @@ public class CameraOffset {
 		}
 	}
 	
+	public static Path getPath() {
+		return Paths.get(ToolSettings.NBITES_DIR, SharedConstants.OFFLINE_CAMERA_OFFSET_SUFFIX());
+	}
+	
 	public static void _NBL_ADD_TESTS_() {
 		Tests.add("calibration", new TestBase("CameraOffset") {
 			@Override
@@ -101,11 +112,47 @@ public class CameraOffset {
 				
 				top.put("mal", mal);
 				
-				JsonObject backwards = Set.parseFrom(top).serialize();
+				JsonObject backwards = Set.parse(top).serialize();
 				assert(backwards.congruent(top));
 				
 				return true;
 			}
+		},
+			new TestBase("CameraOffsetExists") {
+
+					@Override
+					public boolean testBody() throws Exception {
+						Debug.print("%s", ToolSettings.NBITES_DIR_PATH);
+						String cpStr = new String(Files.readAllBytes(
+								Paths.get(ToolSettings.NBITES_DIR, SharedConstants.OFFLINE_CAMERA_OFFSET_SUFFIX())
+								));
+						
+						Set.parse(Json.parse(cpStr).asObject());
+						return true;
+					}
+			
 		});
+	}
+	
+	public static void main(String[] args) throws IOException {
+		String lisp = new String(Files.readAllBytes(ToolSettings.NBITES_DIR_PATH.resolve("src/man/config/calibrationParams.txt")));
+		SExpr se = SExpr.deserializeFrom(lisp);
+		
+		CameraOffset.Set set = new Set();
+		SExpr list = se.get(1);
+		for (int i = 0; i < list.count(); ++i) {
+			String robot = list.get(i).get(0).value();
+			CameraOffset top = new CameraOffset(list.get(i).get(1).get(1).valueAsDouble(),
+							list.get(i).get(1).get(2).valueAsDouble()
+					);
+			
+			CameraOffset bot = new CameraOffset(list.get(i).get(2).get(1).valueAsDouble(),
+					list.get(i).get(2).get(2).valueAsDouble()					
+			);
+			
+			set.put(robot, new Pair(top,bot));
+		}
+		
+		Debug.print("%s", set.serialize().print());
 	}
 }
