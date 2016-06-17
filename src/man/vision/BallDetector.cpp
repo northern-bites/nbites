@@ -268,20 +268,17 @@ int BallDetector::getAzimuthColumnRestrictions(double az) {
     
     int val = percentOfImage * width;
     if(val <= 0) { return 0; }
-    if(val >= width-1) { return width; }
+    if(val >= width) { return width; }
     if(az > 0) { return -1*(width - val); }
     else { return val; }
 }
 
 int BallDetector::getAzimuthRowRestrictions(double az) {
     float percentOfImage;
-    percentOfImage = -0.356*az*az - 0.025*az + 1.044;
-
-    // if(az >= 0) {
-    //     percentOfImage = -0.356*az*az - 0.025*az + 1.044;
-    // } else {
-    //     percentOfImage = -0.356*az*az + 0.025*az + 1.044;
-    // }
+    //percentOfImage = -0.356*az*az - 0.025*az + 1.044; //lower
+    //percentOfImage = -0.396*az*az - 0.015*az + 1.144; //upper
+    //percentOfImage = -0.376*az*az - 0.015*az + 1.084;   //average
+    percentOfImage = -0.376*az*az - 0.015*az + 1.104; //little higher than average
 
     int val = percentOfImage * height;
     if(val <= 0) { return 0; }
@@ -1074,43 +1071,36 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
 
-	//if (debugBall) {
-		std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
-	//}
-
     int startCol = 0; 
-    int endCol = width; //width
+    int endCol = width;
     int endRow = width;
+    if(!topCamera) {
+        int c = getAzimuthColumnRestrictions(homography->azimuth());
+        if(c < 0) {
+            endCol = -c;
+        } else {
+            startCol = c;
+        }
+        if(startCol < 0) { startCol = 0; }
+        if(endCol >= width) { endCol = width; }
 
-    int c = getAzimuthColumnRestrictions(homography->azimuth());
-    if(c < 0) {
-        endCol = -c;
-    } else {
-        startCol = c;
+        int r = getAzimuthRowRestrictions(homography->azimuth());
+        if(r < 0) {
+            endRow = 0;
+        } else {
+            endRow = r;
+        }
+        if(endRow > width) {endRow = height; }
     }
 
-    if(startCol < 0) { startCol = 0; }
-    if(endCol > width-1) { endCol = width-1; } //changed from width
-
-    int r = getAzimuthRowRestrictions(homography->azimuth());
-    std::cout<<"Function Output: "<<r<<std::endl;
-    std::cout<<"Height = "<<height<<std::endl;
-    if(r < 0) {
-        endRow = 0;
-    } else {
-        endRow = r;
-    }
-
-    if(endRow > width) {endRow = height; }
-
-    //if(debugBall) {
+    if(debugBall) {
+        std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
         std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
         debugDraw.drawPoint(startCol, 10, MAROON);
-        debugDraw.drawPoint(endCol, 10, BLUE);
-    //}
-
         std::cout<<"EndRow: "<<endRow<<std::endl;
         debugDraw.drawPoint(50, endRow, RED);
+        debugDraw.drawPoint(endCol, 10, BLUE);
+    }
 
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
