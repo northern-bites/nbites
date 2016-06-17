@@ -884,10 +884,14 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 			" " << length4 << std::endl;
 	}
+	if (maxl < 4) {
+		return false;
+	}
 	return maxl - minl < 4;
 }
 
 bool BallDetector::whiteNoBlack(Spot spot) {
+	int THRESHOLD = 110;
     // convert back to raw coordinates
     int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
     int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
@@ -897,14 +901,18 @@ bool BallDetector::whiteNoBlack(Spot spot) {
     int midY = -spot.iy() + height / 2;
 	int spotHeight = bottomY - topY + 2;
 
+	// don't take any chances at edges
+	int extra = spot.innerDiam / 4;
+	if (leftX - extra < 3 || rightX + extra > width - 3 || topY - extra < 3) {
+		return false;
+	}
+
 	// The biggest thing is there should be no white and at least
 	// some green above the ball
 	int total = 0;
 	int greens = 0;
 	int whites = 0;
 	int bigGreen = 0;
-	// TO DO: Per Bill's suggestion, just sum up the green values and use a gross
-	// threshold rather than individual pixel values
 	for (int i = leftX; i < rightX; i+=2) {
 		for (int j = max(0, topY - 2 * spotHeight); j < topY - spotHeight; j+=2) {
 			getColor(i, j);
@@ -920,17 +928,16 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 		}
 	}
 
-	if (total * 110 > bigGreen) {
+	if (total * THRESHOLD > bigGreen) {
 		return false;
 	}
 	// check the diagonals
-	//if (!checkDiagonalCircle(spot)) {
-	//	return false;
-	//}
+	if (!checkDiagonalCircle(spot)) {
+		return false;
+	}
 	greens = 0;
 	total = 0;
 	int whiteTotal = 0;
-	// To Do: See previous suggestion
 	for (int i = leftX; i < rightX; i+=2) {
 		for (int j = topY; j < bottomY; j+=2) {
 			getColor(i, j);
@@ -942,7 +949,7 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 			total++;
 		}
 	}
-	if (whiteTotal  < 110 * total) {
+	if (whiteTotal  < THRESHOLD * total) {
 		if (debugBall) {
 			std::cout << "Rejecting ball because not white enough " << midX <<
 				" " << midY << std::endl;
