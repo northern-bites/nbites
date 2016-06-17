@@ -257,14 +257,24 @@ void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
 
 }
 
-int BallDetector::getAzimuthColumnRestrictions() {
-    double az = homography->azimuth();
-    int startColumn;
+int BallDetector::getAzimuthColumnRestrictions(double az) {
+    float percentOfImage;
+
+    if(az >= 0) {
+        percentOfImage = 0.8994*az*az - 0.0036*az - 0.5767;
+    } else {
+        percentOfImage = 0.8994*az*az + 0.0036*az - 0.5767;
+    }
+    
+    int val = percentOfImage * width;
+    if(val <= 0) { return 0; }
+    if(val >= width-1) { return width-1; }
+    if(az > 0) { return -1*(width - val); }
+    else { return val; }
 }
 
-int BallDetector::getAzimuthRowRestrictions() {
-    double az = homography->azimuth();
-    int endRow;
+int BallDetector::getAzimuthRowRestrictions(double az) {
+    return 0;
 }
 
 /* We have a potential ball on the horizon. Do some checking to
@@ -1056,6 +1066,24 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 		std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
 	}
 
+    int startCol = 0; 
+    int endCol = width;
+    int c = getAzimuthColumnRestrictions(homography->azimuth());
+    if(c < 0) {
+        endCol = -c;
+    } else {
+        startCol = c;
+    }
+
+    if(startCol < 0) { startCol = 0; }
+    if(endCol > width-1) { endCol = width; }
+
+    if(debugBall) {
+        std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
+        debugDraw.drawPoint(startCol, 10, MAROON);
+        debugDraw.drawPoint(endCol, 10, BLUE);
+    }
+
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
     intPairVector blackSpots;
@@ -1066,14 +1094,18 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	debugBlackSpots.clear();
 	debugWhiteSpots.clear();
 
+    ImageLiteU16 smallerY;
+    ImageLiteU8 smallerGreen;
+
 	int horiz = 0;
 	if (topCamera) {
 		horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
-	}
-	ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
-							 height - horiz);
-	ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
-							 height - horiz);
+        smallerY = ImageLiteU16(yImage, 0, horiz, yImage.width(), height - horiz);
+        smallerGreen = ImageLiteU8(greenImage, 0, horiz, greenImage.width(), height - horiz);
+	} else {
+        smallerY = ImageLiteU16(yImage, startCol, 0, endCol, height);
+        smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, height);
+    }
 
     if(!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions()) {
         return false;

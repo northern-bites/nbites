@@ -92,8 +92,9 @@ namespace man {
 
             int scanX(int startX, int startY, int direction, int stop);
             int scanY(int startX, int startY, int direction, int stop);
-            int getAzimuthColumnRestrictions();
-            int getAzimuthRowRestrictions();
+            
+            int getAzimuthColumnRestrictions(double az);
+            int getAzimuthRowRestrictions(double az);
 
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 

@@ -42,9 +42,7 @@ SpotDetector::~SpotDetector()
 
 bool SpotDetector::alloc(const ImageLiteBase& src)
 {
-  std::cout<<"Spots Alloc Enter\n";
   if(!src.hasProperDimensions()) {
-    std::cout<<"SRC Does not have proper dimensions\n";
     delete[] innerColumns;
     delete[] outerColumns;
     delete[] filteredImageMemory;
