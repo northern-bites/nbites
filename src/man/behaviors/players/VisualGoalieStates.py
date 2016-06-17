@@ -171,7 +171,7 @@ def repositionAfterWhiff(player):
                                                          0.0)
         player.brain.nav.goTo(repositionAfterWhiff.ballDest,
                               nav.CLOSE_ENOUGH,
-                              nav.GRADUAL_SPEED)
+                              speeds.SPEED_THREE)
 
     # if it took more than 5 seconds, forget it
     if player.counter > 350:

@@ -102,6 +102,13 @@ def afterKick(player):
         return player.goNow('passToFieldCross')
 
     elif transitions.shouldKickAgain(player):
+        destinationOfKick = Location(player.kick.destinationX,
+                                     player.kick.destinationY)
+        if not self.brain.ball.vis:
+            player.brain.nav.goTo(destinationOfKick, precision = nav.PLAYBOOK,
+                          speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                          fast = True, pb = False)
+
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         # if player.motionKick:
         #     player.motionKick = False
