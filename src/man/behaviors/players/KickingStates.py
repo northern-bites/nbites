@@ -86,6 +86,7 @@ executeSweetKick.sweetMove = None
 #     return player.stay()
 
 @superState('gameControllerResponder')
+@ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 def afterKick(player):
     """
     State to follow up after a kick.
@@ -104,9 +105,9 @@ def afterKick(player):
     elif transitions.shouldKickAgain(player):
         destinationOfKick = Location(player.kick.destinationX,
                                      player.kick.destinationY)
-        if not self.brain.ball.vis:
+        if not player.brain.ball.vis.frames_on > 5:
             player.brain.nav.goTo(destinationOfKick, precision = nav.PLAYBOOK,
-                          speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                          speed = speeds.SPEED_SEVEN, avoidObstacles = True,
                           fast = True, pb = False)
 
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
