@@ -218,7 +218,7 @@ inline void columnMove(const T* posRow, const T* negRow, int* columnSums, int co
     columnSums[x] += posRow[x] - negRow[x];
 }
 
-#define FAST_SPOT 0
+#define FAST_SPOT 1
 
 #if FAST_SPOT
 extern "C" void
