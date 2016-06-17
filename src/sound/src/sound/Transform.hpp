@@ -37,5 +37,4 @@ namespace nbsound {
     };
 }
 
-
 #endif /* defined(__xcode_sound2__Transform__) */

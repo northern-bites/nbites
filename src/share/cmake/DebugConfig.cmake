@@ -74,7 +74,7 @@ option(
 option(
   USE_ROBOT_TTS
   "Enable text to speech on the robot."
-  OFF
+  ON
 )
 
 endif( NOT OFFLINE )

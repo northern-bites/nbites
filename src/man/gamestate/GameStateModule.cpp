@@ -299,6 +299,7 @@ namespace man{
                             
                         case STATE_PLAYING: {
                             sharedMemory.gamestate_do_stop();
+                            NBL_WARN("\n:::: WHISTLE MISSED ::::\n\n");
                             man::tts::say(IN_SCRIMMAGE, "whistle missed!");
                         } break;
                     }
