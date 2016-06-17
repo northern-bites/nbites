@@ -30,7 +30,7 @@ void ActionGenerator::reset() {
 }
 
 void ActionGenerator::NBSetStand() {
-   //std::cout << "Action Gen CONSTRUCTING STAND POSE!\n";
+   std::cout << "Action Gen CONSTRUCTING NBSTAND POSE!\n";
    setStand = true;
    JointValues newJoint;
    newJoint.angles[Joints::HeadYaw] = 0.0;
@@ -100,8 +100,9 @@ JointValues ActionGenerator::makeJoints(ActionCommand::All* request,
                                         float ballY) {
 
    if (request->body.actionType = ActionCommand::Body::STAND) {
-      //std::cout << "Actiongen Stand requested! " << std::endl;
-      NBSetStand();
+      std::cout << "Actiongen Stand requested! " << std::endl;
+      this->readOptions("stand.pos");
+      // NBSetStand();
    }
 
    //std::cout << "Joint size: " << joints.size() << std::endl;

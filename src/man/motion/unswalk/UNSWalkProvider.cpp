@@ -169,7 +169,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// //logMsg("\n");
 
 	ActionCommand::All* request = new ActionCommand::All();
-	request->body.actionType = ActionCommand::Body::WALK;
+	request->body.actionType = ActionCommand::Body::STAND;
+	// request->body.actionType = ActionCommand::Body::WALK;
 
 
 	// if (!calibrated()) { //logMsg("not calibrated");} 
