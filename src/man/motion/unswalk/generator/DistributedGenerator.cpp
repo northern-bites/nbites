@@ -52,7 +52,7 @@ DistributedGenerator::DistributedGenerator()
    if (!bodyGenerators[Body::WALK])
       std::cout << "bodyGenerators[WALK] is NULL!" << std::endl;
 
-   // bodyGenerators[Body::KICK] = bodyGenerators[Body::WALK];
+   bodyGenerators[Body::KICK] = bodyGenerators[Body::WALK];
 
    // bodyGenerators[Body::LINE_UP] = bodyGenerators[Body::WALK];
 
@@ -278,7 +278,7 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    // case Body::GETUP_FRONT:      usesHead = true;  break;
    // case Body::GETUP_BACK:       usesHead = true;  break;
    // case Body::INITIAL:          usesHead = true;  break;
-   // case Body::KICK:             usesHead = false; break;
+   case Body::KICK:             usesHead = false; break;
    // case Body::DRIBBLE:          usesHead = false; break;
    // case Body::DEAD:             usesHead = true;  break;
    // case Body::REF_PICKUP:       usesHead = false; break;
@@ -318,9 +318,9 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    fromBody = bodyGenerators[current_generator]->
               makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
 
-   // if(current_generator == Body::KICK && request->body.actionType == Body::WALK) {
-   //    current_generator = Body::WALK;
-   // }
+   if(current_generator == Body::KICK && request->body.actionType == Body::WALK) {
+      current_generator = Body::WALK;
+   }
 
    // if (!usesHead) {
    //    JointValues fromHead = headGenerator->

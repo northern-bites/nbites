@@ -68,16 +68,15 @@ def goToPosition(nav):
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
     dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
-    # print("Distance: ", dist)
+    #print("Distance: ", dist)
     if dist < 30:
-        # print("I'm close enough ! I will not go fast anymore")
+        #print("I'm close enough ! I should not go fast anymore")
         goToPosition.fast = False
+        goToPosition.speeds = (0.1, 0.1, 0.1)
 
-    # print("My reldest: ", str(relDest))
+    #print("My reldest: ", str(relDest))
+    goToPosition.fast = True
 
-    # Why would you move like this? This should be refactored,
-    # in the mean time never go fast and also never dodge
-    # goToPosition.fast = True
     if goToPosition.fast:
         # print("goToPosition fast")
         # So that fast mode works for objects of type RobotLocation also

@@ -112,6 +112,7 @@ protected:
     void setActive() {}
 
 private:
+
 	bool requestedToStop;
 	bool standby;
 	bool tryingToWalk;
