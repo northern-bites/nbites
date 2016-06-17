@@ -12,7 +12,7 @@ def setRoleConstants(player, role):
         player.isKickingOff = False
     elif isRightDefender(role):
         player.homePosition = oddDefenderHome
-        player.kickoffPosition = oddDefenderHome
+        player.kickoffPosition = oddDefenderKickoff
         #player.kickoffPosition = oddDefenderKickoff
         player.box = oddDefenderBox
         player.isKickingOff = False
@@ -193,8 +193,8 @@ else:
     oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y - 70,
                                 35)
-    oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
+    oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 70,
                                 0)
 
 ## END SUMMER 2016 CHANGES ##

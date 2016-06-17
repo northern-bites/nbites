@@ -353,26 +353,55 @@ class Brain(object):
               blue goalbox constants always match up with our goal.
         """
         # Does this matter for the goalie? It really shouldn't...
+        #walk out** so it should matter
         if self.playerNumber == 1:
             self.resetLocTo(Constants.MIDFIELD_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 2:
-            self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 3:
-            self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 4:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_CC_NEAREST_POINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 5:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_CC_NEAREST_POINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
+
+
+
+
+
+
+
+        # OLD WALK OUT POSITIONS
+        # if self.playerNumber == 1:
+        #     self.resetLocTo(Constants.MIDFIELD_X,
+        #                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+        #                     Constants.HEADING_UP)
+        # elif self.playerNumber == 2:
+        #     self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
+        #                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+        #                     Constants.HEADING_DOWN)
+        # elif self.playerNumber == 3:
+        #     self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
+        #                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+        #                     Constants.HEADING_UP)
+        # elif self.playerNumber == 4:
+        #     self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+        #                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+        #                     Constants.HEADING_DOWN)
+        # elif self.playerNumber == 5:
+        #     self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+        #                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+        #                     Constants.HEADING_UP)
 
 
     #@todo: HACK HACK HACK Mexico 2012 to make sure we still re-converge properly even if
