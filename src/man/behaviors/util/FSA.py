@@ -66,7 +66,7 @@ class FSA:
 
     def addStates(self,module):
         # gives a list of all methods and attributes of a module
-        if DEBUG: print "Listing states loaded for " + self.name + ":"
+        if DEBUG: print "Listing states loaded for " + str(module) + ":"
         for candidate in dir(module):
             attribute = getattr(module,candidate)
             if callable(attribute):

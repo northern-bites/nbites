@@ -56,11 +56,11 @@ public class BehaviorsView extends ViewParent {
 	 * @return            Boolean: true if the first item matches, false if it 
 	 *                             doesn't
 	 */
-	private boolean recentHistoryEquals(ArrayList<String> list, String comparison) {
+	private boolean recentHistoryEquals(ArrayList<BehaviorState> list, String comparison) {
 		return list.size() > 0 && list.get(0).getName().equals(comparison);
 	}
 
-	private void addItemToHistory(ArrayList<String> list, String input) {
+	private void addItemToHistory(ArrayList<BehaviorState> list, String input) {
 		if (list.size() == 0 || !recentHistoryEquals(list, input)) {
 			list.add(0, new BehaviorState(input));
 		}
