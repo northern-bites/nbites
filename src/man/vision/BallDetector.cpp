@@ -1070,29 +1070,21 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	if (topCamera) {
 		horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
 	}
-    std::cout<<"Height - Horiz = "<<height-horiz<<std::endl;
 	ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
 							 height - horiz);
 	ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
 							 height - horiz);
 
     if(!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions()) {
-        std::cout<<"Smaller Y or Smaller Green Does not have proper dimensions\n";
-        std::cout<<"SY - Width: "<<smallerY.width()<<" Height: "<<smallerY.height()<<std::endl;
-        std::cout<<"SG - Width: "<<smallerGreen.width()<<" Height: "<<smallerGreen.height()<<std::endl;
         return false;
     }
-    std::cout<<"Top Camera: "<<topCamera<<std::endl;
     SpotDetector darkSpotDetector;
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
 
     if(darkSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
-        std::cout<<"DarkSpot SpotDetect Returned True\n";
         SpotList darkSpots = darkSpotDetector.spots();
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
-    } else {
-        std::cout<<"DarkSpot SpotDetect Returned False\n";
     }
     
     if(debugBall) {
@@ -1130,7 +1122,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
     if(whiteSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
-        std::cout<<"WhiteSpot SpotDetect Returned True\n";
         SpotList whiteSpots = whiteSpotDetector.spots();
         if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
                              cameraHeight,foundBall)) {
@@ -1140,8 +1131,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
             return true;
 #endif
         }
-    } else {
-        std::cout<<"WhiteSpot SpotDetect Returned False\n";
     }
 
     if(blackSpots.size() != 0) {

@@ -54,15 +54,12 @@ bool SpotDetector::alloc(const ImageLiteBase& src)
 
   if (src.width() >= _filteredImage.width())
   {
-    // std::cout<<"src.width() > _filteredImage.width()\n";
     delete[] innerColumns;
     delete[] outerColumns;
     int n = (src.width() + 15 ) & ~15;
     outerColumns = new int[n];
     innerColumns = new int[n];
-    std::cout<<"Exit 1\n";
   }
-  std::cout<<"Passed First if Statement\n";
 
   enum
   {
@@ -71,35 +68,27 @@ bool SpotDetector::alloc(const ImageLiteBase& src)
   };
   int pitchNeeded = (src.width() + rowAlignMask) & ~rowAlignMask;
   int maxHeightNeeded = src.height() - initialOuterDiam() + 2;  // one extra for peak detect
-  std::cout<<"maxHeightNeeded = "<<maxHeightNeeded<<std::endl;
+
   if(maxHeightNeeded <= 0) {
-    std::cout<<"maxHeightNeeded has size <= 0\n";
     _spots.clear();
     return false;
   }
+
   size_t sizeNeeded = pitchNeeded * maxHeightNeeded; //is sizeNeeded good?
-  std::cout<<"sizeNeeded = "<<sizeNeeded<<std::endl;
-  std::cout<<"Approaching Second if Statement\n";
   if (sizeNeeded >= filteredSize)
   {
-    std::cout<<"sizeNeeded > filteredSize"<<std::endl;
-    std::cout<<"sizeNeeded = "<<sizeNeeded<<std::endl;
     delete[] filteredImageMemory;
     filteredPixels = (uint8_t*)alignedAlloc(sizeNeeded, 4, filteredImageMemory);
     filteredSize = sizeNeeded;
-    std::cout<<"Exit 2\n";
   }
-  std::cout<<"Passed Second if Statement\n";
+  
   int width = src.width();
   int height = maxHeightNeeded;
-  std::cout<<"Approaching Third if Statement\n";
   if(width > 0 && height > 0) {
     _filteredImage = ImageLiteU8(src.x0() + ((initialOuterDiam() + 1) & 1), src.y0() - initialOuterDiam() + 1,
                                width, height, pitchNeeded, filteredPixels);
-    std::cout<<"Spots Alloc Returning True\n";
     return true;
   } else {
-    std::cout<<"Spots Alloc Returning False\n";
     return false;
   }
 }
