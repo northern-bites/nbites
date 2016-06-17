@@ -48,12 +48,12 @@ whistle:
 #targets for nowifi
 
 sendr:
-@echo $(CYAN) compiling whistle executable $(NORMAL)
-$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(WHS_SND_SRC) -lasound -lrt lib/libfftw3f.a -o whistle
+	@echo $(CYAN) compiling SENDR executable $(NORMAL)
+	$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(WHS_SND_SRC) -lasound -lrt lib/libfftw3f.a -o whistle
 
 recvr:
-@echo $(CYAN) compiling whistle executable $(NORMAL)
-$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(WHS_SND_SRC) -lasound -lrt lib/libfftw3f.a -o whistle
+	@echo $(CYAN) compiling RECVR executable $(NORMAL)
+	$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(WHS_SND_SRC) -lasound -lrt lib/libfftw3f.a -o whistle
 
 clean:
 	rm src/**.o
