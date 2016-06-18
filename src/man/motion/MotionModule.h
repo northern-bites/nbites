@@ -23,6 +23,7 @@
 // Motion commands
 #include "BodyJointCommand.h"
 #include "WalkCommand.h"
+#include "WalkInPlaceCommand.h"
 #include "DestinationCommand.h"
 #include "KickCommand.h"
 #include "StepCommand.h"
@@ -84,7 +85,7 @@ public:
     void sendMotionCommand(const messages::PositionHeadCommand& command);
     void sendMotionCommand(const HeadJointCommand::ptr command);
     void sendMotionCommand(const messages::ScriptedHeadCommand command);
-
+    void sendMotionCommand(const WalkInPlaceCommand::ptr command);
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
 

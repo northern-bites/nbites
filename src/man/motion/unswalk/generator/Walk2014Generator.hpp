@@ -162,6 +162,7 @@ class Walk2014Generator : Generator {
     * Sets kick settings when starting the kick
     */
    void prepKick(bool isLeft, BodyModel &bodyModel);
+   void walkKick(float ballX, BodyModel &bodyModel);
 
    /**
     * Specifies the joint parameters that form the kick 
