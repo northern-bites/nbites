@@ -10,13 +10,7 @@ namespace motion
 
 	IMUAdjuster::IMUAdjuster() {
 		initted = false;
-
-		gyroBiasProcessNoise = Vec2(0.05f, 0.05f);
-		gyroBiasStandMeasurementNoise = Vec2(0.01f, 0.01f);
-		gyroBiasWalkMeasurementNoise = Vec2(0.1f, 0.1f);
-		accBiasProcessNoise = Vec3(0.1f, 0.1f, 0.1f);
-		accBiasStandMeasurementNoise = Vec3(0.1f, 0.1f, 0.1f);
-		accBiasWalkMeasurementNoise = Vec3(1.f, 1.f, 1.f);
+		falling = false;
 
 		gyr_zero_x = 0.0f;
 		gyr_zero_y = 0.0f;
@@ -33,42 +27,46 @@ namespace motion
 		gyr_zero_x = gyr_zero_x * 0.99 + gyX * 0.01;
 		gyr_zero_y = gyr_zero_y * 0.99 + gyY * 0.01;
 
-		acc_zero_x = acc_zero_x * 0.99 + acc_x * 0.01;
-		acc_zero_y = acc_zero_y * 0.99 + acc_y * 0.01;
-		acc_zero_z = acc_zero_z * 0.99 + acc_z * 0.01;
-
-		// std::cout << "NEW ZERO GY X: " << gyr_zero_x << std::endl;
-		// std::cout << "NEW ZERO GY Y: " << gyr_zero_y << std::endl;
-		// std::cout << "NEW ZERO acc_zero_x: " << acc_zero_x << std::endl;
-		// std::cout << "NEW ZERO acc_zero_y: " << acc_zero_y << std::endl;
-		// std::cout << "NEW ZERO acc_zero_z: " << acc_zero_z << std::endl;
-
 		if (counter <= DONE + 1) {
 			counter++;
 		}
 
 	}
 
-	void IMUAdjuster::adjustIMUs(float gyr_x, float gyr_y, float acc_x, float acc_y, float acc_z) {
-		// adj_gyr_x = gyr_x - gyr_zero_x;
-		// adj_gyr_y = gyr_y - gyr_zero_y;
-		
+	void IMUAdjuster::adjustIMUs(float gyr_x, float gyr_y, float angle_x, float angle_y) {
 		gyr_x = gyr_x - gyr_zero_x;
 		adj_gyr_x = adj_gyr_x * OLD_SCALE + gyr_x * (1.0 - OLD_SCALE);
 
 		gyr_y = gyr_y - gyr_zero_y;
 		adj_gyr_y = adj_gyr_y * OLD_SCALE + gyr_y * (1.0 - OLD_SCALE);
 
+		if (angle_x >= fallDownAngleX || angle_y >= fallDownAngleY) {
+			// std::cout << "FALLING IS TRUUUUE\n";
+			falling = true;
+		} else {
+			falling = false;
+		}
 
 
-		acc_x = acc_x - acc_zero_x;
-		adj_acc_x = adj_acc_x * OLD_SCALE + acc_x * (1.0 - OLD_SCALE);
+		// accXBuffer.add(acc_x);
+		// accYBuffer.add(acc_y);
+		// accZBuffer.add(acc_z);
+		// float accXaverage(accXBuffer.getAverage());
+		// float accYaverage(accYBuffer.getAverage());
+		// float accZaverage(accZBuffer.getAverage());
+		// float accelerationAngleXZ(atan2(accZaverage, accXaverage));
+		// float accelerationAngleYZ(atan2(accZaverage, accYaverage));
 
-		acc_y = acc_y - acc_zero_y;
-		adj_acc_y = adj_acc_y * OLD_SCALE + acc_y * (1.0 - OLD_SCALE);
 
-		acc_z = acc_z - acc_zero_z;
-		adj_acc_z = adj_acc_z * OLD_SCALE + acc_z * (1.0 - OLD_SCALE);
+
+		// acc_x = acc_x - acc_zero_x;
+		// adj_acc_x = adj_acc_x * OLD_SCALE + acc_x * (1.0 - OLD_SCALE);
+
+		// acc_y = acc_y - acc_zero_y;
+		// adj_acc_y = adj_acc_y * OLD_SCALE + acc_y * (1.0 - OLD_SCALE);
+
+		// acc_z = acc_z - acc_zero_z;
+		// adj_acc_z = adj_acc_z * OLD_SCALE + acc_z * (1.0 - OLD_SCALE);
 
 
 		// std::cout << "NEW ZERO GY X: " << gyr_zero_x << std::endl;

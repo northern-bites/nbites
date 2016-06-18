@@ -1,4 +1,5 @@
 #include "utils/Kalman.h"
+#include <math.h>
 #include "utils/RingBufferWithSum.h"
 // #include "utils/Vector3.h"
 
@@ -15,60 +16,42 @@ public:
 
 	static const int DONE = 400;
 
-	typedef struct Vec3 {
-		float x;
-		float y;
-		float z;
-
-		Vec3(float _x, float _y, float _z) {
-			x = _x;
-			y = _y;
-			z = _z;
-		}
-
-		Vec3() { }
-	};
-
-	typedef struct Vec2 {
-		float x;
-		float y;
-
-		Vec2(float _x, float _y) {
-			x = _x;
-			y = _y;
-		}
-
-		Vec2() { }
-	};
-
-	Vec2 gyroBiasProcessNoise;
-	Vec2 gyroBiasStandMeasurementNoise;
-	Vec2 gyroBiasWalkMeasurementNoise;
-	Vec3 accBiasProcessNoise;
-	Vec3 accBiasStandMeasurementNoise;
-	Vec3 accBiasWalkMeasurementNoise;
+	// Vec2 gyroBiasProcessNoise;
+	// Vec2 gyroBiasStandMeasurementNoise;
+	// Vec2 gyroBiasWalkMeasurementNoise;
+	// Vec3 accBiasProcessNoise;
+	// Vec3 accBiasStandMeasurementNoise;
+	// Vec3 accBiasWalkMeasurementNoise;
 
 		
-	  Kalman<float> accXBias; /**< The calibration bias of accX. */
-	  Kalman<float> accYBias; /**< The calibration bias of accY. */
-	  Kalman<float> accZBias; /**< The calibration bias of accZ. */
-	  Kalman<float> gyroXBias; /**< The calibration bias of gyroX. */
-	  Kalman<float> gyroYBias; /**< The calibration bias of gyroY. */
+	  // Kalman<float> accXBias; /**< The calibration bias of accX. */
+	  // Kalman<float> accYBias; /**< The calibration bias of accY. */
+	  // Kalman<float> accZBias; *< The calibration bias of accZ. 
+	  // Kalman<float> gyroXBias; /**< The calibration bias of gyroX. */
+	  // Kalman<float> gyroYBias; /**< The calibration bias of gyroY. */
 
-	void adjustIMUs(float gyr_x, float gyr_y, float acc_x, float acc_y, float acc_z);
+	void adjustIMUs(float gyr_x, float gyr_y, float angle_x, float angle_y);
 
 	void findAvgOffset(float gyX, float gyY, float acc_x, float acc_y, float acc_z);
 	bool isDone() { return counter >= DONE; };
 
+	float getGyrXZero() { return gyr_zero_x; }
+	float getGyrYZero() { return gyr_zero_y; }
+
+	float getGyrX() { return adj_gyr_x; }
+	float getGyrY() { return adj_gyr_y; }
+
+	bool isFalling() { return falling; }
+
+private:
+
 	// Take a long running average of the gyroscope's values,  making the assumption
 	// that if the robot does not perform any complete revolutions, accurate readings should
 	// average to exactly zero
+	bool falling;
+
 	float gyr_zero_x;
 	float gyr_zero_y;
-
-	float acc_zero_x;
-	float acc_zero_y;
-	float acc_zero_z;
 
 	int counter;
 	bool initted;
@@ -79,31 +62,14 @@ public:
 	float adj_gyr_x;
 	float adj_gyr_y;
 
-	float adj_acc_x;
-	float adj_acc_y;
-	float adj_acc_z;
-
-	// The filtered reading is multipled by an experimentally determined constant,
-	// the nod_gyro_ratio, to give an adjustment angle
-	static const float NOD_GYRO_RATIO = 0.04;
-	// After the pose of the robot is determined by the engine, this adjustment
-	// angle is added to particular joint angles in the robot to give an 
-	// adjusted pose
-
-	float getGyrXZero() { return gyr_zero_x; }
-	float getGyrYZero() { return gyr_zero_y; }
-
-	float getGyrX() { return adj_gyr_x; }
-	float getGyrY() { return adj_gyr_y; }
-
-	float getAccX() { return adj_acc_x; }
-	float getAccY() { return adj_acc_y; }
-	float getAccZ() { return adj_acc_z; }
-
+	static const float fallDownAngleX = 55 * M_PI / 180;
+	static const float fallDownAngleY = 55 * M_PI / 180;
+	static const float onGroundAngle = 75 * M_PI / 180;
 
     // RingBufferWithSumBH<Vector3BH<>, 300> accValues; *< Ringbuffer for collecting the acceleration sensor values of one walking phase or 1 secBH. 
-    RingBufferWithSumBH<float, 300> gyroXValues; /**< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. */
-    RingBufferWithSumBH<float, 300> gyroYValues; /**< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. */
+    // RingBufferWithSumBH<float, 15> accXBuffer; // *< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. 
+    // RingBufferWithSumBH<float, 15> accYBuffer; *< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. 
+    // RingBufferWithSumBH<float, 15> accZBuffer; /**< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. */
 
 
 };
