@@ -20,7 +20,7 @@ WHS_SND_SRC= src/whistle/whistle.cpp
 
 DBFLAGS= -ggdb
 
-BUILD= g++ -std=c++11 -w -D NBL_STANDALONE -D WHISTLE_COMPILE $(LGSHARE_SRC) -I $(LGSHARE_DIR) -I $(SHARE_DIR) -lpthread
+BUILD= g++ -std=c++11 -w -D NBL_STANDALONE -D WHISTLE_COMPILE $(LGSHARE_SRC) -I $(LGSHARE_DIR) -I $(SHARE_DIR) -I ./lib_include/ -lpthread
 
 default: detection
 
