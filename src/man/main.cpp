@@ -17,7 +17,7 @@ const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
 
 void cleanup() {
 
-    printf("MAN cleanup code executing!\n");
+    printf(":::::::::::::::::::MAN cleanup code executing!\n:::::::::::::::::::");
 
     if (whistlePID > 0) {
         kill(whistlePID, SIGTERM);
@@ -34,7 +34,7 @@ void cleanup() {
     fclose(stdout);
 
     if (instance) delete instance;
-    printf("MAN cleanup code finished!\n");
+    printf(":::::::::::::::::::MAN cleanup code finished!\n:::::::::::::::::::");
 }
 
 void handler(int signal)
