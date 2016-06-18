@@ -80,7 +80,6 @@ Config used_config{48000, 16384};
 size_t iteration = 0;
 
 
-
 void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
 
     if (shared.isOpen()) {
@@ -104,6 +103,7 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
 
 void establishLock() {
     whistleSingleFD = open("/home/nao/nbites/whistle.lock", O_CREAT | O_RDWR, 0666);
+
     if (whistleSingleFD < 0) {
         int err = errno;
         nbl::utilities::safe_perror(err);
