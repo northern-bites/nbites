@@ -645,7 +645,7 @@ void MotionModule::swapBodyProvider()
                 for(unsigned int i = 0; i< transitions.size(); i++){
                     scriptedProvider.setCommand(transitions[i]);
                 }
-                std::cout << "Switching to scripted provider!\n";
+                // std::cout << "Switching to scripted provider!\n";
                 curProvider = static_cast<MotionProvider * >(&scriptedProvider);
                 break;
             }
@@ -752,7 +752,7 @@ void MotionModule::sendMotionCommand(messages::WalkCommand command)
 
 void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
 {
-    std::cout << "[MOTION MODULE] Switching to scripted body providers \n";
+    // std::cout << "[MOTION MODULE] Switching to scripted body providers \n";
 
     noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
@@ -761,7 +761,7 @@ void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
 
 void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands)
 {
-    std::cout << "[MOTION MODULE] Switching to scripted body providers \n";
+    // std::cout << "[MOTION MODULE] Switching to scripted body providers \n";
 
     noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
@@ -943,7 +943,7 @@ void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
 
 void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
 {
-    std::cout << "[MOTION MODULE] Switching to NULL body providers \n";
+    // std::cout << "[MOTION MODULE] Switching to NULL body providers \n";
 
     nextProvider = &nullBodyProvider;
     nextHeadProvider = &nullHeadProvider;
