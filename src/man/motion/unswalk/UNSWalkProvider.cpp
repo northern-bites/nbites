@@ -185,7 +185,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// logMsg("Calculating next joints and stiffnesses \n");
 
 	if (standby) {
-		logMsg("in standby");
+		// logMsg("in standby");
 		tryingToWalk = false;
 	} else {
 		if (requestedToStop || !isActive()) {
@@ -246,14 +246,14 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			request->body.speed = command->gain;
 
-			std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
-			std::cout << "Scaled Dest Command: " << command->x_mm * DEST_SCALE << "," << command->y_mm * DEST_SCALE << ") \n";
-			std::cout << "Dest gain: " << command->gain << std::endl;
+			// std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
+			// std::cout << "Scaled Dest Command: " << command->x_mm * DEST_SCALE << "," << command->y_mm * DEST_SCALE << ") \n";
+			// std::cout << "Dest gain: " << command->gain << std::endl;
 			// TODO incorporate motion kicks
 
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::KICK) {
-			logMsg("Kick command sent now!");
+			// logMsg("Kick command sent now!");
 			// tryingToWalk = false;
 			//std::cout << "Kick Command" << std::endl;
             // kickCommand = boost::shared_static_cast<KickCommand>(currentCommand);

@@ -68,13 +68,13 @@ def goToPosition(nav):
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
     dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
-    print("Distance: ", dist)
+    # print("Distance: ", dist)
     if dist < 30:
-        print("I'm close enough ! I should not go fast anymore")
+        # print("I'm close enough ! I should not go fast anymore")
         goToPosition.fast = False
         goToPosition.speeds = (0.1, 0.1, 0.1)
 
-    print("My reldest: ", str(relDest))
+    # print("My reldest: ", str(relDest))
 
     if goToPosition.fast:
         # print("goToPosition fast")
@@ -144,7 +144,7 @@ def goToPosition(nav):
         helper.setSpeed(nav, goToPosition.speeds)
 
     else:
-        print("Was not fase!")
+        # print("Was not fase!")
         if goToPosition.adaptive:
             #reduce the speed if we're close to the target
             speed = helper.adaptSpeed(relDest.dist,
