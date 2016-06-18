@@ -136,7 +136,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       speed         = active.speed;                      // used to distinguish between jabKick and walkKick
       foot          = active.foot;                       // kicking foot
       isFast        = active.isFast;
-      std::cout << "[WALK GEN DEBUG] Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
+      // std::cout << "[WALK GEN DEBUG] Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
       if (stopping) {                                    // not used at present
       }
       else {
@@ -169,7 +169,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
       // 1.5 ratchet forward by FORWARD_CHANGE (uncomment to limit absolute change in "forward" to FORWARD_CHANGE)
       		 if (!exactStepsRequested && abs(forward-lastForward)>FORWARD_CHANGE) {                // ie greater than a FORWARD_CHANGE / sec change
-      			std::cout << "LIMITING FORWARD CHANGE\n\n";
+      			// std::cout << "LIMITING FORWARD CHANGE\n\n";
                forward = lastForward + (forward-lastForward)/abs(forward-lastForward)*FORWARD_CHANGE;
       		}
       		lastForward   = forward;                           // back up old value in m/s

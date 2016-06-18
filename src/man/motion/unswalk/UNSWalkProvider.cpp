@@ -235,7 +235,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			request->body.turn = command->theta_percent * MAX_TURN;
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
-			logMsg("\n\nDestination command - Destination Walking!");
+			// logMsg("\n\nDestination command - Destination Walking!");
 			tryingToWalk = true;
 			float DEST_SCALE = 1;
 

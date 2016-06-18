@@ -136,8 +136,8 @@ private:
 	float lastAngleZ;
 	float angleChanged;
 
-	void logMsg(std::string msg) { std::cout << "[UNSW WALK DEBUG] " << msg << std::endl; }
-	void logMsgNoEL(std::string msg) { std::cout << "[UNSW WALK DEBUG] " << msg; }
+	void logMsg(std::string msg) { return; std::cout << "[UNSW WALK DEBUG] " << msg << std::endl; }
+	void logMsgNoEL(std::string msg) { return; std::cout << "[UNSW WALK DEBUG] " << msg; }
 
 };
 

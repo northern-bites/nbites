@@ -78,7 +78,7 @@ def walkToWayPoint(player):
                                  ball.y - constants.WAYPOINT_DIST*sin(radians(player.kick.setupH)),
                                  player.brain.loc.h)
 
-        player.brain.nav.goTo(wayPoint, Navigator.CLOSE_ENOUGH, speed, True, fast = True)
+        player.brain.nav.goTo(wayPoint, Navigator.GENERAL_AREA, speed, True, fast = True)
 
         if transitions.shouldSpinToKickHeading(player):
             return player.goNow('spinToKickHeading')
@@ -260,12 +260,6 @@ def lineUp(player):
     xSpeedCorrect = lineUp.xController.correct(xError)
     hSpeedCorrect = lineUp.hController.correct(hError)
 
-    while xSpeedCorrect > 0.4 or xSpeedCorrect < -0.4:
-        xSpeedCorrect /= 2
-
-    while hSpeedCorrect > 0.4 or hSpeedCorrect < -0.4:
-        hSpeedCorrect /= 2
-
     # Set walk vector
     # print "xSpeedCorrect: " + str(xSpeedCorrect)
     player.setWalk(xSpeedCorrect, 0, hSpeedCorrect)
@@ -420,7 +414,7 @@ def positionForKick(player):
         # if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
         #     positionForKick.speed = Navigator.GRADUAL_SPEED
         # else:
-        positionForKick.speed = speeds.SPEED_TWO
+        positionForKick.speed = speeds.SPEED_FOUR
 
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)
@@ -432,7 +426,7 @@ def positionForKick(player):
     # print "positionForKick"
 
     player.ballBeforeKick = player.brain.ball
-    print("Kickpose: ", str(positionForKick.kickPose))
+    # print("Kickpose: ", str(positionForKick.kickPose))
 
     if transitions.ballInPosition(player, positionForKick.kickPose):
         # print("The ball is in position! CHASEBALL")
