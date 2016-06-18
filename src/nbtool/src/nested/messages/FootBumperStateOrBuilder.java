@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface FootBumperStateOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.FootBumperState)
-    com.google.protobuf.MessageOrBuilder {
+public interface FootBumperStateOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional .messages.ButtonState l_foot_bumper_left = 1;
   /**
    * <code>optional .messages.ButtonState l_foot_bumper_left = 1;</code>
    *
@@ -32,6 +32,7 @@ public interface FootBumperStateOrBuilder extends
    */
   messages.ButtonStateOrBuilder getLFootBumperLeftOrBuilder();
 
+  // optional .messages.ButtonState l_foot_bumper_right = 2;
   /**
    * <code>optional .messages.ButtonState l_foot_bumper_right = 2;</code>
    */
@@ -45,6 +46,7 @@ public interface FootBumperStateOrBuilder extends
    */
   messages.ButtonStateOrBuilder getLFootBumperRightOrBuilder();
 
+  // optional .messages.ButtonState r_foot_bumper_left = 3;
   /**
    * <code>optional .messages.ButtonState r_foot_bumper_left = 3;</code>
    *
@@ -70,6 +72,7 @@ public interface FootBumperStateOrBuilder extends
    */
   messages.ButtonStateOrBuilder getRFootBumperLeftOrBuilder();
 
+  // optional .messages.ButtonState r_foot_bumper_right = 4;
   /**
    * <code>optional .messages.ButtonState r_foot_bumper_right = 4;</code>
    */

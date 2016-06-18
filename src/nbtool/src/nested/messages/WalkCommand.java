@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.WalkCommand}
  */
-public final class WalkCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.WalkCommand)
-    WalkCommandOrBuilder {
+public  final class WalkCommand extends
+    com.google.protobuf.GeneratedMessage
+    implements WalkCommandOrBuilder {
   // Use WalkCommand.newBuilder() to construct.
   private WalkCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -110,6 +109,7 @@ public final class WalkCommand extends
   }
 
   private int bitField0_;
+  // optional float x_percent = 1;
   public static final int X_PERCENT_FIELD_NUMBER = 1;
   private float xPercent_;
   /**
@@ -125,6 +125,7 @@ public final class WalkCommand extends
     return xPercent_;
   }
 
+  // optional float y_percent = 2;
   public static final int Y_PERCENT_FIELD_NUMBER = 2;
   private float yPercent_;
   /**
@@ -140,6 +141,7 @@ public final class WalkCommand extends
     return yPercent_;
   }
 
+  // optional float h_percent = 3;
   public static final int H_PERCENT_FIELD_NUMBER = 3;
   private float hPercent_;
   /**
@@ -163,8 +165,7 @@ public final class WalkCommand extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -285,9 +286,8 @@ public final class WalkCommand extends
    * Protobuf type {@code messages.WalkCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.WalkCommand)
-      messages.WalkCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.WalkCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_WalkCommand_descriptor;
@@ -418,6 +418,7 @@ public final class WalkCommand extends
     }
     private int bitField0_;
 
+    // optional float x_percent = 1;
     private float xPercent_ ;
     /**
      * <code>optional float x_percent = 1;</code>
@@ -450,6 +451,7 @@ public final class WalkCommand extends
       return this;
     }
 
+    // optional float y_percent = 2;
     private float yPercent_ ;
     /**
      * <code>optional float y_percent = 2;</code>
@@ -482,6 +484,7 @@ public final class WalkCommand extends
       return this;
     }
 
+    // optional float h_percent = 3;
     private float hPercent_ ;
     /**
      * <code>optional float h_percent = 3;</code>

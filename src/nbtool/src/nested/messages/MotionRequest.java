@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.MotionRequest}
  */
-public final class MotionRequest extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.MotionRequest)
-    MotionRequestOrBuilder {
+public  final class MotionRequest extends
+    com.google.protobuf.GeneratedMessage
+    implements MotionRequestOrBuilder {
   // Use MotionRequest.newBuilder() to construct.
   private MotionRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -130,6 +129,7 @@ public final class MotionRequest extends
   }
 
   private int bitField0_;
+  // optional bool stop_body = 1;
   public static final int STOP_BODY_FIELD_NUMBER = 1;
   private boolean stopBody_;
   /**
@@ -145,6 +145,7 @@ public final class MotionRequest extends
     return stopBody_;
   }
 
+  // optional bool stop_head = 2;
   public static final int STOP_HEAD_FIELD_NUMBER = 2;
   private boolean stopHead_;
   /**
@@ -160,6 +161,7 @@ public final class MotionRequest extends
     return stopHead_;
   }
 
+  // optional bool reset_odometry = 3;
   public static final int RESET_ODOMETRY_FIELD_NUMBER = 3;
   private boolean resetOdometry_;
   /**
@@ -175,6 +177,7 @@ public final class MotionRequest extends
     return resetOdometry_;
   }
 
+  // optional bool remove_stiffness = 4;
   public static final int REMOVE_STIFFNESS_FIELD_NUMBER = 4;
   private boolean removeStiffness_;
   /**
@@ -190,6 +193,7 @@ public final class MotionRequest extends
     return removeStiffness_;
   }
 
+  // optional bool enable_stiffness = 5;
   public static final int ENABLE_STIFFNESS_FIELD_NUMBER = 5;
   private boolean enableStiffness_;
   /**
@@ -205,6 +209,7 @@ public final class MotionRequest extends
     return enableStiffness_;
   }
 
+  // optional bool reset_providers = 6;
   public static final int RESET_PROVIDERS_FIELD_NUMBER = 6;
   private boolean resetProviders_;
   /**
@@ -220,6 +225,7 @@ public final class MotionRequest extends
     return resetProviders_;
   }
 
+  // optional int64 timestamp = 7;
   public static final int TIMESTAMP_FIELD_NUMBER = 7;
   private long timestamp_;
   /**
@@ -247,8 +253,7 @@ public final class MotionRequest extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -397,9 +402,8 @@ public final class MotionRequest extends
    * Protobuf type {@code messages.MotionRequest}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.MotionRequest)
-      messages.MotionRequestOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.MotionRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_MotionRequest_descriptor;
@@ -566,6 +570,7 @@ public final class MotionRequest extends
     }
     private int bitField0_;
 
+    // optional bool stop_body = 1;
     private boolean stopBody_ ;
     /**
      * <code>optional bool stop_body = 1;</code>
@@ -598,6 +603,7 @@ public final class MotionRequest extends
       return this;
     }
 
+    // optional bool stop_head = 2;
     private boolean stopHead_ ;
     /**
      * <code>optional bool stop_head = 2;</code>
@@ -630,6 +636,7 @@ public final class MotionRequest extends
       return this;
     }
 
+    // optional bool reset_odometry = 3;
     private boolean resetOdometry_ ;
     /**
      * <code>optional bool reset_odometry = 3;</code>
@@ -662,6 +669,7 @@ public final class MotionRequest extends
       return this;
     }
 
+    // optional bool remove_stiffness = 4;
     private boolean removeStiffness_ ;
     /**
      * <code>optional bool remove_stiffness = 4;</code>
@@ -694,6 +702,7 @@ public final class MotionRequest extends
       return this;
     }
 
+    // optional bool enable_stiffness = 5;
     private boolean enableStiffness_ ;
     /**
      * <code>optional bool enable_stiffness = 5;</code>
@@ -726,6 +735,7 @@ public final class MotionRequest extends
       return this;
     }
 
+    // optional bool reset_providers = 6;
     private boolean resetProviders_ ;
     /**
      * <code>optional bool reset_providers = 6;</code>
@@ -758,6 +768,7 @@ public final class MotionRequest extends
       return this;
     }
 
+    // optional int64 timestamp = 7;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 7;</code>

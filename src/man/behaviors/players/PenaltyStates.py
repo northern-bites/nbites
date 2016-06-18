@@ -214,7 +214,7 @@ def manualPlacement(player):
             manualPlacement.leftHorizon += vis.horizon_dist
 
     if manualPlacement.frameCounter > 200:
-        print("Horizon totals RIGHT:", afterPenalty.rightHorizon, "LEFT:", afterPenalty.leftHorizon)
+        print("Horizon totals RIGHT:", manualPlacement.rightHorizon, "LEFT:", manualPlacement.leftHorizon)
         return player.goNow('gamePenalized')
 
 
@@ -278,7 +278,7 @@ def manualPlacement(player):
 
 @superState('gameControllerResponder')
 def walkOut(player):
-    player.brain.nav.walk(0.5, 0, 0)
+    player.brain.nav.walk(0.2, 0, 0)
 
     if player.stateTime > 5:
         return player.goNow('determineRole')

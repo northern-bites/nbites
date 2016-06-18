@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface PositionHeadCommandOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.PositionHeadCommand)
-    com.google.protobuf.MessageOrBuilder {
+public interface PositionHeadCommandOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float head_yaw = 1;
   /**
    * <code>optional float head_yaw = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface PositionHeadCommandOrBuilder extends
    */
   float getHeadYaw();
 
+  // optional float head_pitch = 2;
   /**
    * <code>optional float head_pitch = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface PositionHeadCommandOrBuilder extends
    */
   float getHeadPitch();
 
+  // optional float max_speed_yaw = 3 [default = -1];
   /**
    * <code>optional float max_speed_yaw = 3 [default = -1];</code>
    */
@@ -34,6 +36,7 @@ public interface PositionHeadCommandOrBuilder extends
    */
   float getMaxSpeedYaw();
 
+  // optional float max_speed_pitch = 4 [default = -1];
   /**
    * <code>optional float max_speed_pitch = 4 [default = -1];</code>
    */
