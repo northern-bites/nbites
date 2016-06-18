@@ -342,7 +342,7 @@ void VisionModule::run_()
 
         // Detect obstacles
         PROF_ENTER2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
-        bool detectedRobot = false;
+        bool detectedRobot = false; // used for selective logging
         if (i == 1) {
         detectedRobot = robotDetector[i]->getWhiteGradImage(frontEnd[i]->whiteImage(),
                                             edgeDetector[i], *(edges[i]),
@@ -353,9 +353,7 @@ void VisionModule::run_()
 
         PROF_EXIT2(P_VISION_TOP, P_VISION_BOT, i==0)
 #ifdef USE_LOGGING
-        if (detectedRobot) {
-            logImage(i);
-        }
+        logImage(i);
 #endif
     }
     double topTotal;
