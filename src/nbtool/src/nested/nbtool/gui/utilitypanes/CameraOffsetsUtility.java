@@ -40,6 +40,8 @@ import nbtool.gui.ToolMessage;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.nio.CrossServer;
+import nbtool.nio.LogRPC;
+import nbtool.nio.RobotConnection;
 import nbtool.nio.CrossServer.CrossInstance;
 import nbtool.util.Debug;
 import nbtool.util.Robots;
@@ -352,8 +354,72 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					//TODO do
-					Debug.notRefactored();
+					
+					RobotConnection robot = RobotConnection.getByIndex(0);
+		            
+					if (robot == null) {
+						ToolMessage.displayError("CCU: send: no robot connected!");
+						return;
+					}
+					
+					Path offsetsPath = CameraOffset.getPath();
+		            assert(Files.exists(offsetsPath) && Files.isRegularFile(offsetsPath));
+		            
+		            CameraOffset.Set offsets = null;
+		            
+		            try {
+		            	String contents = new String(Files.readAllBytes(offsetsPath));
+		            	offsets = CameraOffset.Set.parse(Json.parse(contents).asObject());
+		            } catch (IOException ie) {
+		            	ie.printStackTrace();
+		            	Debug.error("IOException: %s", ie.getMessage());
+		            	ToolMessage.displayError("error reading %s!", offsetsPath);
+		            	return;
+		            } catch (JsonParseException e1) {
+						e1.printStackTrace();
+						Debug.error("JsonParseException: %s", e1.getMessage());
+		            	ToolMessage.displayError("error parsing json file %s !", offsetsPath);
+		            	return;
+					}
+		            
+		            assert(offsets != null);
+		            
+		            if (rows == null) {
+		            	ToolMessage.displayError("calculate offsets before saving!");
+		            	return;
+		            }
+		            
+		           String written = "";
+		            
+		            for (Row r : rows) {
+		            	if (r != null && r.name == robot.host()) {
+		            		if (!r.status) { 
+		            			Debug.info("%s %s failed.", r.name, r.getCamera());
+		            			continue;
+		            		}
+		            		
+		            		Debug.info("replacing offsets for: %s %s", r.name, r.getCamera());
+		            		
+		            		if (r.top) {
+		            			offsets.get(r.name).top = r.offset;
+		            		} else {
+		            			offsets.get(r.name).bot = r.offset;
+		            		}
+		            		
+		            		written += String.format("{%s, %s}", r.name, r.getCamera());
+		            	}
+		            }
+
+					if (offsets == null) {
+						ToolMessage.displayError("CCU: send: offset params!");
+						return;
+					}
+		                        	
+					LogRPC.setFileContents(LogRPC.NULL_RESPONDER, robot, "/home/nao/nbites/Config/cameraOffsets.json",
+							offsets.serialize().print());
+
+					ToolMessage.displayAndPrint("< params sent to %s >", robot.host());
+
 				}
 				
 			});
