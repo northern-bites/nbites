@@ -342,15 +342,20 @@ void VisionModule::run_()
 
         // Detect obstacles
         PROF_ENTER2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
-        robotDetector[i]->getWhiteGradImage(frontEnd[i]->whiteImage(),
+        bool detectedRobot = false;
+        if (i == 1) {
+        detectedRobot = robotDetector[i]->getWhiteGradImage(frontEnd[i]->whiteImage(),
                                             edgeDetector[i], *(edges[i]),
                                             homography[i], i==0);
+        }
         PROF_EXIT2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
         times[i][12] = timer.end();
 
         PROF_EXIT2(P_VISION_TOP, P_VISION_BOT, i==0)
 #ifdef USE_LOGGING
-        logImage(i);
+        if (detectedRobot) {
+            logImage(i);
+        }
 #endif
     }
     double topTotal;
@@ -547,14 +552,15 @@ void VisionModule::outportalVisionField()
     // (6) Outportal visually detected robots
     int size = 10;
     // Make array bigger than 8 directions so we can do direction +- 1 without error
-    bool topRobots[size];
+    // bool topRobots[size];
     bool bottomRobots[size];
-    robotDetector[0]->getDetectedRobots(topRobots,size);
+    // robotDetector[0]->getDetectedRobots(topRobots,size);
     robotDetector[1]->getDetectedRobots(bottomRobots,size);
 
     for (int i = 1; i < size-1; i++)
     {
-        bool result = topRobots[i] || bottomRobots[i];
+        // bool result = topRobots[i] || bottomRobots[i];
+        bool result = bottomRobots[i];
         if (!result) { continue; } //no obstacle here
 
         messages::VRobot* temp = visionField.add_robot();

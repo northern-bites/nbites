@@ -35,14 +35,12 @@ RobotDetector::RobotDetector(int wd_, int ht_)
 }
 
 RobotDetector::~RobotDetector() {
-    // candidates.clear();
-    // unmergedCandidates.clear();
-    // delete candidates;
-    // delete unmergedCandidates;
+    candidates.clear();
+    unmergedCandidates.clear();
 }
 
 // Run every frame from VisionModule.cpp
-void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
+bool RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
                                       EdgeDetector* ed, EdgeList& edges,
                                       FieldHomography* hom, bool is_top)
 {
@@ -51,7 +49,6 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
 
     uint8_t min = 255;
     uint8_t max = 0;
-    // uint8_t* pixels = new uint8_t[img_ht*img_wd];
 
     // HACK: Do this better -> might impact other things
     ed->gradientThreshold(low_fuzzy_thresh);
@@ -61,18 +58,13 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
     int bottomRow = .9 * img_ht;
     if (!is_top) {
         int val = findAzimuthRestrictions(hom);
-        std::cout<<"Az column: "<<val<<", w = "<<img_wd<<std::endl;
         if (val < 0) { endCol = -val; }
         else if (val > 1) { startCol = val; }
         startCol -= 15;
         if (startCol < 1) { startCol = 1; }
         endCol += 15;
         if (endCol > img_wd - 1) { endCol = img_wd - 1; }
-        std::cout<<"Start col: "<<startCol<<", end col: "<<endCol<<std::endl;
     }
-    // std::cout<<"Start col: "<<startCol<<", endCol = "<<endCol<<", wd = "<<img_wd<<std::endl;
-
-    // std::cout<<"[ ROBOT DETECTOR] Az = "<<hom->azimuth()<<std::endl;
 
     for (int j = 1; j < img_ht-1; ++j) {
         if (j > bottomRow) {
@@ -99,8 +91,13 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
         }
     }
 
-    // removeHoughLines(edges);
-    // findCandidates(is_top);
+    removeHoughLines(edges);
+    findCandidates(is_top);
+
+    if (candidates.size() > 0) {
+        return true;
+    }
+    return false;
 }
 
 uint8_t RobotDetector::getFuzzyValue(uint8_t gradientValue)
@@ -114,19 +111,7 @@ uint8_t RobotDetector::getFuzzyValue(uint8_t gradientValue)
 
 int RobotDetector::findAzimuthRestrictions(FieldHomography* hom)
 {
-
-    // A little hacky: TODO make function / calculate better values / use constants
-    // HACK US OPEN 2016 SORRY!!
     double az = hom->azimuth();
-
-    // printAz(0);
-    // printAz(1.21028);
-    // printAz(-1.21028);
-    // printAz(1.19341);
-    // printAz(-1.19341);
-    // printAz(1.04154);
-    std::cout<<"Azimuth: "<<az<<std::endl;
-    // A function predetermined from a wide range of values + line of best fit
 
     float percentOfImage;
     if (az > 0) {
@@ -135,10 +120,7 @@ int RobotDetector::findAzimuthRestrictions(FieldHomography* hom)
         percentOfImage = 0.8994*az*az + 0.0036*az - 0.5767;
     }
 
-    // float percentOfImage = 2.125*(abs(az)) - 1.769;
-    std::cout<<"Percent of image: "<<percentOfImage<<std::endl;
     int val = percentOfImage * img_wd;
-    std::cout<<"Val: "<<val<<std::endl;
 
     // detect everything
     if (val <= 0) { return 0; }
@@ -146,27 +128,8 @@ int RobotDetector::findAzimuthRestrictions(FieldHomography* hom)
     // detect nothing
     if (val >= img_wd -1) { return img_wd-1; }
 
-    if (az > 0) { std::cout<<"Val return 1: "<<-1*(img_wd - val)<<std::endl; return -1*(img_wd - val); } // right side
-    else { std::cout<<"Val return 2: "<<val<<std::endl; return val; } // left side (negative lets us know it is the "end col")
-}
-
-void RobotDetector::printAz(double az)
-{
-    std::cout<<"Azimuth: "<<az<<std::endl;
-    // A function predetermined from a wide range of values + line of best fit
-    float percentOfImage;
-    if (az > 0) {
-        percentOfImage = 2.125*az - 1.769;
-    } else {
-        percentOfImage = 2.125*(-az) - 1.769;
-    }
-    // float percentOfImage = 2.125*(abs(az)) - 1.769;
-    std::cout<<"Percent of image: "<<percentOfImage<<std::endl;
-    int val = percentOfImage * img_wd;
-    std::cout<<"Val: "<<val<<std::endl;
-
-    if (az > 0) { std::cout<<"Val return 1: "<<-1*(img_wd - val)<<std::endl; } // right side
-    else { std::cout<<"Val return 2: "<<val<<std::endl; } // left side (negative lets us know it is the "end col")
+    if (az > 0) { return -1*(img_wd - val); } // right side (negative lets us know it is the "end col")
+    else { return val; } // left side = start col
 }
 
 void RobotDetector::getCurrentDirection(FieldHomography* hom)
@@ -337,27 +300,20 @@ void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
             if (tp <= (*it).top && (*it).top <= ((tp+bt)/2)) {
                 // std::cout<<"yes1.1!"<<std::endl;
                 // new box is upper left of candidate box
-                // (*it).top = tp;
-                // (*it).left = lf;
                 bt = (*it).bottom;
                 rt = (*it).right;
 
                 // printCandidates("printing candidates after merging 1");
                 // return;
-                // does this start at the second one actually?
                 candidates.erase(it);
                 it = candidates.begin()-1; // loop through them all again
             } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2)) {
                 // std::cout<<"yes1.2!"<<std::endl;
                 // new box is to lower left of candidate box
-                // (*it).bottom = bt;
-                // (*it).left = lf;
                 tp = (*it).top;
                 rt = (*it).right;
                 // printCandidates("printing candidates after merging 2");
                 // return;
-                // does this start at the second one actually?
-                candidates.erase(it);
                 it = candidates.begin()-1; // loop through them all again
             }
         } else if ((*it).left <= lf && lf <= (((*it).left+(*it).right)/2)) {
@@ -369,8 +325,6 @@ void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
             if (tp <= (*it).top && (*it).top <= ((tp+bt)/2)) {
                 // std::cout<<"yes2.1"<<std::endl;
                 // new box is upper right of candidate box
-                // (*it).top = tp;
-                // (*it).right = rt;
                 bt = (*it).bottom;
                 lf = (*it).left;
 
@@ -382,8 +336,6 @@ void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
             } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2)) {
                 // std::cout<<"yes2.2"<<std::endl;
                 // new box is to lower right of candidate box
-                // (*it).bottom = bt;
-                // (*it).right = rt;
                 tp = (*it).top;
                 lf = (*it).left;
                 // return;
@@ -522,17 +474,6 @@ void RobotDetector::getDetectedRobots(bool* detectedObstacles, int size) {
     // Account for buffer space in array
     if (detectedObstacles[0]) { detectedObstacles[8] = true; }
     if (detectedObstacles[9]) { detectedObstacles[1] = true; }
-
-    // // ignore "NONE" direction, start at 1
-    // for (int i = 1; i < 9; i++)
-    // {
-    //     if (detectedObstacles[i]==0) { continue; } //no obstacle here
-
-    //     messages::RobotObstacle::VRobot* temp = current.get()->add_obstacle();
-    //     temp->set_position(obstaclesList[i]);
-    // }
-
-    // visualRobotOut.setMessage(current);
 }
 
 void RobotDetector::printCandidates(std::string message) {

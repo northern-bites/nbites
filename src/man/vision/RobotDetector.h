@@ -31,7 +31,7 @@ public:
     RobotDetector(int wd_, int ht_);
     ~RobotDetector();
 
-    void getWhiteGradImage(ImageLiteU8 whiteImage,
+    bool getWhiteGradImage(ImageLiteU8 whiteImage,
                            EdgeDetector* ed, EdgeList& edges,
                            FieldHomography* hom, bool is_top);
     uint8_t getFuzzyValue(uint8_t gradientValue);
@@ -44,7 +44,6 @@ public:
     void getCurrentDirection(FieldHomography* hom);
     void getDetectedRobots(bool* detectedObstacles, int size);
     void printCandidates(std::string message);
-    void printAz(double az);
 
     struct box {
         int left;
