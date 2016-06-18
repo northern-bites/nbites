@@ -8,12 +8,11 @@ def mediocreComm(player):
 
 def awfulComm(player):
     return True
-    # off = checkCommDropOffs(player)
-    # return off >= 2
+    off = checkCommDropOffs(player)
+    return off >= 2
 
 def checkCommDropOffs(player):
     off = 0
-
     for mate in player.brain.teamMembers:
         if mate.playerNumber == 1 or mate.playerNumber == player.brain.playerNumber:
             continue

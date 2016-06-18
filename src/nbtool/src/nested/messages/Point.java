@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.Point}
  */
-public final class Point extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Point)
-    PointOrBuilder {
+public  final class Point extends
+    com.google.protobuf.GeneratedMessage
+    implements PointOrBuilder {
   // Use Point.newBuilder() to construct.
   private Point(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -110,6 +109,7 @@ public final class Point extends
   }
 
   private int bitField0_;
+  // optional float x = 1;
   public static final int X_FIELD_NUMBER = 1;
   private float x_;
   /**
@@ -125,6 +125,7 @@ public final class Point extends
     return x_;
   }
 
+  // optional float y = 2;
   public static final int Y_FIELD_NUMBER = 2;
   private float y_;
   /**
@@ -140,6 +141,7 @@ public final class Point extends
     return y_;
   }
 
+  // optional float field_angle = 3;
   public static final int FIELD_ANGLE_FIELD_NUMBER = 3;
   private float fieldAngle_;
   /**
@@ -171,8 +173,7 @@ public final class Point extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -293,9 +294,8 @@ public final class Point extends
    * Protobuf type {@code messages.Point}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Point)
-      messages.PointOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.PointOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionField.internal_static_messages_Point_descriptor;
@@ -426,6 +426,7 @@ public final class Point extends
     }
     private int bitField0_;
 
+    // optional float x = 1;
     private float x_ ;
     /**
      * <code>optional float x = 1;</code>
@@ -458,6 +459,7 @@ public final class Point extends
       return this;
     }
 
+    // optional float y = 2;
     private float y_ ;
     /**
      * <code>optional float y = 2;</code>
@@ -490,6 +492,7 @@ public final class Point extends
       return this;
     }
 
+    // optional float field_angle = 3;
     private float fieldAngle_ ;
     /**
      * <code>optional float field_angle = 3;</code>

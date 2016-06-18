@@ -2,6 +2,8 @@
 Game controller states for pBrunswick, our soccer player.
 """
 
+from ..Say import *
+
 import noggin_constants as nogginConstants
 from math import fabs
 from ..util import *
@@ -9,6 +11,8 @@ from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
 from math import fabs, degrees
+
+DEBUG_MANUAL_PLACEMENT = False
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -55,17 +59,16 @@ def gameReady(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
-            # US OPEN 16 Turns of going into after penalty in ready
-            # return player.goNow('afterPenalty')
+            player.goNow('manualPlacement')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
 
-    # CHINA HACK player 5 walking off field so start by walking forward
-    if player.brain.playerNumber == 5 and player.stateTime <= 4:
-        player.setWalk(0.6, 0, 0)
-        return player.stay()
+    # # CHINA HACK player 5 walking off field so start by walking forward
+    # if player.brain.playerNumber == 5 and player.stateTime <= 4:
+    #     player.setWalk(0.6, 0, 0)
+    #     return player.stay()
 
     return player.goNow('positionReady')
 
@@ -78,7 +81,7 @@ def gameSet(player):
     if player.firstFrame():
         #The player's currentState = gameSet
 
-        print "GAME SET FIRST FRAME"
+        # print "GAME SET FIRST FRAME"
 
         player.inKickingState = False
         player.brain.fallController.enabled = True
@@ -93,10 +96,11 @@ def gameSet(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
+            player.goNow('manualPlacement')
 
     elif player.brain.tracker.isStopped():
 
-        print "TRUE"
+        # print "TRUE"
 
         player.brain.tracker.trackBall(True)
         # print "Current Angle: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
@@ -118,7 +122,6 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
-
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
     #     player.brain.play.isChaser()):
@@ -129,6 +132,8 @@ def gamePlaying(player):
     if player.wasPenalized:
         player.wasPenalized = False
         if player.lastDiffState != 'gameSet': 
+            if DEBUG_MANUAL_PLACEMENT:
+                return player.goNow('manualPlacement')
             return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
@@ -183,7 +188,7 @@ def gamePenalized(player):
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
             player.brain.resetLocToCross()
-            print "BRUNSWICK PENALIZED"
+            # print "BRUNSWICK PENALIZED"
 
     if player.brain.vision.horizon_dist < 200.0:
         player.brain.penalizedEdgeClose += 1

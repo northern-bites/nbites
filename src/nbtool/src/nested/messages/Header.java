@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.Header}
  */
-public final class Header extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Header)
-    HeaderOrBuilder {
+public  final class Header extends
+    com.google.protobuf.GeneratedMessage
+    implements HeaderOrBuilder {
   // Use Header.newBuilder() to construct.
   private Header(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -61,9 +60,8 @@ public final class Header extends
             break;
           }
           case 18: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000002;
-            name_ = bs;
+            name_ = input.readBytes();
             break;
           }
           case 24: {
@@ -116,6 +114,7 @@ public final class Header extends
   }
 
   private int bitField0_;
+  // optional int64 timestamp = 1;
   public static final int TIMESTAMP_FIELD_NUMBER = 1;
   private long timestamp_;
   /**
@@ -131,6 +130,7 @@ public final class Header extends
     return timestamp_;
   }
 
+  // required string name = 2;
   public static final int NAME_FIELD_NUMBER = 2;
   private java.lang.Object name_;
   /**
@@ -173,6 +173,7 @@ public final class Header extends
     }
   }
 
+  // required int32 version = 3;
   public static final int VERSION_FIELD_NUMBER = 3;
   private int version_;
   /**
@@ -188,6 +189,7 @@ public final class Header extends
     return version_;
   }
 
+  // optional bool top_camera = 4;
   public static final int TOP_CAMERA_FIELD_NUMBER = 4;
   private boolean topCamera_;
   /**
@@ -212,8 +214,7 @@ public final class Header extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     if (!hasName()) {
       memoizedIsInitialized = 0;
@@ -349,9 +350,8 @@ public final class Header extends
    * Protobuf type {@code messages.Header}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Header)
-      messages.HeaderOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.HeaderOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Header.internal_static_messages_Header_descriptor;
@@ -501,6 +501,7 @@ public final class Header extends
     }
     private int bitField0_;
 
+    // optional int64 timestamp = 1;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 1;</code>
@@ -533,6 +534,7 @@ public final class Header extends
       return this;
     }
 
+    // required string name = 2;
     private java.lang.Object name_ = "";
     /**
      * <code>required string name = 2;</code>
@@ -546,12 +548,9 @@ public final class Header extends
     public java.lang.String getName() {
       java.lang.Object ref = name_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          name_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        name_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
@@ -609,6 +608,7 @@ public final class Header extends
       return this;
     }
 
+    // required int32 version = 3;
     private int version_ ;
     /**
      * <code>required int32 version = 3;</code>
@@ -641,6 +641,7 @@ public final class Header extends
       return this;
     }
 
+    // optional bool top_camera = 4;
     private boolean topCamera_ ;
     /**
      * <code>optional bool top_camera = 4;</code>

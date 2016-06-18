@@ -8,7 +8,7 @@ public final class _File_FeetOnGround {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FeetOnGround_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -27,23 +27,23 @@ public final class _File_FeetOnGround {
       "nGroundP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_messages_FeetOnGround_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_messages_FeetOnGround_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_FeetOnGround_descriptor,
+              new java.lang.String[] { "OnGround", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_messages_FeetOnGround_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_FeetOnGround_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_FeetOnGround_descriptor,
-        new java.lang.String[] { "OnGround", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
