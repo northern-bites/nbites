@@ -392,7 +392,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 		           String written = "";
 		            
 		            for (Row r : rows) {
-		            	if (r != null && r.name == robot.host()) {
+		            	if (r != null && r.name.equals(robot.host())) {
 		            		if (!r.status) { 
 		            			Debug.info("%s %s failed.", r.name, r.getCamera());
 		            			continue;
