@@ -100,12 +100,12 @@ def doFirstHalfSpin(player):
 
     if player.firstFrame():
         print "------------First half spin-------------"
-
-        player.setWalk(0, 0, nav.QUICK_SPEED)
-
+        
         if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, nav.QUICK_SPEED)
             player.brain.tracker.lookToSpinDirection(1) #Clockwise
         else:
+            player.setWalk(0, 0, -nav.QUICK_SPEED)
             player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
@@ -137,11 +137,11 @@ def doSecondHalfSpin(player):
     if player.firstFrame():
         print "--------------Second Half Spin---------------"
 
-        player.setWalk(0, 0, speeds.QUICK_SPEED)
-
         if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, nav.QUICK_SPEED)
             player.brain.tracker.lookToSpinDirection(1) #Clockwise
         else:
+            player.setWalk(0, 0, -nav.QUICK_SPEED)
             player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
@@ -236,6 +236,23 @@ def searchFieldForFlippedSharedBall(player):
         player.sharedBallOffCount = 0
 
     player.brain.nav.updateDest(sharedball)
+
+@superState('playOffBall')
+@stay
+def strikerSearchField(player):
+
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+    if 
+
+    if
+
+strikerQuad1Center = 
+strikerQuad2Center = 
+strikerQuad3Center = 
+strikerQuad4Center = 
+strikerPoints = [strikerQuad1Center, strikerQuad2Center, strikerQuad3Center, strikerQuad4Center]
 
 @superState('playOffBall')
 @stay
