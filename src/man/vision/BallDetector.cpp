@@ -241,29 +241,46 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
 }
 
 int BallDetector::projectedBallRadius(imagePoint p, SpotDetector & sd) {
-    float outerGrow = sd.outerGrowRows();
-    int outerDiam = sd.initialOuterDiam();
+    // int dwx1, dwy1, dwx2, dwy2;
+    // homography->fieldVector(p.first, p.second, 1, 0, &dwx1, &dwy1);
+    // homography->fieldVector(p.first, p.second, 0, 1, &dwx2, &dwx2);
 
-    std::cout<<"Outer Grow: "<<outerGrow<<std::endl;
-    std::cout<<"Outer Diam: "<<outerDiam<<std::endl;
 
-    //int point_y = p.first;  
+
+    // //int point_y = p.first;  
 
     return 1;
 }
 
-imagePoint BallDetector::findPointsCentroid(intPairVector v) {
-    double x_sum = 0.0, y_sum = 0, cx, cy;
+imagePoint BallDetector::findPointsCentroid(intPairVector & v) {
+    double x_sum = 0.0, y_sum = 0, cx = 0, cy = 0;
     int n = v.size();
     if(n != 0) {
         for(int i=0; i < v.size(); i++) {
             x_sum += v[i].first;
             y_sum += v[i].second;
         }
+        cx = x_sum/n;
+        cy = y_sum/n;
     }
-    cx = x_sum/n;
-    cy = y_sum/n;
     return std::make_pair(cx, cy);
+}
+
+bool BallDetector::equalDistancesFromCentroid(intPairVector & v, int projectedBallRadius) {
+    imagePoint c = findPointsCentroid(v);
+    double averageDistanceFromCentroid = 0;
+    for(int i=0; i<v.size(); i++) {
+        imagePoint p = v[i];
+        double d = sqrt((p.first - c.first)*(p.first - c.first) + 
+                        (p.second - c.second)*(p.second - c.second));
+        averageDistanceFromCentroid += d;
+    }
+    averageDistanceFromCentroid = averageDistanceFromCentroid/v.size();
+    if(-2 < averageDistanceFromCentroid - projectedBallRadius < 2) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
@@ -1186,7 +1203,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         } else {
             endRow = r;
         }
-        if(endRow > width) {endRow = height; }
+        if(endRow > height) {endRow = height; }
     }
 
     if(debugBall) {
@@ -1195,7 +1212,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         // std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
         // debugDraw.drawPoint(startCol, 10, MAROON);
         // std::cout<<"EndRow: "<<endRow<<std::endl;
-        // debugDraw.drawPoint(50, endRow, RED);
+        //debugDraw.drawPoint(20, endRow, ORANGE);
         // debugDraw.drawPoint(endCol, 10, BLUE);
     }
 
@@ -1218,8 +1235,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         smallerY = ImageLiteU16(yImage, 0, horiz, yImage.width(), height - horiz);
         smallerGreen = ImageLiteU8(greenImage, 0, horiz, greenImage.width(), height - horiz);
 	} else {
-        smallerY = ImageLiteU16(yImage, startCol, 0, endCol, height);
-        smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, height);
+        smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
+        smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
     }
 
     if(!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions()) {

@@ -95,7 +95,8 @@ namespace man {
             int scanY(int startX, int startY, int direction, int stop);
 
             int projectedBallRadius(imagePoint p, SpotDetector & sp);
-            imagePoint findPointsCentroid(intPairVector v);
+            imagePoint findPointsCentroid(intPairVector & v);
+            bool equalDistancesFromCentroid(intPairVector & v, int projectedBallRadius);
             
             int getAzimuthColumnRestrictions(double az);
             int getAzimuthRowRestrictions(double az);
