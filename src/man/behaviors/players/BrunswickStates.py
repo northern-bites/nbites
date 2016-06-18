@@ -180,6 +180,7 @@ def gamePenalized(player):
         player.wasPenalized = True
         player.brain.penalizedEdgeClose = 0
         player.brain.penalizedCount = 0
+        player.executeMove(SweetMoves.STRETCHED_KNEE_STAND)
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
             player.brain.resetLocToCross()

@@ -100,6 +100,20 @@ SIT_POS_V5 = (((0.,90.,0.,0.),
                1.5,0,stiff.LOW_LEG_STIFFNESSES)
              )
 
+STRETCHED_KNEE_STAND = ((INITIAL_POS[0][0],
+                        INITIAL_POS[0][1],
+                        INITIAL_POS[0][2],
+                        INITIAL_POS[0][3],
+                        0.5,0, stiff.STANDUP_STIFFNESSES),
+
+                      ((90.6, 12.9, -89.5, -2.3),
+                       (-2.3, 3.0, 4.6, -0.1, -0.4, -3.2),
+                       (-2.3, -1.8, 5.4, -0.2, -0.6, 3.2),
+                       (90.6, -9.9, 89.9, 1.8),
+                       1.5,0,stiff.STANDUP_STIFFNESSES)
+                     )
+
+
 #**********************
 #                     *
 #     STAND  UPS      *
