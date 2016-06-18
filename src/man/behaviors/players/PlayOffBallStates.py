@@ -56,7 +56,7 @@ def positionAtHome(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         fastWalk = role.isChaser(player.role)
-        player.brain.nav.goTo(home, precision = nav.HOME,
+        player.brain.nav.goTo(home, precision = nav.GRAINY,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = fastWalk, pb = False)
 
@@ -85,7 +85,7 @@ def watchForBall(player):
 
 @defaultState('doFirstHalfSpin')
 @superState('playOffBall')
-@ifSwitchNow(transitions.stopSpinning, 'positionAtHome')
+# @ifSwitchNow(transitions.stopSpinning, 'positionAtHome')
 def spinAtHome(player):
     """
     Spin while at home.
@@ -237,22 +237,22 @@ def searchFieldForFlippedSharedBall(player):
 
     player.brain.nav.updateDest(sharedball)
 
-@superState('playOffBall')
-@stay
-def strikerSearchField(player):
+# @superState('playOffBall')
+# @stay
+# def strikerSearchField(player):
 
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
+#     if player.firstFrame():
+#         player.brain.tracker.trackBall()
 
-    if 
+#     if 
 
-    if
+#     if
 
-strikerQuad1Center = 
-strikerQuad2Center = 
-strikerQuad3Center = 
-strikerQuad4Center = 
-strikerPoints = [strikerQuad1Center, strikerQuad2Center, strikerQuad3Center, strikerQuad4Center]
+# strikerQuad1Center = 
+# strikerQuad2Center = 
+# strikerQuad3Center = 
+# strikerQuad4Center = 
+# strikerPoints = [strikerQuad1Center, strikerQuad2Center, strikerQuad3Center, strikerQuad4Center]
 
 @superState('playOffBall')
 @stay
@@ -264,7 +264,7 @@ def searchFieldByQuad(player):
         player.brain.tracker.trackBall()
         # player.brain.tracker.repeatWideSnapPan()
         searchFieldByQuad.dest = min(points, key=lambda x:fabs(player.brain.loc.distTo(x)))
-        player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
+        player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.HOME,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)
         searchFieldByQuad.quadIndex = points.index(searchFieldByQuad.dest)
