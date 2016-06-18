@@ -246,7 +246,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			request->body.speed = command->gain;
 
-			std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
+			// std::cout << "Dest Command: " << command->x_mm << "," << command->y_mm << "," << command->theta_rads << ") \n";
 			// std::cout << "Scaled Dest Command: " << command->x_mm * DEST_SCALE << "," << command->y_mm * DEST_SCALE << ") \n";
 			// std::cout << "Dest gain: " << command->gain << std::endl;
 			// TODO incorporate motion kicks

@@ -1,7 +1,7 @@
 from ..navigator import BrunswickSpeeds as speeds
 
 # Ball on and off frame thresholds
-BALL_ON_THRESH = 2
+BALL_ON_THRESH = 4
 BALL_OFF_THRESH = 20
 BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 

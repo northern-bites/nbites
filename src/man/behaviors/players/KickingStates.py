@@ -159,8 +159,10 @@ def chaseAfterBall(player):
         print "in chaseAfterBall"
         player.brain.nav.destinationWalkTo(RelRobotLocation(200, 0, 0))
         return player.stay()
+    if transitions.shouldChaseBall(player):
+        print "I can see the ball!"
+        return player.goNow('approachBall')
     if shared.navAtPosition(player) or player.counter > 100:
-        print "switching to lookAroundForBall"
         return player.goNow('lookAroundForBall')
     return player.stay()
 
@@ -168,10 +170,12 @@ def chaseAfterBall(player):
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 def lookAroundForBall(player):
     if player.firstFrame():
-        print "in lookAroundForBall"
         player.brain.nav.stand()
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         return player.stay()
+    if transitions.shouldChaseBall(player):
+        print "I can see the ball!"
+        return player.goNow('approachBall')
     if player.counter > 50:
         print "going back to afterKick"
         return player.goNow('afterKick')
