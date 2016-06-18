@@ -423,11 +423,16 @@ void RobotDetector::getDetectedRobots(bool* detectedObstacles, int size) {
         detectedObstacles[i] = false;
     }
 
-    int left_barrier = img_wd / 4;
-    int right_barrier = (img_wd / 4)*3;
-    int left_halfway = img_wd / 8;
+    // int left_barrier = img_wd / 4;
+    // int right_barrier = (img_wd / 4)*3;
+    // int left_halfway = img_wd / 8;
+    // int middle_halfway = img_wd / 2;
+    // int right_halfway = (img_wd / 8)*7;
+    int left_barrier = img_wd / 3;
+    int right_barrier = (img_wd / 3)*2;
+    int left_halfway = img_wd / 6;
     int middle_halfway = img_wd / 2;
-    int right_halfway = (img_wd / 8)*7;
+    int right_halfway = (img_wd / 6)*5;
 
     std::vector<Robot>::iterator it;
     for(it = candidates.begin(); it != candidates.end(); ++it) {
