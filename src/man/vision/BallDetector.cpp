@@ -111,7 +111,7 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
                 actualWhiteSpots.push_back(s);
                 makeBall(s, cameraHeight, 0.75, foundBall, false);
                 if(debugBall) {
-                    std::cout<<"Blobber returning true\n";
+                    //std::cout<<"Blobber returning true\n";
                 }
 #ifdef OFFLINE
                 foundBall = true;
@@ -238,6 +238,32 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
         }
     }
     return newY;
+}
+
+int BallDetector::projectedBallRadius(imagePoint p, SpotDetector & sd) {
+    float outerGrow = sd.outerGrowRows();
+    int outerDiam = sd.initialOuterDiam();
+
+    std::cout<<"Outer Grow: "<<outerGrow<<std::endl;
+    std::cout<<"Outer Diam: "<<outerDiam<<std::endl;
+
+    //int point_y = p.first;  
+
+    return 1;
+}
+
+imagePoint BallDetector::findPointsCentroid(intPairVector v) {
+    double x_sum = 0.0, y_sum = 0, cx, cy;
+    int n = v.size();
+    if(n != 0) {
+        for(int i=0; i < v.size(); i++) {
+            x_sum += v[i].first;
+            y_sum += v[i].second;
+        }
+    }
+    cx = x_sum/n;
+    cy = y_sum/n;
+    return std::make_pair(cx, cy);
 }
 
 void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
@@ -1164,12 +1190,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
     if(debugBall) {
-        std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
-        std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
-        debugDraw.drawPoint(startCol, 10, MAROON);
-        std::cout<<"EndRow: "<<endRow<<std::endl;
-        debugDraw.drawPoint(50, endRow, RED);
-        debugDraw.drawPoint(endCol, 10, BLUE);
+        std::cout<<"Top Camera: "<<topCamera<<std::endl;
+        // std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
+        // std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
+        // debugDraw.drawPoint(startCol, 10, MAROON);
+        // std::cout<<"EndRow: "<<endRow<<std::endl;
+        // debugDraw.drawPoint(50, endRow, RED);
+        // debugDraw.drawPoint(endCol, 10, BLUE);
     }
 
     // Then we are going to filter out all of the blobs that obviously
@@ -1207,13 +1234,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
     }
     
-    if(debugBall) {
-        for(int z = 0; z < blackSpots.size(); z++) {
-            std::pair<int, int> spot = blackSpots[z];
-            std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "
-					 <<spot.second<<std::endl;
-        }
-    }
+    // if(debugBall) {
+    //     for(int z = 0; z < blackSpots.size(); z++) {
+    //         std::pair<int, int> spot = blackSpots[z];
+    //         std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "
+				// 	 <<spot.second<<std::endl;
+    //     }
+    // }
 
 	// run blobber on parts of the image where spot detector won't work
 	int bottomThird = height * 2 / 3;
