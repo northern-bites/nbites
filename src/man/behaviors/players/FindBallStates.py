@@ -20,11 +20,11 @@ def findBall(player):
         if distance > constants.FAR_BALL_SEARCH_DIST:
             return player.goNow('playOffBall')
             
-        bearing = fabs(degrees(player.brain.ball.bearing))
-        if distance <= constants.SCRUM_DIST and bearing < constants.SPIN_SEARCH_BEARING:
-            return player.goNow('scrumStrategy')
-        else:
-            return player.goNow('searchInFront')
+        # bearing = fabs(degrees(player.brain.ball.bearing))
+        # if distance <= constants.SCRUM_DIST and bearing < constants.SPIN_SEARCH_BEARING:
+        #     return player.goNow('scrumStrategy')
+        # else:
+        return player.goNow('searchInFront')
 
 @superState('gameControllerResponder')
 @stay
@@ -37,7 +37,7 @@ def searchInFront(player):
     # playerTracker = player.brain.tracker
 
     if not player.brain.tracker.brain.motion.head_is_active and player.brain.tracker.isStopped():
-        print "-------HEAD IS NOT ACTIVE, GOING TO SPINNING--------------\n"
+        # print "-------HEAD IS NOT ACTIVE, GOING TO SPINNING--------------\n"
         return player.goNow('spinSearch')
 
 @superState('gameControllerResponder')
@@ -87,13 +87,13 @@ def spinToFoundBall(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        print "spinning to found ball"
+        # print "spinning to found ball"
 
     theta = degrees(player.brain.ball.bearing)
     spinToFoundBall.isFacingBall = (fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING)
 
     if spinToFoundBall.isFacingBall:
-        print "facing ball"
+        # print "facing ball"
         return player.goLater('playOffBall')
 
     player.brain.tracker.repeatFixedPitchLookAhead()
@@ -104,26 +104,26 @@ def spinToFoundBall(player):
     else:
         player.brain.nav.walk(0., 0., constants.FIND_BALL_SPIN_SPEED)
 
-@defaultState('backPedal')
-@superState('gameControllerResponder')
-@ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
-def scrumStrategy(player):
-    """
-    super state of the strategy to search for balls lost in front of robot
-    """
-    pass
+# @defaultState('backPedal')
+# @superState('gameControllerResponder')
+# @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
+# def scrumStrategy(player):
+#     """
+#     super state of the strategy to search for balls lost in front of robot
+#     """
+#     pass
 
-@superState('scrumStrategy')
-@stay
-def backPedal(player):
+# @superState('scrumStrategy')
+# @stay
+# def backPedal(player):
 
-    if player.firstFrame():
-        player.setWalk(constants.BACK_PEDAL_SPEED, 0., 0.)
-        player.brain.tracker.performFixedPitchLookAhead()
-        # player.brain.tracker.repeatWideSnapPan()
+#     if player.firstFrame():
+#         player.setWalk(constants.BACK_PEDAL_SPEED, 0., 0.)
+#         player.brain.tracker.performFixedPitchLookAhead()
+#         # player.brain.tracker.repeatWideSnapPan()
 
-    elif player.stateTime > constants.BACK_PEDAL_TIME:
-        return player.goLater('searchInFront')
+#     elif player.stateTime > constants.BACK_PEDAL_TIME:
+#         return player.goLater('searchInFront')
 
 @superState('scrumStrategy')
 @stay

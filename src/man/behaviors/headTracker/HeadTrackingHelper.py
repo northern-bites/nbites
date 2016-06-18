@@ -198,6 +198,8 @@ class HeadTrackingHelper(object):
 
         # Assert: target is visible.
 
+        #Marcus - LOOK AT TARGET HERE. ROTATE BODY TO FACE BALL HERE.
+
         # Find the target's angular distance from yaw center.
         changeX = target.vis.angle_x_deg
         # ignore changeY: pitch is fixed
