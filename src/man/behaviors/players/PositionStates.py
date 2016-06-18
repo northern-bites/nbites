@@ -19,7 +19,7 @@ def positionReady(player):
             player.kickoffPosition = roleConstants.theirKickoff
 
         player.brain.nav.goTo(player.kickoffPosition,
-                              precision = Navigator.PLAYBOOK,
+                              precision = Navigator.GRAINY ,
                               speed = Navigator.QUICK_SPEED,
                               avoidObstacles = True,
                               fast = True, pb = False)

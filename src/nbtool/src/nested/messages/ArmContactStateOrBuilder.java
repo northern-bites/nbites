@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface ArmContactStateOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.ArmContactState)
-    com.google.protobuf.MessageOrBuilder {
+public interface ArmContactStateOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional .messages.ArmContactState.PushDirection right_push_direction = 1;
   /**
    * <code>optional .messages.ArmContactState.PushDirection right_push_direction = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface ArmContactStateOrBuilder extends
    */
   messages.ArmContactState.PushDirection getRightPushDirection();
 
+  // optional .messages.ArmContactState.PushDirection left_push_direction = 2;
   /**
    * <code>optional .messages.ArmContactState.PushDirection left_push_direction = 2;</code>
    */
