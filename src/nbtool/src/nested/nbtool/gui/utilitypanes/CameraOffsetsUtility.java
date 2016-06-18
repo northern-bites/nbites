@@ -358,7 +358,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 					RobotConnection robot = RobotConnection.getByIndex(0);
 		            
 					if (robot == null) {
-						ToolMessage.displayError("CCU: send: no robot connected!");
+						ToolMessage.displayError("COU: send: no robot connected!");
 						return;
 					}
 					
@@ -411,7 +411,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 		            }
 
 					if (offsets == null) {
-						ToolMessage.displayError("CCU: send: offset params!");
+						ToolMessage.displayError("COU: send: offset params!");
 						return;
 					}
 		                        	
