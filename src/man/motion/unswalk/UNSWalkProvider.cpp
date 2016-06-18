@@ -435,7 +435,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     		}
 
    //  		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
-			// // std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
+			// USE THESE LINES TO PRINT OUT JOINT ANGLES
+			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
 			// std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;
 
     		if (hardness[nb_joint_order[j]] == 0) {
