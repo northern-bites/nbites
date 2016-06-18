@@ -24,6 +24,6 @@ def positionReady(player):
                               avoidObstacles = True,
                               fast = True, pb = False)
 
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.repeatWideSnapPan()
 
     return player.stay()

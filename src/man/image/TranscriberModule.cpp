@@ -251,7 +251,7 @@ void ImageTranscriber::initQueueAllBuffers() {
 void ImageTranscriber::initSettings()
 {
     std::string filepath;
-//#ifdef NAOQI_2 //for NAOQI 2.x
+#ifdef V5_ROBOT
     if(cameraType == Camera::TOP) {
         filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
         std::cout<<"[INFO] Camera::TOP"<<std::endl;
@@ -259,15 +259,15 @@ void ImageTranscriber::initSettings()
         filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
     }
-// #else //for NAOQI 1.14
-//     if(cameraType == Camera::TOP) {
-//         filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
-//         std::cout<<"[INFO] Camera::TOP"<<std::endl;
-//     } else {
-//         filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
-//         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
-//     }
-// #endif
+#else
+    if(cameraType == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+        std::cout<<"[INFO] Camera::TOP"<<std::endl;
+    } else {
+        filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+        std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
+    }
+#endif
     
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);

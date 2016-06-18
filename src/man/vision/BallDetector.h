@@ -10,6 +10,7 @@
 #include "Homography.h"
 #include "Field.h"
 #include "Hough.h"
+#include "Spots.h"
 
 
 namespace man {
@@ -32,29 +33,30 @@ namespace man {
 
 		class Ball {
 		public:
-			Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
-				 int imgWidth_, bool top, bool os, bool ot, bool ob,
-				 double cx, double cy);
+			Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
+				 int imgWidth_, bool tc,
+				 double cx, double cy, double conf);
 			Ball();
 
 			std::string properties();
 
+            Spot & getSpot() { return spot; }
 			double confidence() const { return _confidence; }
 
 			// For tool
-            Blob& getBlob() { return blob; }
 //private: should be private. leaving public for now
 			void compute();
 
 			double pixDiameterFromDist(double d) const;
 
-            Blob blob;
+            Spot spot;
+
 			FuzzyThr thresh;
 			FuzzyThr radThresh;
 
 			int centerX;
 			int centerY;
-			int firstPrincipalLength;
+			int radius;
 
 			double x_rel;
 			double y_rel;
@@ -75,6 +77,9 @@ namespace man {
 			std::string details;
 		};
 
+		typedef std::vector<std::pair<int, int>> intPairVector;
+		typedef std::vector<Spot> spotVector;
+
 		class BallDetector {
 		public:
 			BallDetector(FieldHomography* homography_, Field* field_, bool topCamera);
@@ -84,34 +89,59 @@ namespace man {
             void edgeSanityCheck(int x, int y, int radius);
             void sanityChecks(int bx, int by, int radius);
             void makeEdgeList(EdgeList & edges);
+
             int scanX(int startX, int startY, int direction, int stop);
             int scanY(int startX, int startY, int direction, int stop);
-
+            
+            int getAzimuthColumnRestrictions(double az);
+            int getAzimuthRowRestrictions(double az);
 
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
-            void filterBlackBlobs(Blob currentBlob,
-                                  std::vector<std::pair<int,int>> & blobs,
-                                  std::vector<Blob> & actualBlobs);
-            int filterWhiteBlobs(Blob currentBlob,
-                                  std::vector<std::pair<int,int>> & blobs,
-                                  std::vector<std::pair<int,int>> blackBlobs);
-            bool findCorrelatedBlackBlobs(std::vector<std::pair<int,int>> & blackBlobs,
-                                          std::vector<Blob> & actualBlobs,
-                                          double cameraHeight, bool foundBall);
+            void initializeSpotterSettings(SpotDetector &s, bool darkSpot, float innerDiam, 
+								float altInnerDiam, bool topCamera, int filterThreshold, 
+								int greenThreshold, float filterGain);
+
+            void processDarkSpots(SpotList & darkSpots, intPairVector & blackSpots, 
+            						intPairVector & badBlackSpots, spotVector & actualBlackSpots);
+            bool processWhiteSpots(SpotList & whiteSpots, intPairVector & blackSpots,
+            						intPairVector & badBlackSpots, spotVector & actualWhiteSpots,
+            						double cameraHeight, bool & foundBall);
+            bool processBlobs(Connectivity & blobber, intPairVector & blackSpots,
+                               		bool & foundBall, intPairVector & badBlackSpots,
+                                	spotVector & actualWhiteSpots, double cameraHeight,
+                                	int bottomQuarer);
+
+			bool whiteNoBlack(Spot spot);
+			bool checkGradientInSpot(Spot spot);
+			bool checkDiagonalCircle(Spot spot);
+
+            bool filterBlackSpots(Spot currentBlob);
+            bool filterWhiteBlob(Spot spot, intPairVector & blackSpots,
+            						intPairVector & badBlackSpots);
+            bool filterWhiteSpot(Spot spot, intPairVector & blackSpots,
+            						intPairVector & badBlackSpots);
+            int filterWhiteBlobs(Blob currentBlob, intPairVector &blobs,
+                                  	intPairVector blackBlobs);
+            bool findCorrelatedBlackSpots(intPairVector & blackBlobs,spotVector & actualBlobs,
+                                          	double cameraHeight, bool & foundBall);
             bool blobsAreClose(std::pair<int,int> first,
                                std::pair<int,int> second);
 
-            void makeBall(Blob blob, double cameraHeight, double conf,
+            void makeBall(Spot blob, double cameraHeight, double conf,
                           bool foundBall, bool isBlack);
+
             bool lookForFarAwayBalls(Blob blob);
+
             bool farSanityChecks(Blob blob);
             bool nearSanityChecks(Blob blob);
 			bool hardSanityCheck(int leftx, int rightx, int topy, int bottomy);
 
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
-						   ImageLiteU16 yImg);
+						   ImageLiteU16 yImg, EdgeDetector * edgeD);
 			void getColor(int x, int y);
+			int  getGreen();
+			int  getWhite();
 			bool isGreen();
 			bool isWhite();
 			bool isBlack();
@@ -121,12 +151,15 @@ namespace man {
 			// For tool
 #ifdef OFFLINE
 			const std::vector<Ball>& getBalls() const { return candidates; }
-			Connectivity* getBlobber() { return &blobber; }
+			const std::vector<Spot>& getWhiteSpots() { return debugWhiteSpots; }
+			const std::vector<Spot>& getBlackSpots() { return debugBlackSpots; }
 			void setDebugBall(bool debug) {debugBall = debug;}
+			void setDebugFilterDark(int fd) { filterThresholdDark = fd; }
+			void setDebugGreenDark(int gd) { greenThresholdDark = gd; }
+			void setDebugFilterBrite(int fb) { filterThresholdBrite = fb; }
+			void setDebugGreenBrite(int gb) { greenThresholdBrite = gb; }
 #endif
 		private:
-			Connectivity blobber;
-            Connectivity blobber2;
 			FieldHomography* homography;
 			Field* field;
 			bool topCamera;
@@ -134,19 +167,40 @@ namespace man {
 			int height;
 			int currentX, currentY;
             std::vector<Edge> goodEdges;
+			spotVector debugBlackSpots;
+			spotVector debugWhiteSpots;
+			Connectivity blobber;
 
 			DebugImage debugDraw;
 			ImageLiteU8 whiteImage, greenImage, blackImage;
 			ImageLiteU16 yImage;
+			EdgeDetector * edgeDetector;
 
 			Ball _best;
+
+			enum SpotType {
+				WHITE_CANDIDATE = 1,
+				WHITE_REJECT,
+				DARK_CANDIDATE,
+				DARK_REJECT,
+				WHITE_BLOB,
+				WHITE_BLOB_BAD
+			};
 
 			// For tool
 			std::vector<Ball> candidates;
 #ifdef OFFLINE
 			bool debugBall;
+			int filterThresholdDark;
+			int greenThresholdDark;
+			int filterThresholdBrite;
+			int greenThresholdBrite;
 #else
 			static const bool debugBall = false;
+			static const int filterThresholdDark = 144;
+			static const int greenThresholdDark = 60;
+			static const int filterThresholdBrite = 144;
+			static const int greenThresholdBrite = 120;
 #endif
 		};
 
