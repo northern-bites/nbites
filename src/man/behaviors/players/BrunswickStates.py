@@ -12,7 +12,7 @@ from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
 from math import fabs, degrees
 
-DEBUG_MANUAL_PLACEMENT = True
+DEBUG_MANUAL_PLACEMENT = False
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
