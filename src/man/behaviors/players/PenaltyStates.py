@@ -13,8 +13,8 @@ from ..util import *
 
 DEBUG_PENALTY_STATES = False
 DEBUG_MANUAL_PLACEMENT = False
-CHECK_VALS_EACH_PAN = True
-DEBUG_HORIZONS = True
+CHECK_VALS_EACH_PAN = False
+DEBUG_HORIZONS = False
 SCRIMMAGE = True
 angle = 80
 manualPlacement_angle = 65
@@ -125,13 +125,11 @@ def afterPenalty(player):
 
         # arbitrary thresholds for now!
         if afterPenalty.tCornerLeft > 20 or afterPenalty.outerLCornerRight > 20:
-            if DEBUG_PENALTY_STATES:
-                print "Player thinks the goal is on the right!"
+            print "Player thinks the goal is on the right!"
             afterPenalty.decidedSide = True
 
         elif afterPenalty.tCornerLeft < -20 or afterPenalty.outerLCornerRight < -20:
-            if DEBUG_PENALTY_STATES:
-                print "Player thinks the goal is on the left!"
+            print "Player thinks the goal is on the left!"
             afterPenalty.decidedSide = True
             afterPenalty.right = False
 
@@ -140,8 +138,8 @@ def afterPenalty(player):
             player.brain.resetLocalizationFromPenalty(afterPenalty.right)
 
         else:
+            print("THRESHOLDS WERE NOT MET! Rely on Horizons!")
             if DEBUG_PENALTY_STATES:
-                print("THRESHOLDS WERE NOT MET! Rely on Horizons!")
                 # TODO test if horizons are actually more reliable.
                 # See if this helps if we're blocking corners
                 afterPenalty.averageLeftHorizon = afterPenalty.leftHorizSum / (afterPenalty.numOfPans / 2.0)
