@@ -292,9 +292,7 @@ class HeadTrackingHelper(object):
         """
         If the relative y is positive, look left. Otherwise, look right.
         """
-
-        print "----------Looking to point------------"
-
+        
         if hasattr(target, "height"):
             height = target.height
         else:
