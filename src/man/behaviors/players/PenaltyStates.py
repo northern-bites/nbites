@@ -214,7 +214,7 @@ def manualPlacement(player):
             manualPlacement.leftHorizon += vis.horizon_dist
 
     if manualPlacement.frameCounter > 200:
-        print("Horizon totals RIGHT:", afterPenalty.rightHorizon, "LEFT:", afterPenalty.leftHorizon)
+        print("Horizon totals RIGHT:", manualPlacement.rightHorizon, "LEFT:", manualPlacement.leftHorizon)
         return player.goNow('gamePenalized')
 
 

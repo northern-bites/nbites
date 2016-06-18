@@ -1,13 +1,14 @@
 """
 Here we house all of the state methods used for kicking the ball
 """
-
+import SharedTransitions as shared
 from . import ChaseBallTransitions as transitions
 from . import ChaseBallConstants as constants
 from ..util import *
 from ..kickDecider import kicks
 from ..navigator import Navigator as nav
 from ..navigator import BrunswickSpeeds as speeds
+from ..headTracker import HeadMoves
 from objects import Location, RelRobotLocation
 
 # TODO refactor, super state?
@@ -124,20 +125,60 @@ def afterKick(player):
         player.kickedOut = False
         return player.goNow('spinSearch')
 
+    if player.counter < 300:
+        print "going to chaseAfterBall"
+        return player.goNow('chaseAfterBall')
+
+    # while not transitions.shouldChaseBall(player) and player.counter < 300:
+    #     print "Walking forward"
+    #     player.brain.nav.destinationWalkTo(RelRobotLocation(10, 0, 0))
+        # print "Standing"
+        # player.brain.nav.stand()
+        # print "Performing head move"
+        # player.brain.tracker.performHeadMove(kicks.FAST_TWO_INTERVAL)
     # elif transitions.shouldChaseBall(player):
     #     return player.goLater('approachBall')
     # elif player.stateTime > 2:
-    destinationOfKick = Location(player.kick.destinationX,
-                                 player.kick.destinationY)
-    # print "Let's go to the kick destination: " + str(destinationOfKick)
-    player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
-                          speed = speeds.SPEED_EIGHT, avoidObstacles = True,
-                          fast = True, pb = False)
+    # destinationOfKick = Location(player.kick.destinationX,
+    #                              player.kick.destinationY)
+    # # print "Let's go to the kick destination: " + str(destinationOfKick)
+    # player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
+    #                       speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+    #                       fast = True, pb = False)
 
     if player.stateTime > 12: # https://www.youtube.com/watch?v=YMufkQo5pvA
         # print "goLater: approachBall -- from afterKick"
         return player.goLater('approachBall')
 
+    return player.stay()
+
+@superState('gameControllerResponder')
+@ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
+def chaseAfterBall(player):
+    if player.firstFrame():
+        print "in chaseAfterBall"
+        player.brain.nav.destinationWalkTo(RelRobotLocation(200, 0, 0))
+        return player.stay()
+    if transitions.shouldChaseBall(player):
+        print "I can see the ball!"
+        return player.goNow('approachBall')
+    if shared.navAtPosition(player) or player.counter > 100:
+        return player.goNow('lookAroundForBall')
+    return player.stay()
+
+@superState('gameControllerResponder')
+@ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
+def lookAroundForBall(player):
+    if player.firstFrame():
+        player.brain.nav.stand()
+        player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
+        return player.stay()
+    if transitions.shouldChaseBall(player):
+        print "I can see the ball!"
+        return player.goNow('approachBall')
+    if player.counter > 50:
+        print "going back to afterKick"
+        return player.goNow('afterKick')
     return player.stay()
 
 @superState('gameControllerResponder')

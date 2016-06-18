@@ -1,6 +1,7 @@
 """
 Here we house all of the state methods used for chasing the ball
 """
+import SharedTransitions as shared
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import RoleConstants as roleConstants
@@ -20,7 +21,7 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
-    # print "approachBall"
+    print "approachBall"
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)

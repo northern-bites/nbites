@@ -234,7 +234,7 @@ def destinationWalkingTo(nav):
         helper.setDestination(nav, dest,
                               destinationWalkingTo.speed,
                               destinationWalkingTo.kick)
-        destinationWalkingTo.enqueAZeroVector = True
+        # destinationWalkingTo.enqueAZeroVector = True
     elif destinationWalkingTo.enqueAZeroVector:
         helper.setDestination(nav, RelRobotLocation(0,0,0),
                               destinationWalkingTo.speed,
