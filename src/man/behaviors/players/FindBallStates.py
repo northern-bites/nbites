@@ -1,6 +1,7 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 from ..navigator import Navigator
+from ..navigator import BrunswickSpeeds as speeds
 from ..util import *
 from objects import Location
 from math import fabs, degrees
@@ -53,7 +54,7 @@ def spinSearch(player):
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
-        player.setWalk(0, 0, spinDir*Navigator.QUICK_SPEED)
+        player.setWalk(0, 0, spinDir*speeds.SPEED_FIVE)
         player.brain.tracker.lookToSpinDirection(spinDir)
 
 @superState('gameControllerResponder')

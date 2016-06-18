@@ -128,7 +128,7 @@ def afterPenalty(player):
 
 @superState('gameControllerResponder')
 def walkOut(player):
-    player.brain.nav.walk(0.5, 0, 0)
+    player.brain.nav.walk(0.2, 0, 0)
 
     if player.stateTime > 5:
         return player.goNow('determineRole')

@@ -10,6 +10,7 @@ import KickOffConstants as kickOff
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 from ..navigator import Navigator
+from ..navigator import BrunswickSpeeds as speeds
 import noggin_constants as NogginConstants
 from objects import Location, RelRobotLocation
 from . import RoleConstants as roleConstants
@@ -57,7 +58,7 @@ def gameReady(player):
 
         player.brain.nav.goTo(myLocation,
                               precision = Navigator.PLAYBOOK,
-                              speed = Navigator.QUICK_SPEED,
+                              speed = speeds.SPEED_SEVEN,
                               avoidObstacles = True,
                               fast = True, pb = False)
 

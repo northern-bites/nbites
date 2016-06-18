@@ -78,7 +78,7 @@ def gameSet(player):
     if player.firstFrame():
         #The player's currentState = gameSet
 
-        print "GAME SET FIRST FRAME"
+        # print "GAME SET FIRST FRAME"
 
         player.inKickingState = False
         player.brain.fallController.enabled = True
@@ -96,7 +96,7 @@ def gameSet(player):
 
     elif player.brain.tracker.isStopped():
 
-        print "TRUE"
+        # print "TRUE"
 
         player.brain.tracker.trackBall(True)
         # print "Current Angle: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
@@ -183,7 +183,7 @@ def gamePenalized(player):
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
             player.brain.resetLocToCross()
-            print "BRUNSWICK PENALIZED"
+            # print "BRUNSWICK PENALIZED"
 
     if player.brain.vision.horizon_dist < 200.0:
         player.brain.penalizedEdgeClose += 1
