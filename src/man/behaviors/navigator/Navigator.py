@@ -203,7 +203,6 @@ class Navigator(FSA.FSA):
         NavStates.destinationWalkingTo.destQueue.clear()
 
         NavStates.destinationWalkingTo.destQueue.append(walkToDest)
-        
         self.requestVelocity = speed
         NavStates.destinationWalkingTo.speed = self.velocity
 

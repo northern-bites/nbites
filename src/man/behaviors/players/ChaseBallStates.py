@@ -1,6 +1,7 @@
 """
 Here we house all of the state methods used for chasing the ball
 """
+import SharedTransitions as shared
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import RoleConstants as roleConstants

@@ -1,7 +1,7 @@
 """
 Here we house all of the state methods used for kicking the ball
 """
-
+import SharedTransitions as shared
 from . import ChaseBallTransitions as transitions
 from . import ChaseBallConstants as constants
 from ..util import *
@@ -125,7 +125,8 @@ def afterKick(player):
         player.kickedOut = False
         return player.goNow('spinSearch')
 
-    if not transitions.shouldChaseBall and player.counter < 300:
+    if player.counter < 300:
+        print "going to chaseAfterBall"
         return player.goNow('chaseAfterBall')
 
     # while not transitions.shouldChaseBall(player) and player.counter < 300:
@@ -156,9 +157,9 @@ def afterKick(player):
 def chaseAfterBall(player):
     if player.firstFrame():
         print "in chaseAfterBall"
-        player.brain.nav.goTo(RelRobotLocation(25, 0, 0))
+        player.brain.nav.destinationWalkTo(RelRobotLocation(200, 0, 0))
         return player.stay()
-    if shared.navAtPosition() or player.counter > 100:
+    if shared.navAtPosition(player) or player.counter > 100:
         print "switching to lookAroundForBall"
         return player.goNow('lookAroundForBall')
     return player.stay()
@@ -171,7 +172,7 @@ def lookAroundForBall(player):
         player.brain.nav.stand()
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         return player.stay()
-    if player.counter > 100:
+    if player.counter > 50:
         print "going back to afterKick"
         return player.goNow('afterKick')
     return player.stay()
