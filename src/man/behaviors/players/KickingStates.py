@@ -124,15 +124,23 @@ def afterKick(player):
         player.kickedOut = False
         return player.goNow('spinSearch')
 
+
+    while not transitions.shouldChaseBall(player) and player.counter < 300:
+        print "Walking forward"
+        player.brain.nav.destinationWalkTo(RelRobotLocation(10, 0, 0))
+        # print "Standing"
+        # player.brain.nav.stand()
+        # print "Performing head move"
+        # player.brain.tracker.performHeadMove(kicks.FAST_TWO_INTERVAL)
     # elif transitions.shouldChaseBall(player):
     #     return player.goLater('approachBall')
     # elif player.stateTime > 2:
-    destinationOfKick = Location(player.kick.destinationX,
-                                 player.kick.destinationY)
-    # print "Let's go to the kick destination: " + str(destinationOfKick)
-    player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
-                          speed = speeds.SPEED_EIGHT, avoidObstacles = True,
-                          fast = True, pb = False)
+    # destinationOfKick = Location(player.kick.destinationX,
+    #                              player.kick.destinationY)
+    # # print "Let's go to the kick destination: " + str(destinationOfKick)
+    # player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
+    #                       speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+    #                       fast = True, pb = False)
 
     if player.stateTime > 12: # https://www.youtube.com/watch?v=YMufkQo5pvA
         # print "goLater: approachBall -- from afterKick"
