@@ -8,6 +8,7 @@ from ..util import *
 from ..kickDecider import kicks
 from ..navigator import Navigator as nav
 from ..navigator import BrunswickSpeeds as speeds
+from ..headTracker import HeadMoves
 from objects import Location, RelRobotLocation
 
 # TODO refactor, super state?
@@ -124,10 +125,12 @@ def afterKick(player):
         player.kickedOut = False
         return player.goNow('spinSearch')
 
+    if not transitions.shouldChaseBall and player.counter < 300:
+        return player.goNow('chaseAfterBall')
 
-    while not transitions.shouldChaseBall(player) and player.counter < 300:
-        print "Walking forward"
-        player.brain.nav.destinationWalkTo(RelRobotLocation(10, 0, 0))
+    # while not transitions.shouldChaseBall(player) and player.counter < 300:
+    #     print "Walking forward"
+    #     player.brain.nav.destinationWalkTo(RelRobotLocation(10, 0, 0))
         # print "Standing"
         # player.brain.nav.stand()
         # print "Performing head move"
@@ -146,6 +149,31 @@ def afterKick(player):
         # print "goLater: approachBall -- from afterKick"
         return player.goLater('approachBall')
 
+    return player.stay()
+
+@superState('gameControllerResponder')
+@ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
+def chaseAfterBall(player):
+    if player.firstFrame():
+        print "in chaseAfterBall"
+        player.brain.nav.goTo(RelRobotLocation(25, 0, 0))
+        return player.stay()
+    if shared.navAtPosition() or player.counter > 100:
+        print "switching to lookAroundForBall"
+        return player.goNow('lookAroundForBall')
+    return player.stay()
+
+@superState('gameControllerResponder')
+@ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
+def lookAroundForBall(player):
+    if player.firstFrame():
+        print "in lookAroundForBall"
+        player.brain.nav.stand()
+        player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
+        return player.stay()
+    if player.counter > 100:
+        print "going back to afterKick"
+        return player.goNow('afterKick')
     return player.stay()
 
 @superState('gameControllerResponder')
