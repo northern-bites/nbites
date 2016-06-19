@@ -8,7 +8,7 @@ public final class _File_InertialState {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_InertialState_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -30,23 +30,23 @@ public final class _File_InertialState {
       "InertialStateP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_messages_InertialState_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_messages_InertialState_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_InertialState_descriptor,
+              new java.lang.String[] { "AccX", "AccY", "AccZ", "GyrX", "GyrY", "GyrZ", "AngleX", "AngleY", "AngleZ", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_messages_InertialState_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_InertialState_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_InertialState_descriptor,
-        new java.lang.String[] { "AccX", "AccY", "AccZ", "GyrX", "GyrY", "GyrZ", "AngleX", "AngleY", "AngleZ", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
