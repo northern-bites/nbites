@@ -87,3 +87,11 @@
 #else
 #   undef USE_ROBOT_TTS
 #endif
+
+#define USE_SPL_BUTTONS_${USE_SPL_BUTTONS}
+#ifdef USE_SPL_BUTTONS_ON
+#   define USE_SPL_BUTTONS
+#else
+#   undef USE_SPL_BUTTONS
+#endif
+

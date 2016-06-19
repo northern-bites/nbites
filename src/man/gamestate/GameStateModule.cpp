@@ -27,6 +27,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "DebugConfig.h"
+
 namespace man{
     namespace gamestate{
 
@@ -172,6 +174,7 @@ namespace man{
 
         void GameStateModule::advanceState()
         {
+#ifndef USE_SPL_BUTTONS
             switch (latest_data.state())
             {
                 case STATE_INITIAL:
@@ -189,6 +192,28 @@ namespace man{
                     manual_penalize();
                     break;
             }
+#else
+            switch (latest_data.state())
+            {
+                case STATE_INITIAL:
+                    latest_data.set_state(STATE_PLAYING);
+                    manual_penalize();
+                    break;
+                case STATE_READY:
+                    latest_data.set_state(STATE_PLAYING);
+                    keep_time = true;
+                    start_time = realtime_micro_time();
+                    break;
+                case STATE_SET:
+                    latest_data.set_state(STATE_PLAYING);
+                    keep_time = true;
+                    start_time = realtime_micro_time();
+                    break;
+                case STATE_PLAYING:
+                    manual_penalize();
+                    break;
+            }
+#endif
         }
 
         void GameStateModule::manual_penalize()
