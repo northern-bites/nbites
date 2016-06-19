@@ -101,7 +101,7 @@ def ballInPosition(player, kickPose):
 
     # NOTE don't take the absolute value of kickPose.relX because being too
     # close to the ball is not a problem for kicking
-    return (kickPose.relX < constants.BALL_X_OFFSET and
+    return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and
             fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
             fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 

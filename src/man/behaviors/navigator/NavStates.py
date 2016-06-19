@@ -28,7 +28,7 @@ def kickEngine(nav):
     State that we stay in while calling kick engine
     """
     if nav.firstFrame():
-        print "First frame of kick engine"
+        # print "First frame of kick engine"
         helper.executeKickEngine(nav, kickEngine.kickType)
         return nav.stay()
 
@@ -234,7 +234,7 @@ def destinationWalkingTo(nav):
         helper.setDestination(nav, dest,
                               destinationWalkingTo.speed,
                               destinationWalkingTo.kick)
-        destinationWalkingTo.enqueAZeroVector = True
+        # destinationWalkingTo.enqueAZeroVector = True
     elif destinationWalkingTo.enqueAZeroVector:
         helper.setDestination(nav, RelRobotLocation(0,0,0),
                               destinationWalkingTo.speed,
@@ -308,6 +308,7 @@ def walking(nav):
     State to be used for velocity walking.
     """
     helper.setSpeed(nav, walking.speeds)
+    # print "walking speeds: " + str(walking.speeds)
 
     # if navTrans.shouldDodge(nav):
     #     return nav.goNow('dodge')

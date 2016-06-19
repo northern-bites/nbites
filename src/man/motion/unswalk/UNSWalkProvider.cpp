@@ -133,7 +133,7 @@ void UNSWalkProvider::adjustIMU(const ::messages::InertialState&	sensorInertials
 }
 
 bool UNSWalkProvider::upright() const {
-	return true;
+	return imuAdjuster->isFalling();
 }
 
 float UNSWalkProvider::leftHandSpeed() const {
@@ -320,8 +320,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     sensors.sensors[Sensors::InertialSensor_AngleX] = sensorInertials.angle_x();
     sensors.sensors[Sensors::InertialSensor_AngleY] = sensorInertials.angle_y();
 
-    imuAdjuster->adjustIMUs(sensorInertials.gyr_x(), sensorInertials.gyr_y(), sensorInertials.acc_x(),
-    	sensorInertials.acc_y(), sensorInertials.acc_z());
+    imuAdjuster->adjustIMUs(sensorInertials.gyr_x(), sensorInertials.gyr_y(), sensorInertials.angle_x(),
+    	sensorInertials.angle_y());
     float adjGyrX = imuAdjuster->getGyrX();
     float adjGyrY = imuAdjuster->getGyrY();
 
@@ -589,12 +589,12 @@ bool UNSWalkProvider::isWalkActive() const {
 }
 
 void UNSWalkProvider::stand() {
-	std::cout << "STAND IS BEING CALLED!!\n";
-	// currentCommand = MotionCommand::ptr();
+	// std::cout << "STAND IS BEING CALLED!!\n";
+	currentCommand = MotionCommand::ptr();
 
 	// UNTIL STAND IS WORKED OUT, JUST WALK IN PLACE
 	// CHANGE THIS BEFORE COMPETITION
-	currentCommand = WalkInPlaceCommand::ptr(new WalkInPlaceCommand());
+	// currentCommand = WalkInPlaceCommand::ptr(new WalkInPlaceCommand());
 }
 
 

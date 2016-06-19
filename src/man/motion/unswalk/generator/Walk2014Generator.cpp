@@ -173,7 +173,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
       // 1.5 ratchet forward by FORWARD_CHANGE (uncomment to limit absolute change in "forward" to FORWARD_CHANGE)
       		 if (!exactStepsRequested && abs(forward-lastForward)>FORWARD_CHANGE) {                // ie greater than a FORWARD_CHANGE / sec change
-      			std::cout << "LIMITING FORWARD CHANGE\n\n";
+      			// std::cout << "LIMITING FORWARD CHANGE\n\n";
                forward = lastForward + (forward-lastForward)/abs(forward-lastForward)*FORWARD_CHANGE;
       		}
       		lastForward   = forward;                           // back up old value in m/s

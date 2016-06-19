@@ -45,7 +45,7 @@
 #include "NBMath.h"
 
 // Default speed for destination and odometry walk
-#define DEFAULT_SPEED .5f
+#define DEFAULT_SPEED .3f
 
 namespace man
 {
