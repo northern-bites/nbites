@@ -93,8 +93,7 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
     for (auto i = blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
         int diam = (*i).firstPrincipalLength();
         int diam2 = (*i).secondPrincipalLength();
-		//std::cout<<"Diam: "<<diam<<std::endl;
-		//std::cout<<"Diam2: "<<diam2<<std::endl;
+
         if (diam < 26 && diam >= 6 && diam2 >= 5 &&
 			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
             // convert this blob to a Spot
@@ -110,9 +109,6 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
                 s.spotType = WHITE_BLOB;
                 actualWhiteSpots.push_back(s);
                 makeBall(s, cameraHeight, 0.75, foundBall, false);
-                if(debugBall) {
-                    //std::cout<<"Blobber returning true\n";
-                }
 #ifdef OFFLINE
                 foundBall = true;
 #else
@@ -240,16 +236,19 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
     return newY;
 }
 
-int BallDetector::projectedBallRadius(imagePoint p, SpotDetector & sd) {
-    // int dwx1, dwy1, dwx2, dwy2;
-    // homography->fieldVector(p.first, p.second, 1, 0, &dwx1, &dwy1);
-    // homography->fieldVector(p.first, p.second, 0, 1, &dwx2, &dwx2);
+int BallDetector::projectedBallRadius(imagePoint p) {
+    double dwx1, dwy1, dwx2, dwy2 = 0.0;
+    homography->fieldVector((double)p.first, (double)p.second, 1.0, 0.0, dwx1, dwy1);
+    // homography->fieldVector((double)p.first, (double)p.second, 0.0, 1.0, dwx2, dwy2);
 
+    double pixel_width = sqrt(dwx1*dwx1 + dwy1*dwy1);
+    // double pixel_height = sqrt(dwx2*dwx2 + dwy2*dwy2);
 
+    int rw = (int)(BALL_RADIUS/pixel_width);
+    // int rh = (int)(BALL_RADIUS/pixel_height);
 
-    // //int point_y = p.first;  
-
-    return 1;
+    // int avg_radius = (rw + rh) >> 1;
+    return rw;
 }
 
 imagePoint BallDetector::findPointsCentroid(intPairVector & v) {
@@ -263,7 +262,7 @@ imagePoint BallDetector::findPointsCentroid(intPairVector & v) {
         cx = x_sum/n;
         cy = y_sum/n;
     }
-    return std::make_pair(cx, cy);
+    return std::make_pair((int)cx, (int)cy);
 }
 
 bool BallDetector::equalDistancesFromCentroid(intPairVector & v, int projectedBallRadius) {
@@ -1214,6 +1213,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         // std::cout<<"EndRow: "<<endRow<<std::endl;
         //debugDraw.drawPoint(20, endRow, ORANGE);
         // debugDraw.drawPoint(endCol, 10, BLUE);
+        debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW);
     }
 
     // Then we are going to filter out all of the blobs that obviously

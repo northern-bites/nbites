@@ -94,7 +94,7 @@ namespace man {
             int scanX(int startX, int startY, int direction, int stop);
             int scanY(int startX, int startY, int direction, int stop);
 
-            int projectedBallRadius(imagePoint p, SpotDetector & sp);
+            int projectedBallRadius(imagePoint p);
             imagePoint findPointsCentroid(intPairVector & v);
             bool equalDistancesFromCentroid(intPairVector & v, int projectedBallRadius);
             
