@@ -1,2 +1,0 @@
-alias done='source /home/nao/nbites/scripts/done.sh && exit'
-alias naolog='tail -f /home/nao/nbites/log/nblog -f /home/nao/nbites/log/manlog'
