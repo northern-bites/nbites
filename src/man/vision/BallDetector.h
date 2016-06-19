@@ -22,6 +22,9 @@ namespace man {
 		const double HORIZ_FOV_DEG = 60.97;
 		const double HORIZ_FOV_RAD = HORIZ_FOV_DEG * M_PI / 180;
 
+		const int BOT_RESTRICTION_BUF = 15;
+		const int TOP_RESTRICTION_BUF = 10;
+
 #define BLACK 1
 #define BLUE 7
 #define MAROON 8
@@ -101,6 +104,7 @@ namespace man {
             
             int getAzimuthColumnRestrictions(double az);
             int getAzimuthRowRestrictions(double az);
+            void adjustWindow(int &startCol, int & endCol, int & endRow);
 
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
@@ -152,7 +156,7 @@ namespace man {
 			bool isWhite();
 			bool isBlack();
 
-			
+
             void billToImageCoordinates(double bx, double by, double & ix, double & iy);
             void imageToBillCoordinates(double ix, double iy, double & bx, double & by);
 

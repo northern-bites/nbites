@@ -327,6 +327,67 @@ int BallDetector::getAzimuthRowRestrictions(double az) {
     return val;
 }
 
+void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
+    int c = getAzimuthColumnRestrictions(homography->azimuth());
+    if(c < 0) {
+        endCol = -c;
+    } else {
+        startCol = c;
+    }
+    if(startCol < 0) { startCol = 0; }
+    if(endCol >= width) { endCol = width; }
+
+    int r = getAzimuthRowRestrictions(homography->azimuth());
+    if(r < 0) {
+        endRow = 0;
+    } else {
+        endRow = r;
+    }
+    if(endRow > height) {endRow = height; }
+
+    bool extendedBottom = false;
+
+    if(startCol-BOT_RESTRICTION_BUF >= 0 && endRow+BOT_RESTRICTION_BUF <= height) {
+        getColor(startCol, endRow);
+        if(isGreen()) {
+            startCol -= BOT_RESTRICTION_BUF;
+            endRow   += BOT_RESTRICTION_BUF;
+            extendedBottom = true;
+        }
+    }
+    if(endCol+BOT_RESTRICTION_BUF <= width && endRow+BOT_RESTRICTION_BUF <= height) {
+        getColor(endCol, endRow);
+        if(isGreen()) {
+            endCol += BOT_RESTRICTION_BUF;
+            endRow += BOT_RESTRICTION_BUF;
+            extendedBottom = true;
+        }
+    }
+    if(startCol-TOP_RESTRICTION_BUF >= 0) {
+        std::cout<<"can shift start left\n";
+        getColor(startCol, 0);
+        if(isGreen()) {
+            if(extendedBottom) {
+                std::cout<<"extented bottom\n";
+                startCol -= TOP_RESTRICTION_BUF/2;
+            } else {
+                std::cout<<"shifting start left\n";
+                startCol -= TOP_RESTRICTION_BUF;
+            }
+        }
+    }
+    if(endCol+TOP_RESTRICTION_BUF <= width) {
+        getColor(startCol, 0);
+        if(isGreen()) {
+            if(extendedBottom) {
+                endCol += TOP_RESTRICTION_BUF/2;
+            } else {
+                endCol += TOP_RESTRICTION_BUF;
+            }
+        }
+    }
+}
+
 /* We have a potential ball on the horizon. Do some checking to
    screen out potential other stuff.
    This is a substantial area of possible improvement - more sanity
@@ -1186,22 +1247,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     int endCol = width;
     int endRow = width;
     if(!topCamera) {
-        int c = getAzimuthColumnRestrictions(homography->azimuth());
-        if(c < 0) {
-            endCol = -c;
-        } else {
-            startCol = c;
-        }
-        if(startCol < 0) { startCol = 0; }
-        if(endCol >= width) { endCol = width; }
-
-        int r = getAzimuthRowRestrictions(homography->azimuth());
-        if(r < 0) {
-            endRow = 0;
-        } else {
-            endRow = r;
-        }
-        if(endRow > height) {endRow = height; }
+        adjustWindow(startCol, endCol, endRow);
     }
 
     if(debugBall) {
