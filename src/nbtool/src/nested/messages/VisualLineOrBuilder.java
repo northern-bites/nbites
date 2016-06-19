@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisualLineOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.VisualLine)
-    com.google.protobuf.MessageOrBuilder {
+public interface VisualLineOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional .messages.VisualDetection visual_detection = 1;
   /**
    * <code>optional .messages.VisualDetection visual_detection = 1;</code>
    */
@@ -20,6 +20,7 @@ public interface VisualLineOrBuilder extends
    */
   messages.VisualDetectionOrBuilder getVisualDetectionOrBuilder();
 
+  // optional int32 start_x = 2;
   /**
    * <code>optional int32 start_x = 2;</code>
    */
@@ -29,6 +30,7 @@ public interface VisualLineOrBuilder extends
    */
   int getStartX();
 
+  // optional int32 start_y = 3;
   /**
    * <code>optional int32 start_y = 3;</code>
    */
@@ -38,6 +40,7 @@ public interface VisualLineOrBuilder extends
    */
   int getStartY();
 
+  // optional float start_dist = 12;
   /**
    * <code>optional float start_dist = 12;</code>
    */
@@ -47,6 +50,7 @@ public interface VisualLineOrBuilder extends
    */
   float getStartDist();
 
+  // optional float start_bearing = 13;
   /**
    * <code>optional float start_bearing = 13;</code>
    */
@@ -56,6 +60,7 @@ public interface VisualLineOrBuilder extends
    */
   float getStartBearing();
 
+  // optional int32 end_x = 4;
   /**
    * <code>optional int32 end_x = 4;</code>
    */
@@ -65,6 +70,7 @@ public interface VisualLineOrBuilder extends
    */
   int getEndX();
 
+  // optional int32 end_y = 5;
   /**
    * <code>optional int32 end_y = 5;</code>
    */
@@ -74,6 +80,7 @@ public interface VisualLineOrBuilder extends
    */
   int getEndY();
 
+  // optional float end_dist = 14;
   /**
    * <code>optional float end_dist = 14;</code>
    */
@@ -83,6 +90,7 @@ public interface VisualLineOrBuilder extends
    */
   float getEndDist();
 
+  // optional float end_bearing = 15;
   /**
    * <code>optional float end_bearing = 15;</code>
    */
@@ -92,6 +100,7 @@ public interface VisualLineOrBuilder extends
    */
   float getEndBearing();
 
+  // optional float angle = 6;
   /**
    * <code>optional float angle = 6;</code>
    */
@@ -101,6 +110,7 @@ public interface VisualLineOrBuilder extends
    */
   float getAngle();
 
+  // optional float avg_width = 7;
   /**
    * <code>optional float avg_width = 7;</code>
    */
@@ -110,6 +120,7 @@ public interface VisualLineOrBuilder extends
    */
   float getAvgWidth();
 
+  // optional float length = 8;
   /**
    * <code>optional float length = 8;</code>
    */
@@ -119,6 +130,7 @@ public interface VisualLineOrBuilder extends
    */
   float getLength();
 
+  // optional float slope = 9;
   /**
    * <code>optional float slope = 9;</code>
    */
@@ -128,6 +140,7 @@ public interface VisualLineOrBuilder extends
    */
   float getSlope();
 
+  // optional float y_int = 10;
   /**
    * <code>optional float y_int = 10;</code>
    */
@@ -137,6 +150,7 @@ public interface VisualLineOrBuilder extends
    */
   float getYInt();
 
+  // repeated .messages.VisualLine.line_id possibilities = 11;
   /**
    * <code>repeated .messages.VisualLine.line_id possibilities = 11;</code>
    */

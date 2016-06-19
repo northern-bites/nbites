@@ -81,9 +81,60 @@ class HeadTracker(FSA.FSA):
     def repeatBasicPan(self):
         '''Repeat the basic fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
-    
+
+    def performSnapPan(self):
+        self.performHeadMove(HeadMoves.SNAP_PAN)
+
+    def repeatSnapPan(self):
+
+        # print "REPEATING STANDARD SNAP PAN WITH NEW TIMES"
+
+        self.repeatHeadMove(HeadMoves.SNAP_PAN)
+
+    def performWideSnapPan(self):
+        self.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    def repeatWideSnapPan(self):
+        self.repeatHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    def performFastSnapPan(self):
+        self.performHeadMove(HeadMoves.FAST_SNAP_PAN)
+
+    def repeatFastSnapPan(self):
+        self.repeatHeadMove(HeadMoves.FAST_SNAP_PAN)
+
+    def performWideFastSnapPan(self):
+        self.performHeadMove(HeadMoves.WIDE_FAST_SNAP_PAN)
+
+    def repeatWideFastSnapPan(self):
+        self.repeatHeadMove(HeadMoves.WIDE_FAST_SNAP_PAN)
+
+    def performCenterSnapPan(self):
+        self.performHeadMove(HeadMoves.CENTER_SNAP_PAN)
+
+    def repeatCenterSnapPan(self):
+        self.repeatHeadMove(HeadMoves.CENTER_SNAP_PAN)
+
+    def performGoalieWideSnapPan(self):
+        self.performHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+
+    def repeatGoalieWideSnapPan(self):
+        self.repeatHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+
     def performWidePan(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+
+    def performGameSetWideSnapPan(self):
+        self.performHeadMove(HeadMoves.GAME_SET_WIDE_SNAP_PAN)
+
+    def performGameSetInitialWideSnapPan(self):
+        self.performHeadMove(HeadMoves.GAME_SET_INITIAL_WIDE_SNAP_PAN)
+
+    def performFixedPitchLookAhead(self):
+        self.performHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+
+    def repeatFixedPitchLookAhead(self):
+        self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
 
     def repeatWidePan(self):
         """
@@ -99,12 +150,18 @@ class HeadTracker(FSA.FSA):
     def repeatFastNarrowPan(self):
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW_FAST)
 
+    def performFastTwoIntervalPan(self):
+        self.performHeadMove(HeadMoves.FAST_TWO_INTERVAL)
+
+    def repeatFastTwoIntervalPan(self):
+        self.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
+
     # @param invert: false if pan should start to the left,
     #                true if pan should start to the right
     def performKickPan(self, invert = False):
         self.performHeadMove(self.helper.convertKickPan(HeadMoves.FIXED_PITCH_KICK_PAN, invert))
 
-    def trackBall(self):
+    def trackBall(self, gameSet = False, gamePlaying = False):
         """
         Enters a state cycle:
         When ball is in view, tracks via vision values.
@@ -116,9 +173,22 @@ class HeadTracker(FSA.FSA):
             self.bounceTrackBall()
             return
 
-        if (self.currentState is not 'fullPan' and
-            self.currentState is not 'tracking'):
-            self.switchTo('tracking')
+        self.target = self.brain.ball
+
+        if (gameSet): # == True
+
+            if (self.currentState is not 'gameSetSnapPan' and self.currentState is not 'gameSetTracking'):
+                self.switchTo('gameSetTracking')
+                return
+
+        if (gamePlaying):
+
+            if (self.currentState is not 'goalieSnapPan' and self.currentState is not 'goalieTracking'):
+                self.switchTo('goalieTracking')
+                return
+
+        if (self.currentState is not 'gamePlayingSnapPan' and self.currentState is not 'tracking'):
+            self.switchTo('tracking') # which is in TrackingStates.py
 
     def bounceTrackBall(self):
         """
@@ -139,15 +209,18 @@ class HeadTracker(FSA.FSA):
         Look to the direction we are spinning.
         """
         if direction < 0:
-            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT)
+            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEAST_RIGHT)
         else:
-            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT)
+            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEAST_LEFT)
 
     def lookToAngle(self, yaw):
         """
         Look to the given yaw at an appropriate (fixed) pitch.
         """
         self.performHeadMove(self.helper.lookToAngle(yaw))
+
+    def lookToAngleWithTime(self, yaw, time):
+        self.performHeadMove(self.helper.lookToAngleWithTime(yaw, time))
 
     def trackSharedBall(self):
         self.switchTo('trackSharedBall')

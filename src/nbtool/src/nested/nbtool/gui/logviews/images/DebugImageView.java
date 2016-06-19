@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.Container;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.event.ComponentAdapter;
@@ -27,6 +28,10 @@ import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
 import javax.swing.JSlider;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JLabel;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import java.awt.GridLayout;
 
 import nbtool.data.SExpr;
@@ -83,8 +88,12 @@ public class DebugImageView extends VisionView implements
     ChangeListener sliderListener;
     static int thresh = 128;
 
-    static final int NUMBER_OF_PARAMS = 5; // update as new params are added
+    static final int NUMBER_OF_PARAMS = 9; // update as new params are added
     static int displayParams[] = new int[NUMBER_OF_PARAMS];
+	int filterThresholdDark;
+	int greenThresholdDark;
+	int filterThresholdBrite;
+	int greenThresholdBrite;
 
     // Dimensions of the image that we are working with
     int width;
@@ -138,13 +147,22 @@ public class DebugImageView extends VisionView implements
 
 		// default image to display - save across instances
 		if (firstLoad) {
-			persistant = new PersistantStuff(this);
 			for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
 				displayParams[i] = 0;
 			}
+			// ideally these would actually be read from NBCROSS
+			filterThresholdDark = 140;
+			greenThresholdDark = 60;
+			filterThresholdBrite = 150;
+			greenThresholdBrite = 120;
+			displayParams[5] = filterThresholdDark;
+			displayParams[6] = greenThresholdDark;
+			displayParams[7] = filterThresholdBrite;
+			displayParams[8] = greenThresholdBrite;
 
 			firstLoad = false;
 			currentBottom = ORIGINAL;
+			persistant = new PersistantStuff(this);
 		} else {
 			System.out.println("Reloading");
 			newLogLoaded = true;
@@ -181,7 +199,11 @@ public class DebugImageView extends VisionView implements
 										SExpr.newKeyValue("FieldHorizon", displayParams[1]),
 										SExpr.newKeyValue("DebugHorizon", displayParams[2]),
 										SExpr.newKeyValue("DebugField", displayParams[3]),
-										SExpr.newKeyValue("DebugBall", displayParams[4]));
+										SExpr.newKeyValue("DebugBall", displayParams[4]),
+										SExpr.newKeyValue("FilterDark", displayParams[5]),
+										SExpr.newKeyValue("GreenDark", displayParams[6]),
+										SExpr.newKeyValue("FilterBrite", displayParams[7]),
+										SExpr.newKeyValue("GreenBrite", displayParams[8]));
 
 
         // Look for existing Params atom in current this.log description
@@ -505,8 +527,9 @@ public class DebugImageView extends VisionView implements
 
 
     class PersistantStuff extends JPanel
-		implements ItemListener {
+		implements ItemListener, ChangeListener {
 		JPanel checkBoxPanel;
+		JPanel paramPanel;
 		JCheckBox showCameraHorizon;
 		JCheckBox showFieldHorizon;
 		JCheckBox debugHorizon;
@@ -516,6 +539,10 @@ public class DebugImageView extends VisionView implements
 		boolean displayFieldLines;
 		boolean drawAllBalls;
 		DebugImageView parent;
+		JSpinner filterDark;
+		JSpinner greenDark;
+		JSpinner filterBrite;
+		JSpinner greenBrite;
 
 		PersistantStuff(DebugImageView p) {
 			parent = p;
@@ -553,8 +580,52 @@ public class DebugImageView extends VisionView implements
 			debugBall.setSelected(false);
 			showFieldLines.setSelected(false);
 
+			SpinnerModel filterDarkModel = new
+				SpinnerNumberModel(parent.displayParams[5], 0, 512, 4);
+			SpinnerModel greenDarkModel = new
+				SpinnerNumberModel(parent.displayParams[6], 0, 255, 4);
+			SpinnerModel filterBriteModel = new
+				SpinnerNumberModel(parent.displayParams[7], 0, 512, 4);
+			SpinnerModel greenBriteModel = new
+				SpinnerNumberModel(parent.displayParams[8], 0, 255, 4);
+			paramPanel = new JPanel();
+			paramPanel.setLayout(new GridLayout(0, 2));
+			filterDark = addLabeledSpinner(paramPanel, "filterThresholdDark",
+										   filterDarkModel);
+			greenDark = addLabeledSpinner(paramPanel, "greenThresholdDark",
+										  greenDarkModel);
+			filterBrite = addLabeledSpinner(paramPanel, "filterThresholdBrite",
+											filterBriteModel);
+			greenBrite = addLabeledSpinner(paramPanel, "greenThresholdBrite",
+										   greenBriteModel);
+			greenBrite.addChangeListener(this);
+			filterBrite.addChangeListener(this);
+			greenDark.addChangeListener(this);
+			filterDark.addChangeListener(this);
+
+
 			add(checkBoxPanel);
-			setSize(300, 300);
+			add(paramPanel);
+			setSize(400, 500);
+		}
+
+		protected JSpinner addLabeledSpinner(Container c, String label,
+													SpinnerModel model) {
+			JLabel l = new JLabel(label);
+			c.add(l);
+			JSpinner spinner = new JSpinner(model);
+			l.setLabelFor(spinner);
+			c.add(spinner);
+			return spinner;
+		}
+
+		public void stateChanged(ChangeEvent e) {
+			parent.displayParams[5] = ((Integer)filterDark.getValue()).intValue();
+			parent.displayParams[6] = ((Integer)greenDark.getValue()).intValue();
+			parent.displayParams[7] = ((Integer)filterBrite.getValue()).intValue();
+			parent.displayParams[8] = ((Integer)greenBrite.getValue()).intValue();
+			parent.adjustParams();
+			parent.repaint();
 		}
 
 		public void setParent(DebugImageView p) {

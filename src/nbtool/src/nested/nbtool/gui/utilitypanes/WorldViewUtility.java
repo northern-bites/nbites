@@ -111,11 +111,10 @@ public class WorldViewUtility extends UtilityParent {
 						} else {
 							robots[tb.dataTeamPacket.getPlayerNumber()-1] = null;
 						}
-
 						//shared ball
 						if(index == 3 || index == 4) {
 							robots[tb.dataTeamPacket.getPlayerNumber()-1].wvSharedBall(tb);
-						} 
+						}
 						updateTeamInfo(tb);
 						fieldDisplay.repaint();
 					} else {

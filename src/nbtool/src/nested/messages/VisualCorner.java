@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.VisualCorner}
  */
-public final class VisualCorner extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.VisualCorner)
-    VisualCornerOrBuilder {
+public  final class VisualCorner extends
+    com.google.protobuf.GeneratedMessage
+    implements VisualCornerOrBuilder {
   // Use VisualCorner.newBuilder() to construct.
   private VisualCorner(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -94,7 +93,7 @@ public final class VisualCorner extends
             messages.VisualCorner.corner_id value = messages.VisualCorner.corner_id.valueOf(rawValue);
             if (value == null) {
               unknownFields.mergeVarintField(5, rawValue);
-              } else {
+            } else {
               if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
                 possId_ = new java.util.ArrayList<messages.VisualCorner.corner_id>();
                 mutable_bitField0_ |= 0x00000010;
@@ -111,7 +110,7 @@ public final class VisualCorner extends
               messages.VisualCorner.corner_id value = messages.VisualCorner.corner_id.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
-                } else {
+              } else {
                 if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
                   possId_ = new java.util.ArrayList<messages.VisualCorner.corner_id>();
                   mutable_bitField0_ |= 0x00000010;
@@ -974,6 +973,7 @@ public final class VisualCorner extends
   }
 
   private int bitField0_;
+  // optional .messages.VisualDetection visual_detection = 1;
   public static final int VISUAL_DETECTION_FIELD_NUMBER = 1;
   private messages.VisualDetection visualDetection_;
   /**
@@ -995,6 +995,7 @@ public final class VisualCorner extends
     return visualDetection_;
   }
 
+  // optional float orientation = 2;
   public static final int ORIENTATION_FIELD_NUMBER = 2;
   private float orientation_;
   /**
@@ -1010,6 +1011,7 @@ public final class VisualCorner extends
     return orientation_;
   }
 
+  // optional .messages.VisualCorner.shape corner_type = 3;
   public static final int CORNER_TYPE_FIELD_NUMBER = 3;
   private messages.VisualCorner.shape cornerType_;
   /**
@@ -1025,6 +1027,7 @@ public final class VisualCorner extends
     return cornerType_;
   }
 
+  // optional float physical_orientation = 4;
   public static final int PHYSICAL_ORIENTATION_FIELD_NUMBER = 4;
   private float physicalOrientation_;
   /**
@@ -1040,6 +1043,7 @@ public final class VisualCorner extends
     return physicalOrientation_;
   }
 
+  // repeated .messages.VisualCorner.corner_id poss_id = 5;
   public static final int POSS_ID_FIELD_NUMBER = 5;
   private java.util.List<messages.VisualCorner.corner_id> possId_;
   /**
@@ -1061,6 +1065,7 @@ public final class VisualCorner extends
     return possId_.get(index);
   }
 
+  // optional sint32 x = 6;
   public static final int X_FIELD_NUMBER = 6;
   private int x_;
   /**
@@ -1076,6 +1081,7 @@ public final class VisualCorner extends
     return x_;
   }
 
+  // optional sint32 y = 7;
   public static final int Y_FIELD_NUMBER = 7;
   private int y_;
   /**
@@ -1103,8 +1109,7 @@ public final class VisualCorner extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -1258,9 +1263,8 @@ public final class VisualCorner extends
    * Protobuf type {@code messages.VisualCorner}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.VisualCorner)
-      messages.VisualCornerOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.VisualCornerOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionField.internal_static_messages_VisualCorner_descriptor;
@@ -1444,6 +1448,7 @@ public final class VisualCorner extends
     }
     private int bitField0_;
 
+    // optional .messages.VisualDetection visual_detection = 1;
     private messages.VisualDetection visualDetection_ = messages.VisualDetection.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder> visualDetectionBuilder_;
@@ -1552,7 +1557,7 @@ public final class VisualCorner extends
       if (visualDetectionBuilder_ == null) {
         visualDetectionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder>(
-                getVisualDetection(),
+                visualDetection_,
                 getParentForChildren(),
                 isClean());
         visualDetection_ = null;
@@ -1560,6 +1565,7 @@ public final class VisualCorner extends
       return visualDetectionBuilder_;
     }
 
+    // optional float orientation = 2;
     private float orientation_ ;
     /**
      * <code>optional float orientation = 2;</code>
@@ -1592,6 +1598,7 @@ public final class VisualCorner extends
       return this;
     }
 
+    // optional .messages.VisualCorner.shape corner_type = 3;
     private messages.VisualCorner.shape cornerType_ = messages.VisualCorner.shape.UNKNOWN;
     /**
      * <code>optional .messages.VisualCorner.shape corner_type = 3;</code>
@@ -1627,6 +1634,7 @@ public final class VisualCorner extends
       return this;
     }
 
+    // optional float physical_orientation = 4;
     private float physicalOrientation_ ;
     /**
      * <code>optional float physical_orientation = 4;</code>
@@ -1659,6 +1667,7 @@ public final class VisualCorner extends
       return this;
     }
 
+    // repeated .messages.VisualCorner.corner_id poss_id = 5;
     private java.util.List<messages.VisualCorner.corner_id> possId_ =
       java.util.Collections.emptyList();
     private void ensurePossIdIsMutable() {
@@ -1716,8 +1725,7 @@ public final class VisualCorner extends
     public Builder addAllPossId(
         java.lang.Iterable<? extends messages.VisualCorner.corner_id> values) {
       ensurePossIdIsMutable();
-      com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, possId_);
+      super.addAll(values, possId_);
       onChanged();
       return this;
     }
@@ -1731,6 +1739,7 @@ public final class VisualCorner extends
       return this;
     }
 
+    // optional sint32 x = 6;
     private int x_ ;
     /**
      * <code>optional sint32 x = 6;</code>
@@ -1763,6 +1772,7 @@ public final class VisualCorner extends
       return this;
     }
 
+    // optional sint32 y = 7;
     private int y_ ;
     /**
      * <code>optional sint32 y = 7;</code>

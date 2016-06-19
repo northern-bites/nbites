@@ -1,0 +1,98 @@
+{
+  "camera_TOP" :
+    {
+      "green" :
+        {
+          "uAtY0" :
+            166,
+          "uAtY255" :
+            160,
+          "vAtY0" :
+            126,
+          "vAtY255" :
+            182,
+          "u_fuzzy_range" :
+            100,
+          "v_fuzzy_range" :
+            132
+        },
+      "white" :
+        {
+          "uAtY0" :
+            106,
+          "uAtY255" :
+            159,
+          "vAtY0" :
+            152,
+          "vAtY255" :
+            60,
+          "u_fuzzy_range" :
+            122,
+          "v_fuzzy_range" :
+            137
+        },
+      "black" :
+        {
+          "uAtY0" :
+            198.125,
+          "uAtY255" :
+            18.35000000000001,
+          "vAtY0" :
+            200.675,
+          "vAtY255" :
+            29.825000000000003,
+          "u_fuzzy_range" :
+            135.65,
+          "v_fuzzy_range" :
+            158.6
+        }
+    },
+  "camera_BOT" :
+    {
+      "green" :
+        {
+          "uAtY0" :
+            156,
+          "uAtY255" :
+            147,
+          "vAtY0" :
+            122,
+          "vAtY255" :
+            206,
+          "u_fuzzy_range" :
+            115,
+          "v_fuzzy_range" :
+            130
+        },
+      "white" :
+        {
+          "uAtY0" :
+            53,
+          "uAtY255" :
+            214,
+          "vAtY0" :
+            92,
+          "vAtY255" :
+            228,
+          "u_fuzzy_range" :
+            139,
+          "v_fuzzy_range" :
+            134
+        },
+      "black" :
+        {
+          "uAtY0" :
+            157.325,
+          "uAtY255" :
+            175.175,
+          "vAtY0" :
+            113.975,
+          "vAtY255" :
+            191.75,
+          "u_fuzzy_range" :
+            102.5,
+          "v_fuzzy_range" :
+            129.275
+        }
+    }
+}
