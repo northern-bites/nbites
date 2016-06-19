@@ -147,9 +147,9 @@ def prepareForKick(player):
 
     if not player.inKickOffPlay:
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
-            # print "Overriding kick decider for kickoff!"
+            print "Overriding kick decider for kickoff!"
             player.shouldKickOff = False
-            player.kick = player.decider.new2016KickStrategy()
+            player.kick = player.decider.diagonalKickoffStrategy()
         else:
             player.shouldKickOff = False
             # print("PREPAREFOREKICK THIS CASE")

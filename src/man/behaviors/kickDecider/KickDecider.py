@@ -92,6 +92,25 @@ class KickDecider(object):
         except:
             return None
 
+    def diagonalKickoff(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_DIAGONAL_KICK)
+        self.kicks.append(kicks.RIGHT_DIAGONAL_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
     # def frontKicksOrbitIfSmall(self):
     #     print "frontKicksOrbitIfSmall"
     #     self.brain.player.motionKick = False
@@ -629,6 +648,9 @@ class KickDecider(object):
     """ THIS IS THE ONE WE'RE USING NOW"""
     def new2016KickStrategy(self):
         return self.frontKicksOrbit()
+
+    def diagonalKickoffStrategy(self):
+        return self.diagonalKickoff()
 
     # def usOpenStrategy2016(self): # TODO REMOVE UNDO POOP
     #     print "usOpenStrategy2016"
