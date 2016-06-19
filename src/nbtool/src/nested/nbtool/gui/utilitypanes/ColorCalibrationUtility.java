@@ -1,5 +1,6 @@
 package nbtool.gui.utilitypanes;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -319,6 +320,7 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 			ColorCalibrationTab tab;
 
 			ImageDisplay imageDisplay;
+			ImageDisplay imageDisplayNorm;
 
 			Log dropped = null;
 			int dropped_width, dropped_height;
@@ -439,6 +441,12 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 						.asNumber().asInt();
 				dropped_height = dropped.blocks.get(0).dict.get(SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS())
 							.asNumber().asInt();
+
+
+				if (imageDisplayNorm != null)
+					imageDisplayNorm.setImage(dropped.blocks.get(0).parseAsYUVImage().toBufferedImage());
+				else debug.error("{%s} null image display for normal pic!", title());
+
 				visionCall();
 			}
 
@@ -548,34 +556,20 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				}
 
 				imageDisplay = new ImageDisplay();
-				tab.imageTabs.add("result", imageDisplay);
+				tab.imageSplitPane.setLeftComponent(imageDisplay);
+
+				imageDisplayNorm = new ImageDisplay();
+				tab.imageSplitPane.setRightComponent(imageDisplayNorm);
+
+				tab.imageSplitPane.setResizeWeight(0.5);
+				tab.imageSplitPane.setEnabled(false);
+				tab.imageSplitPane.setBackground(Color.BLACK);
+				tab.imageSplitPane.setForeground(Color.BLACK);
+
+				tab.imageSplitPane.setDividerLocation(0.5);
+
 
 				LogDND.makeComponentTarget(tab, top ? topCameraTarget : botCameraTarget);
-
-//				LogDND.makeComponentTarget(tab, new LogDNDTarget(){
-//				@Override
-//				public void takeLogsFromDrop(Log[] log) {
-//						if (log.length > 0) {
-//							Log attempt = log[0];
-//
-//							if (!attempt.logClass.equals("tripoint")) {
-//								ToolMessage.displayError("must use tripoint log for ColorCalibration, not %s!",
-//										attempt.logClass);
-//								return;
-//							}
-//
-//							String reqFrom = top ? "camera_TOP" : "camera_BOT";
-//
-//							if (!attempt.blocks.get(0).whereFrom.equals(reqFrom)) {
-//								ToolMessage.displayError("tab {%s} must have log from: %s",
-//										title(), reqFrom);
-//								return;
-//							}
-//
-//							useLog(log[0]);
-//						}
-//				}
-//				});
 
 				debug.info("leaving constructor");
 			}
