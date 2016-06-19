@@ -11,6 +11,8 @@ std::vector<nbl::Block> detect_results;
 
 using namespace nbsound;
 
+#if DETECT_METHOD == DETECT_WITH_SDEV
+
 namespace detect {
 
     bool inited = false;
@@ -229,6 +231,6 @@ namespace detect {
     bool cleanup() {
         return true;
     }
-
-
 }
+
+#endif
