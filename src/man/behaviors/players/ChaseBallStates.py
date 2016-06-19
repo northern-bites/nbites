@@ -70,7 +70,7 @@ def walkToWayPoint(player):
 
     if transitions.shouldDecelerate(player):
         # print "I should decelerate"
-        speed = speeds.SPEED_THREE
+        speed = speeds.SPEED_FIVE
     else:
         speed = speeds.SPEED_EIGHT
 
@@ -307,17 +307,34 @@ def orbitBall(player):
         #player.stopWalking()
         return player.goLater('approachBall')
 
+        
+    xSpeed = 0.0
+    ySpeed = 0.0
+    hSpeed = 0.0
+
     # Set our walk. Nav will make sure that we don't set duplicate speeds.
     if relH < 0:
         if relH < -20:
-            player.setWalk(0, 0.7, -0.25)
+            xSpeed = 0.0
+            ySpeed = 0.7
+            hSpeed = -0.25
+            # player.setWalk(0, 0.7, -0.25)
         else:
-            player.setWalk(0, 0.5, -0.15)
+            xSpeed = 0.0
+            ySpeed = 0.5
+            hSpeed = -0.15
+            # player.setWalk(0, 0.5, -0.15)
     elif relH > 0:
         if relH > 20:
-            player.setWalk(0, -0.7, 0.25)
+            xSpeed = 0.0
+            ySpeed = -0.7
+            hSpeed = 0.25
+            # player.setWalk(0, -0.7, 0.25)
         else:
-            player.setWalk(0, -0.5, 0.15)
+            xSpeed = 0.0
+            ySpeed = -0.5
+            hSpeed = 0.15
+            # player.setWalk(0, -0.5, 0.15)
 
     # DEBUGGING PRINT OUTS
     if constants.DEBUG_ORBIT and player.counter%20 == 0:
@@ -330,44 +347,66 @@ def orbitBall(player):
     # X correction
     if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR <
         player.brain.ball.distance): # Too far away
-        player.brain.nav.setXSpeed(.15)
+        xSpeed = orbitBall.X_SPEED
+        # player.brain.nav.setXSpeed(orbitBall.X_SPEED)
     elif (constants.ORBIT_BALL_DISTANCE - constants.ORBIT_DISTANCE_CLOSE >
           player.brain.ball.distance): # Too close
-        player.brain.nav.setXSpeed(-.15)
+        xSpeed = orbitBall.X_BACKUP_SPEED
+        # player.brain.nav.setXSpeed(-orbitBall.X_BACKUP_SPEED)
     elif (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_GOOD >
           player.brain.ball.distance and constants.ORBIT_BALL_DISTANCE -
           constants.ORBIT_DISTANCE_GOOD < player.brain.ball.distance):
-        player.brain.nav.setXSpeed(0)
+        xSpeed = 0.0
+        # player.brain.nav.setXSpeed(0)
 
     # H correction
     if relH < 0: # Orbiting clockwise
         if player.brain.ball.rel_y > 2:
-            player.brain.nav.setHSpeed(0)
+            hSpeed = 0.0
+            # player.brain.nav.setHSpeed(0)
         elif player.brain.ball.rel_y < -2:
             if relH < -20:
-                player.brain.nav.setHSpeed(-0.35)
+                hSpeed = -0.35
+                # player.brain.nav.setHSpeed(-0.35)
             else:
-                player.brain.nav.setHSpeed(-0.2)
+                hSpeed = -0.2
+                # player.brain.nav.setHSpeed(-0.2)
         else:
             if relH < -20:
-                player.brain.nav.setHSpeed(-0.25)
+                hSpeed = -0.25
+                # player.brain.nav.setHSpeed(-0.25)
             else:
-                player.brain.nav.setHSpeed(-0.15)
+                hSpeed = -0.15
+                # player.brain.nav.setHSpeed(-0.15)
     else: # Orbiting counter-clockwise
         if player.brain.ball.rel_y > 2:
             if relH > 20:
-                player.brain.nav.setHSpeed(0.35)
+                hSpeed = 0.35
+                # player.brain.nav.setHSpeed(0.35)
             else:
-                player.brain.nav.setHSpeed(0.2)
+                hSpeed = 0.2
+                # player.brain.nav.setHSpeed(0.2)
         elif player.brain.ball.rel_y < -2:
-            player.brain.nav.setHSpeed(0)
+            hSpeed = 0.0
+            # player.brain.nav.setHSpeed(0)
         else:
             if relH > 20:
-                player.brain.nav.setHSpeed(0.25)
+                hSpeed = 0.25
+                # player.brain.nav.setHSpeed(0.25)
             else:
-                player.brain.nav.setHSpeed(0.15)
+                hSpeed = 0.15
+                # player.brain.nav.setHSpeed(0.15)
 
+    player.setWalk(xSpeed, ySpeed, hSpeed)
+    # print("Orbit speedx: ", xSpeed, "speedY:", ySpeed, "hSpeed:", hSpeed)
     return player.stay()
+
+orbitBall.X_SPEED = .35
+orbitBall.X_BACKUP_SPEED = .2
+
+# <<<<<
+
+
 
 @superState('positionAndKickBall')
 def spinToBall(player):

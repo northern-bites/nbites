@@ -1,5 +1,5 @@
 {
-  "ringo" :
+  "blt" :
     {
       "camera_TOP" :
         {
@@ -16,7 +16,7 @@
             0.022088
         }
     },
-  "avril" :
+  "buzz" :
     {
       "camera_TOP" :
         {
@@ -33,7 +33,7 @@
             0.089381
         }
     },
-  "ozzy" :
+  "wasp" :
     {
       "camera_TOP" :
         {
@@ -50,7 +50,7 @@
             -0.014835
         }
     },
-  "beyonce" :
+  "elektra" :
     {
       "camera_TOP" :
         {

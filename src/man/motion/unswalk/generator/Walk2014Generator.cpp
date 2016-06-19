@@ -146,10 +146,10 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       // 1.0 For backwards compatibility with old interface (can be deleted when behaviours are updated)
       if(forward==0 and left==0 and turn==0 and power==0) bend=0;
       speed = 0.0;
-      if (forward < .01 && forward > 0.0) { 
+      if (forward < .05 && forward > 0.0) { 
          // std::cout << "Adjust forward to bigger!" << forward << std::endl;
          forward = .05; 
-      } else if (forward > -.01 && forward < 0.0) {
+      } else if (forward > -.05 && forward < 0.0) {
          // std::cout << "Adjust forward to less " << forward << std::endl;
          forward = -.05;
       }
@@ -157,6 +157,8 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
          // forward = .1;
          // std::cout << "Forward is less than .1!! bad \n";
       }
+
+
 
       // 1.1 Scale back values to try to ensure stability. Just clipped for now (see wiki)
       if(forward>MAX_FORWARD) forward = MAX_FORWARD; if(forward<-MAX_BACKWARDS) forward = -MAX_BACKWARDS;
