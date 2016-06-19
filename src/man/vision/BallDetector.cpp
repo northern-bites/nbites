@@ -235,6 +235,7 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
     }
     return newY;
 }
+
 //this expects coordinates in Bill's coordinate system;
 int BallDetector::projectedBallRadius(imagePoint p) {
     double dwx1, dwy1, dwx2, dwy2 = 0.0;
@@ -1365,6 +1366,19 @@ void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
     blackImage = black;
     yImage = yImg;
 	edgeDetector = edgeD;
+}
+
+void BallDetector::billToImageCoordinates(double bx, double by, 
+                                          double & ix, double & iy){
+
+    ix = bx + width/2;
+    iy = -1*by + height/2;
+}
+
+void BallDetector::imageToBillCoordinates(double ix, double iy, 
+                                          double & bx, double & by) {
+    bx = ix - width/2;
+    by = (iy - height/2)*-1;
 }
 
 /* Ball functions.

@@ -152,6 +152,10 @@ namespace man {
 			bool isWhite();
 			bool isBlack();
 
+			
+            void billToImageCoordinates(double bx, double by, double & ix, double & iy);
+            void imageToBillCoordinates(double ix, double iy, double & bx, double & by);
+
 			Ball& best() { return _best; }
 
 			// For tool
