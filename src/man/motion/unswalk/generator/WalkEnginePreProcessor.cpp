@@ -276,8 +276,8 @@ bool WalkEnginePreProcessor::isActive() {
    return walkEngine->isActive() || !dribbleEngine->hasEnded();
 }
 
-void WalkEnginePreProcessor::readOptions(boost::program_options::variables_map& config) {
-   walkEngine->readOptions(config);
+void WalkEnginePreProcessor::readOptions(std::string path) {
+   walkEngine->readOptions(path);
 }
 
 void WalkEnginePreProcessor::reset() {

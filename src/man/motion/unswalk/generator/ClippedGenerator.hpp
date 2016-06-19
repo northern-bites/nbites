@@ -15,7 +15,8 @@ class ClippedGenerator : Generator {
                                      float ballY);
       virtual bool isActive();
       void reset();
-      void readOptions(const boost::program_options::variables_map &config);
+      void readOptions(std::string path);
+      // void readOptions(const boost::program_options::variables_map &config);
       bool isStanding() { return ((DistributedGenerator *)generator)->isStanding(); }
 
    private:

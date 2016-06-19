@@ -26,8 +26,8 @@ void ClippedGenerator::reset() {
    old_exists = false;
 }
 
-void ClippedGenerator::readOptions(const boost::program_options::variables_map &config) {
-   generator->readOptions(config);
+void ClippedGenerator::readOptions(std::string path) {
+   generator->readOptions(path);
 }
 
 JointValues ClippedGenerator::makeJoints(ActionCommand::All* request,

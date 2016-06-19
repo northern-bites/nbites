@@ -8,11 +8,11 @@ using boost::program_options::variables_map;
 
 StandGenerator::StandGenerator()
    : phi(UNSWDEG2RAD(0.0f)) {    //was 15, using 20 knee bend to prevent jerky transition between walk and stand
-   //llog(INFO) << "StandGenerator constructed" << std::endl;
+   std::cout << "StandGenerator constructed" << std::endl;
    posGen = (Generator*)(new ActionGenerator("stand"));
    std::cout << "Constructing stand generator!\n";
-   // if (!posGen)
-      //llog(FATAL) << "stand generator is NULL!" << std::endl;
+   if (!posGen)
+      std::cout << "stand generator is NULL!" << std::endl;
 }
 
 StandGenerator::~StandGenerator() {
@@ -65,9 +65,10 @@ void StandGenerator::stop() {
    posGen->stop();
 }
 
-void StandGenerator::readOptions(const boost::program_options::variables_map &config) {
-   posGen->readOptions(config);
+void StandGenerator::readOptions(std::string path) {
+   std::cout
+   posGen->readOptions(path);
 //   phi = UNSWDEG2RAD(config["walk.b"].as<float>());
-//   //llog(INFO) << "Successfully changed stand generator options" << std::endl;
+  // std::cout << "Successfully changed stand generator options" << std::endl;
 //   //llog(INFO) << "Stand generator options ignored" << std::endl;
 }

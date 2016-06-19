@@ -44,6 +44,6 @@ void RefPickupGenerator::stop() {
    stopping = true;
 }
 
-void RefPickupGenerator::readOptions(const boost::program_options::variables_map &config) {
-   standGen->readOptions(config);
+void RefPickupGenerator::readOptions(std::string path) {
+   standGen->readOptions(path);
 }

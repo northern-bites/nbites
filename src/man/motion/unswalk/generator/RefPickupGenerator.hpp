@@ -15,7 +15,7 @@ class RefPickupGenerator : Generator {
       virtual bool isActive();
       void reset();
       void stop();
-      void readOptions(const boost::program_options::variables_map &config);
+      void readOptions(std::string path);
 
    private:
       float phi;

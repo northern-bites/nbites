@@ -47,5 +47,5 @@ class Generator {
       virtual void stop() { /* defaults to reset() - can be overridden */
       }
 
-      virtual void readOptions(const boost::program_options::variables_map &config) {}
+      virtual void readOptions(std::string path) {}
 };

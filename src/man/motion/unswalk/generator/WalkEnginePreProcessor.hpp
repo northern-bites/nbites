@@ -15,7 +15,7 @@ class WalkEnginePreProcessor : Generator {
             float ballX,
             float ballY);
       bool isActive();
-      void readOptions(boost::program_options::variables_map& config);
+      void readOptions(std::string path);
       void reset();
       void stop();
       bool isStanding();

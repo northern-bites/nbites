@@ -821,7 +821,7 @@ bool Walk2014Generator::isStanding() {
    return walk2014Option == STAND;
 }
 
-void Walk2014Generator::readOptions(boost::program_options::variables_map &config) {}
+void Walk2014Generator::readOptions(std::string path) {}
 void Walk2014Generator:: reset() {
    initialise();
    //llog(INFO) << "Walk2014 reset" << endl;

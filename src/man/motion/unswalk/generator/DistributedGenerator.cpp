@@ -34,6 +34,10 @@ DistributedGenerator::DistributedGenerator()
    if (!bodyGenerators[Body::NONE])
       std::cout << "bodyGenerators[NONE] is NULL!" << std::endl;
 
+   // bodyGenerators[Body::STAND] = (Generator*)(new ActionGenerator("initial"));
+   // if (!bodyGenerators[Body::STAND])
+   //    std::cout << "bodyGenerators[STAND] is NULL!" << std::endl;
+
    bodyGenerators[Body::STAND] = (Generator*)(new StandGenerator());
    if (!bodyGenerators[Body::STAND])
       std::cout << "bodyGenerators[STAND] is NULL!" << std::endl;
@@ -350,9 +354,9 @@ void DistributedGenerator::reset() {
    current_generator = ActionCommand::Body::NONE;
 }
 
-void DistributedGenerator::readOptions(const boost::program_options::variables_map &config) {
+void DistributedGenerator::readOptions(std::string path) {
    for (uint8_t i = 0; i < NUM_NBITE_GENS; ++i) {
-      bodyGenerators[i]->readOptions(config);
+      bodyGenerators[i]->readOptions(path);
    }
    // headGenerator->readOptions(config);
 }

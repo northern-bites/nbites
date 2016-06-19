@@ -25,7 +25,7 @@ class ActionGenerator : Generator {
       void reset();
       void stop();
       void NBSetStand();
-      // void readOptions(const boost::program_options::variables_map &config);
+      void readOptions(std::string path);
 
    private:
       int current_time;
@@ -59,5 +59,4 @@ class ActionGenerator : Generator {
        * @param path the directory to read the pose file
        */
       void constructPose(std::string path);
-      void readOptions(std::string path);
 };

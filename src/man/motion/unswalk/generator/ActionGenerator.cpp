@@ -10,6 +10,7 @@ using boost::program_options::variables_map;
 
 bool setStand = false;
 
+/* Stand straight pose */
 const float INITIAL_BODY_POSE_ANGLES[] {
    1.57f, 0.17f, -1.57f, -0.05f,
    0.0f, 0.0f,
@@ -19,6 +20,7 @@ const float INITIAL_BODY_POSE_ANGLES[] {
    0.f,0.f,
 };
 
+/* Normal stand pose */
 // const float INITIAL_BODY_POSE_ANGLES[] {
 //    1.57f, 0.17f, -1.57f, -0.05f,
 //    0.0f, 0.0f,
@@ -167,11 +169,12 @@ JointValues ActionGenerator::makeJoints(ActionCommand::All* request,
                                         float ballX,
                                         float ballY) {
 
-   if (request->body.actionType = ActionCommand::Body::STAND) {
+   /* For testing different actions */
+   // if (request->body.actionType = ActionCommand::Body::STAND) {
       // std::cout << "Actiongen Stand requested! " << std::endl;
-      // this->readOptions("initial.pos");
-      NBSetStand();
-   }
+      // this->readOptions("stand.pos");
+      // NBSetStand();
+   // }
 
    //std::cout << "Joint size: " << joints.size() << std::endl;
    JointValues j;
@@ -246,11 +249,12 @@ void ActionGenerator::interpolate(JointValues newJoint, int duration) {
 }
 
 void ActionGenerator::constructPose(std::string path) {
+   // ifstream in(string(path + ".pos").c_str());
    ifstream in(string(path + "/" + file_name + ".pos").c_str());
    std::cout << "ActionGenerator(" << file_name << ") creating" << endl;
 
    if (!in.is_open()) {
-      //std::cout << "ActionGenerator can not open " << file_name << endl;
+      std::cout << "ActionGenerator can not open " << file_name << endl;
    } else {
       int duration = 0;
       float stiffness = 1.0;
@@ -271,7 +275,7 @@ void ActionGenerator::constructPose(std::string path) {
                in.ignore();
             }
             if (in.peek() == '#' || in.peek() == '$' || in.peek() == '\n' || in.peek() == EOF) {
-               //std::cout << "You're missing a joint value in " << file_name << ".pos" << std::endl;
+               std::cout << "You're missing a joint value in " << file_name << ".pos" << std::endl;
                exit(1);
             }
             in >> angles;
@@ -286,7 +290,7 @@ void ActionGenerator::constructPose(std::string path) {
             in.ignore();
          }
          if (in.peek() == '#' || in.peek() == '$' || in.peek() == '\n' || in.peek() == EOF) {
-            //std::cout << "You're missing a duration in " << file_name << ".pos" << std::endl;
+            std::cout << "You're missing a duration in " << file_name << ".pos" << std::endl;
             exit(1);
          }
          in >> duration;
@@ -334,10 +338,11 @@ void ActionGenerator::constructPose(std::string path) {
       }
       in.close();
    }
-   //std::cout << "ActionGenerator(" << file_name << ") created" << endl;
+   std::cout << "ActionGenerator(" << file_name << ") created" << endl;
 }
 
 void ActionGenerator::readOptions(std::string path) {
    // std::string path = config["motion.path"].as<std::string>();
+   std::cout << "Calling construct pose in the action generator" << std::endl;
    constructPose(path);
 }

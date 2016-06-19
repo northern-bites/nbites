@@ -16,7 +16,7 @@ class DistributedGenerator : Generator {
                                      float ballY);
       virtual bool isActive();
       void reset();
-      void readOptions(const boost::program_options::variables_map &config);
+      void readOptions(std::string path);
       bool isStopping;
       static const unsigned int NUM_NBITE_GENS = 3;
       bool isStanding();

@@ -48,7 +48,7 @@ class Walk2014Generator : Generator {
 
    Walk2014Option walk2014Option;
    WalkState walkState;
-   void readOptions(boost::program_options::variables_map& config);
+   void readOptions(std::string path);
    void reset();
    void stop();
 
