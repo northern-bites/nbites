@@ -66,10 +66,10 @@ def walkToWayPoint(player):
 
     ball = player.brain.ball
 
-    print "In walkToWayPoint"
+    # print "In walkToWayPoint"
 
     if transitions.shouldDecelerate(player):
-        print "I should decelerate"
+        # print "I should decelerate"
         speed = speeds.SPEED_FIVE
     else:
         speed = speeds.SPEED_EIGHT
