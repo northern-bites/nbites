@@ -219,6 +219,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 				ltst.name = topNames[i];
 				ltst.given = found_top.get(ltst.name).size();
 			}
+			ltst.offset = new CameraOffset(Double.NaN, Double.NaN);
 
 			rowList.add(ltst);
 		}
