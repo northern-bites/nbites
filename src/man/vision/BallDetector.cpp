@@ -235,7 +235,7 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
     }
     return newY;
 }
-
+//this expects coordinates in Bill's coordinate system;
 int BallDetector::projectedBallRadius(imagePoint p) {
     double dwx1, dwy1, dwx2, dwy2 = 0.0;
     homography->fieldVector((double)p.first, (double)p.second, 1.0, 0.0, dwx1, dwy1);
