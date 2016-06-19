@@ -234,25 +234,8 @@ def searchFieldForFlippedSharedBall(player):
         player.sharedBallOffCount += 1
     else:
         player.sharedBallOffCount = 0
-
+        
     player.brain.nav.updateDest(sharedball)
-
-# @superState('playOffBall')
-# @stay
-# def strikerSearchField(player):
-
-#     if player.firstFrame():
-#         player.brain.tracker.trackBall()
-
-#     if 
-
-#     if
-
-# strikerQuad1Center = 
-# strikerQuad2Center = 
-# strikerQuad3Center = 
-# strikerQuad4Center = 
-# strikerPoints = [strikerQuad1Center, strikerQuad2Center, strikerQuad3Center, strikerQuad4Center]
 
 @superState('playOffBall')
 @stay
