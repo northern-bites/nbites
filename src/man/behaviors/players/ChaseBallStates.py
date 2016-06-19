@@ -70,7 +70,7 @@ def walkToWayPoint(player):
 
     if transitions.shouldDecelerate(player):
         # print "I should decelerate"
-        speed = speeds.SPEED_FIVE
+        speed = speeds.SPEED_FOUR
     else:
         speed = speeds.SPEED_EIGHT
 
@@ -316,7 +316,7 @@ def orbitBall(player):
     if relH < 0:
         if relH < -20:
             xSpeed = 0.0
-            ySpeed = 0.7
+            ySpeed = 0.8
             hSpeed = -0.25
             # player.setWalk(0, 0.7, -0.25)
         else:
@@ -327,7 +327,7 @@ def orbitBall(player):
     elif relH > 0:
         if relH > 20:
             xSpeed = 0.0
-            ySpeed = -0.7
+            ySpeed = -0.8
             hSpeed = 0.25
             # player.setWalk(0, -0.7, 0.25)
         else:
@@ -454,7 +454,7 @@ def positionForKick(player):
         # if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
         #     positionForKick.speed = Navigator.GRADUAL_SPEED
         # else:
-        positionForKick.speed = speeds.SPEED_FOUR
+        positionForKick.speed = speeds.SPEED_TWO
 
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)
