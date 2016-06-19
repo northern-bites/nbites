@@ -48,10 +48,10 @@ DistributedGenerator::DistributedGenerator()
    // if (!bodyGenerators[Body::MOTION_CALIBRATE])
    //    std::cout << "bodyGenerators[MOTION_CALIBRATE] is NULL!" << std::endl;
 
-   // bodyGenerators[Body::STAND_STRAIGHT] =
-   //         (Generator*)(new ActionGenerator("standStraight"));
-   // if (!bodyGenerators[Body::STAND_STRAIGHT])
-   //    std::cout << "bodyGenerators[STAND_STRAIGHT] is NULL!" << std::endl;
+   bodyGenerators[Body::STAND_STRAIGHT] =
+           (Generator*)(new ActionGenerator("standStraight"));
+   if (!bodyGenerators[Body::STAND_STRAIGHT])
+      std::cout << "bodyGenerators[STAND_STRAIGHT] is NULL!" << std::endl;
 
    bodyGenerators[Body::WALK] = (Generator*)(new WalkEnginePreProcessor());
    if (!bodyGenerators[Body::WALK])
