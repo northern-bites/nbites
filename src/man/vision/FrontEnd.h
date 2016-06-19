@@ -131,7 +131,6 @@ struct Colors
   ColorParams white;
   ColorParams green;
   ColorParams orange;
-  ColorParams black;
 
   // TODO parameters should not be hard coded
   Colors() {
