@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface GCResponseOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.GCResponse)
-    com.google.protobuf.MessageOrBuilder {
+public interface GCResponseOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional uint32 status = 1 [default = 2];
   /**
    * <code>optional uint32 status = 1 [default = 2];</code>
    */

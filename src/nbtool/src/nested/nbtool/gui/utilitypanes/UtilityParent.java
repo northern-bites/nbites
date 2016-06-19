@@ -41,10 +41,10 @@ public abstract class UtilityParent {
 	/* get display for this utility – subclass may decide whether to supply new instance on each request */
 	public abstract JFrame supplyDisplay();
 	
-	/* return brief description of utility's purpose */
+	/* return a string describing the utility's purpose -Automatically added to gui*/
 	public abstract String purpose();
 	
-	/* return preferred keybind – may not be honored */
+	/* return preferred keybind (the letter you press to cause the utility to pop up) – may not be honored */
 	public abstract char preferredMemnonic();
 	
 	public static interface UtilityListener<P> {
