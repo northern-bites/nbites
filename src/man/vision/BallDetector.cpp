@@ -865,6 +865,7 @@ bool BallDetector::filterWhiteBlob(Spot spot,
     if (badspots > 1) {
         return false;
     }
+    return true;
 }
 
 bool BallDetector::checkGradientInSpot(Spot spot) {
