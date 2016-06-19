@@ -197,6 +197,21 @@ def manualPlacement(player):
 
         player.brain.tracker.lookToAngle(-1 * angle)
 
+        """
+        This is a dumb hack.
+        It's five days until competition and I don't want to spend my time
+        making a new protobuf to handle loc reset requests that take multiple
+        points. This code will hopefully send a message to the loc system that
+        I can catch once I'm there. This will reset the particle filter to
+        evenly spread particles among various coordinates the robot could be
+        after they've been manually placed. Those points are defined in
+        LocalizationModule.cpp.
+        Sorry.
+        -James
+        """
+        print "resetting loc to (999, 999, 999)"
+        player.brain.resetLocTo(999, 999, 999)
+
     manualPlacement.frameCounter += 1
     vis = player.brain.vision
 
