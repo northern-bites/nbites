@@ -100,8 +100,8 @@ def ballInPosition(player, kickPose):
 
     if not player.brain.ball.vis.on:
         return False
-    print("Checking ball in position")
-    print("Relx: ", kickPose.relX, " RelY:", kickPose.relY)
+    # print("Checking ball in position")
+    # print("Relx: ", kickPose.relX, " RelY:", kickPose.relY)
     # NOTE don't take the absolute value of kickPose.relX because being too
     # close to the ball is not a problem for kicking
     return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and

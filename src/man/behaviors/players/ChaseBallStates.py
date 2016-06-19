@@ -284,7 +284,6 @@ def orbitBall(player):
     """
     State to orbit the ball
     """
-    print("IN orbit: kick is: ", str(player.kick))
     if player.brain.nav.dodging:
         return player.stay()
 
@@ -294,7 +293,6 @@ def orbitBall(player):
     # Are we within the acceptable heading range?
     if (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
-        print "STOPPED! Because relH is: ", relH
         #player.stopWalking()
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
@@ -305,7 +303,6 @@ def orbitBall(player):
 
     if (transitions.orbitTooLong(player) or
         transitions.orbitBallTooFar(player)):
-        print("This sent me to appraochball")
         #player.stopWalking()
         return player.goLater('approachBall')
 
@@ -451,18 +448,18 @@ def positionForKick(player):
                                                 ball.rel_y - player.kick.setupY,
                                                 0)
 
-    print("Ball.rel_x:", ball.rel_x, "rel_y:", ball.rel_y)
+    # print("Ball.rel_x:", ball.rel_x, "rel_y:", ball.rel_y)
 
     if player.firstFrame():
-        print("IN position for kick, should kick off: ", player.shouldKickOff)
+        # print("IN position for kick, should kick off: ", player.shouldKickOff)
         player.brain.tracker.lookStraightThenTrack()
 
         # if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
         #     positionForKick.speed = Navigator.GRADUAL_SPEED
         # else:
         positionForKick.speed = speeds.SPEED_TWO
-        print("In position for kick! Setting walk speed")
-        print("My location:", str(positionForKick.kickPose))
+        # print("In position for kick! Setting walk speed")
+        # print("My location:", str(positionForKick.kickPose))
         player.brain.nav.goTo(positionForKick.kickPose, Navigator.CLOSE_ENOUGH, 
             speeds.SPEED_FOUR, True, fast = True, useLoc = False)
         # player.brain.nav.walkTo(positionForKick.kickPose, speeds.SPEED_THREE)
