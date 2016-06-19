@@ -52,25 +52,31 @@ void LocalizationModule::update()
                 std::cout << "Resetting Loc to Manual Placement Values" << std::endl;
                 std::vector<particleLocationStruct> particleVector;
 
+                // Coordinates include green padding around field
                 particleVector.push_back(particleLocationStruct());
-                particleVector.at(0).x = 90;
-                particleVector.at(0).y = 90;
+                particleVector.at(0).x = 160;
+                particleVector.at(0).y = 160;
                 particleVector.at(0).h = 0;
 
                 particleVector.push_back(particleLocationStruct());
-                particleVector.at(1).x = 90;
-                particleVector.at(1).y = 220;
+                particleVector.at(1).x = 160;
+                particleVector.at(1).y = 320;
                 particleVector.at(1).h = 0;
 
                 particleVector.push_back(particleLocationStruct());
-                particleVector.at(2).x = 90;
-                particleVector.at(2).y = 390;
+                particleVector.at(2).x = 160;
+                particleVector.at(2).y = 420;
                 particleVector.at(2).h = 0;
 
                 particleVector.push_back(particleLocationStruct());
-                particleVector.at(3).x = 90;
-                particleVector.at(3).y = 530;
+                particleVector.at(3).x = 160;
+                particleVector.at(3).y = 600;
                 particleVector.at(3).h = 0;
+
+                particleVector.push_back(particleLocationStruct());
+                particleVector.at(4).x = 420;
+                particleVector.at(4).y = 360;
+                particleVector.at(4).h = 0;
 
                 std::cout << "Made my vector of structs, calling resetLocToMany" << std::endl;
 
