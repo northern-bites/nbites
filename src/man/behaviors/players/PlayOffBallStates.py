@@ -103,10 +103,10 @@ def doFirstHalfSpin(player):
         print "------------First half spin-------------"
         
         if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_EIGHT)
+            player.setWalk(0, 0, speeds.SPEED_FOUR)
             player.brain.tracker.lookToSpinDirection(1) #Clockwise
         else:
-            player.setWalk(0, 0, -speeds.SPEED_EIGHT)
+            player.setWalk(0, 0, -speeds.SPEED_FOUR)
             player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
@@ -139,10 +139,10 @@ def doSecondHalfSpin(player):
         print "--------------Second Half Spin---------------"
 
         if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_EIGHT)
+            player.setWalk(0, 0, speeds.SPEED_FOUR)
             player.brain.tracker.lookToSpinDirection(1) #Clockwise
         else:
-            player.setWalk(0, 0, -speeds.SPEED_EIGHT)
+            player.setWalk(0, 0, -speeds.SPEED_FOUR)
             player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
