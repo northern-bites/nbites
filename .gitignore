@@ -31,6 +31,5 @@ src/nbtool/bin
 _tempFiles
 *.swp
 .nbtemp/*
-src/sound
 /src/nbtool/gui-forms/nbproject/private/
-
+/src/sound/scripts/

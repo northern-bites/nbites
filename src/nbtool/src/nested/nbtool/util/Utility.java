@@ -209,6 +209,14 @@ public class Utility {
 		return p;
 	}
 
+	public static JPanel labelWithPanel(JLabel lbl, JPanel pnl) {
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(lbl,BorderLayout.WEST);
+		p.add(pnl,BorderLayout.CENTER);
+
+		return p;
+	}
+
 	/*
 	 * assuming the .proto files have the necessary java_options,
 	 * this function can get the java class of an protobuf from its name

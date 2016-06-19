@@ -66,7 +66,6 @@ void Enactor::noStiff()
     catch (AL::ALError e) {
         std::cout << "Couldn't kill stiffness becasue: " << e.toString() << std::endl;
     }
-
 }
 
 // Based on (stolen from) the original JointEnactorModule by Ellis Ratner
