@@ -137,7 +137,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       speed         = active.speed;                      // used to distinguish between jabKick and walkKick
       foot          = active.foot;                       // kicking foot
       isFast        = active.isFast;
-      // std::cout << "[WALK GEN DEBUG] Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
+      std::cout << "[WALK GEN DEBUG] Forward: " << forward << " Left: " << left << " Turn: " << turn << " Speed: " << speed << " \n";
       if (stopping) {                                    // not used at present
       }
       else {
@@ -147,10 +147,10 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       if(forward==0 and left==0 and turn==0 and power==0) bend=0;
       speed = 0.0;
       if (forward < .1 && forward > 0.0) { 
-         // std::cout << "Adjust forward to bigger!" << forward << std::endl;
+         std::cout << "Adjust forward to bigger!" << forward << std::endl;
          forward = .1; 
       } else if (forward > -.1 && forward < 0.0) {
-         // std::cout << "Adjust forward to less " << forward << std::endl;
+         std::cout << "Adjust forward to less " << forward << std::endl;
          forward = -.1;
       }
        else if (forward < .1 && forward != 0.0) {
