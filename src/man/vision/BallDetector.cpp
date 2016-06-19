@@ -265,20 +265,17 @@ imagePoint BallDetector::findPointsCentroid(intPairVector & v) {
     return std::make_pair((int)cx, (int)cy);
 }
 
-bool BallDetector::equalDistancesFromCentroid(intPairVector & v, int projectedBallRadius) {
+void BallDetector::centroidEquidistantPoints(intPairVector & v, int projectedBallRadius, 
+                                              intPairVector & goodPoints) {
     imagePoint c = findPointsCentroid(v);
-    double averageDistanceFromCentroid = 0;
-    for(int i=0; i<v.size(); i++) {
-        imagePoint p = v[i];
-        double d = sqrt((p.first - c.first)*(p.first - c.first) + 
-                        (p.second - c.second)*(p.second - c.second));
-        averageDistanceFromCentroid += d;
-    }
-    averageDistanceFromCentroid = averageDistanceFromCentroid/v.size();
-    if(-2 < averageDistanceFromCentroid - projectedBallRadius < 2) {
-        return true;
-    } else {
-        return false;
+    if(v.size() > 0) {
+        for(int i = 0; i < v.size(); i++) {
+            double distance = sqrt((v[i].first - c.first)*(v[i].first - c.first) + 
+                        (v[i].second - c.second)*(v[i].second - c.second));
+            if(-3 < distance - projectedBallRadius < 3) { //these should be constants.
+                goodPoints.push_back(v[i]);               //thoughts on what the thresholds should be?
+            }
+        }
     }
 }
 
