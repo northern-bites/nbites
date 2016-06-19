@@ -93,6 +93,7 @@ class KickDecider(object):
             return None
 
     def diagonalKickoff(self):
+        return kicks.LEFT_DIAGONAL_KICK
         self.brain.player.motionKick = False
 
         self.kicks = []

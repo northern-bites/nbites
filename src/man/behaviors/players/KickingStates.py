@@ -50,6 +50,7 @@ def executeSweetKick(player):
     Kick the ball using sweet move. But don't do it. They suck!
     """
     if player.firstFrame():
+        print("Using kick: ", str(player.kick))
         player.brain.tracker.trackBall()
         executeSweetKick.sweetMove = player.kick.sweetMove
         return player.stay()

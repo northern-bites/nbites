@@ -481,7 +481,6 @@ void MotionModule::preProcessBody()
 
         if (!curProvider->isActive())
         {
-            std::cout << "[MOTION MODULE] Swapping body providers \n";
             swapBodyProvider();
         }
     }
@@ -842,7 +841,6 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
             );
 
         noWalkTransitionCommand = true;
-        std::cout << "[MOTION MODULE] Swapping body providers \n";
 
         nextProvider = &scriptedProvider;
         scriptedProvider.setCommand(newCommand);
