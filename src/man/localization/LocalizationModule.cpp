@@ -42,13 +42,8 @@ void LocalizationModule::update()
             std::cout << "RESET LOC ON " << i << std::endl;
             lastReset[i] = resetInput[i].message().timestamp();
 
-            std::cout << "resetInput: " << resetInput[i].message().x() << ", " << resetInput[i].message().x() << ", " << resetInput[i].message().x() << std::endl;
-
             // See PenaltyStates.py in the manualPlacement state
-            if ((int)(resetInput[i].message().x()) == 999) // &&
-                // (int)(resetInput[i].message().y()) == 999 &&
-                // (int)(resetInput[i].message().h()) == 999)
-            {
+            if ((int)(resetInput[i].message().x()) == 999) {
                 std::cout << "Resetting Loc to Manual Placement Values" << std::endl;
                 std::vector<particleLocationStruct> particleVector;
 
@@ -78,11 +73,8 @@ void LocalizationModule::update()
                 particleVector.at(4).y = 360;
                 particleVector.at(4).h = 0;
 
-                std::cout << "Made my vector of structs, calling resetLocToMany" << std::endl;
-
                 particleFilter->resetLocToMany(particleVector);
             } else {
-                std::cout << "No special values, resetting loc to the one point" << std::endl;
                 particleFilter->resetLocTo(resetInput[i].message().x(),
                                            resetInput[i].message().y(),
                                            resetInput[i].message().h());

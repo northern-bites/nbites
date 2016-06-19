@@ -207,7 +207,7 @@ def manualPlacement(player):
         Sorry.
         -James
         """
-        print "resetting loc to (999, 999, 999)"
+        # print "resetting loc to (999, 999, 999)"
         player.brain.resetLocTo(999, 999, 999)
 
     manualPlacement.frameCounter += 1

@@ -377,7 +377,10 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
 void ParticleFilter::resetLocToMany(std::vector<particleLocationStruct> particleList, 
                         LocNormalParams params)
 {
-    std::cout << "Setting particles evenly based on a list" << std::endl;
+    framesSinceReset = 0;
+#ifdef DEBUG_LOC
+    std::cout << "WTF: LOC IS RESETTING to MANY locations!" << std::endl;
+#endif
     poseEstimate.set_x(particleList.at(0).x);
     poseEstimate.set_y(particleList.at(0).y);
     poseEstimate.set_h(NBMath::subPIAngle(particleList.at(0).h));
@@ -387,19 +390,16 @@ void ParticleFilter::resetLocToMany(std::vector<particleLocationStruct> particle
 
     for (int i = 0; i < particleList.size(); ++i)
     {
-        std::cout << "Particle set " << i << std::endl;
         for (int j = 0; j < (parameters.numParticles / 2); ++j)
         {
             float pX = sampleNormal(particleList.at(i).x, params.sigma_x);
             float pY = sampleNormal(particleList.at(i).y, params.sigma_y);
             float pH = sampleNormal(particleList.at(i).h, params.sigma_h);
 
-            std::cout << "One particle at (" << pX << ", " << pY << ", " << pH << ")\t";
 
             Particle p(pX, pY, pH, weight);
 
             particles.push_back(p);
-            std::cout << "Successfully pushed back" << std::endl;
         }
     }
 }
