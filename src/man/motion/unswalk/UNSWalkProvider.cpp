@@ -175,7 +175,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// logMsg("\n");
 
 	ActionCommand::All* request = new ActionCommand::All();
-	request->body.actionType = ActionCommand::Body::STAND;
+	std::cout << "This is where the stand command is called!" << std::endl;
+	// request->body.actionType = ActionCommand::Body::STAND;
 	// request->body.actionType = ActionCommand::Body::WALK;
 
 

@@ -34,7 +34,7 @@ ActionGenerator::ActionGenerator(std::string filename) : file_name(filename) {
    max_iter = 0;
    current_time = NOT_RUNNING;
    joints.clear();
-
+   std::cout << "input file name is " << this->file_name << std::endl;
 };
 
 ActionGenerator::~ActionGenerator() {

@@ -39,6 +39,7 @@ DistributedGenerator::DistributedGenerator()
    //    std::cout << "bodyGenerators[STAND] is NULL!" << std::endl;
 
    bodyGenerators[Body::STAND] = (Generator*)(new StandGenerator());
+   std::cout << "Called stand generator from distributed generator!" << std::endl;
    if (!bodyGenerators[Body::STAND])
       std::cout << "bodyGenerators[STAND] is NULL!" << std::endl;
 

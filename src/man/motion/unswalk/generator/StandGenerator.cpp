@@ -66,7 +66,7 @@ void StandGenerator::stop() {
 }
 
 void StandGenerator::readOptions(std::string path) {
-   std::cout
+   std::cout << "Read options called by stand generator!" << std::endl;
    posGen->readOptions(path);
 //   phi = UNSWDEG2RAD(config["walk.b"].as<float>());
   // std::cout << "Successfully changed stand generator options" << std::endl;
