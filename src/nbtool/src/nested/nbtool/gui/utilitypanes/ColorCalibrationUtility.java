@@ -555,10 +555,12 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 					g.slider.setMaximum(255);
 				}
 
-				imageDisplay = new ImageDisplay();
+				Dimension ratio = new Dimension(320,240);
+
+				imageDisplay = new ImageDisplay(ratio);
 				tab.imageSplitPane.setLeftComponent(imageDisplay);
 
-				imageDisplayNorm = new ImageDisplay();
+				imageDisplayNorm = new ImageDisplay(ratio);
 				tab.imageSplitPane.setRightComponent(imageDisplayNorm);
 
 				tab.imageSplitPane.setResizeWeight(0.5);
@@ -567,7 +569,6 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				tab.imageSplitPane.setForeground(Color.BLACK);
 
 				tab.imageSplitPane.setDividerLocation(0.5);
-
 
 				LogDND.makeComponentTarget(tab, top ? topCameraTarget : botCameraTarget);
 
