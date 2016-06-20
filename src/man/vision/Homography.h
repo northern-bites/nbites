@@ -107,11 +107,11 @@ public:
 
   // Map image coordinates to field coordinates.
   // Returns true if the point is below the horizon and therefore actually on the field
-  bool fieldCoords(double ix, double iy, double& wx, double& wy) const;
+  bool fieldCoords(double ix, double iy, double& wx, double& wy, double wz = 0) const;
 
   // Map the image vector (dix, diy) at the image point (ix, iy) to the field vector
   // (dwx, dwy).
-  void fieldVector(double ix, double iy, double dix, double diy, double& dwx, double& dwy) const;
+  void fieldVector(double ix, double iy, double dix, double diy, double& dwx, double& dwy, double wz = 0) const;
 
   // Map the field vector (dwx, dwy) at the image point (ix, iy) to the field vector
   // (dix, diy).
