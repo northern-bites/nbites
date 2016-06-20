@@ -6,6 +6,7 @@ import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import RoleConstants as roleConstants
 import PlayOffBallTransitions as playOffTransitions
+import PlayOffBallStates as playOffStates
 from ..navigator import Navigator
 from ..navigator import PID
 from ..navigator import BrunswickSpeeds as speeds
@@ -25,6 +26,7 @@ def approachBall(player):
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
+        playOffStates.playerFiveSearchBehavior.pointIndex = -1
 
     if player.brain.nav.dodging:
         return player.stay()

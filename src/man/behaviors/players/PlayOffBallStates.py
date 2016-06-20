@@ -43,7 +43,6 @@ def branchOnRole(player):
         return player.goNow('playerFiveSearchBehavior')
     return player.goNow('positionAtHome')
 
-
 @superState('playOffBall')
 @stay
 @ifSwitchNow(shared.navAtPosition, 'watchForBall')
@@ -125,7 +124,7 @@ def doPan(player):
         print "------------Doing Pan-------------"
 
         player.stand()
-        player.brain.tracker.repeatWideSnapPan()
+        player.brain.tracker.trackBall()
 
     while player.stateTime < 4: #Should use constant for 1 pan here.
         return player.stay()
@@ -152,6 +151,8 @@ def doSecondHalfSpin(player):
 
     if role.isFirstChaser(player.role):
         return player.goNow('playerFourSearchBehavior')
+    elif role.isStriker(player.role):
+        return player.goNow('playerFiveSearchBehavior')
     return player.goNow('playOffBall')
 
 @superState('playOffBall')
@@ -163,6 +164,7 @@ def positionAsSupporter(player):
     """
     positionAsSupporter.position = getSupporterPosition(player, player.role)
     fastWalk = False
+    playerFiveSearchBehavior.pointIndex = -1
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -243,47 +245,46 @@ def searchFieldForFlippedSharedBall(player):
 @superState('playOffBall')
 @stay
 def playerFourSearchBehavior(player):
-    # How do we specify the heading of the robot
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        playerFourSearchBehavior.dest = min(playerFourPoints, key = lambda x:fabs(player.brain.loc.distTo(x)))
+        if playerFourSearchBehavior.pointIndex == -1:
+            playerFourSearchBehavior.dest = min(playerFourPoints, key = lambda x:fabs(player.brain.loc.distTo(x)))
+            playerFourSearchBehavior.pointIndex = playerFourPoints.index(playerFourSearchBehavior.dest)
+            playerFourSearchBehavior.pointsWalked = 0
+        else:
+            playerFourSearchBehavior.pointIndex += 1
+            playerFourSearchBehavior.pointsWalked += 1
+            playerFourSearchBehavior.dest = playerFourPoints[playerFourSearchBehavior.pointIndex % len(playerFourPoints)]
+
         player.brain.nav.goTo(playerFourSearchBehavior.dest, precision = nav.HOME,
                           speed = speeds.SPEED_SEVEN, avoidObstacles = True,
                           fast = True, pb = False)
-        playerFourSearchBehavior.pointIndex = playerFourPoints.index(playerFourSearchBehavior.dest)
-        playerFourSearchBehavior.pointsWalked = 0
 
     if shared.navAtPosition(player) and player.brain.loc.distTo(playerFourSearchBehavior.dest) < 60:
-        playerFourSearchBehavior.pointIndex += 1
-        playerFourSearchBehavior.pointsWalked += 1
-        playerFourSearchBehavior.dest = playerFourPoints[playerFourSearchBehavior.pointIndex % len(playerFourPoints)]
+        if pointIndex == 0:
+            adjustHeading.desiredHeading = 0
+            return player.goNow("adjustHeading")
+        elif pointIndex == 1:
+            adjustHeading.desiredHeading = 135
+            return player.goNow("adjustHeading")
+        else:
+            adjustHeading.desiredHeading = 225
+            return player.goNow("adjustHeading")
 
     if playerFourSearchBehavior.pointsWalked > 2:
         return player.goLater('playOffBall')
 
-    player.brain.nav.updateDest(playerFourSearchBehavior.dest) 
+    player.brain.nav.updateDest(playerFourSearchBehavior.dest)
+) 
 
 playerFourWayPoint1 = Location(NogginConstants.CENTER_FIELD_X - 160, NogginConstants.CENTER_FIELD_Y)
 playerFourWayPoint2 = Location(NogginConstants.CENTER_FIELD_X + 170, NogginConstants.MY_GOALBOX_TOP_Y + 120)
 playerFourWayPoint3 = Location(NogginConstants.CENTER_FIELD_X + 170, NogginConstants.MY_GOALBOX_BOTTOM_Y - 120)
 playerFourPoints = [playerFourWayPoint1, playerFourWayPoint2, playerFourWayPoint3]
-
-# @superState('spinAtHome')
-def spinToFaceDestination(player):
-    """
-    Keep spinning in the same direction.
-    """
-    if player.firstFrame():
-        player.setWalk(0, 0, -speeds.SPEED_FOUR)
-        player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
-
-    while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
-        return player.stay()
-
-    if role.isFirstChaser(player.role):
-        return player.goNow('playerFourSearchBehavior')
-    return player.goNow('playOffBall')
+playerFourSearchBehavior.pointIndex = -1
+playerFourSearchBehavior.pointsWalked = 0
+playerFourSearchBehavior.dest = playerFourWayPoint1
 
 @superState('playOffBall')
 @stay
@@ -291,31 +292,35 @@ def playerFiveSearchBehavior(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        playerFiveSearchBehavior.dest = min(playerFivePoints, key = lambda x:fabs(player.brain.loc.distTo(x)))
+        if playerFiveSearchBehavior.pointIndex == -1:
+            playerFiveSearchBehavior.dest = min(playerFivePoints, key = lambda x:fabs(player.brain.loc.distTo(x)))
+            playerFiveSearchBehavior.pointIndex = playerFivePoints.index(playerFiveSearchBehavior.dest)
+            playerFiveSearchBehavior.pointsWalked = 0
+        else:
+            playerFiveSearchBehavior.pointIndex += 1
+            playerFiveSearchBehavior.pointsWalked += 1
+            playerFiveSearchBehavior.dest = playerFivePoints[playerFiveSearchBehavior.pointIndex % len(playerFivePoints)]
+
         player.brain.nav.goTo(playerFiveSearchBehavior.dest, precision = nav.HOME,
                           speed = speeds.SPEED_SEVEN, avoidObstacles = True,
                           fast = True, pb = False)
-        playerFiveSearchBehavior.pointIndex = playerFivePoints.index(playerFiveSearchBehavior.dest)
-        playerFiveSearchBehavior.pointsWalked = 0
 
     if shared.navAtPosition(player) and player.brain.loc.distTo(playerFiveSearchBehavior.dest) < 60:
-
-        #At way point.
-
-        #Pseudo
-        # if at destination 1 or 3:
-        #   pan
-        # else:
-        #   spin
-
-        playerFiveSearchBehavior.pointIndex += 1
-        playerFiveSearchBehavior.pointsWalked += 1
-        playerFiveSearchBehavior.dest = playerFivePoints[playerFiveSearchBehavior.pointIndex % len(playerFivePoints)]
+        if pointIndex == 0:
+            adjustHeading.desiredHeading = NogginConstants.strikerRightHome
+            return player.goNow("adjustHeading")
+        elif pointIndex == 1:
+            return player.goNow("spinAtWayPoint")
+        elif pointIndex == 2:
+            adjustHeading.desiredHeading = NogginConstants.strikerLeftHome
+            return player.goNow("adjustHeading")
+        else:
+            return player.goNow("spinAtWayPoint")
 
     if playerFiveSearchBehavior.pointsWalked > 3:
         return player.goLater('playOffBall')
 
-    player.brain.nav.updateDest(playerFiveSearchBehavior.dest) 
+    player.brain.nav.updateDest(playerFiveSearchBehavior.dest)
 
 #Can we specify heading as third parameter
 playerFiveWayPoint1 = Location(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100, NogginConstants.MIDFIELD_Y - 200)
@@ -323,6 +328,36 @@ playerFiveWayPoint2 = Location(NogginConstants.CENTER_FIELD_X + 130, NogginConst
 playerFiveWayPoint3 = Location(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100, NogginConstants.MIDFIELD_Y + 200) # Mirror of 1
 playerFiveWayPoint4 = Location(NogginConstants.CENTER_FIELD_X + 320, NogginConstants.CENTER_FIELD_Y)
 playerFivePoints = [playerFiveWayPoint1, playerFiveWayPoint2, playerFiveWayPoint3, playerFiveWayPoint4]
+playerFiveSearchBehavior.pointIndex = -1
+playerFiveSearchBehavior.pointsWalked = 0
+playerFiveSearchBehavior.dest = playerFiveWayPoint1
+
+@superState('playOffBall')
+def adjustHeading(player):
+
+    if player.firstFrame():
+        # Spin to home heading
+        player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
+
+        # or math.fabs()
+    while fabs(player.brain.loc.h - adjustheading.desiredHeading) > 5:
+        return player.stay()
+
+    player.stand()
+    return player.goNow("spinAtHome")
+
+@superState('playOffBall')
+def spinAtWayPoint(player):
+    """
+    Keep spinning in the same direction.
+    """
+    if player.firstFrame():
+        player.setWalk(0, 0, speeds.SPEED_FOUR)
+
+    while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH:
+        return player.stay()
+
+    return player.goNow('playerFiveSearchBehavior')
 
 # @superState('playOffBall')
 # @stay
@@ -355,3 +390,69 @@ playerFivePoints = [playerFiveWayPoint1, playerFiveWayPoint2, playerFiveWayPoint
 # quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * .6)
 # quad4Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * 1.4)
 # points = [quad1Center, quad2Center, quad3Center, quad4Center]
+
+# def watchForBallAtWayPoint(player):
+
+#     if player.firstFrame():
+#         player.brain.tracker.trackBall()
+#         player.brain.nav.stand()
+
+#     while player.stateTime < 8:
+#         return player.stay()
+
+#     return player.goNow('firstSpin')
+
+# def firstSpin(player):
+
+#     #Can we access playerFiveBehavior.pointIndex???
+
+#     if player.firstFrame():
+#         player.setWalk(0, 0, speeds.SPEED_EIGHT)
+#         player.brain.tracker.lookToSpinDirection(1)
+
+#     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
+#         return player.stay()
+
+#     return player.goNow("watchForBallAfterSpin")
+
+# def watchForBallAfterSpin(player):
+
+#     if player.firstFrame():
+#         player.stand()
+#         player.brain.tracker.trackBall()
+
+#     while player.stateTime < 4: #Should use constant for 1 pan here.
+#         return player.stay()
+
+#     return player.goNow('secondSpin')
+
+# def secondSpin(player):
+
+#     if player.firstFrame():
+#         player.setWalk(0, 0, speeds.SPEED_EIGHT)
+#         player.brain.tracker.lookToSpinDirection(1)
+
+#     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
+#         return player.stay()
+
+#     return player.goNow("playerFiveSearchBehavior")
+
+
+# @superState('spinAtHome')
+# def spinToFaceDestination(player):
+#     """
+#     Keep spinning in the same direction.
+#     """
+#     if player.firstFrame():
+#         player.setWalk(0, 0, -speeds.SPEED_FOUR)
+#         player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
+
+#     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
+#         return player.stay()
+
+#     if role.isFirstChaser(player.role):
+#         return player.goNow('playerFourSearchBehavior')
+#     return player.goNow('playOffBall')
+
+
+

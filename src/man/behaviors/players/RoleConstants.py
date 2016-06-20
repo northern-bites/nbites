@@ -164,6 +164,17 @@ strikerTop = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
 strikerTriangle = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
                                 NogginConstants.MIDFIELD_Y - 200,
                                 135)
+
+# Facing opponent's goal box
+# Made for when striker alternates between two home positions
+strikerLeftHome = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
+                                NogginConstants.MIDFIELD_Y + 200,
+                                225)
+strikerRightHome = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
+                                NogginConstants.MIDFIELD_Y - 200,
+                                135)
+
+
 ## SUMMER 2016 CHANGES ##
 
 if NogginConstants.LEFT_FORWARD_DEFENSE:
