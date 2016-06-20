@@ -194,7 +194,7 @@ else:
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y - 70,
                                 35)
     oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 70,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 20,
                                 0)
 
 ## END SUMMER 2016 CHANGES ##
@@ -204,7 +204,7 @@ oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                               90)
 
 oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 60,
-                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 120,
+                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 70,
                                  10)
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS,
                                NogginConstants.CENTER_FIELD_Y,
