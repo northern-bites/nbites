@@ -266,18 +266,25 @@ imagePoint BallDetector::findPointsCentroid(intPairVector & v) {
     return std::make_pair((int)cx, (int)cy);
 }
 
-void BallDetector::centroidEquidistantPoints(intPairVector & v, int projectedBallRadius, 
-                                              intPairVector & goodPoints) {
+bool BallDetector::centroidEquidistantPoints(intPairVector & v, int projectedBallRadius) {
     imagePoint c = findPointsCentroid(v);
+    int wrongDistanceCounter = 0;
     if(v.size() > 0) {
         for(int i = 0; i < v.size(); i++) {
             double distance = sqrt((v[i].first - c.first)*(v[i].first - c.first) + 
                         (v[i].second - c.second)*(v[i].second - c.second));
-            if(-3 < distance - projectedBallRadius < 3) { //these should be constants.
-                goodPoints.push_back(v[i]);               //thoughts on what the thresholds should be?
+            if(-3 > distance - projectedBallRadius > 3) { //these should be constants.
+                wrongDistanceCounter++;                   //thoughts on what the thresholds should be?
+            }
+            if(wrongDistanceCounter > v.size() / 4) { //this can be some threshold
+                return false;
             }
         }
+        if(wrongDistanceCounter < v.size() / 4) { //so can this
+            return true;
+        }
     }
+    return false;
 }
 
 void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
@@ -972,8 +979,10 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	getColor(x, y);
 	int THRESHOLD = 110;
 	if (!checkGradientInSpot(spot)) {
+        std::cout<<"returning false 1\n";
 		return false;
 	}
+    intPairVector gp;
 	// top right corner
 	for ( ; x < width && y >= 0 && getGreen() < THRESHOLD; x++, y--) {
 		getColor(x, y);
@@ -981,6 +990,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	if (debugBall) {
 		debugDraw.drawPoint(x, y, RED);
 	}
+    gp.push_back(std::make_pair(x,y));
 	int length1 = x - rightX;
 	// top left corner
 	getColor(leftX, topY);
@@ -990,6 +1000,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	if (debugBall) {
 		debugDraw.drawPoint(x, y, RED);
 	}
+    gp.push_back(std::make_pair(x,y));
 	int length2 = leftX - x;
 	// bottom right corner
 	getColor(rightX, bottomY);
@@ -999,6 +1010,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	if (debugBall) {
 		debugDraw.drawPoint(x, y, RED);
 	}
+    gp.push_back(std::make_pair(x,y));
 	int length3 = x - rightX;
 	// bottom left
 	getColor(leftX, bottomY);
@@ -1008,15 +1020,18 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	if (debugBall) {
 		debugDraw.drawPoint(x, y, RED);
 	}
+    gp.push_back(std::make_pair(x,y));
 	int length4 = leftX - x;
 	if (debugBall) {
 		std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 			" " << length4 << std::endl;
 	}
 	if (abs(length1 + length2 - length3 - length4) > 4) {
+        std::cout<<"returning false 2\n";
 		return false;
 	}
 	if (max(length1, length2) < 4 && max(length3, length4) < 4) {
+        std::cout<<"returning false 3\n";
 		return false;
 	}
 
@@ -1029,6 +1044,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		if (debugBall) {
 			debugDraw.drawPoint(x, y, RED);
 		}
+        gp.push_back(std::make_pair(x,y));
 		int length5 = topY - y;
 		// straight down
 		getColor(midX, bottomY);
@@ -1038,6 +1054,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		if (debugBall) {
 			debugDraw.drawPoint(x, y, RED);
 		}
+        gp.push_back(std::make_pair(x,y));
 		length5 += y - bottomY;
 		// left
 		getColor(leftX, midY);
@@ -1045,8 +1062,9 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			getColor(x, y);
 		}
 		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
+			 debugDraw.drawPoint(x, y, RED);
 		}
+        gp.push_back(std::make_pair(x,y));
 		int length6 = leftX - x;
 		// right
 		getColor(rightX, midY);
@@ -1054,8 +1072,9 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			getColor(x, y);
 		}
 		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
+			// debugDraw.drawPoint(x, y, RED);
 		}
+        gp.push_back(std::make_pair(x,y));
 		length6 += x - rightX;
 		// allow extra leeway because bottom is generally really dark
 		if (abs(length6 - length5) > 6) {
@@ -1066,6 +1085,14 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			return false;
 		}
 	}
+    std::cout<<"GP SIZE: "<<gp.size()<<std::endl;
+    if(debugBall) {
+        std::cout<<"here\n";
+        for(int i=0; i<gp.size(); i++) {
+            std::cout<<"drawing\n";
+            debugDraw.drawPoint(gp[i].first, gp[i].second, RED);
+        }
+    }
 	return true;
 }
 
