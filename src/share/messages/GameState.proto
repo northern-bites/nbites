@@ -16,7 +16,9 @@ message GameState
     optional uint32 secs_remaining = 7 [default = 600];
 
     optional bool have_remote_gc = 8;
+
     optional bool whistle_override = 10;
+    optional bool penalty_is_placement = 11;
 
     repeated TeamInfo team = 9;
 }

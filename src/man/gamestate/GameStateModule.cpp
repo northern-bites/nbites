@@ -66,6 +66,8 @@ namespace man{
             latchInputs();
             update();
 
+            latest_data.set_penalty_is_placement(true);
+
             portals::Message<messages::GameState> output(&latest_data);
             gameStateOutput.setMessage(output);
 
@@ -264,6 +266,8 @@ namespace man{
 
         void GameStateModule::whistleHandler(game_state_t last, game_state_t& next) {
 
+            latest_data.set_whistle_override(false);
+
             switch(last) {
                 case STATE_READY: {
                     switch(next) {
@@ -294,6 +298,7 @@ namespace man{
                                 NBL_WARN("\n:::: WHISTLE OVERRIDE ::::\n\n");
                                 man::tts::say(IN_SCRIMMAGE, "whistle heard!");
                                 next = STATE_PLAYING;
+                                latest_data.set_whistle_override(true);
                             }
                         } break;
                             
@@ -313,8 +318,10 @@ namespace man{
 
                         case STATE_SET: {
                             bool heard = sharedMemory.gamestate_do_query();
+
                             if (heard) {
                                 next = STATE_PLAYING;
+                                latest_data.set_whistle_override(true);
                             }
 
                         } break;
