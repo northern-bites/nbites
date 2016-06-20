@@ -35,10 +35,10 @@ namespace motion
 // };
 
 const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] {
-	1.57f, 0.17f, -1.57f, -0.05f,
-	0.0f, 0.0017f, -0.488f, 0.87f, -0.44f, 0.0f,
-	0.0f, 0.0017f, -0.488f, 0.97f, -0.44f, 0.0f,
-	1.57f, -0.17f, 1.57f, 0.05f,
+	1.57f, 0.17f, 0.0f, 0.0f,
+	0.0f, 0.0017f, -0.488f, 0.87f, -0.436f, 0.0f,
+	0.0f, 0.0017f, -0.488f, 0.87f, -0.436f, 0.0f,
+	1.57f, -0.17f, 0.0f, 0.0f,
 	0.f,0.f,
 };
 
@@ -176,8 +176,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	ActionCommand::All* request = new ActionCommand::All();
 	// std::cout << "This is where the stand command is called!" << std::endl;
-	request->body.actionType = ActionCommand::Body::STAND;
-	// request->body.actionType = ActionCommand::Body::WALK;
+	// request->body.actionType = ActionCommand::Body::STAND;
+	request->body.actionType = ActionCommand::Body::WALK;
 
 
 	// if (!calibrated()) { logMsg("not calibrated");} 
