@@ -16,11 +16,29 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import nbtool.data.log.Block;
+import nbtool.data.log.Log;
 import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
 
 public class Utility {
+
+	/* true if top, false if bot */
+	public static boolean camera(Log imageLog) {
+		assert(imageLog.blocks.size() > 0);
+		Block imageBlock = imageLog.blocks.get(0);
+
+		if (imageBlock.whereFrom.equals("camera_TOP")) {
+			return true;
+		}
+
+		if (imageBlock.whereFrom.equals("camera_BOT")) {
+			return false;
+		}
+
+		throw new RuntimeException("unknown camera: " + imageBlock.whereFrom);
+	}
 
 	/* for testing components standalone */
 	public static void display(Component comp) {

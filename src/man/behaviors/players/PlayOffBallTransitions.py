@@ -64,11 +64,14 @@ def stopSpinning(player):
     return player.brain.ball.vis.frames_on > 0
   
 def shouldApproachBall(player):
+    # print("In approachball")
     if ballNotInBox(player):
+        # print("Returning false bc ball not in box")
         player.claimedBall = False
         return False
 
     if claimTransitions.shouldCedeClaim(player):
+        print("Ceding claim")
         return False
 
     return True

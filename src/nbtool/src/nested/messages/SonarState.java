@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.SonarState}
  */
-public final class SonarState extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.SonarState)
-    SonarStateOrBuilder {
+public  final class SonarState extends
+    com.google.protobuf.GeneratedMessage
+    implements SonarStateOrBuilder {
   // Use SonarState.newBuilder() to construct.
   private SonarState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -105,6 +104,7 @@ public final class SonarState extends
   }
 
   private int bitField0_;
+  // optional float us_left = 1;
   public static final int US_LEFT_FIELD_NUMBER = 1;
   private float usLeft_;
   /**
@@ -120,6 +120,7 @@ public final class SonarState extends
     return usLeft_;
   }
 
+  // optional float us_right = 2;
   public static final int US_RIGHT_FIELD_NUMBER = 2;
   private float usRight_;
   /**
@@ -142,8 +143,7 @@ public final class SonarState extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -257,9 +257,8 @@ public final class SonarState extends
    * Protobuf type {@code messages.SonarState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.SonarState)
-      messages.SonarStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.SonarStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_SonarState.internal_static_messages_SonarState_descriptor;
@@ -381,6 +380,7 @@ public final class SonarState extends
     }
     private int bitField0_;
 
+    // optional float us_left = 1;
     private float usLeft_ ;
     /**
      * <code>optional float us_left = 1;</code>
@@ -413,6 +413,7 @@ public final class SonarState extends
       return this;
     }
 
+    // optional float us_right = 2;
     private float usRight_ ;
     /**
      * <code>optional float us_right = 2;</code>

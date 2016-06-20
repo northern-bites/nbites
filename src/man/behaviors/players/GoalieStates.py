@@ -1,6 +1,7 @@
 import time
 from objects import RelRobotLocation, RobotLocation
 from ..navigator import Navigator as nav
+from ..navigator import BrunswickSpeeds as speeds
 from ..util import *
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
@@ -10,8 +11,8 @@ import math
 import noggin_constants as nogginConstants
 
 #TestingChange
-SAVING = True
-DIVING = True
+SAVING = False
+DIVING = False
 savedebug = False
 
 @superState('gameControllerResponder')
@@ -212,7 +213,9 @@ def watchWithLineChecks(player):
         and not watchWithLineChecks.looking
         and not watchWithLineChecks.hasPanned):
         watchWithLineChecks.looking = True
-        player.brain.tracker.performBasicPan()
+
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.performGoalieWideSnapPan()
         watchWithLineChecks.hasPanned = True
 
     if player.brain.tracker.isStopped():
@@ -244,7 +247,7 @@ def lineCheckReposition(player):
         else:
             print "This was a reposition, I think"
             watchWithLineChecks.numFixes += 1
-        player.brain.nav.walkTo(dest, speed = nav.QUICK_SPEED)
+        player.brain.nav.walkTo(dest, speed = speeds.SPEED_EIGHT)
 
     if player.counter > 300:
         return player.goLater('watchWithLineChecks')
@@ -266,7 +269,7 @@ def returnUsingLoc(player):
     if player.firstFrame():
         dest = constants.HOME_POSITION
         player.brain.nav.goTo(dest,
-                            speed = nav.QUICK_SPEED)
+                            speed = speeds.SPEED_EIGHT)
         print("I'm trying to return using loc!")
         player.brain.tracker.trackBall()
         returnUsingLoc.panning = False
@@ -274,7 +277,8 @@ def returnUsingLoc(player):
     if (player.counter % 90 == 0):
         print("Switching headtracker")
         if not returnUsingLoc.panning:
-            player.brain.tracker.repeatBasicPan()
+            # @SNAPPAN-CHANGE
+            player.brain.tracker.repeatGoalieWideSnapPan()
         else:
             player.brain.tracker.trackBall
 
@@ -292,7 +296,7 @@ def shiftPosition(player):
         print("H:", shiftPosition.dest.h)
 
         player.brain.nav.goTo(shiftPosition.dest,
-                            speed = nav.QUICK_SPEED,
+                            speed = speeds.SPEED_EIGHT,
                             fast = False)
 
     if player.counter > 300:
@@ -327,8 +331,8 @@ def faceBall(player):
 def watch(player):
     if player.firstFrame():
         player.brain.fallController.enabled = True
-        player.brain.tracker.trackBall()
-        # player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.trackBall(False, True)
+        # player.brain.tracker.repeatWideSnapPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
         if (player.lastState is not 'shiftPosition'

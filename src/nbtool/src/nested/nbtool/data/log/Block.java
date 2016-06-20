@@ -1,5 +1,7 @@
 package nbtool.data.log;
 
+import java.util.Arrays;
+
 import com.google.protobuf.Message;
 
 import nbtool.data.SExpr;
@@ -108,11 +110,13 @@ public class Block {
 	}
 
 	public Y8Image parseAsY8Image() {
+//		parseTypeCheck(SharedConstants.YUVImageType_Y8(), "whiteRet", "greenRet", "orangeRet");
 		parseTypeCheck(SharedConstants.YUVImageType_Y8());
 
 		Pair<Integer,Integer> pair = imagePair();
 		return new Y8Image(pair.a, pair.b, this.data);
 	}
+
 
 
 	public Message parseAsProtobufOfClass(Class<? extends Message> pclass) {
@@ -131,17 +135,19 @@ public class Block {
 		return parsed;
 	}
 
-	private void parseTypeCheck(String rType) {
-		if (!rType.equals(type)) {
-			throw new BlockParseException(type, rType);
+	private void parseTypeCheck(String ... rtypes) {
+		for (String r : rtypes) {
+			if (r.equals(type)) return;
 		}
+
+		throw new BlockParseException(type, rtypes);
 	}
 
 	@SuppressWarnings("serial")
 	public static class BlockParseException extends RuntimeException {
-		public BlockParseException(String type, String rtype) {
-			super(String.format("Block of type '%s' cannot be parsed as '%s'",
-					type, rtype));
+		public BlockParseException(String type, String ... rtype) {
+			super(String.format("Block of type '%s' cannot be parsed as any of '%s'",
+					type, Arrays.toString(rtype)));
 		}
 	}
 }

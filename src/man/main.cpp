@@ -11,6 +11,7 @@
 
 int lockFD = 0;
 man::Man* instance;
+
 pid_t whistlePID = 0;
 const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
 //const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
@@ -53,7 +54,12 @@ void error_signal_handler(int signal) {
     fflush(stdout);
     fflush(stderr);
 
-    cleanup();
+    // while(1) {
+    // 	//man::tts::say(IN_GAME, "g d b me");
+    // 	sleep(10);
+    // }
+
+    // cleanup();
 
     printf("error_signal_handler() done.\n");
     exit(-1);
