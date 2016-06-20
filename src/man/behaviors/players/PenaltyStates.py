@@ -36,7 +36,7 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
-        # if we heard the whistle recently
+        
         return player.goNow('overeagerWhistle')
 
         afterPenalty.decidedSide = False

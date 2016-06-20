@@ -157,6 +157,7 @@ class Brain(object):
         self.counter += 1
 
     def run(self):
+        print "going into brain"
         """
         Main control loop
         """
@@ -203,6 +204,8 @@ class Brain(object):
 
         # Flush the output
         sys.stdout.flush()
+
+        print "whistle? " + str(player.brain.interface.gameState.whistle_override)
 
         # US OPEN :(
         if self.ball.vis.on:
