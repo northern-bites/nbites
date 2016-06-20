@@ -53,6 +53,12 @@ def goToPosition(nav):
     #                                             nav.brain.ball.loc.relY,
     #                                             nav.brain.ball.loc.bearing)
 
+    
+    if nav.firstFrame():
+        print("In go to position, walking in place")
+        helper.walkInPlace(nav)
+        return nav.stay()
+
     goToPosition.speed = nav.velocity
     if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
         nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
@@ -295,11 +301,11 @@ def walkingTo(nav):
         print("I think i'm there!")
         return nav.goNow('standing')
 
-    if nav.counter % 10 == 0:
-        print "Current odo:"
-        print ("x:", walkingTo.currentOdo.relX)
-        print ("y:", walkingTo.currentOdo.relY)
-        print ("h:", walkingTo.currentOdo.relH)
+    # if nav.counter % 10 == 0:
+    #     print "Current odo:"
+    #     print ("x:", walkingTo.currentOdo.relX)
+    #     print ("y:", walkingTo.currentOdo.relY)
+    #     print ("h:", walkingTo.currentOdo.relH)
 
     return nav.stay()
 
@@ -326,11 +332,24 @@ walking.transitions = {}
 def stopped(nav):
     return nav.stay()
 
+def walkInPlace(nav):
+    if nav.firstFrame():
+        helper.walkInPlace(nav)
+
+    # if nav.counter > 20:
+    #     return nav.goLater('atPosition')    
+
+    return nav.stay()
+
 def atPosition(nav):
     """
     Switches back if we're not at the destination anymore.
     """
     if nav.firstFrame():
+        print("In at position, walking in place")
+        helper.walkInPlace(nav)
+
+    if nav.counter > 20:
         helper.stand(nav)
 
     return Transition.getNextState(nav, atPosition)
