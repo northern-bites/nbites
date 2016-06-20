@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface BodyJointCommandOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.BodyJointCommand)
-    com.google.protobuf.MessageOrBuilder {
+public interface BodyJointCommandOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float time = 1;
   /**
    * <code>optional float time = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface BodyJointCommandOrBuilder extends
    */
   float getTime();
 
+  // optional .messages.JointAngles angles = 2;
   /**
    * <code>optional .messages.JointAngles angles = 2;</code>
    */
@@ -29,6 +30,7 @@ public interface BodyJointCommandOrBuilder extends
    */
   messages.JointAnglesOrBuilder getAnglesOrBuilder();
 
+  // optional .messages.JointAngles stiffness = 3;
   /**
    * <code>optional .messages.JointAngles stiffness = 3;</code>
    */
@@ -42,6 +44,7 @@ public interface BodyJointCommandOrBuilder extends
    */
   messages.JointAnglesOrBuilder getStiffnessOrBuilder();
 
+  // optional .messages.BodyJointCommand.InterpolationType interpolation = 4;
   /**
    * <code>optional .messages.BodyJointCommand.InterpolationType interpolation = 4;</code>
    */

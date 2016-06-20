@@ -28,7 +28,7 @@ def kickEngine(nav):
     State that we stay in while calling kick engine
     """
     if nav.firstFrame():
-        print "First frame of kick engine"
+        # print "First frame of kick engine"
         helper.executeKickEngine(nav, kickEngine.kickType)
         return nav.stay()
 
@@ -47,8 +47,8 @@ def goToPosition(nav):
     """
     relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
 
-    #if nav.counter % 10 is 0:
-    #    print "going to " + str(relDest)
+    # if nav.counter % 10 is 0:
+    # print "\ngoing to " + str(relDest)
     #    print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX,
     #                                             nav.brain.ball.loc.relY,
     #                                             nav.brain.ball.loc.bearing)
@@ -67,12 +67,24 @@ def goToPosition(nav):
             goToPosition.fast = True
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
+    dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
+    # print("Distance: ", dist)
+    if dist < 30:
+        # print("I'm close enough ! I should not go fast anymore")
+        goToPosition.fast = False
+        goToPosition.speeds = (0.1, 0.1, 0.1)
+
+    # print("My reldest: ", str(relDest))
+
     if goToPosition.fast:
+        # print("goToPosition fast")
         # So that fast mode works for objects of type RobotLocation also
         if isinstance(goToPosition.dest, RobotLocation) and not goToPosition.close:
+            # print("It is an instance of a robot location")
             fieldDest = RobotLocation(goToPosition.dest.x, goToPosition.dest.y, 0)
             relDest = nav.brain.loc.relativeRobotLocationOf(fieldDest)
             relDest.relH = nav.brain.loc.getRelativeBearing(fieldDest)
+
 
         HEADING_ADAPT_CUTOFF = 103
         DISTANCE_ADAPT_CUTOFF = 10
@@ -123,10 +135,21 @@ def goToPosition(nav):
         else:
             goToPosition.close = True
 
-        goToPosition.speeds = (velX, velY, velH)
+
+        # TODO nikki walk unsw hack
+        if relDest.relY < DISTANCE_ADAPT_CUTOFF:
+            velY = 0.0
+
+        if (fabs(relDest.relH) > 20.0):
+            goToPosition.speeds = (0, 0, velH)
+        else:
+            goToPosition.speeds = (velX, velY, velH)
+        # print("My speeds:", velX, velY, velH)
+
         helper.setSpeed(nav, goToPosition.speeds)
 
     else:
+        print("Was not fast!")
         if goToPosition.adaptive:
             #reduce the speed if we're close to the target
             speed = helper.adaptSpeed(relDest.dist,
@@ -137,8 +160,8 @@ def goToPosition(nav):
 
         helper.setDestination(nav, relDest, speed)
 
-    if navTrans.shouldDodge(nav):
-        return nav.goNow('dodge')
+    # if navTrans.shouldDodge(nav):
+    #     return nav.goNow('dodge')
         
     return Transition.getNextState(nav, goToPosition)
 
@@ -153,6 +176,8 @@ goToPosition.close = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
+    # return
+    #I'm making an executive decision and TURNING OFF DODGING 
     if nav.firstFrame():
         nav.dodging = True
 
@@ -214,7 +239,7 @@ def destinationWalkingTo(nav):
         helper.setDestination(nav, dest,
                               destinationWalkingTo.speed,
                               destinationWalkingTo.kick)
-        destinationWalkingTo.enqueAZeroVector = True
+        # destinationWalkingTo.enqueAZeroVector = True
     elif destinationWalkingTo.enqueAZeroVector:
         helper.setDestination(nav, RelRobotLocation(0,0,0),
                               destinationWalkingTo.speed,
@@ -288,9 +313,10 @@ def walking(nav):
     State to be used for velocity walking.
     """
     helper.setSpeed(nav, walking.speeds)
+    # print "walking speeds: " + str(walking.speeds)
 
-    if navTrans.shouldDodge(nav):
-        return nav.goNow('dodge')
+    # if navTrans.shouldDodge(nav):
+    #     return nav.goNow('dodge')
 
     return Transition.getNextState(nav, walking)
 

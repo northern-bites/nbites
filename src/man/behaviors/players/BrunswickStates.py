@@ -12,6 +12,8 @@ from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
 from math import fabs, degrees
 
+DEBUG_MANUAL_PLACEMENT = False
+
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -57,8 +59,7 @@ def gameReady(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
-            # US OPEN 16 Turns of going into after penalty in ready
-            # return player.goNow('afterPenalty')
+            player.goNow('manualPlacement')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
@@ -80,7 +81,7 @@ def gameSet(player):
     if player.firstFrame():
         #The player's currentState = gameSet
 
-        print "GAME SET FIRST FRAME"
+        # print "GAME SET FIRST FRAME"
 
         player.inKickingState = False
         player.brain.fallController.enabled = True
@@ -95,10 +96,11 @@ def gameSet(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
+            player.goNow('manualPlacement')
 
     elif player.brain.tracker.isStopped():
 
-        print "TRUE"
+        # print "TRUE"
 
         player.brain.tracker.trackBall(True)
         # print "Current Angle: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
@@ -130,6 +132,8 @@ def gamePlaying(player):
     if player.wasPenalized:
         player.wasPenalized = False
         if player.lastDiffState != 'gameSet': 
+            if DEBUG_MANUAL_PLACEMENT:
+                return player.goNow('manualPlacement')
             return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
@@ -181,10 +185,11 @@ def gamePenalized(player):
         player.wasPenalized = True
         player.brain.penalizedEdgeClose = 0
         player.brain.penalizedCount = 0
+        player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
             player.brain.resetLocToCross()
-            print "BRUNSWICK PENALIZED"
+            # print "BRUNSWICK PENALIZED"
 
     if player.brain.vision.horizon_dist < 200.0:
         player.brain.penalizedEdgeClose += 1

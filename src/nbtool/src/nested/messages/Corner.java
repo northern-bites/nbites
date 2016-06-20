@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.Corner}
  */
-public final class Corner extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Corner)
-    CornerOrBuilder {
+public  final class Corner extends
+    com.google.protobuf.GeneratedMessage
+    implements CornerOrBuilder {
   // Use Corner.newBuilder() to construct.
   private Corner(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -135,6 +134,7 @@ public final class Corner extends
   }
 
   private int bitField0_;
+  // optional float x = 1;
   public static final int X_FIELD_NUMBER = 1;
   private float x_;
   /**
@@ -150,6 +150,7 @@ public final class Corner extends
     return x_;
   }
 
+  // optional float y = 2;
   public static final int Y_FIELD_NUMBER = 2;
   private float y_;
   /**
@@ -165,6 +166,7 @@ public final class Corner extends
     return y_;
   }
 
+  // optional int32 id = 3;
   public static final int ID_FIELD_NUMBER = 3;
   private int id_;
   /**
@@ -180,6 +182,7 @@ public final class Corner extends
     return id_;
   }
 
+  // optional int32 correspondence = 4;
   public static final int CORRESPONDENCE_FIELD_NUMBER = 4;
   private int correspondence_;
   /**
@@ -195,6 +198,7 @@ public final class Corner extends
     return correspondence_;
   }
 
+  // optional float prob = 5;
   public static final int PROB_FIELD_NUMBER = 5;
   private float prob_;
   /**
@@ -210,6 +214,7 @@ public final class Corner extends
     return prob_;
   }
 
+  // optional int32 line1 = 6;
   public static final int LINE1_FIELD_NUMBER = 6;
   private int line1_;
   /**
@@ -225,6 +230,7 @@ public final class Corner extends
     return line1_;
   }
 
+  // optional int32 line2 = 7;
   public static final int LINE2_FIELD_NUMBER = 7;
   private int line2_;
   /**
@@ -240,6 +246,7 @@ public final class Corner extends
     return line2_;
   }
 
+  // optional float wz0 = 8;
   public static final int WZ0_FIELD_NUMBER = 8;
   private float wz0_;
   /**
@@ -268,8 +275,7 @@ public final class Corner extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -425,9 +431,8 @@ public final class Corner extends
    * Protobuf type {@code messages.Corner}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Corner)
-      messages.CornerOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.CornerOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_Corner_descriptor;
@@ -603,6 +608,7 @@ public final class Corner extends
     }
     private int bitField0_;
 
+    // optional float x = 1;
     private float x_ ;
     /**
      * <code>optional float x = 1;</code>
@@ -635,6 +641,7 @@ public final class Corner extends
       return this;
     }
 
+    // optional float y = 2;
     private float y_ ;
     /**
      * <code>optional float y = 2;</code>
@@ -667,6 +674,7 @@ public final class Corner extends
       return this;
     }
 
+    // optional int32 id = 3;
     private int id_ ;
     /**
      * <code>optional int32 id = 3;</code>
@@ -699,6 +707,7 @@ public final class Corner extends
       return this;
     }
 
+    // optional int32 correspondence = 4;
     private int correspondence_ ;
     /**
      * <code>optional int32 correspondence = 4;</code>
@@ -731,6 +740,7 @@ public final class Corner extends
       return this;
     }
 
+    // optional float prob = 5;
     private float prob_ ;
     /**
      * <code>optional float prob = 5;</code>
@@ -763,6 +773,7 @@ public final class Corner extends
       return this;
     }
 
+    // optional int32 line1 = 6;
     private int line1_ ;
     /**
      * <code>optional int32 line1 = 6;</code>
@@ -795,6 +806,7 @@ public final class Corner extends
       return this;
     }
 
+    // optional int32 line2 = 7;
     private int line2_ ;
     /**
      * <code>optional int32 line2 = 7;</code>
@@ -827,6 +839,7 @@ public final class Corner extends
       return this;
     }
 
+    // optional float wz0 = 8;
     private float wz0_ ;
     /**
      * <code>optional float wz0 = 8;</code>

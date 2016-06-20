@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.ButtonState}
  */
-public final class ButtonState extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.ButtonState)
-    ButtonStateOrBuilder {
+public  final class ButtonState extends
+    com.google.protobuf.GeneratedMessage
+    implements ButtonStateOrBuilder {
   // Use ButtonState.newBuilder() to construct.
   private ButtonState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -100,6 +99,7 @@ public final class ButtonState extends
   }
 
   private int bitField0_;
+  // optional bool pressed = 1;
   public static final int PRESSED_FIELD_NUMBER = 1;
   private boolean pressed_;
   /**
@@ -121,8 +121,7 @@ public final class ButtonState extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -229,9 +228,8 @@ public final class ButtonState extends
    * Protobuf type {@code messages.ButtonState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.ButtonState)
-      messages.ButtonStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.ButtonStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_ButtonState.internal_static_messages_ButtonState_descriptor;
@@ -344,6 +342,7 @@ public final class ButtonState extends
     }
     private int bitField0_;
 
+    // optional bool pressed = 1;
     private boolean pressed_ ;
     /**
      * <code>optional bool pressed = 1;</code>

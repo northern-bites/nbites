@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.RobotLocation}
  */
-public final class RobotLocation extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.RobotLocation)
-    RobotLocationOrBuilder {
+public  final class RobotLocation extends
+    com.google.protobuf.GeneratedMessage
+    implements RobotLocationOrBuilder {
   // Use RobotLocation.newBuilder() to construct.
   private RobotLocation(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -125,6 +124,7 @@ public final class RobotLocation extends
   }
 
   private int bitField0_;
+  // optional float x = 1;
   public static final int X_FIELD_NUMBER = 1;
   private float x_;
   /**
@@ -140,6 +140,7 @@ public final class RobotLocation extends
     return x_;
   }
 
+  // optional float y = 2;
   public static final int Y_FIELD_NUMBER = 2;
   private float y_;
   /**
@@ -155,6 +156,7 @@ public final class RobotLocation extends
     return y_;
   }
 
+  // optional float h = 3;
   public static final int H_FIELD_NUMBER = 3;
   private float h_;
   /**
@@ -170,6 +172,7 @@ public final class RobotLocation extends
     return h_;
   }
 
+  // optional int64 timestamp = 4;
   public static final int TIMESTAMP_FIELD_NUMBER = 4;
   private long timestamp_;
   /**
@@ -185,6 +188,7 @@ public final class RobotLocation extends
     return timestamp_;
   }
 
+  // optional float uncert = 5;
   public static final int UNCERT_FIELD_NUMBER = 5;
   private float uncert_;
   /**
@@ -200,6 +204,7 @@ public final class RobotLocation extends
     return uncert_;
   }
 
+  // optional bool lost = 6;
   public static final int LOST_FIELD_NUMBER = 6;
   private boolean lost_;
   /**
@@ -226,8 +231,7 @@ public final class RobotLocation extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -369,9 +373,8 @@ public final class RobotLocation extends
    * Protobuf type {@code messages.RobotLocation}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.RobotLocation)
-      messages.RobotLocationOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.RobotLocationOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_RobotLocation.internal_static_messages_RobotLocation_descriptor;
@@ -529,6 +532,7 @@ public final class RobotLocation extends
     }
     private int bitField0_;
 
+    // optional float x = 1;
     private float x_ ;
     /**
      * <code>optional float x = 1;</code>
@@ -561,6 +565,7 @@ public final class RobotLocation extends
       return this;
     }
 
+    // optional float y = 2;
     private float y_ ;
     /**
      * <code>optional float y = 2;</code>
@@ -593,6 +598,7 @@ public final class RobotLocation extends
       return this;
     }
 
+    // optional float h = 3;
     private float h_ ;
     /**
      * <code>optional float h = 3;</code>
@@ -625,6 +631,7 @@ public final class RobotLocation extends
       return this;
     }
 
+    // optional int64 timestamp = 4;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 4;</code>
@@ -657,6 +664,7 @@ public final class RobotLocation extends
       return this;
     }
 
+    // optional float uncert = 5;
     private float uncert_ ;
     /**
      * <code>optional float uncert = 5;</code>
@@ -689,6 +697,7 @@ public final class RobotLocation extends
       return this;
     }
 
+    // optional bool lost = 6;
     private boolean lost_ ;
     /**
      * <code>optional bool lost = 6;</code>

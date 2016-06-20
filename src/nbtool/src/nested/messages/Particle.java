@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.Particle}
  */
-public final class Particle extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Particle)
-    ParticleOrBuilder {
+public  final class Particle extends
+    com.google.protobuf.GeneratedMessage
+    implements ParticleOrBuilder {
   // Use Particle.newBuilder() to construct.
   private Particle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -113,6 +112,7 @@ public final class Particle extends
   }
 
   private int bitField0_;
+  // optional float weight = 1;
   public static final int WEIGHT_FIELD_NUMBER = 1;
   private float weight_;
   /**
@@ -128,6 +128,7 @@ public final class Particle extends
     return weight_;
   }
 
+  // optional .messages.RobotLocation loc = 2;
   public static final int LOC_FIELD_NUMBER = 2;
   private messages.RobotLocation loc_;
   /**
@@ -156,8 +157,7 @@ public final class Particle extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -271,9 +271,8 @@ public final class Particle extends
    * Protobuf type {@code messages.Particle}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Particle)
-      messages.ParticleOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.ParticleOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_ParticleSwarm.internal_static_messages_Particle_descriptor;
@@ -404,6 +403,7 @@ public final class Particle extends
     }
     private int bitField0_;
 
+    // optional float weight = 1;
     private float weight_ ;
     /**
      * <code>optional float weight = 1;</code>
@@ -436,6 +436,7 @@ public final class Particle extends
       return this;
     }
 
+    // optional .messages.RobotLocation loc = 2;
     private messages.RobotLocation loc_ = messages.RobotLocation.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder> locBuilder_;
@@ -544,7 +545,7 @@ public final class Particle extends
       if (locBuilder_ == null) {
         locBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder>(
-                getLoc(),
+                loc_,
                 getParentForChildren(),
                 isClean());
         loc_ = null;

@@ -42,6 +42,8 @@ void MotionSystem::update(ParticleSet& particles,
 
     if( (std::fabs(dX_R) > 3.f) || (std::fabs(dY_R) > 3.f) ) {
         // Probably reset odometry somewhere, so skip frame
+        // std::cout << "std::fabs(dX_R) = " << std::fabs(dX_R) << " std::fabs(dY_R) = " << std::fabs(dY_R) << std::endl;
+        // std::cout << "curOdometry.x() = " << curOdometry.x() << " curOdometry.y() = " << curOdometry.y() << std::endl;
         std::cout << "Odometry reset, motion frame skipped in loc" << std::endl;
         return;
     }
