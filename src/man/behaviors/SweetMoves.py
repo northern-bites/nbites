@@ -1141,6 +1141,112 @@ ZELLVARRO_LEFT_KICK = (
 
 ZELLVARRO_RIGHT_KICK = mirrorMove(ZELLVARRO_LEFT_KICK)
 
+# Fast kick
+FAST_FRONT_KICK_LEFT = (
+    #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (-0.2,5,-25,43.5,-21.2, 0.0),
+     (-0.2,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     0.3,0,stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((90.,10.,-90.,-10.),
+     (0.4, 17.3, -36.9, 77.5, -40.9, -8.8),
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.3,0, stiff.NORMAL_STIFFNESSES),
+
+    #kick move
+    ((90.,10.,-90.,-10.),
+     # (0.4, 19.7, -57.6, 82.1, -27.0, -8.7), ## medium turnt
+     (0.3, 19.7, -56.6, 83.1, -28.0, -8.7), ## less turnt
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((90.,10.,-90.,-10.),
+     (0.4, 20.3, -36.9, 77.5, -40.9, -8.8),
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    QUICK_INITIAL_POS_KEYFRAME,
+    )
+
+FAST_FRONT_KICK_RIGHT = mirrorMove(FAST_FRONT_KICK_LEFT)
+
+#SO freaking cute
+CUTE_KICK_LEFT = (
+    #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (-0.2,5,-25,43.5,-21.2, 0.0),
+     (-0.2,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     0.3,0,stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((90.,10.,-90.,-10.),
+     (0.4, 17.3, -36.9, 77.5, -40.9, -8.8),
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.3,0, stiff.NORMAL_STIFFNESSES),
+
+    #kick move
+    ((90.,10.,-90.,-10.),
+     (0.3, 20.2, -54.1, 85.3, -31.2, -8.7),
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((90.,10.,-90.,-10.),
+     (0.4, 20.3, -36.9, 77.5, -40.9, -8.8),
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    QUICK_INITIAL_POS_KEYFRAME,
+    )
+
+CUTE_KICK_RIGHT = mirrorMove(CUTE_KICK_LEFT)
+
+#Stands for Megan + Kote who shed tears for this kick
+MEGKOTE_DIAGONAL_FAST_KICK_LEFT = (
+    #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (-0.2,5,-25,43.5,-21.2, 0.0),
+     (-0.2,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     0.3,0,stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((90.,10.,-90.,-10.),
+     (0.4, 17.3, -36.9, 77.5, -40.9, -8.8),
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.3,0, stiff.NORMAL_STIFFNESSES),
+
+    #kick move
+    ((97.2, 26.4, -89.4, -21.1),
+     (-1.9, 33.4, -62.8, 83.0, -15.9, -17.0),
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((90.,10.,-90.,-10.),
+     (0.4, 20.3, -36.9, 77.5, -40.9, -8.8),
+     (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
+     (90.,-10.,82.,13.2),
+     0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    QUICK_INITIAL_POS_KEYFRAME,
+    )
+
+MEGKOTE_DIAGONAL_FAST_KICK_RIGHT = mirrorMove(MEGKOTE_DIAGONAL_FAST_KICK_LEFT)
+
 #**********************#
 #                      #
 #       Celebrations   #

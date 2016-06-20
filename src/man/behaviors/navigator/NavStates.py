@@ -57,7 +57,7 @@ def goToPosition(nav):
     if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
         nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
 
-    if goToPosition.pb:
+    if goToPosition.pb and isinstance(goToPosition.dest, RelRobotLocation):
         # Calc dist to dest
         dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
         if goToPosition.fast and dist < 140:
@@ -67,12 +67,13 @@ def goToPosition(nav):
             goToPosition.fast = True
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
-    dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
-    # print("Distance: ", dist)
-    if dist < 30:
-        # print("I'm close enough ! I should not go fast anymore")
-        goToPosition.fast = False
-        goToPosition.speeds = (0.1, 0.1, 0.1)
+    if isinstance(goToPosition.dest, RobotLocation):
+        dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
+        # print("Distance: ", dist)
+        if dist < 30:
+            # print("I'm close enough ! I should not go fast anymore")
+            goToPosition.fast = False
+            goToPosition.speeds = (0.1, 0.1, 0.1)
 
     # print("My reldest: ", str(relDest))
 
@@ -84,6 +85,8 @@ def goToPosition(nav):
             fieldDest = RobotLocation(goToPosition.dest.x, goToPosition.dest.y, 0)
             relDest = nav.brain.loc.relativeRobotLocationOf(fieldDest)
             relDest.relH = nav.brain.loc.getRelativeBearing(fieldDest)
+        elif isinstance(goToPosition.dest, RelRobotLocation):
+            relDest = goToPosition.dest
 
 
         HEADING_ADAPT_CUTOFF = 103
@@ -270,7 +273,7 @@ def walkingTo(nav):
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         print ("MY dest: ", nav.destination.relX, nav.destination.relY, nav.destination.relH)
-        helper.stand(nav)
+        # helper.stand(nav)
         return nav.stay()
 
 
@@ -289,9 +292,10 @@ def walkingTo(nav):
             print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
     if locationsMatch(nav.destination, walkingTo.currentOdo):
+        print("I think i'm there!")
         return nav.goNow('standing')
 
-    if nav.counter % 30 == 0:
+    if nav.counter % 10 == 0:
         print "Current odo:"
         print ("x:", walkingTo.currentOdo.relX)
         print ("y:", walkingTo.currentOdo.relY)
