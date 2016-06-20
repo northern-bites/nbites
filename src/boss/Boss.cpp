@@ -175,19 +175,12 @@ Boss::~Boss()
 void Boss::listener()
 {
     int status; //currently unused.
-    static bool inDiedOverride = false;
-
-    if (inDiedOverride && !manDiedOverride) {
-        inDiedOverride = false;
-        man::tts::say(IN_SCRIMMAGE, "sit finished");
-    }
 
     while(true) {
         if (manRunning && !manDiedOverride) {
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
                 std::cout << "Boss::listener() killing man due to inactivity" << std::endl;
                 man::tts::say(IN_SCRIMMAGE, "man down!");
-                inDiedOverride = true;
 
                 print_info();
                 manDiedOverride = true;
@@ -349,7 +342,7 @@ void Boss::DCMPreProcessCallback()
 
     if (manDiedOverride) {
         bool sit_finished = enactor.manDied();
-        printf("[DEBUG] sit_finished was %d\n", sit_finished);
+
         if (sit_finished) {
             manRunning = false;
             manDiedOverride = false;

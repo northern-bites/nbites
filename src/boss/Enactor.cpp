@@ -107,13 +107,18 @@ bool Enactor::manDied() {
             jointCommand[5][i][0] = value;
         }
 
-//        printf("[DEBUG] manDied() in %d frame!\n", nextFrame);
-//        std::cout << std::endl;
+#ifdef DEBUG_MAN_DIED
+        printf("[DEBUG] manDied() in %d frame!\n", nextFrame);
+        std::cout << std::endl;
+#endif
 
         nextFrame++;
     } else {
+
+#ifdef DEBUG_MAN_DIED
         printf("[DEBUG] manDied() in last frame!\n");
         std::cout << std::endl;
+#endif
 
         noStiff();
         is_finished = true;
