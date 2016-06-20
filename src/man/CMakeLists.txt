@@ -177,6 +177,10 @@ file ( GLOB loggingFiles "../share/logshare/LOGGING_CONSTANTS.json" )
 
 install ( FILES ${loggingFiles} DESTINATION ${CMAKE_INSTALL_PREFIX}/Config )
 
+file ( GLOB runswiftPositionFiles "../man/motion/unswalk/generator/stand.pos" )
+
+install ( FILES ${runswiftPositionFiles} DESTINATION ${CMAKE_INSTALL_PREFIX}/Config)
+
 
 
 
