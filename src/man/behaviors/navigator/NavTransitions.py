@@ -105,6 +105,8 @@ def getDirection(h):
         return states.dodge.DDirects[6]
 
 def notAtLocPosition(nav):
+    if not states.goToPosition.useLoc: 
+        return False
     return not atDestination(nav)
 
 ######### BALL IN BOX ###############
