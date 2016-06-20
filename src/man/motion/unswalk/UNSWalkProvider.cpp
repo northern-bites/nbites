@@ -99,6 +99,8 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
     angleChanged = 0.0;
 
     counter = 0;
+
+    generator->readOptions("generator");
 	
 	resetAll();
 }
@@ -175,8 +177,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// logMsg("\n");
 
 	ActionCommand::All* request = new ActionCommand::All();
-	std::cout << "This is where the stand command is called!" << std::endl;
-	// request->body.actionType = ActionCommand::Body::STAND;
+	// std::cout << "This is where the stand command is called!" << std::endl;
+	request->body.actionType = ActionCommand::Body::STAND;
 	// request->body.actionType = ActionCommand::Body::WALK;
 
 
@@ -435,7 +437,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); 
     		}
 
-   //  		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
+    		// logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
 			// USE THESE LINES TO PRINT OUT JOINT ANGLES
 			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
 			// std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;

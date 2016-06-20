@@ -251,6 +251,7 @@ void ActionGenerator::interpolate(JointValues newJoint, int duration) {
 void ActionGenerator::constructPose(std::string path) {
    // ifstream in(string(path + ".pos").c_str());
    ifstream in(string(path + "/" + file_name + ".pos").c_str());
+   std::cout << "Path is " << path << std::endl;
    std::cout << "ActionGenerator(" << file_name << ") creating" << endl;
 
    if (!in.is_open()) {
@@ -337,8 +338,8 @@ void ActionGenerator::constructPose(std::string path) {
          }
       }
       in.close();
+      std::cout << "ActionGenerator(" << file_name << ") created" << endl;
    }
-   std::cout << "ActionGenerator(" << file_name << ") created" << endl;
 }
 
 void ActionGenerator::readOptions(std::string path) {
