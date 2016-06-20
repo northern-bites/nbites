@@ -47,6 +47,7 @@ const float MM_PER_CM  = 10.0;
 const float MAX_FORWARD = .25;
 const float MAX_LEFT = .1; //.2;                                 // meters
 const float MAX_TURN = .87;                                // radians
+int NUM_ITERATIONS = 0;
 
 
 /*
@@ -175,10 +176,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// logMsg("\n");
 
 	ActionCommand::All* request = new ActionCommand::All();
-	// std::cout << "This is where the stand command is called!" << std::endl;
-	// request->body.actionType = ActionCommand::Body::STAND;
+	// std::cout << "Calling walk" << std::endl;
 	request->body.actionType = ActionCommand::Body::WALK;
-
+	// std::cout << "Calling stand" << std::endl;
+	// request->body.actionType = ActionCommand::Body::STAND;
 
 	// if (!calibrated()) { logMsg("not calibrated");} 
 	// else {logMsg("calibrated!!!"); }
@@ -208,6 +209,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 				request->body.turn = relativeTarget.turn;
 			} else {
 				tryingToWalk = false;
+				std::cout << "Calling stand in the walk provider!" << std::endl;
 				request->body.actionType = ActionCommand::Body::STAND;
 
 			}
@@ -278,9 +280,11 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			request->body.left = 00.0; //command->y_percent ;
 			request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
 			request->body.speed = 0.0f;
+		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STAND) {
+			request->body.actionType = ActionCommand::Body::STAND;
 		}
 		else if (!currentCommand.get()) {
-			// logMsg("Can't get current command! Requesting stand");
+			// std::cout << "Can't get current command! Requesting stand" << std::endl;
 			tryingToWalk = false;
 			// call stand
 			request->body.actionType = ActionCommand::Body::STAND;
@@ -425,6 +429,11 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
     	std::vector<float> chain_angles;
     	std::vector<float> chain_hardness;
+
+    	if (request->body.actionType == ActionCommand::Body::STAND && NUM_ITERATIONS < 1) {
+	    	std::cout << "---------------------------------------" << std::endl;
+    	}
+
     	for (unsigned j = Kinematics::chain_first_joint_UNSWALK[i]; j <= Kinematics::chain_last_joint_UNSWALK[i]; j++) {
 
     		if ((Kinematics::ChainID)i == Kinematics::RLEG_CHAIN && j == 11) {
@@ -435,10 +444,12 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); 
     		}
 
-    		// logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
-			// USE THESE LINES TO PRINT OUT JOINT ANGLES
-			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
-			// std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;
+    		// PRINT JOINT ANGLES
+    		if (request->body.actionType == ActionCommand::Body::STAND && NUM_ITERATIONS < 1) {
+    			std::cout << "ANGLE in " << Joints::jointNames[nb_joint_order[j]] << " = ";
+				std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]) << std::endl;
+				// std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;
+    		}
 
     		if (hardness[nb_joint_order[j]] == 0) {
 				// JUST PUSH BACK 1 so arms move
@@ -453,6 +464,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     	this->setNextChainJoints((Kinematics::ChainID)i, chain_angles);
     	this->setNextChainStiffnesses((Kinematics::ChainID)i, chain_hardness);
 
+    }
+
+    if (request->body.actionType == ActionCommand::Body::STAND) {
+    	NUM_ITERATIONS += 1;
     }
 
     // We only leave when we do a sweet move, so request a special action
@@ -480,7 +495,10 @@ void UNSWalkProvider::resetOdometry() {
 void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
 	if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
 		std::cout << "Stand command!\n";
-		this->stand();
+		std::cout << "Stand is being called! Setting currentCommand to empty pointer\n";
+		// request->body.actionType = ActionCommand::Body::STAND;
+		currentCommand = MotionCommand::ptr();
+		// this->stand();
 		return;
 	}
 
@@ -590,8 +608,10 @@ bool UNSWalkProvider::isWalkActive() const {
 }
 
 void UNSWalkProvider::stand() {
-	// std::cout << "STAND IS BEING CALLED!!\n";
-	currentCommand = MotionCommand::ptr();
+	// std::cout << "Stand is being called! Setting currentCommand to empty pointer\n";
+	// // request->body.actionType = ActionCommand::Body::STAND;
+	// currentCommand = MotionCommand::ptr();
+	// std::cout << "pointer is " << &currentCommand << std::endl;
 
 	// UNTIL STAND IS WORKED OUT, JUST WALK IN PLACE
 	// CHANGE THIS BEFORE COMPETITION
