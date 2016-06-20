@@ -39,7 +39,7 @@ def branchOnRole(player):
         # if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
             # return player.goNow('searchFieldForSharedBall')
         return player.goNow('playerFourSearchBehavior')
-    elif role.isSecondChaser(player.role):
+    elif role.isStriker(player.role):
         return player.goNow('playerFiveSearchBehavior')
     return player.goNow('positionAtHome')
 
