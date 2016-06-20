@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 
 enum say_when {
     IN_DEBUG,
@@ -21,7 +22,11 @@ namespace man {
                 char buffer[line_size];
                 snprintf(buffer, line_size, "say \"%s\"", line);
                 system( (const char *) buffer );
-                exit(0);
+                for (;;) {                  //forever
+                    ::exit(0);              //in some cases, this does not seem to be enough (weird naoqi process?)
+
+                    kill(getpid(), SIGKILL);//so send SIGKILL too
+                }
             }
         }
 

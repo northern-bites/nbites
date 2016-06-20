@@ -38,16 +38,8 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
 
         jointCommand[5][i][0] = jointAngles[i];
         stiffnessCommand[5][i][0] = jointStiffnesses[i];
-        // if(tester == 100) {
-        // 	std::cout<< jointCommand[5][i][0]<< std::endl;
-        // }
     }
-    // if (tester ==100) {
-    // 	std::cout<<"\n"<<std::endl;
-    // 	tester = 0;
 
-    // }
-    // tester++;
     try
     {
         jointCommand[4][0] = dcm->getTime(0);
@@ -92,19 +84,20 @@ double interp(double start, double end, int index, int outof) {
     return ret;
 }
 
+    //#define DEBUG_MAN_DIED
+
 long nextFrame = 0;
 bool Enactor::manDied() {
     static const int num_frames_interpolate = 400;
-    bool is_finished = true;
+    bool is_finished = false;
 
 #ifdef V5_ROBOT
-
     double jointCrash[numJoints] = { -0.0890141, -0.0276539, 1.66128, 0.0137641, -1.56165, -0.0429101, -0.0168321, 
     					-0.113474, -0.826784, 2.15369, -1.20883, 0.10282, 0.0859461, -0.829936, 2.15224, -1.21949, 
     					-0.053648, 1.67977, -0.04146, 1.56464, 0.0997519 };
 #else
     double jointCrash[numJoints] = { -0.214802, 0.35, 1.57538, 0.131882, -1.56165, -0.0229681, -0.0475121, -0.0137641,
-                        -0.811444, 2.16443, -1.22111, 0.00771189,  0.0261199, -0.81613, 2.17986, -1.23023, 
+                        -0.811444, 2.16443, -1.22111, 0.00771189,  0.0261199, -0.81613, 2.17986, -1.23023,
                         -0.0352399, 1.58466, -0.046062, 1.5631, 0.0353239};
 #endif
 
@@ -113,14 +106,25 @@ bool Enactor::manDied() {
             double value = interp(lastSet[i], jointCrash[i], nextFrame, num_frames_interpolate);
             jointCommand[5][i][0] = value;
         }
+
+#ifdef DEBUG_MAN_DIED
+        printf("[DEBUG] manDied() in %d frame!\n", nextFrame);
+        std::cout << std::endl;
+#endif
+
+        nextFrame++;
     } else {
+
+#ifdef DEBUG_MAN_DIED
+        printf("[DEBUG] manDied() in last frame!\n");
+        std::cout << std::endl;
+#endif
+
         noStiff();
-        is_finished = false;
+        is_finished = true;
         nextFrame = 0;
     }
 
-    nextFrame++;
-    
     try
     {
         jointCommand[4][0] = dcm->getTime(0);
@@ -262,8 +266,6 @@ void Enactor::initEnactor()
         stiffnessCommand[5][i][0] = 0.0f; // This will be the new joint stiffness.
     }
 }
-
-
 
 }
 }

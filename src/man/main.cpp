@@ -1,6 +1,3 @@
-/**
- * Specified in http://www.aldebaran-robotics.com/documentation/dev/cpp/tutos/create_module.html#how-to-create-a-local-module
- **/
 
 #include "Man.h"
 #include "SharedData.h"
@@ -11,8 +8,8 @@
 
 int lockFD = 0;
 man::Man* instance;
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
+//const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
     instance->preClose();

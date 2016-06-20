@@ -6,6 +6,7 @@
 
 #include "TextToSpeech.h"
 
+#include <stdlib.h>
 #include <iostream>
 #include <string.h>
 #include <cstdlib>
@@ -78,8 +79,9 @@ bool DCM_TIMING_DEBUG_END() {
 
 #endif
 //original
-#define MAN_DEAD_THRESHOLD 2000
-//#define MAN_DEAD_THRESHOLD 500
+
+//#define MAN_DEAD_THRESHOLD 2000
+#define MAN_DEAD_THRESHOLD 1000
 
 #define BOSS_MAIN_LOOP_US 500000
 
@@ -101,6 +103,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     fifo_fd(-1)
 {
     printf("\t\tBOSS VERSION == %d\n", BOSS_VERSION);
+
     //for when man dies
     manDiedOverride = false;
 
@@ -171,20 +174,31 @@ Boss::~Boss()
 
 void Boss::listener()
 {
+    int status; //currently unused.
+
     while(true) {
         if (manRunning && !manDiedOverride) {
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
                 std::cout << "Boss::listener() killing man due to inactivity" << std::endl;
-                man::tts::say(IN_SCRIMMAGE, "man has crashed!");
+                man::tts::say(IN_SCRIMMAGE, "man down!");
 
                 print_info();
                 manDiedOverride = true;
+
+                if (manPID > 0) {
+                    std::cout << "Boss::listener() sending SIGKILL for good measure." << std::endl;
+                    kill(manPID, SIGKILL);
+                }
+
                 continue;
             }
         }
         
         checkFIFO();
-        
+
+        //clear zombie mans
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
+
         usleep(BOSS_MAIN_LOOP_US);
     }
 }
@@ -192,25 +206,34 @@ void Boss::listener()
 int Boss::startMan() {
     // TODO make extra sure man isn't running yet?
     // Man uses a lock file so it shouldn't be necessary..
+
     if (manRunning) {
         std::cout << "Man is already running. Will not start." << std::endl;
         return -1;
     }
 
-    manDiedOverride = false;    
+    if (manDiedOverride) {
+        std::cout << "Cannot start while executing sit." << std::endl;
+        return -1;
+    }
 
     std::cout << "Starting man!" << std::endl;
     pid_t child = fork();
     if (child > 0) {
         manPID = child;
         manRunning = true;
+        shared->latestSensorRead = shared->latestSensorWritten;
         std::cout << "\n\n\n=================================================\n\n\n" << std::endl;
     }
     else if (child == 0) {
         //replace this child process with an instance of man.
         execl("/home/nao/nbites/lib/man", "", NULL);
         printf("CHILD PROCESS FAILED TO EXECL MAN!\n");
-        ::exit(1);
+
+        for (;;) {
+            ::exit(1);
+            kill(getpid(), SIGKILL);
+        }
     }
     else {
         std::cout << "COULD NOT DETACH MAN" << std::endl;
@@ -318,11 +341,13 @@ void Boss::DCMPreProcessCallback()
     DCM_TIMING_DEBUG_PRE1();
 
     if (manDiedOverride) {
-        bool statusMan = enactor.manDied();
-        if (!statusMan) {
-            manDiedOverride = false;
+        bool sit_finished = enactor.manDied();
+
+        if (sit_finished) {
             manRunning = false;
+            manDiedOverride = false;
         }
+        
         return;
     }
             
@@ -340,6 +365,7 @@ void Boss::DCMPreProcessCallback()
     std::string leds;
 
     if (shared->latestCommandWritten > shared->latestCommandRead) {
+
         if (bossSyncRead(shared, cmndStaging)) {
             Deserialize des(cmndStaging);
 
