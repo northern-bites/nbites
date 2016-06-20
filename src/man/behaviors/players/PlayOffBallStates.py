@@ -18,7 +18,7 @@ import random
 
 @defaultState('branchOnRole')
 @superState('gameControllerResponder')
-@ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
+# @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
 @ifSwitchNow(transitions.shouldBeSupporter, 'positionAsSupporter')
 @ifSwitchNow(transitions.shouldApproachBall, 'approachBall')
 def playOffBall(player):
@@ -36,10 +36,10 @@ def branchOnRole(player):
     """
     # print("TIME SINCE PLAYING:", player.brain.gameController.timeSincePlaying)
     if role.isFirstChaser(player.role):
-        if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
-            return player.goNow('searchFieldForSharedBall')
+        # if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
+            # return player.goNow('searchFieldForSharedBall')
         return player.goNow('playerFourSearchBehavior')
-    else if role.isSecondChaser(player.role):
+    elif role.isSecondChaser(player.role):
         return player.goNow('playerFiveSearchBehavior')
     return player.goNow('positionAtHome')
 
@@ -60,7 +60,7 @@ def positionAtHome(player):
         player.brain.tracker.trackBall()
         fastWalk = role.isChaser(player.role)
         player.brain.nav.goTo(home, precision = nav.HOME,
-                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = fastWalk, pb = False)
 
     player.brain.nav.updateDest(home)
@@ -105,10 +105,10 @@ def doFirstHalfSpin(player):
         print "------------First half spin-------------"
         
         if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_FOUR)
+            player.setWalk(0, 0, speeds.nav.QUICK_SPEED)
             player.brain.tracker.lookToSpinDirection(1) #Clockwise
         else:
-            player.setWalk(0, 0, -speeds.SPEED_FOUR)
+            player.setWalk(0, 0, -nav.QUICK_SPEED)
             player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
@@ -141,10 +141,10 @@ def doSecondHalfSpin(player):
         print "--------------Second Half Spin---------------"
 
         if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_FOUR)
+            player.setWalk(0, 0, nav.QUICK_SPEED)
             player.brain.tracker.lookToSpinDirection(1) #Clockwise
         else:
-            player.setWalk(0, 0, -speeds.SPEED_FOUR)
+            player.setWalk(0, 0, -nav.QUICK_SPEED)
             player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
@@ -168,12 +168,12 @@ def positionAsSupporter(player):
         player.brain.tracker.trackBall()
 
         player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
-                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = fastWalk, pb = False)
 
     if positionAsSupporter.position.distTo(player.brain.loc) > 20:
         player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
-                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = fastWalk, pb = False)
     
     player.brain.nav.updateDest(positionAsSupporter.position, fast = fastWalk)
@@ -195,7 +195,7 @@ def searchFieldForSharedBall(player):
         player.sharedBallCloseCount = 0
         player.sharedBallOffCount = 0
         player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
-                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = True, pb = False)
 
     if sharedball.distTo(player.brain.loc) < 100:
@@ -225,7 +225,7 @@ def searchFieldForFlippedSharedBall(player):
         player.brain.tracker.repeatWideSnapPan()
         player.sharedBallCloseCount = 0
         player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
-                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = True, pb = False)
 
     if sharedball.distTo(player.brain.loc) < 100:
@@ -317,9 +317,10 @@ def playerFiveSearchBehavior(player):
 
     player.brain.nav.updateDest(playerFiveSearchBehavior.dest) 
 
-playerFiveWayPoint1 = Location(NogginConstants.CENTER_FIELD_X + 160, NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 70)
+#Can we specify heading as third parameter
+playerFiveWayPoint1 = Location(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100, NogginConstants.MIDFIELD_Y - 200)
 playerFiveWayPoint2 = Location(NogginConstants.CENTER_FIELD_X + 130, NogginConstants.CENTER_FIELD_Y)
-playerFiveWayPoint3 = Location(NogginConstants.CENTER_FIELD_X - 160, NogginConstants.CENTER_FIELD_Y) # Mirror of 1
+playerFiveWayPoint3 = Location(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100, NogginConstants.MIDFIELD_Y + 200) # Mirror of 1
 playerFiveWayPoint4 = Location(NogginConstants.CENTER_FIELD_X + 320, NogginConstants.CENTER_FIELD_Y)
 playerFivePoints = [playerFiveWayPoint1, playerFiveWayPoint2, playerFiveWayPoint3, playerFiveWayPoint4]
 
@@ -334,7 +335,7 @@ playerFivePoints = [playerFiveWayPoint1, playerFiveWayPoint2, playerFiveWayPoint
 #         # player.brain.tracker.repeatWideSnapPan()
 #         searchFieldByQuad.dest = min(points, key=lambda x:fabs(player.brain.loc.distTo(x)))
 #         player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
-#                           speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+#                           speed = nav.QUICK_SPEED, avoidObstacles = True,
 #                           fast = True, pb = False)
 #         searchFieldByQuad.quadIndex = points.index(searchFieldByQuad.dest)
 #         searchFieldByQuad.quadsWalked = 0
