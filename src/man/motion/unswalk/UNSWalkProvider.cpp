@@ -450,7 +450,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     	std::vector<float> chain_angles;
     	std::vector<float> chain_hardness;
 
-    	if (request->body.actionType == ActionCommand::Body::STAND && NUM_ITERATIONS < 1) {
+    	if (request->body.actionType == ActionCommand::Body::STAND && NUM_ITERATIONS < 5) {
+    		std::cout << "Number of iterations is" << NUM_ITERATIONS << std::endl;
 	    	std::cout << "---------------------------------------" << std::endl;
     	}
 
@@ -465,7 +466,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     		}
 
     		// PRINT JOINT ANGLES
-    		if (request->body.actionType == ActionCommand::Body::STAND && NUM_ITERATIONS < 1) {
+    		if (request->body.actionType == ActionCommand::Body::STAND && NUM_ITERATIONS < 5) {
     			std::cout << "ANGLE in " << Joints::jointNames[nb_joint_order[j]] << " = ";
 				std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]) << std::endl;
 				// std::cout << (joints.angles[nb_joint_order[j]]) << std::endl;
