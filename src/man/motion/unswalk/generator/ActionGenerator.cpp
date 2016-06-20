@@ -9,6 +9,14 @@ using namespace std;
 using boost::program_options::variables_map;
 
 bool setStand = false;
+const float INITIAL_BODY_POSE_ANGLES[] {
+   1.57f, 0.17f, 0.0f, 0.0f,
+   0.0f, 0.0f,
+   0.0f, 0.0017f, -0.488f, 0.87f, -0.436f, 0.0f,
+   0.0017f, -0.488f, 0.87f, -0.436f, 0.0f,
+   1.57f, -0.17f, 0.0f, 0.0f,
+   0.f,0.f,
+};
 
 ActionGenerator::ActionGenerator(std::string filename) : file_name(filename) {
    max_iter = 0;
@@ -36,32 +44,32 @@ void ActionGenerator::NBSetStand() {
    newJoint.angles[Joints::HeadYaw] = 0.0;
    newJoint.angles[Joints::HeadPitch] = 0.0;
 
-   newJoint.angles[Joints::LShoulderPitch] = 1.57f;
-   newJoint.angles[Joints::LShoulderRoll] = 0.17f;
-   newJoint.angles[Joints::LElbowYaw] = -1.57f;
-   newJoint.angles[Joints::LElbowRoll] = -0.05f;
-   newJoint.angles[Joints::LWristYaw] = 0.0;
-   newJoint.angles[Joints::LHand] = 0.0;
+   newJoint.angles[Joints::LShoulderPitch] = INITIAL_BODY_POSE_ANGLES[0];
+   newJoint.angles[Joints::LShoulderRoll] = INITIAL_BODY_POSE_ANGLES[1];
+   newJoint.angles[Joints::LElbowYaw] = INITIAL_BODY_POSE_ANGLES[2];
+   newJoint.angles[Joints::LElbowRoll] = INITIAL_BODY_POSE_ANGLES[3];
+   newJoint.angles[Joints::LWristYaw] = INITIAL_BODY_POSE_ANGLES[4];
+   newJoint.angles[Joints::LHand] = INITIAL_BODY_POSE_ANGLES[5];
 
-   newJoint.angles[Joints::LHipYawPitch] = -0.1;
-   newJoint.angles[Joints::LHipRoll] = 0.0;
-   newJoint.angles[Joints::LHipPitch] = -0.3f;
-   newJoint.angles[Joints::LKneePitch] = 0.98f;
-   newJoint.angles[Joints::LAnklePitch] = -0.55f;
-   newJoint.angles[Joints::LAnkleRoll] =  0.0f;
+   newJoint.angles[Joints::LHipYawPitch] = INITIAL_BODY_POSE_ANGLES[6];
+   newJoint.angles[Joints::LHipRoll] = INITIAL_BODY_POSE_ANGLES[7];
+   newJoint.angles[Joints::LHipPitch] = INITIAL_BODY_POSE_ANGLES[8];
+   newJoint.angles[Joints::LKneePitch] = INITIAL_BODY_POSE_ANGLES[9];
+   newJoint.angles[Joints::LAnklePitch] = INITIAL_BODY_POSE_ANGLES[10];
+   newJoint.angles[Joints::LAnkleRoll] =  INITIAL_BODY_POSE_ANGLES[11];
 
-   newJoint.angles[Joints::RHipRoll] = 0.0;
-   newJoint.angles[Joints::RHipPitch] = -0.3f;
-   newJoint.angles[Joints::RKneePitch] = 0.98f;
-   newJoint.angles[Joints::RAnklePitch] = -0.55f;
-   newJoint.angles[Joints::RAnkleRoll] = 0.0;
+   newJoint.angles[Joints::RHipRoll] = INITIAL_BODY_POSE_ANGLES[12];
+   newJoint.angles[Joints::RHipPitch] = INITIAL_BODY_POSE_ANGLES[13];
+   newJoint.angles[Joints::RKneePitch] = INITIAL_BODY_POSE_ANGLES[14];
+   newJoint.angles[Joints::RAnklePitch] = INITIAL_BODY_POSE_ANGLES[15];
+   newJoint.angles[Joints::RAnkleRoll] = INITIAL_BODY_POSE_ANGLES[16];
 
-   newJoint.angles[Joints::RShoulderPitch] = 1.57f;
-   newJoint.angles[Joints::RShoulderRoll] = -0.17f;
-   newJoint.angles[Joints::RElbowYaw] = 1.57f;
-   newJoint.angles[Joints::RElbowRoll] = 0.05f;
-   newJoint.angles[Joints::RWristYaw] = 0.0;
-   newJoint.angles[Joints::RHand] = 0.0;
+   newJoint.angles[Joints::RShoulderPitch] = INITIAL_BODY_POSE_ANGLES[17];
+   newJoint.angles[Joints::RShoulderRoll] = INITIAL_BODY_POSE_ANGLES[18];
+   newJoint.angles[Joints::RElbowYaw] = INITIAL_BODY_POSE_ANGLES[19];
+   newJoint.angles[Joints::RElbowRoll] = INITIAL_BODY_POSE_ANGLES[20];
+   newJoint.angles[Joints::RWristYaw] = INITIAL_BODY_POSE_ANGLES[21];
+   newJoint.angles[Joints::RHand] = INITIAL_BODY_POSE_ANGLES[22];
 
    for (int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
       newJoint.stiffnesses[i] = 1.0;
