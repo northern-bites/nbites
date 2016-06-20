@@ -9,6 +9,7 @@ import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
 from ..navigator import PID
 from ..navigator import BrunswickSpeeds as speeds
+import ClaimTransitions as claimTransitions
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 # from noggin_constants import MAX_SPEED, MIN_SPEED
@@ -20,6 +21,7 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @stay
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
+@ifSwitchNow(ClaimTransitions.shouldCedeClaim, 'playOffBall')
 def approachBall(player):
     print "approachBall"
     if player.firstFrame():

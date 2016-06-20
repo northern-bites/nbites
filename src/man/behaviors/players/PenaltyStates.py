@@ -36,6 +36,9 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
+        # if we heard the whistle recently
+        return player.goNow('overeagerWhistle')
+
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
 
@@ -205,7 +208,6 @@ def manualPlacement(player):
         after they've been manually placed. Those points are defined in
         LocalizationModule.cpp.
         Sorry.
-        -James
         """
         # print "resetting loc to (999, 999, 999)"
         player.brain.resetLocTo(999, 999, 999)
@@ -288,6 +290,11 @@ def manualPlacement(player):
     #     return player.goLater(player.gameState)
 
     return player.stay()
+
+@superstate('gameControllerResponder')
+def overeagerWhistle(player):
+    player.brain.tracker.lookToAngle(0)
+    return player.goNow('gamePlaying')
 
 @superState('gameControllerResponder')
 def walkOut(player):

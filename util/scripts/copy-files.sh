@@ -25,6 +25,6 @@ ssh-keygen -f "/home/$(whoami)/.ssh/known_hosts" -R nao.local
 
 # Copy important libraries to home folder
 echo "Copying necessary files TO THE ROBOT!"
-scp -r $FOLDER $WIFI_CONFIG setup-robot.sh $ROBOT_UNAME@$ROBOT:
+scp -r $FOLDER $WIFI_CONFIG tts_autoload.ini setup-robot.sh $ROBOT_UNAME@$ROBOT:
 
 echo "Now run setup-robot.sh ON THE ROBOT."

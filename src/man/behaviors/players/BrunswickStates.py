@@ -132,6 +132,7 @@ def gamePlaying(player):
     if player.wasPenalized:
         player.wasPenalized = False
         if player.lastDiffState != 'gameSet': 
+            # Remove the next two lines once we're done testing manual placement
             if DEBUG_MANUAL_PLACEMENT:
                 return player.goNow('manualPlacement')
             return player.goNow('afterPenalty')

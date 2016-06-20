@@ -5,18 +5,27 @@
 #include "Man.h"
 #include "SharedData.h"
 
-//#include "TextToSpeech.h"
-
-
 #include <sys/file.h>
 #include <errno.h>
+#include <unistd.h>
 
 int lockFD = 0;
 man::Man* instance;
+
+pid_t whistlePID = 0;
 const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-// const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
+//const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
+
+    printf(":::::::::::::::::::MAN cleanup code executing!\n:::::::::::::::::::");
+
+    if (whistlePID > 0) {
+        kill(whistlePID, SIGTERM);
+    }
+
+    // Give man a chance to clean up behind it
+    // I.e. close camera driver gracefully
     instance->preClose();
     flock(lockFD, LOCK_UN);
 
@@ -26,18 +35,13 @@ void cleanup() {
     fclose(stdout);
 
     if (instance) delete instance;
+    printf(":::::::::::::::::::MAN cleanup code finished!\n:::::::::::::::::::");
 }
 
 void handler(int signal)
 {
-    if (signal == SIGTERM)
-    {
-
-        // Give man a chance to clean up behind it
-        // I.e. close camera driver gracefully
-        cleanup();
-        exit(0);
-    }
+    cleanup();
+    exit(0);
 }
 
 void error_signal_handler(int signal) {
@@ -57,6 +61,7 @@ void error_signal_handler(int signal) {
 
     // cleanup();
 
+    printf("error_signal_handler() done.\n");
     exit(-1);
 }
 
@@ -80,10 +85,20 @@ void establishLock()
 
 int main() {
     signal(SIGTERM, handler);
+    signal(SIGINT, handler);
 
     establishLock();
 
     signal(SIGSEGV, error_signal_handler);
+
+    printf("forking for whistle...\n");
+    whistlePID = fork();
+    if (whistlePID == 0) {
+        execl("/home/nao/whistle", "", NULL);
+
+        printf("WHISTLE FAILED TO LOAD!!\n");
+        exit(-1);
+    }
 
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     
@@ -93,8 +108,8 @@ int main() {
     fprintf(stderr, "Man re-opening stderr...\n");
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
-//    freopen(MAN_LOG_PATH, "w", stdout);
-     freopen(MAN_LOG_PATH, "wa", stdout);
+    freopen(MAN_LOG_PATH, "w", stdout);
+
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     

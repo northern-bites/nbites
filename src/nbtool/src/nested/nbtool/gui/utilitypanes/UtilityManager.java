@@ -34,6 +34,7 @@ public class UtilityManager {
 
 	public static final BallTestUtility BallTestUtility = new BallTestUtility();
 
+	public static final WhistleTestUtility WhistleTestUtility = new WhistleTestUtility();
 
 	//Unused at the moment – comment out to re-enable.
 //	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();

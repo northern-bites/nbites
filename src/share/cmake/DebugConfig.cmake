@@ -71,20 +71,10 @@ option(
   OFF
 )
 
-include(CMakeDependentOption)
-
-CMAKE_DEPENDENT_OPTION(START_WITH_FILEIO
-    "Start with fileio ON"
-    OFF
-    "USE_LOGGING"
-    OFF
-)
-
-CMAKE_DEPENDENT_OPTION(START_WITH_THUMBNAIL
-    "Start with thumbnails logging"
-    OFF
-    "USE_LOGGING"
-    OFF
+option(
+  USE_ROBOT_TTS
+  "Enable text to speech on the robot."
+  ON
 )
 
 endif( NOT OFFLINE )
