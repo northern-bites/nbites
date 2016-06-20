@@ -6,6 +6,7 @@
 
 #include "TextToSpeech.h"
 
+#include <stdlib.h>
 #include <iostream>
 #include <string.h>
 #include <cstdlib>
@@ -172,6 +173,8 @@ Boss::~Boss()
 
 void Boss::listener()
 {
+    int status; //currently unused.
+
     while(true) {
         if (manRunning && !manDiedOverride) {
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
@@ -180,12 +183,21 @@ void Boss::listener()
 
                 print_info();
                 manDiedOverride = true;
+
+                if (manPID > 0) {
+                    std::cout << "Boss::listener() sending SIGKILL for good measure." << std::endl;
+                    kill(manPID, SIGKILL);
+                }
+
                 continue;
             }
         }
         
         checkFIFO();
-        
+
+        //clear zombie mans
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
+
         usleep(BOSS_MAIN_LOOP_US);
     }
 }
@@ -200,7 +212,7 @@ int Boss::startMan() {
     }
 
     if (manDiedOverride) {
-        std::cout << "Cannot start while sitting." << std::endl;
+        std::cout << "Cannot start while executing sit." << std::endl;
         return -1;
     }
 
@@ -215,7 +227,11 @@ int Boss::startMan() {
         //replace this child process with an instance of man.
         execl("/home/nao/nbites/lib/man", "", NULL);
         printf("CHILD PROCESS FAILED TO EXECL MAN!\n");
-        ::exit(1);
+
+        for (;;) {
+            ::exit(1);
+            kill(getpid(), SIGKILL);
+        }
     }
     else {
         std::cout << "COULD NOT DETACH MAN" << std::endl;
@@ -323,10 +339,10 @@ void Boss::DCMPreProcessCallback()
     DCM_TIMING_DEBUG_PRE1();
 
     if (manDiedOverride) {
-        bool statusMan = enactor.manDied();
-        if (!statusMan) {
-            manDiedOverride = false;
+        bool sit_finished = enactor.manDied();
+        if (sit_finished) {
             manRunning = false;
+            manDiedOverride = false;
         }
         return;
     }

@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 
 enum say_when {
     IN_DEBUG,
