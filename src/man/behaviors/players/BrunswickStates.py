@@ -2,6 +2,8 @@
 Game controller states for pBrunswick, our soccer player.
 """
 
+from ..Say import *
+
 import noggin_constants as nogginConstants
 from math import fabs
 from ..util import *
@@ -62,10 +64,10 @@ def gameReady(player):
     if not player.brain.motion.calibrated:
         return player.stay()
 
-    # CHINA HACK player 5 walking off field so start by walking forward
-    if player.brain.playerNumber == 5 and player.stateTime <= 4:
-        player.setWalk(0.6, 0, 0)
-        return player.stay()
+    # # CHINA HACK player 5 walking off field so start by walking forward
+    # if player.brain.playerNumber == 5 and player.stateTime <= 4:
+    #     player.setWalk(0.6, 0, 0)
+    #     return player.stay()
 
     return player.goNow('positionReady')
 
@@ -118,7 +120,6 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
-
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
     #     player.brain.play.isChaser()):
