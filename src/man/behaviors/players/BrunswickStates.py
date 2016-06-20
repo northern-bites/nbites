@@ -186,6 +186,8 @@ def gamePenalized(player):
         player.wasPenalized = True
         player.brain.penalizedEdgeClose = 0
         player.brain.penalizedCount = 0
+        player.brain.whistled = False
+        print player.brain.whistleCounter
         player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:

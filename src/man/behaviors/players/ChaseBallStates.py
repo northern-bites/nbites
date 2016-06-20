@@ -21,7 +21,7 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @stay
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
-@ifSwitchNow(ClaimTransitions.shouldCedeClaim, 'playOffBall')
+@ifSwitchNow(claimTransitions.shouldCedeClaim, 'playOffBall')
 def approachBall(player):
     print "approachBall"
     if player.firstFrame():

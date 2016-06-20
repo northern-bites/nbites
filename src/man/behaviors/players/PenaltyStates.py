@@ -36,8 +36,10 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
-        
-        return player.goNow('overeagerWhistle')
+        if player.brain.whistleCounter < 600:
+            print "You tried too hard"
+            player.brain.whistleCounter = 700
+            return player.goNow('overeagerWhistle')
 
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
@@ -291,7 +293,7 @@ def manualPlacement(player):
 
     return player.stay()
 
-@superstate('gameControllerResponder')
+@superState('gameControllerResponder')
 def overeagerWhistle(player):
     player.brain.tracker.lookToAngle(0)
     return player.goNow('gamePlaying')

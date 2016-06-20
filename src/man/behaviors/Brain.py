@@ -109,6 +109,9 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
+        self.whistled = False
+        self.whistleCounter = 0
+
         # CHINA HACK(s)
         self.penalizedHack = False
         self.penalizedEdgeClose = 0
@@ -157,7 +160,6 @@ class Brain(object):
         self.counter += 1
 
     def run(self):
-        print "going into brain"
         """
         Main control loop
         """
@@ -205,7 +207,11 @@ class Brain(object):
         # Flush the output
         sys.stdout.flush()
 
-        print "whistle? " + str(player.brain.interface.gameState.whistle_override)
+        if self.interface.gameState.whistle_override:
+            self.whistled = True
+
+        if self.whistled:
+            self.whistleCounter += 1;
 
         # US OPEN :(
         if self.ball.vis.on:
