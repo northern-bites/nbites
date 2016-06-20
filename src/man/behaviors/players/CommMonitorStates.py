@@ -22,6 +22,7 @@ def commMonitor(player):
     elif player.commMode != 0 and player.brain.game.have_remote_gc:
         
         print "Switched to good comm mode because we are on the GC BABAY!"
+        print "Role switching WOULD be set to true"
         
         player.role = player.brain.playerNumber
     
@@ -31,7 +32,7 @@ def commMonitor(player):
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = True
+        player.roleSwitching = False
         player.commMode = 0
 
     elif not player.brain.game.have_remote_gc and player.commMode != 2 and transitions.awfulComm(player):
@@ -64,7 +65,7 @@ def commMonitor(player):
 
     elif player.commMode != 0 and transitions.goodComm(player):
         
-        print "Switched to good comm mode! ROLE SWITCHING IS ON."
+        print "Switched to good comm mode! ROLE SWITCHING SHOULD BE TURNED ON."
         
         player.role = player.brain.playerNumber
         
@@ -74,5 +75,5 @@ def commMonitor(player):
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = True
+        player.roleSwitching = False
         player.commMode = 0
