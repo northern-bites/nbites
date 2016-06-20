@@ -93,8 +93,7 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
     for (auto i = blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
         int diam = (*i).firstPrincipalLength();
         int diam2 = (*i).secondPrincipalLength();
-		//std::cout<<"Diam: "<<diam<<std::endl;
-		//std::cout<<"Diam2: "<<diam2<<std::endl;
+
         if (diam < 26 && diam >= 6 && diam2 >= 5 &&
 			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
             // convert this blob to a Spot
@@ -110,9 +109,6 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
                 s.spotType = WHITE_BLOB;
                 actualWhiteSpots.push_back(s);
                 makeBall(s, cameraHeight, 0.75, foundBall, false);
-                if(debugBall) {
-                    std::cout<<"Blobber returning true\n";
-                }
 #ifdef OFFLINE
                 foundBall = true;
 #else
@@ -240,6 +236,50 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
     return newY;
 }
 
+//this expects coordinates in Bill's coordinate system;
+int BallDetector::projectedBallRadius(imagePoint p) {
+    double dwx1, dwy1, dwx2, dwy2 = 0.0;
+    homography->fieldVector((double)p.first, (double)p.second, 1.0, 0.0, dwx1, dwy1);
+    // homography->fieldVector((double)p.first, (double)p.second, 0.0, 1.0, dwx2, dwy2);
+
+    double pixel_width = sqrt(dwx1*dwx1 + dwy1*dwy1);
+    // double pixel_height = sqrt(dwx2*dwx2 + dwy2*dwy2);
+
+    int rw = (int)(BALL_RADIUS/pixel_width);
+    // int rh = (int)(BALL_RADIUS/pixel_height);
+
+    // int avg_radius = (rw + rh) >> 1;
+    return rw;
+}
+
+imagePoint BallDetector::findPointsCentroid(intPairVector & v) {
+    double x_sum = 0.0, y_sum = 0, cx = 0, cy = 0;
+    int n = v.size();
+    if(n != 0) {
+        for(int i=0; i < v.size(); i++) {
+            x_sum += v[i].first;
+            y_sum += v[i].second;
+        }
+        cx = x_sum/n;
+        cy = y_sum/n;
+    }
+    return std::make_pair((int)cx, (int)cy);
+}
+
+void BallDetector::centroidEquidistantPoints(intPairVector & v, int projectedBallRadius, 
+                                              intPairVector & goodPoints) {
+    imagePoint c = findPointsCentroid(v);
+    if(v.size() > 0) {
+        for(int i = 0; i < v.size(); i++) {
+            double distance = sqrt((v[i].first - c.first)*(v[i].first - c.first) + 
+                        (v[i].second - c.second)*(v[i].second - c.second));
+            if(-3 < distance - projectedBallRadius < 3) { //these should be constants.
+                goodPoints.push_back(v[i]);               //thoughts on what the thresholds should be?
+            }
+        }
+    }
+}
+
 void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
                                             float innerDiam, float altInnerDiam,
                                             bool topCamera, int filterThreshold,
@@ -285,6 +325,67 @@ int BallDetector::getAzimuthRowRestrictions(double az) {
     if(val <= 0) { return 0; }
     if(val >= height) { return height; }
     return val;
+}
+
+void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
+    int c = getAzimuthColumnRestrictions(homography->azimuth());
+    if(c < 0) {
+        endCol = -c;
+    } else {
+        startCol = c;
+    }
+    if(startCol < 0) { startCol = 0; }
+    if(endCol >= width) { endCol = width; }
+
+    int r = getAzimuthRowRestrictions(homography->azimuth());
+    if(r < 0) {
+        endRow = 0;
+    } else {
+        endRow = r;
+    }
+    if(endRow > height) {endRow = height; }
+
+    bool extendedBottom = false;
+
+    if(startCol-BOT_RESTRICTION_BUF >= 0 && endRow+BOT_RESTRICTION_BUF <= height) {
+        getColor(startCol, endRow);
+        if(isGreen()) {
+            startCol -= BOT_RESTRICTION_BUF;
+            endRow   += BOT_RESTRICTION_BUF;
+            extendedBottom = true;
+        }
+    }
+    if(endCol+BOT_RESTRICTION_BUF <= width && endRow+BOT_RESTRICTION_BUF <= height) {
+        getColor(endCol, endRow);
+        if(isGreen()) {
+            endCol += BOT_RESTRICTION_BUF;
+            endRow += BOT_RESTRICTION_BUF;
+            extendedBottom = true;
+        }
+    }
+    if(startCol-TOP_RESTRICTION_BUF >= 0) {
+        std::cout<<"can shift start left\n";
+        getColor(startCol, 0);
+        if(isGreen()) {
+            if(extendedBottom) {
+                std::cout<<"extented bottom\n";
+                startCol -= TOP_RESTRICTION_BUF/2;
+            } else {
+                std::cout<<"shifting start left\n";
+                startCol -= TOP_RESTRICTION_BUF;
+            }
+        }
+    }
+    if(endCol+TOP_RESTRICTION_BUF <= width) {
+        getColor(startCol, 0);
+        if(isGreen()) {
+            if(extendedBottom) {
+                endCol += TOP_RESTRICTION_BUF/2;
+            } else {
+                endCol += TOP_RESTRICTION_BUF;
+            }
+        }
+    }
 }
 
 /* We have a potential ball on the horizon. Do some checking to
@@ -825,6 +926,7 @@ bool BallDetector::filterWhiteBlob(Spot spot,
     if (badspots > 1) {
         return false;
     }
+    return true;
 }
 
 bool BallDetector::checkGradientInSpot(Spot spot) {
@@ -1145,31 +1247,18 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     int endCol = width;
     int endRow = width;
     if(!topCamera) {
-        int c = getAzimuthColumnRestrictions(homography->azimuth());
-        if(c < 0) {
-            endCol = -c;
-        } else {
-            startCol = c;
-        }
-        if(startCol < 0) { startCol = 0; }
-        if(endCol >= width) { endCol = width; }
-
-        int r = getAzimuthRowRestrictions(homography->azimuth());
-        if(r < 0) {
-            endRow = 0;
-        } else {
-            endRow = r;
-        }
-        if(endRow > width) {endRow = height; }
+        adjustWindow(startCol, endCol, endRow);
     }
 
     if(debugBall) {
-        std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
-        std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
-        debugDraw.drawPoint(startCol, 10, MAROON);
-        std::cout<<"EndRow: "<<endRow<<std::endl;
-        debugDraw.drawPoint(50, endRow, RED);
-        debugDraw.drawPoint(endCol, 10, BLUE);
+        std::cout<<"Top Camera: "<<topCamera<<std::endl;
+        // std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
+        // std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
+        // debugDraw.drawPoint(startCol, 10, MAROON);
+        // std::cout<<"EndRow: "<<endRow<<std::endl;
+        //debugDraw.drawPoint(20, endRow, ORANGE);
+        // debugDraw.drawPoint(endCol, 10, BLUE);
+        debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW);
     }
 
     // Then we are going to filter out all of the blobs that obviously
@@ -1191,8 +1280,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         smallerY = ImageLiteU16(yImage, 0, horiz, yImage.width(), height - horiz);
         smallerGreen = ImageLiteU8(greenImage, 0, horiz, greenImage.width(), height - horiz);
 	} else {
-        smallerY = ImageLiteU16(yImage, startCol, 0, endCol, height);
-        smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, height);
+        smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
+        smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
     }
 
     if(!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions()) {
@@ -1207,13 +1296,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
     }
     
-    if(debugBall) {
-        for(int z = 0; z < blackSpots.size(); z++) {
-            std::pair<int, int> spot = blackSpots[z];
-            std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "
-					 <<spot.second<<std::endl;
-        }
-    }
+    // if(debugBall) {
+    //     for(int z = 0; z < blackSpots.size(); z++) {
+    //         std::pair<int, int> spot = blackSpots[z];
+    //         std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "
+				// 	 <<spot.second<<std::endl;
+    //     }
+    // }
 
 	// run blobber on parts of the image where spot detector won't work
 	int bottomThird = height * 2 / 3;
@@ -1324,6 +1413,19 @@ void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
     blackImage = black;
     yImage = yImg;
 	edgeDetector = edgeD;
+}
+
+void BallDetector::billToImageCoordinates(double bx, double by, 
+                                          double & ix, double & iy){
+
+    ix = bx + width/2;
+    iy = -1*by + height/2;
+}
+
+void BallDetector::imageToBillCoordinates(double ix, double iy, 
+                                          double & bx, double & by) {
+    bx = ix - width/2;
+    by = (iy - height/2)*-1;
 }
 
 /* Ball functions.
