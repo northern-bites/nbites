@@ -78,12 +78,22 @@ namespace whistle {
             static time_t last_complain = 0;
 
             double dt = difftime(time(NULL), whistle_heartbeat() );
-            if (dt > 5) {
+            if (dt > 10) {
                 NBL_WARN("gamestate hasn't heard from whistle for %lf seconds!", dt);
 
-                if (difftime(time(NULL), last_complain) > 10) {
+                if (difftime(time(NULL), last_complain) > 30) {
                     last_complain = time(NULL);
                     man::tts::say(IN_SCRIMMAGE, "whistle is not running!");
+
+		    if (!fork()) {
+			execl("/home/nao/whistle", "", NULL);
+
+			for(;;) {
+				printf("WHISTLE FAILED TO LOAD!!\n");
+			        exit(-1);
+				kill(getpid(), SIGKILL);
+			}
+		    }
                 }
 
                 return false;
