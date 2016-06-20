@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.ScriptedProvider}
  */
-public final class ScriptedProvider extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.ScriptedProvider)
-    ScriptedProviderOrBuilder {
+public  final class ScriptedProvider extends
+    com.google.protobuf.GeneratedMessage
+    implements ScriptedProviderOrBuilder {
   // Use ScriptedProvider.newBuilder() to construct.
   private ScriptedProvider(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -105,6 +104,7 @@ public final class ScriptedProvider extends
   }
 
   private int bitField0_;
+  // optional bool active = 1;
   public static final int ACTIVE_FIELD_NUMBER = 1;
   private boolean active_;
   /**
@@ -120,6 +120,7 @@ public final class ScriptedProvider extends
     return active_;
   }
 
+  // optional bool stopping = 2;
   public static final int STOPPING_FIELD_NUMBER = 2;
   private boolean stopping_;
   /**
@@ -142,8 +143,7 @@ public final class ScriptedProvider extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -257,9 +257,8 @@ public final class ScriptedProvider extends
    * Protobuf type {@code messages.ScriptedProvider}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.ScriptedProvider)
-      messages.ScriptedProviderOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.ScriptedProviderOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Motion.internal_static_messages_ScriptedProvider_descriptor;
@@ -381,6 +380,7 @@ public final class ScriptedProvider extends
     }
     private int bitField0_;
 
+    // optional bool active = 1;
     private boolean active_ ;
     /**
      * <code>optional bool active = 1;</code>
@@ -413,6 +413,7 @@ public final class ScriptedProvider extends
       return this;
     }
 
+    // optional bool stopping = 2;
     private boolean stopping_ ;
     /**
      * <code>optional bool stopping = 2;</code>

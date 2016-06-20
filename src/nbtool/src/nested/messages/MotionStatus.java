@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.MotionStatus}
  */
-public final class MotionStatus extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.MotionStatus)
-    MotionStatusOrBuilder {
+public  final class MotionStatus extends
+    com.google.protobuf.GeneratedMessage
+    implements MotionStatusOrBuilder {
   // Use MotionStatus.newBuilder() to construct.
   private MotionStatus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -125,6 +124,7 @@ public final class MotionStatus extends
   }
 
   private int bitField0_;
+  // optional bool standing = 1;
   public static final int STANDING_FIELD_NUMBER = 1;
   private boolean standing_;
   /**
@@ -140,6 +140,7 @@ public final class MotionStatus extends
     return standing_;
   }
 
+  // optional bool body_is_active = 2;
   public static final int BODY_IS_ACTIVE_FIELD_NUMBER = 2;
   private boolean bodyIsActive_;
   /**
@@ -155,6 +156,7 @@ public final class MotionStatus extends
     return bodyIsActive_;
   }
 
+  // optional bool walk_is_active = 3;
   public static final int WALK_IS_ACTIVE_FIELD_NUMBER = 3;
   private boolean walkIsActive_;
   /**
@@ -170,6 +172,7 @@ public final class MotionStatus extends
     return walkIsActive_;
   }
 
+  // optional bool head_is_active = 4;
   public static final int HEAD_IS_ACTIVE_FIELD_NUMBER = 4;
   private boolean headIsActive_;
   /**
@@ -185,6 +188,7 @@ public final class MotionStatus extends
     return headIsActive_;
   }
 
+  // optional bool calibrated = 5;
   public static final int CALIBRATED_FIELD_NUMBER = 5;
   private boolean calibrated_;
   /**
@@ -200,6 +204,7 @@ public final class MotionStatus extends
     return calibrated_;
   }
 
+  // optional bool upright = 6;
   public static final int UPRIGHT_FIELD_NUMBER = 6;
   private boolean upright_;
   /**
@@ -226,8 +231,7 @@ public final class MotionStatus extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -369,9 +373,8 @@ public final class MotionStatus extends
    * Protobuf type {@code messages.MotionStatus}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.MotionStatus)
-      messages.MotionStatusOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.MotionStatusOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_MotionStatus.internal_static_messages_MotionStatus_descriptor;
@@ -529,6 +532,7 @@ public final class MotionStatus extends
     }
     private int bitField0_;
 
+    // optional bool standing = 1;
     private boolean standing_ ;
     /**
      * <code>optional bool standing = 1;</code>
@@ -561,6 +565,7 @@ public final class MotionStatus extends
       return this;
     }
 
+    // optional bool body_is_active = 2;
     private boolean bodyIsActive_ ;
     /**
      * <code>optional bool body_is_active = 2;</code>
@@ -593,6 +598,7 @@ public final class MotionStatus extends
       return this;
     }
 
+    // optional bool walk_is_active = 3;
     private boolean walkIsActive_ ;
     /**
      * <code>optional bool walk_is_active = 3;</code>
@@ -625,6 +631,7 @@ public final class MotionStatus extends
       return this;
     }
 
+    // optional bool head_is_active = 4;
     private boolean headIsActive_ ;
     /**
      * <code>optional bool head_is_active = 4;</code>
@@ -657,6 +664,7 @@ public final class MotionStatus extends
       return this;
     }
 
+    // optional bool calibrated = 5;
     private boolean calibrated_ ;
     /**
      * <code>optional bool calibrated = 5;</code>
@@ -689,6 +697,7 @@ public final class MotionStatus extends
       return this;
     }
 
+    // optional bool upright = 6;
     private boolean upright_ ;
     /**
      * <code>optional bool upright = 6;</code>

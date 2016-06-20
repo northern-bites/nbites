@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VBallOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.VBall)
-    com.google.protobuf.MessageOrBuilder {
+public interface VBallOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional double distance = 1;
   /**
    * <code>optional double distance = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface VBallOrBuilder extends
    */
   double getDistance();
 
+  // optional double bearing = 2;
   /**
    * <code>optional double bearing = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface VBallOrBuilder extends
    */
   double getBearing();
 
+  // optional double angle_x_deg = 3;
   /**
    * <code>optional double angle_x_deg = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface VBallOrBuilder extends
    */
   double getAngleXDeg();
 
+  // optional double angle_y_deg = 4;
   /**
    * <code>optional double angle_y_deg = 4;</code>
    */
@@ -43,6 +46,7 @@ public interface VBallOrBuilder extends
    */
   double getAngleYDeg();
 
+  // optional double bearing_sd = 5;
   /**
    * <code>optional double bearing_sd = 5;</code>
    */
@@ -52,6 +56,7 @@ public interface VBallOrBuilder extends
    */
   double getBearingSd();
 
+  // optional bool in_top_cam = 6;
   /**
    * <code>optional bool in_top_cam = 6;</code>
    */
@@ -61,6 +66,7 @@ public interface VBallOrBuilder extends
    */
   boolean getInTopCam();
 
+  // optional double radius = 7;
   /**
    * <code>optional double radius = 7;</code>
    */
@@ -70,6 +76,7 @@ public interface VBallOrBuilder extends
    */
   double getRadius();
 
+  // optional double confidence = 8;
   /**
    * <code>optional double confidence = 8;</code>
    */
@@ -79,6 +86,7 @@ public interface VBallOrBuilder extends
    */
   double getConfidence();
 
+  // optional bool on = 9;
   /**
    * <code>optional bool on = 9;</code>
    */
@@ -88,6 +96,7 @@ public interface VBallOrBuilder extends
    */
   boolean getOn();
 
+  // optional sint32 frames_on = 10;
   /**
    * <code>optional sint32 frames_on = 10;</code>
    */
@@ -97,6 +106,7 @@ public interface VBallOrBuilder extends
    */
   int getFramesOn();
 
+  // optional sint32 frames_off = 11;
   /**
    * <code>optional sint32 frames_off = 11;</code>
    */
@@ -106,6 +116,7 @@ public interface VBallOrBuilder extends
    */
   int getFramesOff();
 
+  // optional double rel_x_variance = 12;
   /**
    * <code>optional double rel_x_variance = 12;</code>
    */
@@ -115,6 +126,7 @@ public interface VBallOrBuilder extends
    */
   double getRelXVariance();
 
+  // optional double rel_y_variance = 13;
   /**
    * <code>optional double rel_y_variance = 13;</code>
    */
@@ -124,6 +136,7 @@ public interface VBallOrBuilder extends
    */
   double getRelYVariance();
 
+  // optional double bearing_deg = 14;
   /**
    * <code>optional double bearing_deg = 14;</code>
    */
@@ -133,6 +146,7 @@ public interface VBallOrBuilder extends
    */
   double getBearingDeg();
 
+  // optional sint32 x = 15;
   /**
    * <code>optional sint32 x = 15;</code>
    */
@@ -142,6 +156,7 @@ public interface VBallOrBuilder extends
    */
   int getX();
 
+  // optional sint32 y = 16;
   /**
    * <code>optional sint32 y = 16;</code>
    */
@@ -151,6 +166,7 @@ public interface VBallOrBuilder extends
    */
   int getY();
 
+  // optional float wz0 = 17;
   /**
    * <code>optional float wz0 = 17;</code>
    */

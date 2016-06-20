@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.VisionRobot}
  */
-public final class VisionRobot extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.VisionRobot)
-    VisionRobotOrBuilder {
+public  final class VisionRobot extends
+    com.google.protobuf.GeneratedMessage
+    implements VisionRobotOrBuilder {
   // Use VisionRobot.newBuilder() to construct.
   private VisionRobot(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -225,6 +224,7 @@ public final class VisionRobot extends
   }
 
   private int bitField0_;
+  // optional .messages.Robot red1 = 1;
   public static final int RED1_FIELD_NUMBER = 1;
   private messages.Robot red1_;
   /**
@@ -246,6 +246,7 @@ public final class VisionRobot extends
     return red1_;
   }
 
+  // optional .messages.Robot red2 = 2;
   public static final int RED2_FIELD_NUMBER = 2;
   private messages.Robot red2_;
   /**
@@ -267,6 +268,7 @@ public final class VisionRobot extends
     return red2_;
   }
 
+  // optional .messages.Robot red3 = 3;
   public static final int RED3_FIELD_NUMBER = 3;
   private messages.Robot red3_;
   /**
@@ -288,6 +290,7 @@ public final class VisionRobot extends
     return red3_;
   }
 
+  // optional .messages.Robot red4 = 4;
   public static final int RED4_FIELD_NUMBER = 4;
   private messages.Robot red4_;
   /**
@@ -309,6 +312,7 @@ public final class VisionRobot extends
     return red4_;
   }
 
+  // optional .messages.Robot red5 = 5;
   public static final int RED5_FIELD_NUMBER = 5;
   private messages.Robot red5_;
   /**
@@ -330,6 +334,7 @@ public final class VisionRobot extends
     return red5_;
   }
 
+  // optional .messages.Robot navy1 = 6;
   public static final int NAVY1_FIELD_NUMBER = 6;
   private messages.Robot navy1_;
   /**
@@ -351,6 +356,7 @@ public final class VisionRobot extends
     return navy1_;
   }
 
+  // optional .messages.Robot navy2 = 7;
   public static final int NAVY2_FIELD_NUMBER = 7;
   private messages.Robot navy2_;
   /**
@@ -372,6 +378,7 @@ public final class VisionRobot extends
     return navy2_;
   }
 
+  // optional .messages.Robot navy3 = 8;
   public static final int NAVY3_FIELD_NUMBER = 8;
   private messages.Robot navy3_;
   /**
@@ -393,6 +400,7 @@ public final class VisionRobot extends
     return navy3_;
   }
 
+  // optional .messages.Robot navy4 = 9;
   public static final int NAVY4_FIELD_NUMBER = 9;
   private messages.Robot navy4_;
   /**
@@ -414,6 +422,7 @@ public final class VisionRobot extends
     return navy4_;
   }
 
+  // optional .messages.Robot navy5 = 10;
   public static final int NAVY5_FIELD_NUMBER = 10;
   private messages.Robot navy5_;
   /**
@@ -450,8 +459,7 @@ public final class VisionRobot extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -621,9 +629,8 @@ public final class VisionRobot extends
    * Protobuf type {@code messages.VisionRobot}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.VisionRobot)
-      messages.VisionRobotOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.VisionRobotOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionRobot.internal_static_messages_VisionRobot_descriptor;
@@ -907,6 +914,7 @@ public final class VisionRobot extends
     }
     private int bitField0_;
 
+    // optional .messages.Robot red1 = 1;
     private messages.Robot red1_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red1Builder_;
@@ -1015,7 +1023,7 @@ public final class VisionRobot extends
       if (red1Builder_ == null) {
         red1Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getRed1(),
+                red1_,
                 getParentForChildren(),
                 isClean());
         red1_ = null;
@@ -1023,6 +1031,7 @@ public final class VisionRobot extends
       return red1Builder_;
     }
 
+    // optional .messages.Robot red2 = 2;
     private messages.Robot red2_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red2Builder_;
@@ -1131,7 +1140,7 @@ public final class VisionRobot extends
       if (red2Builder_ == null) {
         red2Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getRed2(),
+                red2_,
                 getParentForChildren(),
                 isClean());
         red2_ = null;
@@ -1139,6 +1148,7 @@ public final class VisionRobot extends
       return red2Builder_;
     }
 
+    // optional .messages.Robot red3 = 3;
     private messages.Robot red3_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red3Builder_;
@@ -1247,7 +1257,7 @@ public final class VisionRobot extends
       if (red3Builder_ == null) {
         red3Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getRed3(),
+                red3_,
                 getParentForChildren(),
                 isClean());
         red3_ = null;
@@ -1255,6 +1265,7 @@ public final class VisionRobot extends
       return red3Builder_;
     }
 
+    // optional .messages.Robot red4 = 4;
     private messages.Robot red4_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red4Builder_;
@@ -1363,7 +1374,7 @@ public final class VisionRobot extends
       if (red4Builder_ == null) {
         red4Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getRed4(),
+                red4_,
                 getParentForChildren(),
                 isClean());
         red4_ = null;
@@ -1371,6 +1382,7 @@ public final class VisionRobot extends
       return red4Builder_;
     }
 
+    // optional .messages.Robot red5 = 5;
     private messages.Robot red5_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red5Builder_;
@@ -1479,7 +1491,7 @@ public final class VisionRobot extends
       if (red5Builder_ == null) {
         red5Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getRed5(),
+                red5_,
                 getParentForChildren(),
                 isClean());
         red5_ = null;
@@ -1487,6 +1499,7 @@ public final class VisionRobot extends
       return red5Builder_;
     }
 
+    // optional .messages.Robot navy1 = 6;
     private messages.Robot navy1_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy1Builder_;
@@ -1595,7 +1608,7 @@ public final class VisionRobot extends
       if (navy1Builder_ == null) {
         navy1Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getNavy1(),
+                navy1_,
                 getParentForChildren(),
                 isClean());
         navy1_ = null;
@@ -1603,6 +1616,7 @@ public final class VisionRobot extends
       return navy1Builder_;
     }
 
+    // optional .messages.Robot navy2 = 7;
     private messages.Robot navy2_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy2Builder_;
@@ -1711,7 +1725,7 @@ public final class VisionRobot extends
       if (navy2Builder_ == null) {
         navy2Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getNavy2(),
+                navy2_,
                 getParentForChildren(),
                 isClean());
         navy2_ = null;
@@ -1719,6 +1733,7 @@ public final class VisionRobot extends
       return navy2Builder_;
     }
 
+    // optional .messages.Robot navy3 = 8;
     private messages.Robot navy3_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy3Builder_;
@@ -1827,7 +1842,7 @@ public final class VisionRobot extends
       if (navy3Builder_ == null) {
         navy3Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getNavy3(),
+                navy3_,
                 getParentForChildren(),
                 isClean());
         navy3_ = null;
@@ -1835,6 +1850,7 @@ public final class VisionRobot extends
       return navy3Builder_;
     }
 
+    // optional .messages.Robot navy4 = 9;
     private messages.Robot navy4_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy4Builder_;
@@ -1943,7 +1959,7 @@ public final class VisionRobot extends
       if (navy4Builder_ == null) {
         navy4Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getNavy4(),
+                navy4_,
                 getParentForChildren(),
                 isClean());
         navy4_ = null;
@@ -1951,6 +1967,7 @@ public final class VisionRobot extends
       return navy4Builder_;
     }
 
+    // optional .messages.Robot navy5 = 10;
     private messages.Robot navy5_ = messages.Robot.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy5Builder_;
@@ -2059,7 +2076,7 @@ public final class VisionRobot extends
       if (navy5Builder_ == null) {
         navy5Builder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder>(
-                getNavy5(),
+                navy5_,
                 getParentForChildren(),
                 isClean());
         navy5_ = null;

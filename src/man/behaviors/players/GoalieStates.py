@@ -1,6 +1,7 @@
 import time
 from objects import RelRobotLocation, RobotLocation
 from ..navigator import Navigator as nav
+from ..navigator import BrunswickSpeeds as speeds
 from ..util import *
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
@@ -246,7 +247,7 @@ def lineCheckReposition(player):
         else:
             print "This was a reposition, I think"
             watchWithLineChecks.numFixes += 1
-        player.brain.nav.walkTo(dest, speed = nav.QUICK_SPEED)
+        player.brain.nav.walkTo(dest, speed = speeds.SPEED_EIGHT)
 
     if player.counter > 300:
         return player.goLater('watchWithLineChecks')
@@ -268,7 +269,7 @@ def returnUsingLoc(player):
     if player.firstFrame():
         dest = constants.HOME_POSITION
         player.brain.nav.goTo(dest,
-                            speed = nav.QUICK_SPEED)
+                            speed = speeds.SPEED_EIGHT)
         print("I'm trying to return using loc!")
         player.brain.tracker.trackBall()
         returnUsingLoc.panning = False
@@ -295,7 +296,7 @@ def shiftPosition(player):
         print("H:", shiftPosition.dest.h)
 
         player.brain.nav.goTo(shiftPosition.dest,
-                            speed = nav.QUICK_SPEED,
+                            speed = speeds.SPEED_EIGHT,
                             fast = False)
 
     if player.counter > 300:
