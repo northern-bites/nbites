@@ -364,14 +364,11 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
         }
     }
     if(startCol-TOP_RESTRICTION_BUF >= 0) {
-        std::cout<<"can shift start left\n";
         getColor(startCol, 0);
         if(isGreen()) {
             if(extendedBottom) {
-                std::cout<<"extented bottom\n";
                 startCol -= TOP_RESTRICTION_BUF/2;
             } else {
-                std::cout<<"shifting start left\n";
                 startCol -= TOP_RESTRICTION_BUF;
             }
         }
