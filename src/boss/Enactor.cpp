@@ -104,9 +104,13 @@ bool Enactor::manDied() {
             double value = interp(lastSet[i], jointCrash[i], nextFrame, num_frames_interpolate);
             jointCommand[5][i][0] = value;
         }
+        printf("[DEBUG] manDied() in %d frame!\n", nextFrame);
+        std::cout << std::endl;
 
         nextFrame++;
     } else {
+        printf("[DEBUG] manDied() in last frame!\n");
+        std::cout << std::endl;
 
         noStiff();
         is_finished = true;

@@ -174,12 +174,19 @@ Boss::~Boss()
 void Boss::listener()
 {
     int status; //currently unused.
+    static bool inDiedOverride = false;
+
+    if (inDiedOverride && !manDiedOverride) {
+        inDiedOverride = false;
+        man::tts::say(IN_SCRIMMAGE, "sit finished");
+    }
 
     while(true) {
         if (manRunning && !manDiedOverride) {
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
                 std::cout << "Boss::listener() killing man due to inactivity" << std::endl;
                 man::tts::say(IN_SCRIMMAGE, "man down!");
+                inDiedOverride = true;
 
                 print_info();
                 manDiedOverride = true;
@@ -221,6 +228,7 @@ int Boss::startMan() {
     if (child > 0) {
         manPID = child;
         manRunning = true;
+        shared->latestSensorRead = shared->latestSensorWritten;
         std::cout << "\n\n\n=================================================\n\n\n" << std::endl;
     }
     else if (child == 0) {
@@ -340,10 +348,12 @@ void Boss::DCMPreProcessCallback()
 
     if (manDiedOverride) {
         bool sit_finished = enactor.manDied();
+        printf("[DEBUG] sit_finished was %d\n", sit_finished);
         if (sit_finished) {
             manRunning = false;
             manDiedOverride = false;
         }
+        
         return;
     }
             
@@ -361,6 +371,7 @@ void Boss::DCMPreProcessCallback()
     std::string leds;
 
     if (shared->latestCommandWritten > shared->latestCommandRead) {
+
         if (bossSyncRead(shared, cmndStaging)) {
             Deserialize des(cmndStaging);
 

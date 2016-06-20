@@ -8,8 +8,8 @@
 
 int lockFD = 0;
 man::Man* instance;
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
+//const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
     instance->preClose();
