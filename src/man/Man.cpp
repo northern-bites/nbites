@@ -139,7 +139,7 @@ Man::Man() :
             sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
         }
         sharedBall.locIn.wireTo(&localization.output);
-        sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
+        sharedBall.visionIn.wireTo(&vision.visionOut);
         naiveBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
 
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
