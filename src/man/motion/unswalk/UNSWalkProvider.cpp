@@ -19,7 +19,6 @@
 #include "utils/basic_maths.hpp"
 #include "utils/speech.hpp"
 #include "touch/FilteredTouch.hpp"
-// #include 
 
 namespace man 
 {
@@ -99,8 +98,7 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
     angleChanged = 0.0;
 
     counter = 0;
-
-    generator->readOptions("generator");
+    generator->readOptions("/home/nao/nbites/Config");
 	
 	resetAll();
 }
