@@ -266,7 +266,7 @@ imagePoint BallDetector::findPointsCentroid(intPairVector & v) {
     return std::make_pair((int)cx, (int)cy);
 }
 
-bool BallDetector::centroidEquidistantPoints(intPairVector & v, int projectedBallRadius) {
+bool BallDetector::pointsEquidistantFromCentroid(intPairVector & v, int projectedBallRadius) {
     imagePoint c = findPointsCentroid(v);
     int wrongDistanceCounter = 0;
     if(v.size() > 0) {

@@ -99,7 +99,7 @@ namespace man {
 
             int projectedBallRadius(imagePoint p);
             imagePoint findPointsCentroid(intPairVector & v);
-            bool centroidEquidistantPoints(intPairVector & v, int projectedBallRadius);
+            bool pointsEquidistantFromCentroid(intPairVector & v, int projectedBallRadius);
             
             int getAzimuthColumnRestrictions(double az);
             int getAzimuthRowRestrictions(double az);
