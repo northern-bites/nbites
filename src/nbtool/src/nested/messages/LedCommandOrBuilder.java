@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface LedCommandOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.LedCommand)
-    com.google.protobuf.MessageOrBuilder {
+public interface LedCommandOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // repeated int32 led_id = 1;
   /**
    * <code>repeated int32 led_id = 1;</code>
    *
@@ -35,6 +35,7 @@ public interface LedCommandOrBuilder extends
    */
   int getLedId(int index);
 
+  // repeated int32 rgb_hex = 2;
   /**
    * <code>repeated int32 rgb_hex = 2;</code>
    */

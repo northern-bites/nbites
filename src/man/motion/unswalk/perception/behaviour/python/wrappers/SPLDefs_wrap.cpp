@@ -1,0 +1,30 @@
+   scope().attr("FIELD_LINE_WIDTH"          ) = FIELD_LINE_WIDTH;
+   scope().attr("OFFNAO_FIELD_LENGTH_OFFSET") = OFFNAO_FIELD_LENGTH_OFFSET;
+   scope().attr("FIELD_LENGTH_OFFSET"       ) = FIELD_LENGTH_OFFSET;
+   scope().attr("OFFNAO_FIELD_WIDTH_OFFSET" ) = OFFNAO_FIELD_WIDTH_OFFSET;
+   scope().attr("FIELD_WIDTH_OFFSET"        ) = FIELD_WIDTH_OFFSET;
+   scope().attr("FIELD_WIDTH"               ) = FIELD_WIDTH;
+   scope().attr("FIELD_LENGTH"              ) = FIELD_LENGTH;
+   scope().attr("GOAL_BOX_WIDTH"            ) = GOAL_BOX_WIDTH;
+   scope().attr("GOAL_BOX_LENGTH"           ) = GOAL_BOX_LENGTH;
+   scope().attr("MARKER_DIMENSIONS"         ) = MARKER_DIMENSIONS;
+   scope().attr("DIST_GOAL_LINE_TO_MARKER"  ) = DIST_GOAL_LINE_TO_MARKER;
+   scope().attr("CENTER_CIRCLE_DIAMETER"    ) = CENTER_CIRCLE_DIAMETER;
+   scope().attr("MARKER_CENTER_X"           ) = MARKER_CENTER_X;
+   scope().attr("GOAL_POST_DIAMETER"        ) = GOAL_POST_DIAMETER;
+   scope().attr("GOAL_BAR_DIAMETER"         ) = GOAL_BAR_DIAMETER;
+   scope().attr("GOAL_POST_HEIGHT"          ) = GOAL_POST_HEIGHT;
+   scope().attr("GOAL_WIDTH"                ) = GOAL_WIDTH;
+#ifdef USING_SMALL_FIELD
+   scope().attr("GOAL_SUPPORT_DIMENSIONS"   ) = GOAL_SUPPORT_DIMENSIONS;
+#endif
+   scope().attr("FULL_FIELD_WIDTH"          ) = FULL_FIELD_WIDTH;
+   scope().attr("OFFNAO_FULL_FIELD_WIDTH"   ) = OFFNAO_FULL_FIELD_WIDTH;
+   scope().attr("FULL_FIELD_LENGTH"         ) = FULL_FIELD_LENGTH;
+   scope().attr("OFFNAO_FULL_FIELD_LENGTH"  ) = OFFNAO_FULL_FIELD_LENGTH;
+   scope().attr("UNKNOWN_COORD"             ) = UNKNOWN_COORD;
+   scope().attr("UNKNOWN_HEADING"           ) = UNKNOWN_HEADING;
+   scope().attr("BALL_RADIUS"               ) = BALL_RADIUS;
+   scope().attr("GOAL_POST_ABS_X"           ) = GOAL_POST_ABS_X;
+   scope().attr("GOAL_POST_ABS_Y"           ) = GOAL_POST_ABS_Y;
+   scope().attr("ROBOTS_PER_TEAM"           ) = ROBOTS_PER_TEAM;

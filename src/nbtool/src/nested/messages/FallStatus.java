@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.FallStatus}
  */
-public final class FallStatus extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.FallStatus)
-    FallStatusOrBuilder {
+public  final class FallStatus extends
+    com.google.protobuf.GeneratedMessage
+    implements FallStatusOrBuilder {
   // Use FallStatus.newBuilder() to construct.
   private FallStatus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -110,6 +109,7 @@ public final class FallStatus extends
   }
 
   private int bitField0_;
+  // optional bool falling = 1;
   public static final int FALLING_FIELD_NUMBER = 1;
   private boolean falling_;
   /**
@@ -125,6 +125,7 @@ public final class FallStatus extends
     return falling_;
   }
 
+  // optional bool fallen = 2;
   public static final int FALLEN_FIELD_NUMBER = 2;
   private boolean fallen_;
   /**
@@ -140,6 +141,7 @@ public final class FallStatus extends
     return fallen_;
   }
 
+  // optional bool on_front = 3;
   public static final int ON_FRONT_FIELD_NUMBER = 3;
   private boolean onFront_;
   /**
@@ -171,8 +173,7 @@ public final class FallStatus extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -293,9 +294,8 @@ public final class FallStatus extends
    * Protobuf type {@code messages.FallStatus}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.FallStatus)
-      messages.FallStatusOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.FallStatusOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_FallStatus.internal_static_messages_FallStatus_descriptor;
@@ -426,6 +426,7 @@ public final class FallStatus extends
     }
     private int bitField0_;
 
+    // optional bool falling = 1;
     private boolean falling_ ;
     /**
      * <code>optional bool falling = 1;</code>
@@ -458,6 +459,7 @@ public final class FallStatus extends
       return this;
     }
 
+    // optional bool fallen = 2;
     private boolean fallen_ ;
     /**
      * <code>optional bool fallen = 2;</code>
@@ -490,6 +492,7 @@ public final class FallStatus extends
       return this;
     }
 
+    // optional bool on_front = 3;
     private boolean onFront_ ;
     /**
      * <code>optional bool on_front = 3;</code>
