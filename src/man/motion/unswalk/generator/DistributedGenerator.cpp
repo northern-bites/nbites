@@ -1,3 +1,7 @@
+#include <fstream>
+#include <limits>
+#include <cctype>
+
 #include "generator/DistributedGenerator.hpp"
 #include "generator/ActionGenerator.hpp"
 #include "generator/DeadGenerator.hpp"
@@ -10,6 +14,7 @@
 #include "utils/body.hpp"
 #include "utils/Logger.hpp"
 
+using namespace std;
 using ActionCommand::Body;
 using boost::program_options::variables_map;
 
@@ -152,6 +157,8 @@ DistributedGenerator::DistributedGenerator()
    //   std::cout << "bodyGenerators[GOALIE_FAST_SIT] is NULL!" << std::endl;
 
    //llog(INFO) << "DistributedGenerator constructed" << std::endl;
+   std::cout << "Calling readOptions in the distributed generator!" << std::endl;
+   // this->readOptions("/home/nao/nbites/Config");
 }
 
 /*-----------------------------------------------------------------------------
@@ -276,6 +283,11 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    current_generator = request->body.actionType;
    // std::cout << "setting current generator!\n";
 
+   if (request->body.actionType == ActionCommand::Body::STAND) {
+      std::cout << "Current generator is STAND COMMAND!" << std::endl;
+      this->readOptions("/home/nao/nbites/Config");
+   }
+
    switch (current_generator) {
    case Body::NONE:             usesHead = false; break;
    case Body::STAND:            usesHead = false; break;
@@ -355,7 +367,163 @@ void DistributedGenerator::reset() {
    current_generator = ActionCommand::Body::NONE;
 }
 
+// INTERPOLATE METHOD ORIGINALLY DEFINED IN THE ACTION GENERATOR
+void DistributedGenerator::interpolate(JointValues newJoint, int duration) {
+   if (joints.empty()) {
+      max_iter = duration / 10;
+      // Reserve space for the interpolation when the generator
+      // first called
+      for (int i = 0; i < max_iter; i++) {
+         joints.push_back(newJoint);
+      }
+      joints.push_back(newJoint);
+   } else {
+      int inTime = 0;
+      float offset[Joints::NUMBER_OF_JOINTS];
+
+      if (duration != 0) {
+
+         inTime = duration / 10;
+         JointValues currentJoint = joints.back();
+
+         // Calculate the difference between new joint and the previous joint
+         for (int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
+            offset[i] = (newJoint.angles[i] - currentJoint.angles[i]) / inTime;
+         }
+
+
+         for (int i = 0; i < inTime; i++) {
+            JointValues inJoint;
+            for (int j = 0; j < Joints::NUMBER_OF_JOINTS; j++) {
+               inJoint.angles[j] = joints.back().angles[j] + offset[j];
+               inJoint.stiffnesses[j] = newJoint.stiffnesses[j];
+            }
+            joints.push_back(inJoint);
+         }
+      } else {
+
+         JointValues firstJoint = joints.at(max_iter);
+         // Calculate the difference between the joint at MAX_ITER position
+         // with the new joint
+         for (int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
+            offset[i] = (firstJoint.angles[i] - newJoint.angles[i]) / max_iter;
+         }
+
+         joints[0] = newJoint;
+         for (int i = 1; i < max_iter; i++) {
+            for (int j = 0; j < Joints::NUMBER_OF_JOINTS; j++) {
+               joints[i].angles[j] = joints[i - 1].angles[j] + offset[j];
+               joints[i].stiffnesses[j] = firstJoint.stiffnesses[j];
+            }
+         }
+      }
+   }
+}
+
+// TRY TO MAKE THE ROBOT STAND WITHOUT CALLING THE STAND GENERATOR
+void DistributedGenerator::constructPose(std::string path) {
+   // ifstream in(string(path + ".pos").c_str());
+   ifstream in(string(path + "/stand.pos").c_str());
+   std::cout << "Path is " << path << std::endl;
+   std::cout << "DistributedGenerator(stand) creating" << endl;
+
+   if (!in.is_open()) {
+      std::cout << "DistributedGenerator can not open " << file_name << endl;
+   } else {
+      int duration = 0;
+      float stiffness = 1.0;
+      float angles = 0.0;
+      while (isspace(in.peek())) {
+         in.ignore();
+      }
+      while (!in.eof()) {
+         // Ignore comments, newlines and ensure not eof
+         if (in.peek() == '#' || in.peek() == '\n' || in.peek() == EOF) {
+            in.ignore(std::numeric_limits<int>::max(), '\n');
+            continue;
+         }
+         JointValues newJoint;
+         // Read the angles in the file to create a new JointValue
+         for (int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
+            while (isspace(in.peek())) {
+               in.ignore();
+            }
+            if (in.peek() == '#' || in.peek() == '$' || in.peek() == '\n' || in.peek() == EOF) {
+               std::cout << "You're missing a joint value in " << file_name << ".pos" << std::endl;
+               exit(1);
+            }
+            in >> angles;
+            // Convert degree to radian because the values in the file
+            // are in degree
+            newJoint.angles[i] = UNSWDEG2RAD(angles);
+            newJoint.stiffnesses[i] = 1.0;
+         }
+
+         // read in the duration
+         while (isspace(in.peek())) {
+            in.ignore();
+         }
+         if (in.peek() == '#' || in.peek() == '$' || in.peek() == '\n' || in.peek() == EOF) {
+            std::cout << "You're missing a duration in " << file_name << ".pos" << std::endl;
+            exit(1);
+         }
+         in >> duration;
+
+         // Ignore comments, newlines and ensure not eof
+         while (isspace(in.peek())) {
+            in.ignore();
+         }
+         while (in.peek() == '#') {
+            in.ignore(std::numeric_limits<int>::max(), '\n');
+         }
+         while (isspace(in.peek())) {
+            in.ignore();
+         }
+
+         // Stiffnesses are specified by a line beginning with "$"
+         if (in.peek() == '$') {
+            in.ignore(std::numeric_limits<int>::max(), '$');
+            for (int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
+               while (isspace(in.peek())) {
+                  in.ignore();
+               }
+               if (in.peek() == '#' || in.peek() == '\n' || in.peek() == EOF) {
+                  //std::cout << "You're missing a stiffness value in " << file_name << ".pos" << std::endl;
+                  exit(1);
+               }
+               in >> stiffness;
+               newJoint.stiffnesses[i] = stiffness;
+            }
+            // Ignore comments, newlines and ensure not eof
+            while (isspace(in.peek())) {
+               in.ignore();
+            }
+            while (in.peek() == '#') {
+               in.ignore(std::numeric_limits<int>::max(), '\n');
+            }
+            while (isspace(in.peek())) {
+               in.ignore();
+            }
+         }
+         interpolate(newJoint, duration);
+         while (isspace(in.peek())) {
+            in.ignore();
+         }
+      }
+      in.close();
+      std::cout << "DistributedGenerator(stand) created" << endl;
+   }
+}
+
+
 void DistributedGenerator::readOptions(std::string path) {
+
+   if (current_generator == ActionCommand::Body::STAND) {
+      std::cout << "readOptions received a STAND COMMAND!" << std::endl;
+      this->constructPose(path);
+      return;
+   }
+
    for (uint8_t i = 0; i < NUM_NBITE_GENS; ++i) {
       bodyGenerators[i]->readOptions(path);
    }

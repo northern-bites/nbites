@@ -515,11 +515,11 @@ void UNSWalkProvider::resetOdometry() {
 
 void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
 	if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
-		std::cout << "Stand command!\n";
-		std::cout << "Stand is being called! Setting currentCommand to empty pointer\n";
+		// std::cout << "Stand command!\n";
+		// std::cout << "Stand is being called! Setting currentCommand to empty pointer\n";
 		// request->body.actionType = ActionCommand::Body::STAND;
-		currentCommand = MotionCommand::ptr();
-		// this->stand();
+		// currentCommand = MotionCommand::ptr();
+		this->stand();
 		return;
 	}
 
@@ -630,9 +630,9 @@ bool UNSWalkProvider::isWalkActive() const {
 
 void UNSWalkProvider::stand() {
 	// std::cout << "Stand is being called! Setting currentCommand to empty pointer\n";
-	// // request->body.actionType = ActionCommand::Body::STAND;
-	// currentCommand = MotionCommand::ptr();
-	// std::cout << "pointer is " << &currentCommand << std::endl;
+	// request->body.actionType = ActionCommand::Body::STAND;
+	currentCommand = MotionCommand::ptr();
+	std::cout << "pointer is " << &currentCommand << std::endl;
 
 	// UNTIL STAND IS WORKED OUT, JUST WALK IN PLACE
 	// CHANGE THIS BEFORE COMPETITION
