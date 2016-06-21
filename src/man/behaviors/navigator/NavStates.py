@@ -55,7 +55,7 @@ def goToPosition(nav):
 
     
     if nav.counter < 10:
-        print("In go to position, walking in place")
+        # print("In go to position, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
 
@@ -346,7 +346,7 @@ def atPosition(nav):
     Switches back if we're not at the destination anymore.
     """
     if nav.counter < 10:
-        print("In at position, walking in place")
+        # print("In at position, walking in place")
         helper.walkInPlace(nav)
     else:
         helper.stand(nav)
@@ -364,7 +364,7 @@ def stand(nav):
         return nav.stay()
 
     if nav.counter < 20:
-        print("In stand, walking in place")
+        # print("In stand, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
     # if nav.firstFrame():
