@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.VisionObstacle}
  */
-public final class VisionObstacle extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.VisionObstacle)
-    VisionObstacleOrBuilder {
+public  final class VisionObstacle extends
+    com.google.protobuf.GeneratedMessage
+    implements VisionObstacleOrBuilder {
   // Use VisionObstacle.newBuilder() to construct.
   private VisionObstacle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -155,6 +154,7 @@ public final class VisionObstacle extends
   }
 
   private int bitField0_;
+  // optional bool on_left = 1;
   public static final int ON_LEFT_FIELD_NUMBER = 1;
   private boolean onLeft_;
   /**
@@ -170,6 +170,7 @@ public final class VisionObstacle extends
     return onLeft_;
   }
 
+  // optional bool on_right = 2;
   public static final int ON_RIGHT_FIELD_NUMBER = 2;
   private boolean onRight_;
   /**
@@ -185,6 +186,7 @@ public final class VisionObstacle extends
     return onRight_;
   }
 
+  // optional bool off_field = 3;
   public static final int OFF_FIELD_FIELD_NUMBER = 3;
   private boolean offField_;
   /**
@@ -200,6 +202,7 @@ public final class VisionObstacle extends
     return offField_;
   }
 
+  // optional sint32 block_left = 4;
   public static final int BLOCK_LEFT_FIELD_NUMBER = 4;
   private int blockLeft_;
   /**
@@ -215,6 +218,7 @@ public final class VisionObstacle extends
     return blockLeft_;
   }
 
+  // optional sint32 block_mid = 5;
   public static final int BLOCK_MID_FIELD_NUMBER = 5;
   private int blockMid_;
   /**
@@ -230,6 +234,7 @@ public final class VisionObstacle extends
     return blockMid_;
   }
 
+  // optional sint32 block_right = 6;
   public static final int BLOCK_RIGHT_FIELD_NUMBER = 6;
   private int blockRight_;
   /**
@@ -245,6 +250,7 @@ public final class VisionObstacle extends
     return blockRight_;
   }
 
+  // optional float left_dist = 7;
   public static final int LEFT_DIST_FIELD_NUMBER = 7;
   private float leftDist_;
   /**
@@ -260,6 +266,7 @@ public final class VisionObstacle extends
     return leftDist_;
   }
 
+  // optional float mid_dist = 8;
   public static final int MID_DIST_FIELD_NUMBER = 8;
   private float midDist_;
   /**
@@ -275,6 +282,7 @@ public final class VisionObstacle extends
     return midDist_;
   }
 
+  // optional float right_dist = 9;
   public static final int RIGHT_DIST_FIELD_NUMBER = 9;
   private float rightDist_;
   /**
@@ -290,6 +298,7 @@ public final class VisionObstacle extends
     return rightDist_;
   }
 
+  // optional float left_bearing = 10;
   public static final int LEFT_BEARING_FIELD_NUMBER = 10;
   private float leftBearing_;
   /**
@@ -305,6 +314,7 @@ public final class VisionObstacle extends
     return leftBearing_;
   }
 
+  // optional float mid_bearing = 11;
   public static final int MID_BEARING_FIELD_NUMBER = 11;
   private float midBearing_;
   /**
@@ -320,6 +330,7 @@ public final class VisionObstacle extends
     return midBearing_;
   }
 
+  // optional float right_bearing = 12;
   public static final int RIGHT_BEARING_FIELD_NUMBER = 12;
   private float rightBearing_;
   /**
@@ -352,8 +363,7 @@ public final class VisionObstacle extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -537,9 +547,8 @@ public final class VisionObstacle extends
    * Protobuf type {@code messages.VisionObstacle}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.VisionObstacle)
-      messages.VisionObstacleOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.VisionObstacleOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionRobot.internal_static_messages_VisionObstacle_descriptor;
@@ -751,6 +760,7 @@ public final class VisionObstacle extends
     }
     private int bitField0_;
 
+    // optional bool on_left = 1;
     private boolean onLeft_ ;
     /**
      * <code>optional bool on_left = 1;</code>
@@ -783,6 +793,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional bool on_right = 2;
     private boolean onRight_ ;
     /**
      * <code>optional bool on_right = 2;</code>
@@ -815,6 +826,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional bool off_field = 3;
     private boolean offField_ ;
     /**
      * <code>optional bool off_field = 3;</code>
@@ -847,6 +859,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional sint32 block_left = 4;
     private int blockLeft_ ;
     /**
      * <code>optional sint32 block_left = 4;</code>
@@ -879,6 +892,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional sint32 block_mid = 5;
     private int blockMid_ ;
     /**
      * <code>optional sint32 block_mid = 5;</code>
@@ -911,6 +925,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional sint32 block_right = 6;
     private int blockRight_ ;
     /**
      * <code>optional sint32 block_right = 6;</code>
@@ -943,6 +958,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional float left_dist = 7;
     private float leftDist_ ;
     /**
      * <code>optional float left_dist = 7;</code>
@@ -975,6 +991,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional float mid_dist = 8;
     private float midDist_ ;
     /**
      * <code>optional float mid_dist = 8;</code>
@@ -1007,6 +1024,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional float right_dist = 9;
     private float rightDist_ ;
     /**
      * <code>optional float right_dist = 9;</code>
@@ -1039,6 +1057,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional float left_bearing = 10;
     private float leftBearing_ ;
     /**
      * <code>optional float left_bearing = 10;</code>
@@ -1071,6 +1090,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional float mid_bearing = 11;
     private float midBearing_ ;
     /**
      * <code>optional float mid_bearing = 11;</code>
@@ -1103,6 +1123,7 @@ public final class VisionObstacle extends
       return this;
     }
 
+    // optional float right_bearing = 12;
     private float rightBearing_ ;
     /**
      * <code>optional float right_bearing = 12;</code>

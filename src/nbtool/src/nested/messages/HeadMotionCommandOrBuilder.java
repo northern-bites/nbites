@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface HeadMotionCommandOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.HeadMotionCommand)
-    com.google.protobuf.MessageOrBuilder {
+public interface HeadMotionCommandOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional .messages.HeadMotionCommand.CommandType type = 1;
   /**
    * <code>optional .messages.HeadMotionCommand.CommandType type = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface HeadMotionCommandOrBuilder extends
    */
   messages.HeadMotionCommand.CommandType getType();
 
+  // optional .messages.PositionHeadCommand pos_command = 2;
   /**
    * <code>optional .messages.PositionHeadCommand pos_command = 2;</code>
    */
@@ -29,6 +30,7 @@ public interface HeadMotionCommandOrBuilder extends
    */
   messages.PositionHeadCommandOrBuilder getPosCommandOrBuilder();
 
+  // optional .messages.ScriptedHeadCommand scripted_command = 3;
   /**
    * <code>optional .messages.ScriptedHeadCommand scripted_command = 3;</code>
    */
@@ -42,6 +44,7 @@ public interface HeadMotionCommandOrBuilder extends
    */
   messages.ScriptedHeadCommandOrBuilder getScriptedCommandOrBuilder();
 
+  // optional int64 timestamp = 4;
   /**
    * <code>optional int64 timestamp = 4;</code>
    */

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisualFieldEdgeOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.VisualFieldEdge)
-    com.google.protobuf.MessageOrBuilder {
+public interface VisualFieldEdgeOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float distance_l = 1;
   /**
    * <code>optional float distance_l = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface VisualFieldEdgeOrBuilder extends
    */
   float getDistanceL();
 
+  // optional float distance_m = 2;
   /**
    * <code>optional float distance_m = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface VisualFieldEdgeOrBuilder extends
    */
   float getDistanceM();
 
+  // optional float distance_r = 3;
   /**
    * <code>optional float distance_r = 3;</code>
    */
