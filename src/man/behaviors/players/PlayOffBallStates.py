@@ -164,6 +164,7 @@ def positionAsSupporter(player):
     """
     positionAsSupporter.position = getSupporterPosition(player, player.role)
     fastWalk = False
+    playerFourSearchBehavior.pointIndex = -1
     playerFiveSearchBehavior.pointIndex = -1
 
     if player.firstFrame():
@@ -276,7 +277,6 @@ def playerFourSearchBehavior(player):
         return player.goLater('playOffBall')
 
     player.brain.nav.updateDest(playerFourSearchBehavior.dest)
-) 
 
 playerFourWayPoint1 = Location(NogginConstants.CENTER_FIELD_X - 160, NogginConstants.CENTER_FIELD_Y)
 playerFourWayPoint2 = Location(NogginConstants.CENTER_FIELD_X + 170, NogginConstants.MY_GOALBOX_TOP_Y + 120)

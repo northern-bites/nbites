@@ -26,6 +26,7 @@ def approachBall(player):
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
+        playOffStates.playerFourSearchBehavior.pointIndex = -1
         playOffStates.playerFiveSearchBehavior.pointIndex = -1
 
     if player.brain.nav.dodging:
