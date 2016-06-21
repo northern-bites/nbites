@@ -58,17 +58,17 @@ INITIAL_POS = (((90.4, 9.6, 0.2, -2.4),
                   3.0,0,stiff.NORMAL_STIFFNESSES),)
 
 #Keyframe that moves can called from an unbalanced position to slowly return the joints to a stable, standing position.
-INITIAL_POS_KEYFRAME = ((90., 10., -90., -3.),
-                        (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-                        (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-                        (90., -10., 90., 3.),
+INITIAL_POS_KEYFRAME = ((90.4, 9.6, 0.2, -2.4),
+                        (0.0, 0.1, -27.9, 50.1, -25.0, 0.0),
+                        (0.0, -0.1, -28.7, 49.9, -25.0, 0.2),
+                        (90.3, -9.3, -0.3, 2.7),
 			                   2,0,stiff.NORMAL_STIFFNESSES)
 
 #Keyframe that moves the joints to a stable, standing position quickly.
-QUICK_INITIAL_POS_KEYFRAME = ((90., 10., -90., -3.),
-                              (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-                              (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-                              (90., -10., 90., 3.),
+QUICK_INITIAL_POS_KEYFRAME = ((90.4, 9.6, 0.2, -2.4),
+                              (0.0, 0.1, -27.9, 50.1, -25.0, 0.0),
+                              (0.0, -0.1, -28.7, 49.9, -25.0, 0.2),
+                              (90.3, -9.3, -0.3, 2.7),
 			                       0.8,0,stiff.NORMAL_STIFFNESSES)
 
 STAND_STRAIGHT_POS = (((98.95, 9.74, -89.95, -2.86),
@@ -826,11 +826,11 @@ LEFT_SHORT_STRAIGHT_KICK = (
      .7,0,stiff.NORMAL_STIFFNESSES),
 
     #stand for a bit
-    ((90., 10., -90., -3.),
-      (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-      (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-      (90., -10., 90., 3.),
-      1,0,stiff.NORMAL_STIFFNESSES),
+    ((90.4, 9.6, 0.2, -2.4),
+      (0.0, 0.1, -27.9, 50.1, -25.0, 0.0),
+      (0.0, -0.1, -28.7, 49.9, -25.0, 0.2),
+      (90.3, -9.3, -0.3, 2.7),
+      1.2,0,stiff.NORMAL_STIFFNESSES),
     )
 
 RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
