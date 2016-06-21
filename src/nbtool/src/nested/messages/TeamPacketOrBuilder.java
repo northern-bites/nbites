@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface TeamPacketOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface TeamPacketOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.TeamPacket)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional string header = 1;
   /**
    * <code>optional string header = 1;</code>
    */
@@ -21,7 +21,6 @@ public interface TeamPacketOrBuilder
   com.google.protobuf.ByteString
       getHeaderBytes();
 
-  // optional int32 team_number = 2;
   /**
    * <code>optional int32 team_number = 2;</code>
    */
@@ -31,7 +30,6 @@ public interface TeamPacketOrBuilder
    */
   int getTeamNumber();
 
-  // optional int32 player_number = 3;
   /**
    * <code>optional int32 player_number = 3;</code>
    */
@@ -41,7 +39,6 @@ public interface TeamPacketOrBuilder
    */
   int getPlayerNumber();
 
-  // optional int32 sequence_number = 4;
   /**
    * <code>optional int32 sequence_number = 4;</code>
    */
@@ -51,7 +48,6 @@ public interface TeamPacketOrBuilder
    */
   int getSequenceNumber();
 
-  // optional int64 timestamp = 5;
   /**
    * <code>optional int64 timestamp = 5;</code>
    */
@@ -61,7 +57,6 @@ public interface TeamPacketOrBuilder
    */
   long getTimestamp();
 
-  // optional .messages.WorldModel payload = 6;
   /**
    * <code>optional .messages.WorldModel payload = 6;</code>
    */

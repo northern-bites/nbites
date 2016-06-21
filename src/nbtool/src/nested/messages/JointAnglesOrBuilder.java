@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface JointAnglesOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface JointAnglesOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.JointAngles)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float head_yaw = 1;
   /**
    * <code>optional float head_yaw = 1;</code>
    *
@@ -24,7 +24,6 @@ public interface JointAnglesOrBuilder
    */
   float getHeadYaw();
 
-  // optional float head_pitch = 2;
   /**
    * <code>optional float head_pitch = 2;</code>
    */
@@ -34,7 +33,6 @@ public interface JointAnglesOrBuilder
    */
   float getHeadPitch();
 
-  // optional float l_shoulder_pitch = 3;
   /**
    * <code>optional float l_shoulder_pitch = 3;</code>
    *
@@ -52,7 +50,6 @@ public interface JointAnglesOrBuilder
    */
   float getLShoulderPitch();
 
-  // optional float l_shoulder_roll = 4;
   /**
    * <code>optional float l_shoulder_roll = 4;</code>
    */
@@ -62,7 +59,6 @@ public interface JointAnglesOrBuilder
    */
   float getLShoulderRoll();
 
-  // optional float l_elbow_yaw = 5;
   /**
    * <code>optional float l_elbow_yaw = 5;</code>
    */
@@ -72,7 +68,6 @@ public interface JointAnglesOrBuilder
    */
   float getLElbowYaw();
 
-  // optional float l_elbow_roll = 6;
   /**
    * <code>optional float l_elbow_roll = 6;</code>
    */
@@ -82,7 +77,6 @@ public interface JointAnglesOrBuilder
    */
   float getLElbowRoll();
 
-  // optional float l_wrist_yaw = 7;
   /**
    * <code>optional float l_wrist_yaw = 7;</code>
    */
@@ -92,7 +86,6 @@ public interface JointAnglesOrBuilder
    */
   float getLWristYaw();
 
-  // optional float l_hand = 8;
   /**
    * <code>optional float l_hand = 8;</code>
    */
@@ -102,7 +95,6 @@ public interface JointAnglesOrBuilder
    */
   float getLHand();
 
-  // optional float r_shoulder_pitch = 9;
   /**
    * <code>optional float r_shoulder_pitch = 9;</code>
    *
@@ -120,7 +112,6 @@ public interface JointAnglesOrBuilder
    */
   float getRShoulderPitch();
 
-  // optional float r_shoulder_roll = 10;
   /**
    * <code>optional float r_shoulder_roll = 10;</code>
    */
@@ -130,7 +121,6 @@ public interface JointAnglesOrBuilder
    */
   float getRShoulderRoll();
 
-  // optional float r_elbow_yaw = 11;
   /**
    * <code>optional float r_elbow_yaw = 11;</code>
    */
@@ -140,7 +130,6 @@ public interface JointAnglesOrBuilder
    */
   float getRElbowYaw();
 
-  // optional float r_elbow_roll = 12;
   /**
    * <code>optional float r_elbow_roll = 12;</code>
    */
@@ -150,7 +139,6 @@ public interface JointAnglesOrBuilder
    */
   float getRElbowRoll();
 
-  // optional float r_wrist_yaw = 13;
   /**
    * <code>optional float r_wrist_yaw = 13;</code>
    */
@@ -160,7 +148,6 @@ public interface JointAnglesOrBuilder
    */
   float getRWristYaw();
 
-  // optional float r_hand = 14;
   /**
    * <code>optional float r_hand = 14;</code>
    */
@@ -170,7 +157,6 @@ public interface JointAnglesOrBuilder
    */
   float getRHand();
 
-  // optional float l_hip_yaw_pitch = 15;
   /**
    * <code>optional float l_hip_yaw_pitch = 15;</code>
    *
@@ -188,7 +174,6 @@ public interface JointAnglesOrBuilder
    */
   float getLHipYawPitch();
 
-  // optional float r_hip_yaw_pitch = 16;
   /**
    * <code>optional float r_hip_yaw_pitch = 16;</code>
    */
@@ -198,7 +183,6 @@ public interface JointAnglesOrBuilder
    */
   float getRHipYawPitch();
 
-  // optional float l_hip_roll = 17;
   /**
    * <code>optional float l_hip_roll = 17;</code>
    *
@@ -216,7 +200,6 @@ public interface JointAnglesOrBuilder
    */
   float getLHipRoll();
 
-  // optional float l_hip_pitch = 18;
   /**
    * <code>optional float l_hip_pitch = 18;</code>
    */
@@ -226,7 +209,6 @@ public interface JointAnglesOrBuilder
    */
   float getLHipPitch();
 
-  // optional float l_knee_pitch = 19;
   /**
    * <code>optional float l_knee_pitch = 19;</code>
    */
@@ -236,7 +218,6 @@ public interface JointAnglesOrBuilder
    */
   float getLKneePitch();
 
-  // optional float l_ankle_pitch = 20;
   /**
    * <code>optional float l_ankle_pitch = 20;</code>
    */
@@ -246,7 +227,6 @@ public interface JointAnglesOrBuilder
    */
   float getLAnklePitch();
 
-  // optional float l_ankle_roll = 21;
   /**
    * <code>optional float l_ankle_roll = 21;</code>
    */
@@ -256,7 +236,6 @@ public interface JointAnglesOrBuilder
    */
   float getLAnkleRoll();
 
-  // optional float r_hip_roll = 22;
   /**
    * <code>optional float r_hip_roll = 22;</code>
    *
@@ -274,7 +253,6 @@ public interface JointAnglesOrBuilder
    */
   float getRHipRoll();
 
-  // optional float r_hip_pitch = 23;
   /**
    * <code>optional float r_hip_pitch = 23;</code>
    */
@@ -284,7 +262,6 @@ public interface JointAnglesOrBuilder
    */
   float getRHipPitch();
 
-  // optional float r_knee_pitch = 24;
   /**
    * <code>optional float r_knee_pitch = 24;</code>
    */
@@ -294,7 +271,6 @@ public interface JointAnglesOrBuilder
    */
   float getRKneePitch();
 
-  // optional float r_ankle_pitch = 25;
   /**
    * <code>optional float r_ankle_pitch = 25;</code>
    */
@@ -304,7 +280,6 @@ public interface JointAnglesOrBuilder
    */
   float getRAnklePitch();
 
-  // optional float r_ankle_roll = 26;
   /**
    * <code>optional float r_ankle_roll = 26;</code>
    */

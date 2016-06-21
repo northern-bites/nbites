@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface OdometryWalkOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface OdometryWalkOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.OdometryWalk)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float rel_x = 1;
   /**
    * <code>optional float rel_x = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface OdometryWalkOrBuilder
    */
   float getRelX();
 
-  // optional float rel_y = 2;
   /**
    * <code>optional float rel_y = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface OdometryWalkOrBuilder
    */
   float getRelY();
 
-  // optional float rel_h = 3;
   /**
    * <code>optional float rel_h = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface OdometryWalkOrBuilder
    */
   float getRelH();
 
-  // optional float gain = 4;
   /**
    * <code>optional float gain = 4;</code>
    */

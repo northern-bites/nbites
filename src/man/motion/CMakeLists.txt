@@ -13,8 +13,7 @@ set(MOTION_SRCS MotionModule
 		HeadJointCommand
 		HeadProvider)
 
-#add_subdirectory( bhwalk )
-add_subdirectory( unswalk )
+add_subdirectory( bhwalk )
 
 # Add project as a library.
 add_library(
@@ -28,6 +27,5 @@ target_link_libraries(motion
   portals
   messages
   support
-#  bhwalk
-  unswalk
+  bhwalk
 )

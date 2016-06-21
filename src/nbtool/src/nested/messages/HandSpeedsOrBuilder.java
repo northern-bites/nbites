@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface HandSpeedsOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface HandSpeedsOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.HandSpeeds)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float left_speed = 1;
   /**
    * <code>optional float left_speed = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface HandSpeedsOrBuilder
    */
   float getLeftSpeed();
 
-  // optional float right_speed = 2;
   /**
    * <code>optional float right_speed = 2;</code>
    */

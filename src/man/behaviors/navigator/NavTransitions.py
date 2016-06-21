@@ -19,7 +19,6 @@ def atDestination(nav):
     relDest = helper.getRelativeDestination(nav.brain.loc, states.goToPosition.dest)
     my = nav.brain.loc
     (x, y, h) = states.goToPosition.precision
-    # print("In atdest, precision = ", str(states.goToPosition.precision))
 
     return relDest.within((x, y, h))
 
@@ -105,8 +104,6 @@ def getDirection(h):
         return states.dodge.DDirects[6]
 
 def notAtLocPosition(nav):
-    if not states.goToPosition.useLoc: 
-        return False
     return not atDestination(nav)
 
 ######### BALL IN BOX ###############

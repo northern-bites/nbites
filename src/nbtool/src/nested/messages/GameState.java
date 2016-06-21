@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.GameState}
  */
-public  final class GameState extends
-    com.google.protobuf.GeneratedMessage
-    implements GameStateOrBuilder {
+public final class GameState extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.GameState)
+    GameStateOrBuilder {
   // Use GameState.newBuilder() to construct.
   private GameState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -145,7 +146,6 @@ public  final class GameState extends
   }
 
   private int bitField0_;
-  // optional uint32 state = 1;
   public static final int STATE_FIELD_NUMBER = 1;
   private int state_;
   /**
@@ -161,7 +161,6 @@ public  final class GameState extends
     return state_;
   }
 
-  // optional bool first_half = 2 [default = true];
   public static final int FIRST_HALF_FIELD_NUMBER = 2;
   private boolean firstHalf_;
   /**
@@ -177,7 +176,6 @@ public  final class GameState extends
     return firstHalf_;
   }
 
-  // optional uint32 kick_off_team = 3;
   public static final int KICK_OFF_TEAM_FIELD_NUMBER = 3;
   private int kickOffTeam_;
   /**
@@ -193,7 +191,6 @@ public  final class GameState extends
     return kickOffTeam_;
   }
 
-  // optional uint32 secondary_state = 4;
   public static final int SECONDARY_STATE_FIELD_NUMBER = 4;
   private int secondaryState_;
   /**
@@ -209,7 +206,6 @@ public  final class GameState extends
     return secondaryState_;
   }
 
-  // optional uint32 drop_in_team = 5;
   public static final int DROP_IN_TEAM_FIELD_NUMBER = 5;
   private int dropInTeam_;
   /**
@@ -225,7 +221,6 @@ public  final class GameState extends
     return dropInTeam_;
   }
 
-  // optional sint32 drop_in_time = 6 [default = -1];
   public static final int DROP_IN_TIME_FIELD_NUMBER = 6;
   private int dropInTime_;
   /**
@@ -241,7 +236,6 @@ public  final class GameState extends
     return dropInTime_;
   }
 
-  // optional uint32 secs_remaining = 7 [default = 600];
   public static final int SECS_REMAINING_FIELD_NUMBER = 7;
   private int secsRemaining_;
   /**
@@ -257,7 +251,6 @@ public  final class GameState extends
     return secsRemaining_;
   }
 
-  // optional bool have_remote_gc = 8;
   public static final int HAVE_REMOTE_GC_FIELD_NUMBER = 8;
   private boolean haveRemoteGc_;
   /**
@@ -273,7 +266,6 @@ public  final class GameState extends
     return haveRemoteGc_;
   }
 
-  // repeated .messages.TeamInfo team = 9;
   public static final int TEAM_FIELD_NUMBER = 9;
   private java.util.List<messages.TeamInfo> team_;
   /**
@@ -323,7 +315,8 @@ public  final class GameState extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -486,8 +479,9 @@ public  final class GameState extends
    * Protobuf type {@code messages.GameState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.GameStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.GameState)
+      messages.GameStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_GameState.internal_static_messages_GameState_descriptor;
@@ -705,7 +699,6 @@ public  final class GameState extends
     }
     private int bitField0_;
 
-    // optional uint32 state = 1;
     private int state_ ;
     /**
      * <code>optional uint32 state = 1;</code>
@@ -738,7 +731,6 @@ public  final class GameState extends
       return this;
     }
 
-    // optional bool first_half = 2 [default = true];
     private boolean firstHalf_ = true;
     /**
      * <code>optional bool first_half = 2 [default = true];</code>
@@ -771,7 +763,6 @@ public  final class GameState extends
       return this;
     }
 
-    // optional uint32 kick_off_team = 3;
     private int kickOffTeam_ ;
     /**
      * <code>optional uint32 kick_off_team = 3;</code>
@@ -804,7 +795,6 @@ public  final class GameState extends
       return this;
     }
 
-    // optional uint32 secondary_state = 4;
     private int secondaryState_ ;
     /**
      * <code>optional uint32 secondary_state = 4;</code>
@@ -837,7 +827,6 @@ public  final class GameState extends
       return this;
     }
 
-    // optional uint32 drop_in_team = 5;
     private int dropInTeam_ ;
     /**
      * <code>optional uint32 drop_in_team = 5;</code>
@@ -870,7 +859,6 @@ public  final class GameState extends
       return this;
     }
 
-    // optional sint32 drop_in_time = 6 [default = -1];
     private int dropInTime_ = -1;
     /**
      * <code>optional sint32 drop_in_time = 6 [default = -1];</code>
@@ -903,7 +891,6 @@ public  final class GameState extends
       return this;
     }
 
-    // optional uint32 secs_remaining = 7 [default = 600];
     private int secsRemaining_ = 600;
     /**
      * <code>optional uint32 secs_remaining = 7 [default = 600];</code>
@@ -936,7 +923,6 @@ public  final class GameState extends
       return this;
     }
 
-    // optional bool have_remote_gc = 8;
     private boolean haveRemoteGc_ ;
     /**
      * <code>optional bool have_remote_gc = 8;</code>
@@ -969,7 +955,6 @@ public  final class GameState extends
       return this;
     }
 
-    // repeated .messages.TeamInfo team = 9;
     private java.util.List<messages.TeamInfo> team_ =
       java.util.Collections.emptyList();
     private void ensureTeamIsMutable() {
@@ -1111,7 +1096,8 @@ public  final class GameState extends
         java.lang.Iterable<? extends messages.TeamInfo> values) {
       if (teamBuilder_ == null) {
         ensureTeamIsMutable();
-        super.addAll(values, team_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, team_);
         onChanged();
       } else {
         teamBuilder_.addAllMessages(values);

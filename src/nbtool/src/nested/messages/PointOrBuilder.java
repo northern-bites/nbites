@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface PointOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface PointOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.Point)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float x = 1;
   /**
    * <code>optional float x = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface PointOrBuilder
    */
   float getX();
 
-  // optional float y = 2;
   /**
    * <code>optional float y = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface PointOrBuilder
    */
   float getY();
 
-  // optional float field_angle = 3;
   /**
    * <code>optional float field_angle = 3;</code>
    *

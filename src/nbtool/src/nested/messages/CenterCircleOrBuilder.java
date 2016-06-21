@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface CenterCircleOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface CenterCircleOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.CenterCircle)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional bool on = 1;
   /**
    * <code>optional bool on = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface CenterCircleOrBuilder
    */
   boolean getOn();
 
-  // optional float x = 2;
   /**
    * <code>optional float x = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface CenterCircleOrBuilder
    */
   float getX();
 
-  // optional float y = 3;
   /**
    * <code>optional float y = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface CenterCircleOrBuilder
    */
   float getY();
 
-  // optional float prob = 4;
   /**
    * <code>optional float prob = 4;</code>
    */
@@ -46,7 +43,6 @@ public interface CenterCircleOrBuilder
    */
   float getProb();
 
-  // optional float wz0 = 5;
   /**
    * <code>optional float wz0 = 5;</code>
    */

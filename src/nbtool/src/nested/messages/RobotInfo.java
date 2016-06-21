@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.RobotInfo}
  */
-public  final class RobotInfo extends
-    com.google.protobuf.GeneratedMessage
-    implements RobotInfoOrBuilder {
+public final class RobotInfo extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.RobotInfo)
+    RobotInfoOrBuilder {
   // Use RobotInfo.newBuilder() to construct.
   private RobotInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -104,7 +105,6 @@ public  final class RobotInfo extends
   }
 
   private int bitField0_;
-  // optional uint32 penalty = 1;
   public static final int PENALTY_FIELD_NUMBER = 1;
   private int penalty_;
   /**
@@ -120,7 +120,6 @@ public  final class RobotInfo extends
     return penalty_;
   }
 
-  // optional uint32 secs_left = 2;
   public static final int SECS_LEFT_FIELD_NUMBER = 2;
   private int secsLeft_;
   /**
@@ -143,7 +142,8 @@ public  final class RobotInfo extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -257,8 +257,9 @@ public  final class RobotInfo extends
    * Protobuf type {@code messages.RobotInfo}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.RobotInfoOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.RobotInfo)
+      messages.RobotInfoOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_GameState.internal_static_messages_RobotInfo_descriptor;
@@ -380,7 +381,6 @@ public  final class RobotInfo extends
     }
     private int bitField0_;
 
-    // optional uint32 penalty = 1;
     private int penalty_ ;
     /**
      * <code>optional uint32 penalty = 1;</code>
@@ -413,7 +413,6 @@ public  final class RobotInfo extends
       return this;
     }
 
-    // optional uint32 secs_left = 2;
     private int secsLeft_ ;
     /**
      * <code>optional uint32 secs_left = 2;</code>

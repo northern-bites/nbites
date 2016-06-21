@@ -1,4 +1,4 @@
-from math import fabs, sqrt, degrees, radians
+from math import fabs, sqrt
 from ..util import MyMath
 from ..kickDecider import kicks
 import NavConstants as constants
@@ -10,15 +10,7 @@ def stand(nav):
     Makes the motion engine stand.
     Right now this is done by sending a (0, 0, 0) velocity vector.
     """
-    print("In stand in nav!")
-
     createAndSendWalkVector(nav, 0, 0, 0)
-
-def walkInPlace(nav):
-    """
-    Makes the motion engine walk in place. 
-    """
-
 
 def getRelativeDestination(my, dest):
     """
@@ -79,18 +71,9 @@ def setDestination(nav, dest, gain = 1.0, kick = None):
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK
 
-    if MyMath.fabs(dest.relH) > 20:
-        # print("NavDebug - heading was too great, I'm turning!")
-        # print("My dest relH: ", MyMath.fabs(dest.relH))
-
-        command.dest.rel_x = 0.0
-        command.dest.rel_y = 0.0
-        command.dest.rel_h = dest.relH
-    else:
-        # print("NavDebug - heading was not too great I won't turn")
-        command.dest.rel_x = dest.relX
-        command.dest.rel_y = dest.relY
-        command.dest.rel_h = dest.relH
+    command.dest.rel_x = dest.relX
+    command.dest.rel_y = dest.relY
+    command.dest.rel_h = dest.relH
 
     command.dest.gain = gain
 
@@ -136,6 +119,10 @@ def setSpeed(nav, speeds):
     """
     Wrapper method to easily change the walk vector of the robot
     """
+    if speeds == constants.ZERO_SPEEDS:
+        nav.printf("!!!!!! USE player.stopWalking() NOT walk(0,0,0)!!!!!")
+        return
+
     createAndSendWalkVector(nav, *speeds)
 
 def createAndSendWalkVector(nav, x, y, theta):
@@ -145,6 +132,7 @@ def createAndSendWalkVector(nav, x, y, theta):
     """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.WALK_COMMAND #Walk Command
+
     command.speed.x_percent = x
     command.speed.y_percent = y
     command.speed.h_percent = theta

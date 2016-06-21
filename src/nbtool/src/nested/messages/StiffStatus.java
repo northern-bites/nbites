@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.StiffStatus}
  */
-public  final class StiffStatus extends
-    com.google.protobuf.GeneratedMessage
-    implements StiffStatusOrBuilder {
+public final class StiffStatus extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.StiffStatus)
+    StiffStatusOrBuilder {
   // Use StiffStatus.newBuilder() to construct.
   private StiffStatus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -99,7 +100,6 @@ public  final class StiffStatus extends
   }
 
   private int bitField0_;
-  // optional bool on = 1;
   public static final int ON_FIELD_NUMBER = 1;
   private boolean on_;
   /**
@@ -121,7 +121,8 @@ public  final class StiffStatus extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -228,8 +229,9 @@ public  final class StiffStatus extends
    * Protobuf type {@code messages.StiffStatus}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.StiffStatusOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.StiffStatus)
+      messages.StiffStatusOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_StiffnessControl.internal_static_messages_StiffStatus_descriptor;
@@ -342,7 +344,6 @@ public  final class StiffStatus extends
     }
     private int bitField0_;
 
-    // optional bool on = 1;
     private boolean on_ ;
     /**
      * <code>optional bool on = 1;</code>

@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.GCResponse}
  */
-public  final class GCResponse extends
-    com.google.protobuf.GeneratedMessage
-    implements GCResponseOrBuilder {
+public final class GCResponse extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.GCResponse)
+    GCResponseOrBuilder {
   // Use GCResponse.newBuilder() to construct.
   private GCResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -99,7 +100,6 @@ public  final class GCResponse extends
   }
 
   private int bitField0_;
-  // optional uint32 status = 1 [default = 2];
   public static final int STATUS_FIELD_NUMBER = 1;
   private int status_;
   /**
@@ -121,7 +121,8 @@ public  final class GCResponse extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -228,8 +229,9 @@ public  final class GCResponse extends
    * Protobuf type {@code messages.GCResponse}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.GCResponseOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.GCResponse)
+      messages.GCResponseOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_GCResponse.internal_static_messages_GCResponse_descriptor;
@@ -342,7 +344,6 @@ public  final class GCResponse extends
     }
     private int bitField0_;
 
-    // optional uint32 status = 1 [default = 2];
     private int status_ = 2;
     /**
      * <code>optional uint32 status = 1 [default = 2];</code>

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface WorldModelOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface WorldModelOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.WorldModel)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional int64 timestamp = 1;
   /**
    * <code>optional int64 timestamp = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface WorldModelOrBuilder
    */
   long getTimestamp();
 
-  // optional float my_x = 2;
   /**
    * <code>optional float my_x = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface WorldModelOrBuilder
    */
   float getMyX();
 
-  // optional float my_y = 3;
   /**
    * <code>optional float my_y = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface WorldModelOrBuilder
    */
   float getMyY();
 
-  // optional float my_h = 4;
   /**
    * <code>optional float my_h = 4;</code>
    */
@@ -46,7 +43,6 @@ public interface WorldModelOrBuilder
    */
   float getMyH();
 
-  // optional float my_uncert = 5;
   /**
    * <code>optional float my_uncert = 5;</code>
    */
@@ -56,7 +52,6 @@ public interface WorldModelOrBuilder
    */
   float getMyUncert();
 
-  // optional float walking_to_x = 6;
   /**
    * <code>optional float walking_to_x = 6;</code>
    */
@@ -66,7 +61,6 @@ public interface WorldModelOrBuilder
    */
   float getWalkingToX();
 
-  // optional float walking_to_y = 7;
   /**
    * <code>optional float walking_to_y = 7;</code>
    */
@@ -76,7 +70,6 @@ public interface WorldModelOrBuilder
    */
   float getWalkingToY();
 
-  // optional bool ball_on = 8;
   /**
    * <code>optional bool ball_on = 8;</code>
    */
@@ -86,7 +79,6 @@ public interface WorldModelOrBuilder
    */
   boolean getBallOn();
 
-  // optional int32 ball_age = 9;
   /**
    * <code>optional int32 ball_age = 9;</code>
    */
@@ -96,7 +88,6 @@ public interface WorldModelOrBuilder
    */
   int getBallAge();
 
-  // optional float ball_dist = 10;
   /**
    * <code>optional float ball_dist = 10;</code>
    */
@@ -106,7 +97,6 @@ public interface WorldModelOrBuilder
    */
   float getBallDist();
 
-  // optional float ball_bearing = 11;
   /**
    * <code>optional float ball_bearing = 11;</code>
    */
@@ -116,7 +106,6 @@ public interface WorldModelOrBuilder
    */
   float getBallBearing();
 
-  // optional float ball_vel_x = 12;
   /**
    * <code>optional float ball_vel_x = 12;</code>
    */
@@ -126,7 +115,6 @@ public interface WorldModelOrBuilder
    */
   float getBallVelX();
 
-  // optional float ball_vel_y = 13;
   /**
    * <code>optional float ball_vel_y = 13;</code>
    */
@@ -136,7 +124,6 @@ public interface WorldModelOrBuilder
    */
   float getBallVelY();
 
-  // optional float ball_uncert = 14;
   /**
    * <code>optional float ball_uncert = 14;</code>
    */
@@ -146,7 +133,6 @@ public interface WorldModelOrBuilder
    */
   float getBallUncert();
 
-  // optional int32 role = 15;
   /**
    * <code>optional int32 role = 15;</code>
    */
@@ -156,7 +142,6 @@ public interface WorldModelOrBuilder
    */
   int getRole();
 
-  // optional bool in_kicking_state = 16;
   /**
    * <code>optional bool in_kicking_state = 16;</code>
    */
@@ -166,7 +151,6 @@ public interface WorldModelOrBuilder
    */
   boolean getInKickingState();
 
-  // optional float kicking_to_x = 17;
   /**
    * <code>optional float kicking_to_x = 17;</code>
    */
@@ -176,7 +160,6 @@ public interface WorldModelOrBuilder
    */
   float getKickingToX();
 
-  // optional float kicking_to_y = 18;
   /**
    * <code>optional float kicking_to_y = 18;</code>
    */
@@ -186,7 +169,6 @@ public interface WorldModelOrBuilder
    */
   float getKickingToY();
 
-  // optional bool fallen = 19;
   /**
    * <code>optional bool fallen = 19;</code>
    */
@@ -196,7 +178,6 @@ public interface WorldModelOrBuilder
    */
   boolean getFallen();
 
-  // optional bool active = 20;
   /**
    * <code>optional bool active = 20;</code>
    */
@@ -206,7 +187,6 @@ public interface WorldModelOrBuilder
    */
   boolean getActive();
 
-  // optional bool claimed_ball = 21;
   /**
    * <code>optional bool claimed_ball = 21;</code>
    */
@@ -216,7 +196,6 @@ public interface WorldModelOrBuilder
    */
   boolean getClaimedBall();
 
-  // optional int32 intention = 22;
   /**
    * <code>optional int32 intention = 22;</code>
    */
@@ -226,7 +205,6 @@ public interface WorldModelOrBuilder
    */
   int getIntention();
 
-  // optional bool alive = 23;
   /**
    * <code>optional bool alive = 23;</code>
    */

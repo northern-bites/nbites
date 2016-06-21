@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.MotionCommand}
  */
-public  final class MotionCommand extends
-    com.google.protobuf.GeneratedMessage
-    implements MotionCommandOrBuilder {
+public final class MotionCommand extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.MotionCommand)
+    MotionCommandOrBuilder {
   // Use MotionCommand.newBuilder() to construct.
   private MotionCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -284,7 +285,6 @@ public  final class MotionCommand extends
   }
 
   private int bitField0_;
-  // optional .messages.MotionCommand.CommandType type = 1;
   public static final int TYPE_FIELD_NUMBER = 1;
   private messages.MotionCommand.CommandType type_;
   /**
@@ -300,7 +300,6 @@ public  final class MotionCommand extends
     return type_;
   }
 
-  // optional .messages.ScriptedMove script = 2;
   public static final int SCRIPT_FIELD_NUMBER = 2;
   private messages.ScriptedMove script_;
   /**
@@ -322,7 +321,6 @@ public  final class MotionCommand extends
     return script_;
   }
 
-  // optional .messages.DestinationWalk dest = 3;
   public static final int DEST_FIELD_NUMBER = 3;
   private messages.DestinationWalk dest_;
   /**
@@ -344,7 +342,6 @@ public  final class MotionCommand extends
     return dest_;
   }
 
-  // optional .messages.WalkCommand speed = 4;
   public static final int SPEED_FIELD_NUMBER = 4;
   private messages.WalkCommand speed_;
   /**
@@ -366,7 +363,6 @@ public  final class MotionCommand extends
     return speed_;
   }
 
-  // optional .messages.OdometryWalk odometry_dest = 5;
   public static final int ODOMETRY_DEST_FIELD_NUMBER = 5;
   private messages.OdometryWalk odometryDest_;
   /**
@@ -388,7 +384,6 @@ public  final class MotionCommand extends
     return odometryDest_;
   }
 
-  // optional .messages.Kick kick = 6;
   public static final int KICK_FIELD_NUMBER = 6;
   private messages.Kick kick_;
   /**
@@ -410,7 +405,6 @@ public  final class MotionCommand extends
     return kick_;
   }
 
-  // optional int64 timestamp = 7;
   public static final int TIMESTAMP_FIELD_NUMBER = 7;
   private long timestamp_;
   /**
@@ -438,7 +432,8 @@ public  final class MotionCommand extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -587,8 +582,9 @@ public  final class MotionCommand extends
    * Protobuf type {@code messages.MotionCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.MotionCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.MotionCommand)
+      messages.MotionCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_MotionCommand_descriptor;
@@ -800,7 +796,6 @@ public  final class MotionCommand extends
     }
     private int bitField0_;
 
-    // optional .messages.MotionCommand.CommandType type = 1;
     private messages.MotionCommand.CommandType type_ = messages.MotionCommand.CommandType.DESTINATION_WALK;
     /**
      * <code>optional .messages.MotionCommand.CommandType type = 1;</code>
@@ -836,7 +831,6 @@ public  final class MotionCommand extends
       return this;
     }
 
-    // optional .messages.ScriptedMove script = 2;
     private messages.ScriptedMove script_ = messages.ScriptedMove.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ScriptedMove, messages.ScriptedMove.Builder, messages.ScriptedMoveOrBuilder> scriptBuilder_;
@@ -945,7 +939,7 @@ public  final class MotionCommand extends
       if (scriptBuilder_ == null) {
         scriptBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ScriptedMove, messages.ScriptedMove.Builder, messages.ScriptedMoveOrBuilder>(
-                script_,
+                getScript(),
                 getParentForChildren(),
                 isClean());
         script_ = null;
@@ -953,7 +947,6 @@ public  final class MotionCommand extends
       return scriptBuilder_;
     }
 
-    // optional .messages.DestinationWalk dest = 3;
     private messages.DestinationWalk dest_ = messages.DestinationWalk.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.DestinationWalk, messages.DestinationWalk.Builder, messages.DestinationWalkOrBuilder> destBuilder_;
@@ -1062,7 +1055,7 @@ public  final class MotionCommand extends
       if (destBuilder_ == null) {
         destBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.DestinationWalk, messages.DestinationWalk.Builder, messages.DestinationWalkOrBuilder>(
-                dest_,
+                getDest(),
                 getParentForChildren(),
                 isClean());
         dest_ = null;
@@ -1070,7 +1063,6 @@ public  final class MotionCommand extends
       return destBuilder_;
     }
 
-    // optional .messages.WalkCommand speed = 4;
     private messages.WalkCommand speed_ = messages.WalkCommand.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.WalkCommand, messages.WalkCommand.Builder, messages.WalkCommandOrBuilder> speedBuilder_;
@@ -1179,7 +1171,7 @@ public  final class MotionCommand extends
       if (speedBuilder_ == null) {
         speedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.WalkCommand, messages.WalkCommand.Builder, messages.WalkCommandOrBuilder>(
-                speed_,
+                getSpeed(),
                 getParentForChildren(),
                 isClean());
         speed_ = null;
@@ -1187,7 +1179,6 @@ public  final class MotionCommand extends
       return speedBuilder_;
     }
 
-    // optional .messages.OdometryWalk odometry_dest = 5;
     private messages.OdometryWalk odometryDest_ = messages.OdometryWalk.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.OdometryWalk, messages.OdometryWalk.Builder, messages.OdometryWalkOrBuilder> odometryDestBuilder_;
@@ -1296,7 +1287,7 @@ public  final class MotionCommand extends
       if (odometryDestBuilder_ == null) {
         odometryDestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.OdometryWalk, messages.OdometryWalk.Builder, messages.OdometryWalkOrBuilder>(
-                odometryDest_,
+                getOdometryDest(),
                 getParentForChildren(),
                 isClean());
         odometryDest_ = null;
@@ -1304,7 +1295,6 @@ public  final class MotionCommand extends
       return odometryDestBuilder_;
     }
 
-    // optional .messages.Kick kick = 6;
     private messages.Kick kick_ = messages.Kick.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Kick, messages.Kick.Builder, messages.KickOrBuilder> kickBuilder_;
@@ -1413,7 +1403,7 @@ public  final class MotionCommand extends
       if (kickBuilder_ == null) {
         kickBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Kick, messages.Kick.Builder, messages.KickOrBuilder>(
-                kick_,
+                getKick(),
                 getParentForChildren(),
                 isClean());
         kick_ = null;
@@ -1421,7 +1411,6 @@ public  final class MotionCommand extends
       return kickBuilder_;
     }
 
-    // optional int64 timestamp = 7;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 7;</code>

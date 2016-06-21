@@ -177,6 +177,8 @@ class HeadTracker(FSA.FSA):
 
         if (gameSet): # == True
 
+            print "IN GAME SET\n"
+
             if (self.currentState is not 'gameSetSnapPan' and self.currentState is not 'gameSetTracking'):
                 self.switchTo('gameSetTracking')
                 return

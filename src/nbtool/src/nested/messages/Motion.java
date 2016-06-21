@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.Motion}
  */
-public  final class Motion extends
-    com.google.protobuf.GeneratedMessage
-    implements MotionOrBuilder {
+public final class Motion extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.Motion)
+    MotionOrBuilder {
   // Use Motion.newBuilder() to construct.
   private Motion(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -60,13 +61,15 @@ public  final class Motion extends
             break;
           }
           case 18: {
+            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000002;
-            currentBodyProvider_ = input.readBytes();
+            currentBodyProvider_ = bs;
             break;
           }
           case 26: {
+            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000004;
-            nextBodyProvider_ = input.readBytes();
+            nextBodyProvider_ = bs;
             break;
           }
           case 34: {
@@ -153,7 +156,6 @@ public  final class Motion extends
   }
 
   private int bitField0_;
-  // optional int64 timestamp = 1;
   public static final int TIMESTAMP_FIELD_NUMBER = 1;
   private long timestamp_;
   /**
@@ -169,7 +171,6 @@ public  final class Motion extends
     return timestamp_;
   }
 
-  // optional string current_body_provider = 2;
   public static final int CURRENT_BODY_PROVIDER_FIELD_NUMBER = 2;
   private java.lang.Object currentBodyProvider_;
   /**
@@ -212,7 +213,6 @@ public  final class Motion extends
     }
   }
 
-  // optional string next_body_provider = 3;
   public static final int NEXT_BODY_PROVIDER_FIELD_NUMBER = 3;
   private java.lang.Object nextBodyProvider_;
   /**
@@ -255,7 +255,6 @@ public  final class Motion extends
     }
   }
 
-  // optional .messages.RobotLocation odometry = 4;
   public static final int ODOMETRY_FIELD_NUMBER = 4;
   private messages.RobotLocation odometry_;
   /**
@@ -277,7 +276,6 @@ public  final class Motion extends
     return odometry_;
   }
 
-  // optional .messages.WalkProvider walk_provider = 5;
   public static final int WALK_PROVIDER_FIELD_NUMBER = 5;
   private messages.WalkProvider walkProvider_;
   /**
@@ -299,7 +297,6 @@ public  final class Motion extends
     return walkProvider_;
   }
 
-  // optional .messages.ScriptedProvider scripted_provider = 6;
   public static final int SCRIPTED_PROVIDER_FIELD_NUMBER = 6;
   private messages.ScriptedProvider scriptedProvider_;
   /**
@@ -321,7 +318,6 @@ public  final class Motion extends
     return scriptedProvider_;
   }
 
-  // optional bool support_foot = 7;
   public static final int SUPPORT_FOOT_FIELD_NUMBER = 7;
   private boolean supportFoot_;
   /**
@@ -349,7 +345,8 @@ public  final class Motion extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -498,8 +495,9 @@ public  final class Motion extends
    * Protobuf type {@code messages.Motion}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.MotionOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.Motion)
+      messages.MotionOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Motion.internal_static_messages_Motion_descriptor;
@@ -697,7 +695,6 @@ public  final class Motion extends
     }
     private int bitField0_;
 
-    // optional int64 timestamp = 1;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 1;</code>
@@ -730,7 +727,6 @@ public  final class Motion extends
       return this;
     }
 
-    // optional string current_body_provider = 2;
     private java.lang.Object currentBodyProvider_ = "";
     /**
      * <code>optional string current_body_provider = 2;</code>
@@ -744,9 +740,12 @@ public  final class Motion extends
     public java.lang.String getCurrentBodyProvider() {
       java.lang.Object ref = currentBodyProvider_;
       if (!(ref instanceof java.lang.String)) {
-        java.lang.String s = ((com.google.protobuf.ByteString) ref)
-            .toStringUtf8();
-        currentBodyProvider_ = s;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          currentBodyProvider_ = s;
+        }
         return s;
       } else {
         return (java.lang.String) ref;
@@ -804,7 +803,6 @@ public  final class Motion extends
       return this;
     }
 
-    // optional string next_body_provider = 3;
     private java.lang.Object nextBodyProvider_ = "";
     /**
      * <code>optional string next_body_provider = 3;</code>
@@ -818,9 +816,12 @@ public  final class Motion extends
     public java.lang.String getNextBodyProvider() {
       java.lang.Object ref = nextBodyProvider_;
       if (!(ref instanceof java.lang.String)) {
-        java.lang.String s = ((com.google.protobuf.ByteString) ref)
-            .toStringUtf8();
-        nextBodyProvider_ = s;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          nextBodyProvider_ = s;
+        }
         return s;
       } else {
         return (java.lang.String) ref;
@@ -878,7 +879,6 @@ public  final class Motion extends
       return this;
     }
 
-    // optional .messages.RobotLocation odometry = 4;
     private messages.RobotLocation odometry_ = messages.RobotLocation.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder> odometryBuilder_;
@@ -987,7 +987,7 @@ public  final class Motion extends
       if (odometryBuilder_ == null) {
         odometryBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder>(
-                odometry_,
+                getOdometry(),
                 getParentForChildren(),
                 isClean());
         odometry_ = null;
@@ -995,7 +995,6 @@ public  final class Motion extends
       return odometryBuilder_;
     }
 
-    // optional .messages.WalkProvider walk_provider = 5;
     private messages.WalkProvider walkProvider_ = messages.WalkProvider.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.WalkProvider, messages.WalkProvider.Builder, messages.WalkProviderOrBuilder> walkProviderBuilder_;
@@ -1104,7 +1103,7 @@ public  final class Motion extends
       if (walkProviderBuilder_ == null) {
         walkProviderBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.WalkProvider, messages.WalkProvider.Builder, messages.WalkProviderOrBuilder>(
-                walkProvider_,
+                getWalkProvider(),
                 getParentForChildren(),
                 isClean());
         walkProvider_ = null;
@@ -1112,7 +1111,6 @@ public  final class Motion extends
       return walkProviderBuilder_;
     }
 
-    // optional .messages.ScriptedProvider scripted_provider = 6;
     private messages.ScriptedProvider scriptedProvider_ = messages.ScriptedProvider.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ScriptedProvider, messages.ScriptedProvider.Builder, messages.ScriptedProviderOrBuilder> scriptedProviderBuilder_;
@@ -1221,7 +1219,7 @@ public  final class Motion extends
       if (scriptedProviderBuilder_ == null) {
         scriptedProviderBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ScriptedProvider, messages.ScriptedProvider.Builder, messages.ScriptedProviderOrBuilder>(
-                scriptedProvider_,
+                getScriptedProvider(),
                 getParentForChildren(),
                 isClean());
         scriptedProvider_ = null;
@@ -1229,7 +1227,6 @@ public  final class Motion extends
       return scriptedProviderBuilder_;
     }
 
-    // optional bool support_foot = 7;
     private boolean supportFoot_ ;
     /**
      * <code>optional bool support_foot = 7;</code>

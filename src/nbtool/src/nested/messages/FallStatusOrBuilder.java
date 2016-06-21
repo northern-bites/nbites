@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface FallStatusOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface FallStatusOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.FallStatus)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional bool falling = 1;
   /**
    * <code>optional bool falling = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface FallStatusOrBuilder
    */
   boolean getFalling();
 
-  // optional bool fallen = 2;
   /**
    * <code>optional bool fallen = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface FallStatusOrBuilder
    */
   boolean getFallen();
 
-  // optional bool on_front = 3;
   /**
    * <code>optional bool on_front = 3;</code>
    *

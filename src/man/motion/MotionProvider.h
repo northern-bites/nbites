@@ -84,11 +84,6 @@ namespace motion
                           <<id<<"th stiffness vector is "<<nextJoints[id].size()
                           <<" not " <<Kinematics::chain_lengths[id]<<std::endl;
             }
-            // std::cout << "IN GET CHAIN JOINTS: " << Kinematics::CHAIN_STRINGS[id] << "\n";
-            // for (unsigned int i = 0; i < Kinematics::chain_lengths[id]; i++) {
-            //     // std::cout << nextJoints[id][i] << " ";
-            // }
-            // std::cout << std::endl;
             return nextJoints[id];
         }
         std::vector<float> getChainStiffnesses(const Kinematics::ChainID id){
@@ -108,12 +103,6 @@ namespace motion
     protected:
         void setNextChainJoints(const Kinematics::ChainID id,
                                 const std::vector <float> &chainJoints) {
-
-            // std::cout << "IN SET CHAIN JOINTS: " << Kinematics::CHAIN_STRINGS[id] << "\n";
-            // for (unsigned int i = 0; i < Kinematics::chain_lengths[id]; i++) {
-            //     // std::cout << chainJoints[i] << " ";
-            // }
-            // std::cout << std::endl<< std::endl;
             nextJoints[id] = chainJoints;
         }
 

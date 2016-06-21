@@ -21,8 +21,6 @@ namespace man
                 STEP,
                 DESTINATION,
                 KICK,
-                STAND,
-                WALK_IN_PLACE,
                 BODY_JOINT,
                 HEAD_JOINT,
                 GAIT,

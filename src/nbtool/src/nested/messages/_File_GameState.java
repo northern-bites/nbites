@@ -8,17 +8,17 @@ public final class _File_GameState {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_GameState_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_GameState_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_TeamInfo_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_TeamInfo_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_RobotInfo_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -46,35 +46,35 @@ public final class _File_GameState {
       "\023B\017_File_GameStateP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_messages_GameState_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_messages_GameState_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_GameState_descriptor,
-              new java.lang.String[] { "State", "FirstHalf", "KickOffTeam", "SecondaryState", "DropInTeam", "DropInTime", "SecsRemaining", "HaveRemoteGc", "Team", });
-          internal_static_messages_TeamInfo_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_messages_TeamInfo_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_TeamInfo_descriptor,
-              new java.lang.String[] { "TeamNumber", "TeamColor", "Score", "GoalColor", "Player", });
-          internal_static_messages_RobotInfo_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_messages_RobotInfo_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_RobotInfo_descriptor,
-              new java.lang.String[] { "Penalty", "SecsLeft", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_messages_GameState_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_messages_GameState_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_GameState_descriptor,
+        new java.lang.String[] { "State", "FirstHalf", "KickOffTeam", "SecondaryState", "DropInTeam", "DropInTime", "SecsRemaining", "HaveRemoteGc", "Team", });
+    internal_static_messages_TeamInfo_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_messages_TeamInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_TeamInfo_descriptor,
+        new java.lang.String[] { "TeamNumber", "TeamColor", "Score", "GoalColor", "Player", });
+    internal_static_messages_RobotInfo_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_messages_RobotInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_RobotInfo_descriptor,
+        new java.lang.String[] { "Penalty", "SecsLeft", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

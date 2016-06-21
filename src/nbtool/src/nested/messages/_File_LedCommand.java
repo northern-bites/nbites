@@ -8,7 +8,7 @@ public final class _File_LedCommand {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_LedCommand_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -27,23 +27,23 @@ public final class _File_LedCommand {
       "File_LedCommandP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_messages_LedCommand_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_messages_LedCommand_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_LedCommand_descriptor,
-              new java.lang.String[] { "LedId", "RgbHex", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_messages_LedCommand_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_messages_LedCommand_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_LedCommand_descriptor,
+        new java.lang.String[] { "LedId", "RgbHex", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

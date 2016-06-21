@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.TeamInfo}
  */
-public  final class TeamInfo extends
-    com.google.protobuf.GeneratedMessage
-    implements TeamInfoOrBuilder {
+public final class TeamInfo extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.TeamInfo)
+    TeamInfoOrBuilder {
   // Use TeamInfo.newBuilder() to construct.
   private TeamInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -125,7 +126,6 @@ public  final class TeamInfo extends
   }
 
   private int bitField0_;
-  // optional uint32 team_number = 1;
   public static final int TEAM_NUMBER_FIELD_NUMBER = 1;
   private int teamNumber_;
   /**
@@ -141,7 +141,6 @@ public  final class TeamInfo extends
     return teamNumber_;
   }
 
-  // optional uint32 team_color = 2;
   public static final int TEAM_COLOR_FIELD_NUMBER = 2;
   private int teamColor_;
   /**
@@ -157,7 +156,6 @@ public  final class TeamInfo extends
     return teamColor_;
   }
 
-  // optional uint32 score = 3;
   public static final int SCORE_FIELD_NUMBER = 3;
   private int score_;
   /**
@@ -173,7 +171,6 @@ public  final class TeamInfo extends
     return score_;
   }
 
-  // optional uint32 goal_color = 4;
   public static final int GOAL_COLOR_FIELD_NUMBER = 4;
   private int goalColor_;
   /**
@@ -189,7 +186,6 @@ public  final class TeamInfo extends
     return goalColor_;
   }
 
-  // repeated .messages.RobotInfo player = 5;
   public static final int PLAYER_FIELD_NUMBER = 5;
   private java.util.List<messages.RobotInfo> player_;
   /**
@@ -235,7 +231,8 @@ public  final class TeamInfo extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -370,8 +367,9 @@ public  final class TeamInfo extends
    * Protobuf type {@code messages.TeamInfo}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.TeamInfoOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.TeamInfo)
+      messages.TeamInfoOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_GameState.internal_static_messages_TeamInfo_descriptor;
@@ -553,7 +551,6 @@ public  final class TeamInfo extends
     }
     private int bitField0_;
 
-    // optional uint32 team_number = 1;
     private int teamNumber_ ;
     /**
      * <code>optional uint32 team_number = 1;</code>
@@ -586,7 +583,6 @@ public  final class TeamInfo extends
       return this;
     }
 
-    // optional uint32 team_color = 2;
     private int teamColor_ ;
     /**
      * <code>optional uint32 team_color = 2;</code>
@@ -619,7 +615,6 @@ public  final class TeamInfo extends
       return this;
     }
 
-    // optional uint32 score = 3;
     private int score_ ;
     /**
      * <code>optional uint32 score = 3;</code>
@@ -652,7 +647,6 @@ public  final class TeamInfo extends
       return this;
     }
 
-    // optional uint32 goal_color = 4;
     private int goalColor_ ;
     /**
      * <code>optional uint32 goal_color = 4;</code>
@@ -685,7 +679,6 @@ public  final class TeamInfo extends
       return this;
     }
 
-    // repeated .messages.RobotInfo player = 5;
     private java.util.List<messages.RobotInfo> player_ =
       java.util.Collections.emptyList();
     private void ensurePlayerIsMutable() {
@@ -827,7 +820,8 @@ public  final class TeamInfo extends
         java.lang.Iterable<? extends messages.RobotInfo> values) {
       if (playerBuilder_ == null) {
         ensurePlayerIsMutable();
-        super.addAll(values, player_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, player_);
         onChanged();
       } else {
         playerBuilder_.addAllMessages(values);

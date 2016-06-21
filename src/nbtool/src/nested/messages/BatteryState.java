@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.BatteryState}
  */
-public  final class BatteryState extends
-    com.google.protobuf.GeneratedMessage
-    implements BatteryStateOrBuilder {
+public final class BatteryState extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.BatteryState)
+    BatteryStateOrBuilder {
   // Use BatteryState.newBuilder() to construct.
   private BatteryState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -99,7 +100,6 @@ public  final class BatteryState extends
   }
 
   private int bitField0_;
-  // optional float charge = 1;
   public static final int CHARGE_FIELD_NUMBER = 1;
   private float charge_;
   /**
@@ -121,7 +121,8 @@ public  final class BatteryState extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -228,8 +229,9 @@ public  final class BatteryState extends
    * Protobuf type {@code messages.BatteryState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.BatteryStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.BatteryState)
+      messages.BatteryStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_BatteryState.internal_static_messages_BatteryState_descriptor;
@@ -342,7 +344,6 @@ public  final class BatteryState extends
     }
     private int bitField0_;
 
-    // optional float charge = 1;
     private float charge_ ;
     /**
      * <code>optional float charge = 1;</code>

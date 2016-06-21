@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface ParticleOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface ParticleOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.Particle)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float weight = 1;
   /**
    * <code>optional float weight = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface ParticleOrBuilder
    */
   float getWeight();
 
-  // optional .messages.RobotLocation loc = 2;
   /**
    * <code>optional .messages.RobotLocation loc = 2;</code>
    */

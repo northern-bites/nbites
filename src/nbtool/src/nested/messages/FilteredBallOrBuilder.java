@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface FilteredBallOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface FilteredBallOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.FilteredBall)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional .messages.VBall vis = 1;
   /**
    * <code>optional .messages.VBall vis = 1;</code>
    */
@@ -20,7 +20,6 @@ public interface FilteredBallOrBuilder
    */
   messages.VBallOrBuilder getVisOrBuilder();
 
-  // optional float distance = 2;
   /**
    * <code>optional float distance = 2;</code>
    */
@@ -30,7 +29,6 @@ public interface FilteredBallOrBuilder
    */
   float getDistance();
 
-  // optional float bearing = 3;
   /**
    * <code>optional float bearing = 3;</code>
    */
@@ -40,7 +38,6 @@ public interface FilteredBallOrBuilder
    */
   float getBearing();
 
-  // optional float rel_x = 4;
   /**
    * <code>optional float rel_x = 4;</code>
    *
@@ -58,7 +55,6 @@ public interface FilteredBallOrBuilder
    */
   float getRelX();
 
-  // optional float rel_y = 5;
   /**
    * <code>optional float rel_y = 5;</code>
    */
@@ -68,7 +64,6 @@ public interface FilteredBallOrBuilder
    */
   float getRelY();
 
-  // optional float vel_x = 6;
   /**
    * <code>optional float vel_x = 6;</code>
    */
@@ -78,7 +73,6 @@ public interface FilteredBallOrBuilder
    */
   float getVelX();
 
-  // optional float vel_y = 7;
   /**
    * <code>optional float vel_y = 7;</code>
    */
@@ -88,7 +82,6 @@ public interface FilteredBallOrBuilder
    */
   float getVelY();
 
-  // optional float var_rel_x = 8;
   /**
    * <code>optional float var_rel_x = 8;</code>
    */
@@ -98,7 +91,6 @@ public interface FilteredBallOrBuilder
    */
   float getVarRelX();
 
-  // optional float var_rel_y = 9;
   /**
    * <code>optional float var_rel_y = 9;</code>
    */
@@ -108,7 +100,6 @@ public interface FilteredBallOrBuilder
    */
   float getVarRelY();
 
-  // optional float var_vel_x = 10;
   /**
    * <code>optional float var_vel_x = 10;</code>
    */
@@ -118,7 +109,6 @@ public interface FilteredBallOrBuilder
    */
   float getVarVelX();
 
-  // optional float var_vel_y = 11;
   /**
    * <code>optional float var_vel_y = 11;</code>
    */
@@ -128,7 +118,6 @@ public interface FilteredBallOrBuilder
    */
   float getVarVelY();
 
-  // optional bool is_stationary = 12;
   /**
    * <code>optional bool is_stationary = 12;</code>
    */
@@ -138,7 +127,6 @@ public interface FilteredBallOrBuilder
    */
   boolean getIsStationary();
 
-  // optional float bearing_deg = 13;
   /**
    * <code>optional float bearing_deg = 13;</code>
    */
@@ -148,7 +136,6 @@ public interface FilteredBallOrBuilder
    */
   float getBearingDeg();
 
-  // optional float x = 14;
   /**
    * <code>optional float x = 14;</code>
    */
@@ -158,7 +145,6 @@ public interface FilteredBallOrBuilder
    */
   float getX();
 
-  // optional float y = 15;
   /**
    * <code>optional float y = 15;</code>
    */
@@ -168,7 +154,6 @@ public interface FilteredBallOrBuilder
    */
   float getY();
 
-  // optional float rel_x_dest = 16;
   /**
    * <code>optional float rel_x_dest = 16;</code>
    */
@@ -178,7 +163,6 @@ public interface FilteredBallOrBuilder
    */
   float getRelXDest();
 
-  // optional float rel_y_dest = 17;
   /**
    * <code>optional float rel_y_dest = 17;</code>
    */
@@ -188,7 +172,6 @@ public interface FilteredBallOrBuilder
    */
   float getRelYDest();
 
-  // optional float speed = 18;
   /**
    * <code>optional float speed = 18;</code>
    *
@@ -206,7 +189,6 @@ public interface FilteredBallOrBuilder
    */
   float getSpeed();
 
-  // optional float rel_y_intersect_dest = 19;
   /**
    * <code>optional float rel_y_intersect_dest = 19;</code>
    */
@@ -216,7 +198,6 @@ public interface FilteredBallOrBuilder
    */
   float getRelYIntersectDest();
 
-  // optional float stat_rel_x = 20;
   /**
    * <code>optional float stat_rel_x = 20;</code>
    */
@@ -226,7 +207,6 @@ public interface FilteredBallOrBuilder
    */
   float getStatRelX();
 
-  // optional float stat_rel_y = 21;
   /**
    * <code>optional float stat_rel_y = 21;</code>
    */
@@ -236,7 +216,6 @@ public interface FilteredBallOrBuilder
    */
   float getStatRelY();
 
-  // optional float stat_distance = 22;
   /**
    * <code>optional float stat_distance = 22;</code>
    */
@@ -246,7 +225,6 @@ public interface FilteredBallOrBuilder
    */
   float getStatDistance();
 
-  // optional float stat_bearing = 23;
   /**
    * <code>optional float stat_bearing = 23;</code>
    */
@@ -256,7 +234,6 @@ public interface FilteredBallOrBuilder
    */
   float getStatBearing();
 
-  // optional float mov_rel_x = 24;
   /**
    * <code>optional float mov_rel_x = 24;</code>
    */
@@ -266,7 +243,6 @@ public interface FilteredBallOrBuilder
    */
   float getMovRelX();
 
-  // optional float mov_rel_y = 25;
   /**
    * <code>optional float mov_rel_y = 25;</code>
    */
@@ -276,7 +252,6 @@ public interface FilteredBallOrBuilder
    */
   float getMovRelY();
 
-  // optional float mov_distance = 26;
   /**
    * <code>optional float mov_distance = 26;</code>
    */
@@ -286,7 +261,6 @@ public interface FilteredBallOrBuilder
    */
   float getMovDistance();
 
-  // optional float mov_bearing = 27;
   /**
    * <code>optional float mov_bearing = 27;</code>
    */
@@ -296,7 +270,6 @@ public interface FilteredBallOrBuilder
    */
   float getMovBearing();
 
-  // optional float mov_vel_x = 28;
   /**
    * <code>optional float mov_vel_x = 28;</code>
    */
@@ -306,7 +279,6 @@ public interface FilteredBallOrBuilder
    */
   float getMovVelX();
 
-  // optional float mov_vel_y = 29;
   /**
    * <code>optional float mov_vel_y = 29;</code>
    */
@@ -316,7 +288,6 @@ public interface FilteredBallOrBuilder
    */
   float getMovVelY();
 
-  // optional float mov_speed = 30;
   /**
    * <code>optional float mov_speed = 30;</code>
    */

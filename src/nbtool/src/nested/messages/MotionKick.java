@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.MotionKick}
  */
-public  final class MotionKick extends
-    com.google.protobuf.GeneratedMessage
-    implements MotionKickOrBuilder {
+public final class MotionKick extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.MotionKick)
+    MotionKickOrBuilder {
   // Use MotionKick.newBuilder() to construct.
   private MotionKick(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -104,7 +105,6 @@ public  final class MotionKick extends
   }
 
   private int bitField0_;
-  // optional bool perform_motion_kick = 1;
   public static final int PERFORM_MOTION_KICK_FIELD_NUMBER = 1;
   private boolean performMotionKick_;
   /**
@@ -120,7 +120,6 @@ public  final class MotionKick extends
     return performMotionKick_;
   }
 
-  // optional int32 kick_type = 2;
   public static final int KICK_TYPE_FIELD_NUMBER = 2;
   private int kickType_;
   /**
@@ -143,7 +142,8 @@ public  final class MotionKick extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -257,8 +257,9 @@ public  final class MotionKick extends
    * Protobuf type {@code messages.MotionKick}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.MotionKickOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.MotionKick)
+      messages.MotionKickOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_MotionKick_descriptor;
@@ -380,7 +381,6 @@ public  final class MotionKick extends
     }
     private int bitField0_;
 
-    // optional bool perform_motion_kick = 1;
     private boolean performMotionKick_ ;
     /**
      * <code>optional bool perform_motion_kick = 1;</code>
@@ -413,7 +413,6 @@ public  final class MotionKick extends
       return this;
     }
 
-    // optional int32 kick_type = 2;
     private int kickType_ ;
     /**
      * <code>optional int32 kick_type = 2;</code>

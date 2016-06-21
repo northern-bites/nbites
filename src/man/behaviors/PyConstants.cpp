@@ -328,9 +328,9 @@ void get_config_params() {
         scope().attr("LEFT_FORWARD_DEFENSE") = false;
         scope().attr("RIGHT_FORWARD_DEFENSE") = false;
         // max speed when chasing the ball
-        scope().attr("MAX_SPEED") = 0.4f;
+        scope().attr("MAX_SPEED") = 0.8f;
         // min speed when chasing the ball
-        scope().attr("MIN_SPEED") = 0.1f;
+        scope().attr("MIN_SPEED") = 0.5f;
     }
 }
 

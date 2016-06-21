@@ -98,8 +98,7 @@ endif()
 # Actual subdirectories
 include_directories( support )
 add_subdirectory( support )
-#include_directories( motion/bhwalk ) # @todo hack?
-include_directories( motion/unswalk )
+include_directories( motion/bhwalk ) # @todo hack?
 
 # Actual modules
 add_subdirectory( arms )
@@ -139,7 +138,7 @@ target_link_libraries(
   audio
   balltrack
   behaviors
-  #bhwalk
+  bhwalk
   comm
   gamestate
   guardian
@@ -158,7 +157,6 @@ target_link_libraries(
   sharedball
   naiveball
   support
-  unswalk
   vision
 )
 

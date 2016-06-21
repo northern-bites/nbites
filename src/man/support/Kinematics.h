@@ -60,10 +60,6 @@ namespace Kinematics {
     static const unsigned int chain_first_joint[NUM_CHAINS] = {0,2,6,12,18};
     static const unsigned int chain_last_joint[NUM_CHAINS] = {1,5,11,17,21};
 
-    // UNSW has different joints, ie they do not include a technically nonexistent joint in their system
-    static const unsigned int chain_first_joint_UNSWALK[NUM_CHAINS] = {0,2,6,11,17};
-    static const unsigned int chain_last_joint_UNSWALK[NUM_CHAINS] = {1,5,11,16,20};
-
     static const std::string CHAIN_STRINGS[NUM_CHAINS] =
     { "Head",
       "LArm",

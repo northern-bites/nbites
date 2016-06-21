@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface FieldObstaclesOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface FieldObstaclesOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.FieldObstacles)
+    com.google.protobuf.MessageOrBuilder {
 
-  // repeated .messages.FieldObstacles.Obstacle obstacle = 1;
   /**
    * <code>repeated .messages.FieldObstacles.Obstacle obstacle = 1;</code>
    */

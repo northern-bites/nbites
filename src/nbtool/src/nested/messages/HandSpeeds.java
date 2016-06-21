@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.HandSpeeds}
  */
-public  final class HandSpeeds extends
-    com.google.protobuf.GeneratedMessage
-    implements HandSpeedsOrBuilder {
+public final class HandSpeeds extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.HandSpeeds)
+    HandSpeedsOrBuilder {
   // Use HandSpeeds.newBuilder() to construct.
   private HandSpeeds(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -104,7 +105,6 @@ public  final class HandSpeeds extends
   }
 
   private int bitField0_;
-  // optional float left_speed = 1;
   public static final int LEFT_SPEED_FIELD_NUMBER = 1;
   private float leftSpeed_;
   /**
@@ -120,7 +120,6 @@ public  final class HandSpeeds extends
     return leftSpeed_;
   }
 
-  // optional float right_speed = 2;
   public static final int RIGHT_SPEED_FIELD_NUMBER = 2;
   private float rightSpeed_;
   /**
@@ -143,7 +142,8 @@ public  final class HandSpeeds extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -257,8 +257,9 @@ public  final class HandSpeeds extends
    * Protobuf type {@code messages.HandSpeeds}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.HandSpeedsOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.HandSpeeds)
+      messages.HandSpeedsOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_HandSpeeds.internal_static_messages_HandSpeeds_descriptor;
@@ -380,7 +381,6 @@ public  final class HandSpeeds extends
     }
     private int bitField0_;
 
-    // optional float left_speed = 1;
     private float leftSpeed_ ;
     /**
      * <code>optional float left_speed = 1;</code>
@@ -413,7 +413,6 @@ public  final class HandSpeeds extends
       return this;
     }
 
-    // optional float right_speed = 2;
     private float rightSpeed_ ;
     /**
      * <code>optional float right_speed = 2;</code>

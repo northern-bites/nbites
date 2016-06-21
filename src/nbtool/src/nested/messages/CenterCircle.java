@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.CenterCircle}
  */
-public  final class CenterCircle extends
-    com.google.protobuf.GeneratedMessage
-    implements CenterCircleOrBuilder {
+public final class CenterCircle extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.CenterCircle)
+    CenterCircleOrBuilder {
   // Use CenterCircle.newBuilder() to construct.
   private CenterCircle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -119,7 +120,6 @@ public  final class CenterCircle extends
   }
 
   private int bitField0_;
-  // optional bool on = 1;
   public static final int ON_FIELD_NUMBER = 1;
   private boolean on_;
   /**
@@ -135,7 +135,6 @@ public  final class CenterCircle extends
     return on_;
   }
 
-  // optional float x = 2;
   public static final int X_FIELD_NUMBER = 2;
   private float x_;
   /**
@@ -151,7 +150,6 @@ public  final class CenterCircle extends
     return x_;
   }
 
-  // optional float y = 3;
   public static final int Y_FIELD_NUMBER = 3;
   private float y_;
   /**
@@ -167,7 +165,6 @@ public  final class CenterCircle extends
     return y_;
   }
 
-  // optional float prob = 4;
   public static final int PROB_FIELD_NUMBER = 4;
   private float prob_;
   /**
@@ -183,7 +180,6 @@ public  final class CenterCircle extends
     return prob_;
   }
 
-  // optional float wz0 = 5;
   public static final int WZ0_FIELD_NUMBER = 5;
   private float wz0_;
   /**
@@ -209,7 +205,8 @@ public  final class CenterCircle extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -344,8 +341,9 @@ public  final class CenterCircle extends
    * Protobuf type {@code messages.CenterCircle}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.CenterCircleOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.CenterCircle)
+      messages.CenterCircleOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_CenterCircle_descriptor;
@@ -494,7 +492,6 @@ public  final class CenterCircle extends
     }
     private int bitField0_;
 
-    // optional bool on = 1;
     private boolean on_ ;
     /**
      * <code>optional bool on = 1;</code>
@@ -527,7 +524,6 @@ public  final class CenterCircle extends
       return this;
     }
 
-    // optional float x = 2;
     private float x_ ;
     /**
      * <code>optional float x = 2;</code>
@@ -560,7 +556,6 @@ public  final class CenterCircle extends
       return this;
     }
 
-    // optional float y = 3;
     private float y_ ;
     /**
      * <code>optional float y = 3;</code>
@@ -593,7 +588,6 @@ public  final class CenterCircle extends
       return this;
     }
 
-    // optional float prob = 4;
     private float prob_ ;
     /**
      * <code>optional float prob = 4;</code>
@@ -626,7 +620,6 @@ public  final class CenterCircle extends
       return this;
     }
 
-    // optional float wz0 = 5;
     private float wz0_ ;
     /**
      * <code>optional float wz0 = 5;</code>

@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.StiffnessControl}
  */
-public  final class StiffnessControl extends
-    com.google.protobuf.GeneratedMessage
-    implements StiffnessControlOrBuilder {
+public final class StiffnessControl extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.StiffnessControl)
+    StiffnessControlOrBuilder {
   // Use StiffnessControl.newBuilder() to construct.
   private StiffnessControl(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -99,7 +100,6 @@ public  final class StiffnessControl extends
   }
 
   private int bitField0_;
-  // optional bool remove = 1;
   public static final int REMOVE_FIELD_NUMBER = 1;
   private boolean remove_;
   /**
@@ -121,7 +121,8 @@ public  final class StiffnessControl extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -228,8 +229,9 @@ public  final class StiffnessControl extends
    * Protobuf type {@code messages.StiffnessControl}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.StiffnessControlOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.StiffnessControl)
+      messages.StiffnessControlOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_StiffnessControl.internal_static_messages_StiffnessControl_descriptor;
@@ -342,7 +344,6 @@ public  final class StiffnessControl extends
     }
     private int bitField0_;
 
-    // optional bool remove = 1;
     private boolean remove_ ;
     /**
      * <code>optional bool remove = 1;</code>

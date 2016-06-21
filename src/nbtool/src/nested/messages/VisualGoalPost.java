@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.VisualGoalPost}
  */
-public  final class VisualGoalPost extends
-    com.google.protobuf.GeneratedMessage
-    implements VisualGoalPostOrBuilder {
+public final class VisualGoalPost extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.VisualGoalPost)
+    VisualGoalPostOrBuilder {
   // Use VisualGoalPost.newBuilder() to construct.
   private VisualGoalPost(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -169,7 +170,6 @@ public  final class VisualGoalPost extends
   }
 
   private int bitField0_;
-  // optional .messages.VisualDetection visual_detection = 1;
   public static final int VISUAL_DETECTION_FIELD_NUMBER = 1;
   private messages.VisualDetection visualDetection_;
   /**
@@ -191,7 +191,6 @@ public  final class VisualGoalPost extends
     return visualDetection_;
   }
 
-  // optional float height = 2;
   public static final int HEIGHT_FIELD_NUMBER = 2;
   private float height_;
   /**
@@ -207,7 +206,6 @@ public  final class VisualGoalPost extends
     return height_;
   }
 
-  // optional float width = 3;
   public static final int WIDTH_FIELD_NUMBER = 3;
   private float width_;
   /**
@@ -223,7 +221,6 @@ public  final class VisualGoalPost extends
     return width_;
   }
 
-  // optional .messages.Point left_top = 4;
   public static final int LEFT_TOP_FIELD_NUMBER = 4;
   private messages.Point leftTop_;
   /**
@@ -245,7 +242,6 @@ public  final class VisualGoalPost extends
     return leftTop_;
   }
 
-  // optional .messages.Point right_top = 5;
   public static final int RIGHT_TOP_FIELD_NUMBER = 5;
   private messages.Point rightTop_;
   /**
@@ -267,7 +263,6 @@ public  final class VisualGoalPost extends
     return rightTop_;
   }
 
-  // optional .messages.Point left_bot = 6;
   public static final int LEFT_BOT_FIELD_NUMBER = 6;
   private messages.Point leftBot_;
   /**
@@ -289,7 +284,6 @@ public  final class VisualGoalPost extends
     return leftBot_;
   }
 
-  // optional .messages.Point right_bot = 7;
   public static final int RIGHT_BOT_FIELD_NUMBER = 7;
   private messages.Point rightBot_;
   /**
@@ -323,7 +317,8 @@ public  final class VisualGoalPost extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -472,8 +467,9 @@ public  final class VisualGoalPost extends
    * Protobuf type {@code messages.VisualGoalPost}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.VisualGoalPostOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.VisualGoalPost)
+      messages.VisualGoalPostOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionField.internal_static_messages_VisualGoalPost_descriptor;
@@ -685,7 +681,6 @@ public  final class VisualGoalPost extends
     }
     private int bitField0_;
 
-    // optional .messages.VisualDetection visual_detection = 1;
     private messages.VisualDetection visualDetection_ = messages.VisualDetection.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder> visualDetectionBuilder_;
@@ -794,7 +789,7 @@ public  final class VisualGoalPost extends
       if (visualDetectionBuilder_ == null) {
         visualDetectionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder>(
-                visualDetection_,
+                getVisualDetection(),
                 getParentForChildren(),
                 isClean());
         visualDetection_ = null;
@@ -802,7 +797,6 @@ public  final class VisualGoalPost extends
       return visualDetectionBuilder_;
     }
 
-    // optional float height = 2;
     private float height_ ;
     /**
      * <code>optional float height = 2;</code>
@@ -835,7 +829,6 @@ public  final class VisualGoalPost extends
       return this;
     }
 
-    // optional float width = 3;
     private float width_ ;
     /**
      * <code>optional float width = 3;</code>
@@ -868,7 +861,6 @@ public  final class VisualGoalPost extends
       return this;
     }
 
-    // optional .messages.Point left_top = 4;
     private messages.Point leftTop_ = messages.Point.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Point, messages.Point.Builder, messages.PointOrBuilder> leftTopBuilder_;
@@ -977,7 +969,7 @@ public  final class VisualGoalPost extends
       if (leftTopBuilder_ == null) {
         leftTopBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Point, messages.Point.Builder, messages.PointOrBuilder>(
-                leftTop_,
+                getLeftTop(),
                 getParentForChildren(),
                 isClean());
         leftTop_ = null;
@@ -985,7 +977,6 @@ public  final class VisualGoalPost extends
       return leftTopBuilder_;
     }
 
-    // optional .messages.Point right_top = 5;
     private messages.Point rightTop_ = messages.Point.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Point, messages.Point.Builder, messages.PointOrBuilder> rightTopBuilder_;
@@ -1094,7 +1085,7 @@ public  final class VisualGoalPost extends
       if (rightTopBuilder_ == null) {
         rightTopBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Point, messages.Point.Builder, messages.PointOrBuilder>(
-                rightTop_,
+                getRightTop(),
                 getParentForChildren(),
                 isClean());
         rightTop_ = null;
@@ -1102,7 +1093,6 @@ public  final class VisualGoalPost extends
       return rightTopBuilder_;
     }
 
-    // optional .messages.Point left_bot = 6;
     private messages.Point leftBot_ = messages.Point.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Point, messages.Point.Builder, messages.PointOrBuilder> leftBotBuilder_;
@@ -1211,7 +1201,7 @@ public  final class VisualGoalPost extends
       if (leftBotBuilder_ == null) {
         leftBotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Point, messages.Point.Builder, messages.PointOrBuilder>(
-                leftBot_,
+                getLeftBot(),
                 getParentForChildren(),
                 isClean());
         leftBot_ = null;
@@ -1219,7 +1209,6 @@ public  final class VisualGoalPost extends
       return leftBotBuilder_;
     }
 
-    // optional .messages.Point right_bot = 7;
     private messages.Point rightBot_ = messages.Point.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.Point, messages.Point.Builder, messages.PointOrBuilder> rightBotBuilder_;
@@ -1328,7 +1317,7 @@ public  final class VisualGoalPost extends
       if (rightBotBuilder_ == null) {
         rightBotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.Point, messages.Point.Builder, messages.PointOrBuilder>(
-                rightBot_,
+                getRightBot(),
                 getParentForChildren(),
                 isClean());
         rightBot_ = null;

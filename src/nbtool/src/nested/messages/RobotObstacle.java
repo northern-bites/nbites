@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.RobotObstacle}
  */
-public  final class RobotObstacle extends
-    com.google.protobuf.GeneratedMessage
-    implements RobotObstacleOrBuilder {
+public final class RobotObstacle extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.RobotObstacle)
+    RobotObstacleOrBuilder {
   // Use RobotObstacle.newBuilder() to construct.
   private RobotObstacle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -114,7 +115,6 @@ public  final class RobotObstacle extends
   }
 
   private int bitField0_;
-  // optional float closest_y = 1;
   public static final int CLOSEST_Y_FIELD_NUMBER = 1;
   private float closestY_;
   /**
@@ -130,7 +130,6 @@ public  final class RobotObstacle extends
     return closestY_;
   }
 
-  // optional float box_bottom = 2;
   public static final int BOX_BOTTOM_FIELD_NUMBER = 2;
   private float boxBottom_;
   /**
@@ -146,7 +145,6 @@ public  final class RobotObstacle extends
     return boxBottom_;
   }
 
-  // optional float box_left = 3;
   public static final int BOX_LEFT_FIELD_NUMBER = 3;
   private float boxLeft_;
   /**
@@ -162,7 +160,6 @@ public  final class RobotObstacle extends
     return boxLeft_;
   }
 
-  // optional float box_right = 4;
   public static final int BOX_RIGHT_FIELD_NUMBER = 4;
   private float boxRight_;
   /**
@@ -187,7 +184,8 @@ public  final class RobotObstacle extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -315,8 +313,9 @@ public  final class RobotObstacle extends
    * Protobuf type {@code messages.RobotObstacle}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.RobotObstacleOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.RobotObstacle)
+      messages.RobotObstacleOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionRobot.internal_static_messages_RobotObstacle_descriptor;
@@ -456,7 +455,6 @@ public  final class RobotObstacle extends
     }
     private int bitField0_;
 
-    // optional float closest_y = 1;
     private float closestY_ ;
     /**
      * <code>optional float closest_y = 1;</code>
@@ -489,7 +487,6 @@ public  final class RobotObstacle extends
       return this;
     }
 
-    // optional float box_bottom = 2;
     private float boxBottom_ ;
     /**
      * <code>optional float box_bottom = 2;</code>
@@ -522,7 +519,6 @@ public  final class RobotObstacle extends
       return this;
     }
 
-    // optional float box_left = 3;
     private float boxLeft_ ;
     /**
      * <code>optional float box_left = 3;</code>
@@ -555,7 +551,6 @@ public  final class RobotObstacle extends
       return this;
     }
 
-    // optional float box_right = 4;
     private float boxRight_ ;
     /**
      * <code>optional float box_right = 4;</code>

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface SharedBallOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface SharedBallOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.SharedBall)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float x = 1;
   /**
    * <code>optional float x = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface SharedBallOrBuilder
    */
   float getX();
 
-  // optional float y = 2;
   /**
    * <code>optional float y = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface SharedBallOrBuilder
    */
   float getY();
 
-  // optional bool ball_on = 3;
   /**
    * <code>optional bool ball_on = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface SharedBallOrBuilder
    */
   boolean getBallOn();
 
-  // optional int32 reliability = 4;
   /**
    * <code>optional int32 reliability = 4;</code>
    */

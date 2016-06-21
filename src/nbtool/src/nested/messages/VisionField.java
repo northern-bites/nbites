@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.VisionField}
  */
-public  final class VisionField extends
-    com.google.protobuf.GeneratedMessage
-    implements VisionFieldOrBuilder {
+public final class VisionField extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.VisionField)
+    VisionFieldOrBuilder {
   // Use VisionField.newBuilder() to construct.
   private VisionField(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -195,7 +196,6 @@ public  final class VisionField extends
   }
 
   private int bitField0_;
-  // optional int64 timestamp = 1;
   public static final int TIMESTAMP_FIELD_NUMBER = 1;
   private long timestamp_;
   /**
@@ -211,7 +211,6 @@ public  final class VisionField extends
     return timestamp_;
   }
 
-  // optional .messages.VisualGoalPost goal_post_l = 2;
   public static final int GOAL_POST_L_FIELD_NUMBER = 2;
   private messages.VisualGoalPost goalPostL_;
   /**
@@ -233,7 +232,6 @@ public  final class VisionField extends
     return goalPostL_;
   }
 
-  // optional .messages.VisualGoalPost goal_post_r = 3;
   public static final int GOAL_POST_R_FIELD_NUMBER = 3;
   private messages.VisualGoalPost goalPostR_;
   /**
@@ -255,7 +253,6 @@ public  final class VisionField extends
     return goalPostR_;
   }
 
-  // repeated .messages.VisualCorner visual_corner = 4;
   public static final int VISUAL_CORNER_FIELD_NUMBER = 4;
   private java.util.List<messages.VisualCorner> visualCorner_;
   /**
@@ -291,7 +288,6 @@ public  final class VisionField extends
     return visualCorner_.get(index);
   }
 
-  // repeated .messages.VisualCorner bottom_corner = 9;
   public static final int BOTTOM_CORNER_FIELD_NUMBER = 9;
   private java.util.List<messages.VisualCorner> bottomCorner_;
   /**
@@ -327,7 +323,6 @@ public  final class VisionField extends
     return bottomCorner_.get(index);
   }
 
-  // repeated .messages.VisualLine visual_line = 5;
   public static final int VISUAL_LINE_FIELD_NUMBER = 5;
   private java.util.List<messages.VisualLine> visualLine_;
   /**
@@ -363,7 +358,6 @@ public  final class VisionField extends
     return visualLine_.get(index);
   }
 
-  // repeated .messages.VisualLine bottom_line = 8;
   public static final int BOTTOM_LINE_FIELD_NUMBER = 8;
   private java.util.List<messages.VisualLine> bottomLine_;
   /**
@@ -399,7 +393,6 @@ public  final class VisionField extends
     return bottomLine_.get(index);
   }
 
-  // optional .messages.VisualDetection visual_cross = 6;
   public static final int VISUAL_CROSS_FIELD_NUMBER = 6;
   private messages.VisualDetection visualCross_;
   /**
@@ -421,7 +414,6 @@ public  final class VisionField extends
     return visualCross_;
   }
 
-  // optional .messages.VisualFieldEdge visual_field_edge = 7;
   public static final int VISUAL_FIELD_EDGE_FIELD_NUMBER = 7;
   private messages.VisualFieldEdge visualFieldEdge_;
   /**
@@ -457,7 +449,8 @@ public  final class VisionField extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -620,8 +613,9 @@ public  final class VisionField extends
    * Protobuf type {@code messages.VisionField}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.VisionFieldOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.VisionField)
+      messages.VisionFieldOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionField.internal_static_messages_VisionField_descriptor;
@@ -974,7 +968,6 @@ public  final class VisionField extends
     }
     private int bitField0_;
 
-    // optional int64 timestamp = 1;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 1;</code>
@@ -1007,7 +1000,6 @@ public  final class VisionField extends
       return this;
     }
 
-    // optional .messages.VisualGoalPost goal_post_l = 2;
     private messages.VisualGoalPost goalPostL_ = messages.VisualGoalPost.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualGoalPost, messages.VisualGoalPost.Builder, messages.VisualGoalPostOrBuilder> goalPostLBuilder_;
@@ -1116,7 +1108,7 @@ public  final class VisionField extends
       if (goalPostLBuilder_ == null) {
         goalPostLBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VisualGoalPost, messages.VisualGoalPost.Builder, messages.VisualGoalPostOrBuilder>(
-                goalPostL_,
+                getGoalPostL(),
                 getParentForChildren(),
                 isClean());
         goalPostL_ = null;
@@ -1124,7 +1116,6 @@ public  final class VisionField extends
       return goalPostLBuilder_;
     }
 
-    // optional .messages.VisualGoalPost goal_post_r = 3;
     private messages.VisualGoalPost goalPostR_ = messages.VisualGoalPost.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualGoalPost, messages.VisualGoalPost.Builder, messages.VisualGoalPostOrBuilder> goalPostRBuilder_;
@@ -1233,7 +1224,7 @@ public  final class VisionField extends
       if (goalPostRBuilder_ == null) {
         goalPostRBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VisualGoalPost, messages.VisualGoalPost.Builder, messages.VisualGoalPostOrBuilder>(
-                goalPostR_,
+                getGoalPostR(),
                 getParentForChildren(),
                 isClean());
         goalPostR_ = null;
@@ -1241,7 +1232,6 @@ public  final class VisionField extends
       return goalPostRBuilder_;
     }
 
-    // repeated .messages.VisualCorner visual_corner = 4;
     private java.util.List<messages.VisualCorner> visualCorner_ =
       java.util.Collections.emptyList();
     private void ensureVisualCornerIsMutable() {
@@ -1383,7 +1373,8 @@ public  final class VisionField extends
         java.lang.Iterable<? extends messages.VisualCorner> values) {
       if (visualCornerBuilder_ == null) {
         ensureVisualCornerIsMutable();
-        super.addAll(values, visualCorner_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, visualCorner_);
         onChanged();
       } else {
         visualCornerBuilder_.addAllMessages(values);
@@ -1481,7 +1472,6 @@ public  final class VisionField extends
       return visualCornerBuilder_;
     }
 
-    // repeated .messages.VisualCorner bottom_corner = 9;
     private java.util.List<messages.VisualCorner> bottomCorner_ =
       java.util.Collections.emptyList();
     private void ensureBottomCornerIsMutable() {
@@ -1623,7 +1613,8 @@ public  final class VisionField extends
         java.lang.Iterable<? extends messages.VisualCorner> values) {
       if (bottomCornerBuilder_ == null) {
         ensureBottomCornerIsMutable();
-        super.addAll(values, bottomCorner_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, bottomCorner_);
         onChanged();
       } else {
         bottomCornerBuilder_.addAllMessages(values);
@@ -1721,7 +1712,6 @@ public  final class VisionField extends
       return bottomCornerBuilder_;
     }
 
-    // repeated .messages.VisualLine visual_line = 5;
     private java.util.List<messages.VisualLine> visualLine_ =
       java.util.Collections.emptyList();
     private void ensureVisualLineIsMutable() {
@@ -1863,7 +1853,8 @@ public  final class VisionField extends
         java.lang.Iterable<? extends messages.VisualLine> values) {
       if (visualLineBuilder_ == null) {
         ensureVisualLineIsMutable();
-        super.addAll(values, visualLine_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, visualLine_);
         onChanged();
       } else {
         visualLineBuilder_.addAllMessages(values);
@@ -1961,7 +1952,6 @@ public  final class VisionField extends
       return visualLineBuilder_;
     }
 
-    // repeated .messages.VisualLine bottom_line = 8;
     private java.util.List<messages.VisualLine> bottomLine_ =
       java.util.Collections.emptyList();
     private void ensureBottomLineIsMutable() {
@@ -2103,7 +2093,8 @@ public  final class VisionField extends
         java.lang.Iterable<? extends messages.VisualLine> values) {
       if (bottomLineBuilder_ == null) {
         ensureBottomLineIsMutable();
-        super.addAll(values, bottomLine_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, bottomLine_);
         onChanged();
       } else {
         bottomLineBuilder_.addAllMessages(values);
@@ -2201,7 +2192,6 @@ public  final class VisionField extends
       return bottomLineBuilder_;
     }
 
-    // optional .messages.VisualDetection visual_cross = 6;
     private messages.VisualDetection visualCross_ = messages.VisualDetection.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder> visualCrossBuilder_;
@@ -2310,7 +2300,7 @@ public  final class VisionField extends
       if (visualCrossBuilder_ == null) {
         visualCrossBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder>(
-                visualCross_,
+                getVisualCross(),
                 getParentForChildren(),
                 isClean());
         visualCross_ = null;
@@ -2318,7 +2308,6 @@ public  final class VisionField extends
       return visualCrossBuilder_;
     }
 
-    // optional .messages.VisualFieldEdge visual_field_edge = 7;
     private messages.VisualFieldEdge visualFieldEdge_ = messages.VisualFieldEdge.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualFieldEdge, messages.VisualFieldEdge.Builder, messages.VisualFieldEdgeOrBuilder> visualFieldEdgeBuilder_;
@@ -2427,7 +2416,7 @@ public  final class VisionField extends
       if (visualFieldEdgeBuilder_ == null) {
         visualFieldEdgeBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VisualFieldEdge, messages.VisualFieldEdge.Builder, messages.VisualFieldEdgeOrBuilder>(
-                visualFieldEdge_,
+                getVisualFieldEdge(),
                 getParentForChildren(),
                 isClean());
         visualFieldEdge_ = null;

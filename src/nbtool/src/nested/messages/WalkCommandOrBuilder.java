@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface WalkCommandOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface WalkCommandOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.WalkCommand)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float x_percent = 1;
   /**
    * <code>optional float x_percent = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface WalkCommandOrBuilder
    */
   float getXPercent();
 
-  // optional float y_percent = 2;
   /**
    * <code>optional float y_percent = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface WalkCommandOrBuilder
    */
   float getYPercent();
 
-  // optional float h_percent = 3;
   /**
    * <code>optional float h_percent = 3;</code>
    */

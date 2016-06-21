@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.ArmContactState}
  */
-public  final class ArmContactState extends
-    com.google.protobuf.GeneratedMessage
-    implements ArmContactStateOrBuilder {
+public final class ArmContactState extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.ArmContactState)
+    ArmContactStateOrBuilder {
   // Use ArmContactState.newBuilder() to construct.
   private ArmContactState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -261,7 +262,6 @@ public  final class ArmContactState extends
   }
 
   private int bitField0_;
-  // optional .messages.ArmContactState.PushDirection right_push_direction = 1;
   public static final int RIGHT_PUSH_DIRECTION_FIELD_NUMBER = 1;
   private messages.ArmContactState.PushDirection rightPushDirection_;
   /**
@@ -277,7 +277,6 @@ public  final class ArmContactState extends
     return rightPushDirection_;
   }
 
-  // optional .messages.ArmContactState.PushDirection left_push_direction = 2;
   public static final int LEFT_PUSH_DIRECTION_FIELD_NUMBER = 2;
   private messages.ArmContactState.PushDirection leftPushDirection_;
   /**
@@ -300,7 +299,8 @@ public  final class ArmContactState extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -414,8 +414,9 @@ public  final class ArmContactState extends
    * Protobuf type {@code messages.ArmContactState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.ArmContactStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.ArmContactState)
+      messages.ArmContactStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_ArmContactState.internal_static_messages_ArmContactState_descriptor;
@@ -537,7 +538,6 @@ public  final class ArmContactState extends
     }
     private int bitField0_;
 
-    // optional .messages.ArmContactState.PushDirection right_push_direction = 1;
     private messages.ArmContactState.PushDirection rightPushDirection_ = messages.ArmContactState.PushDirection.NONE;
     /**
      * <code>optional .messages.ArmContactState.PushDirection right_push_direction = 1;</code>
@@ -573,7 +573,6 @@ public  final class ArmContactState extends
       return this;
     }
 
-    // optional .messages.ArmContactState.PushDirection left_push_direction = 2;
     private messages.ArmContactState.PushDirection leftPushDirection_ = messages.ArmContactState.PushDirection.NONE;
     /**
      * <code>optional .messages.ArmContactState.PushDirection left_push_direction = 2;</code>

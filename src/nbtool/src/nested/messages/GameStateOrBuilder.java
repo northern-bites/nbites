@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface GameStateOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface GameStateOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.GameState)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional uint32 state = 1;
   /**
    * <code>optional uint32 state = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface GameStateOrBuilder
    */
   int getState();
 
-  // optional bool first_half = 2 [default = true];
   /**
    * <code>optional bool first_half = 2 [default = true];</code>
    */
@@ -26,7 +25,6 @@ public interface GameStateOrBuilder
    */
   boolean getFirstHalf();
 
-  // optional uint32 kick_off_team = 3;
   /**
    * <code>optional uint32 kick_off_team = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface GameStateOrBuilder
    */
   int getKickOffTeam();
 
-  // optional uint32 secondary_state = 4;
   /**
    * <code>optional uint32 secondary_state = 4;</code>
    */
@@ -46,7 +43,6 @@ public interface GameStateOrBuilder
    */
   int getSecondaryState();
 
-  // optional uint32 drop_in_team = 5;
   /**
    * <code>optional uint32 drop_in_team = 5;</code>
    */
@@ -56,7 +52,6 @@ public interface GameStateOrBuilder
    */
   int getDropInTeam();
 
-  // optional sint32 drop_in_time = 6 [default = -1];
   /**
    * <code>optional sint32 drop_in_time = 6 [default = -1];</code>
    */
@@ -66,7 +61,6 @@ public interface GameStateOrBuilder
    */
   int getDropInTime();
 
-  // optional uint32 secs_remaining = 7 [default = 600];
   /**
    * <code>optional uint32 secs_remaining = 7 [default = 600];</code>
    */
@@ -76,7 +70,6 @@ public interface GameStateOrBuilder
    */
   int getSecsRemaining();
 
-  // optional bool have_remote_gc = 8;
   /**
    * <code>optional bool have_remote_gc = 8;</code>
    */
@@ -86,7 +79,6 @@ public interface GameStateOrBuilder
    */
   boolean getHaveRemoteGc();
 
-  // repeated .messages.TeamInfo team = 9;
   /**
    * <code>repeated .messages.TeamInfo team = 9;</code>
    */

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface ToggleOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface ToggleOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.Toggle)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional bool toggle = 1;
   /**
    * <code>optional bool toggle = 1;</code>
    *

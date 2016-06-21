@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.ParticleSwarm}
  */
-public  final class ParticleSwarm extends
-    com.google.protobuf.GeneratedMessage
-    implements ParticleSwarmOrBuilder {
+public final class ParticleSwarm extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.ParticleSwarm)
+    ParticleSwarmOrBuilder {
   // Use ParticleSwarm.newBuilder() to construct.
   private ParticleSwarm(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -104,7 +105,6 @@ public  final class ParticleSwarm extends
     return PARSER;
   }
 
-  // repeated .messages.Particle particle = 1;
   public static final int PARTICLE_FIELD_NUMBER = 1;
   private java.util.List<messages.Particle> particle_;
   /**
@@ -146,7 +146,8 @@ public  final class ParticleSwarm extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -253,8 +254,9 @@ public  final class ParticleSwarm extends
    * Protobuf type {@code messages.ParticleSwarm}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.ParticleSwarmOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.ParticleSwarm)
+      messages.ParticleSwarmOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_ParticleSwarm.internal_static_messages_ParticleSwarm_descriptor;
@@ -398,7 +400,6 @@ public  final class ParticleSwarm extends
     }
     private int bitField0_;
 
-    // repeated .messages.Particle particle = 1;
     private java.util.List<messages.Particle> particle_ =
       java.util.Collections.emptyList();
     private void ensureParticleIsMutable() {
@@ -540,7 +541,8 @@ public  final class ParticleSwarm extends
         java.lang.Iterable<? extends messages.Particle> values) {
       if (particleBuilder_ == null) {
         ensureParticleIsMutable();
-        super.addAll(values, particle_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, particle_);
         onChanged();
       } else {
         particleBuilder_.addAllMessages(values);

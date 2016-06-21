@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisualGoalPostOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface VisualGoalPostOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.VisualGoalPost)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional .messages.VisualDetection visual_detection = 1;
   /**
    * <code>optional .messages.VisualDetection visual_detection = 1;</code>
    */
@@ -20,7 +20,6 @@ public interface VisualGoalPostOrBuilder
    */
   messages.VisualDetectionOrBuilder getVisualDetectionOrBuilder();
 
-  // optional float height = 2;
   /**
    * <code>optional float height = 2;</code>
    */
@@ -30,7 +29,6 @@ public interface VisualGoalPostOrBuilder
    */
   float getHeight();
 
-  // optional float width = 3;
   /**
    * <code>optional float width = 3;</code>
    */
@@ -40,7 +38,6 @@ public interface VisualGoalPostOrBuilder
    */
   float getWidth();
 
-  // optional .messages.Point left_top = 4;
   /**
    * <code>optional .messages.Point left_top = 4;</code>
    */
@@ -54,7 +51,6 @@ public interface VisualGoalPostOrBuilder
    */
   messages.PointOrBuilder getLeftTopOrBuilder();
 
-  // optional .messages.Point right_top = 5;
   /**
    * <code>optional .messages.Point right_top = 5;</code>
    */
@@ -68,7 +64,6 @@ public interface VisualGoalPostOrBuilder
    */
   messages.PointOrBuilder getRightTopOrBuilder();
 
-  // optional .messages.Point left_bot = 6;
   /**
    * <code>optional .messages.Point left_bot = 6;</code>
    */
@@ -82,7 +77,6 @@ public interface VisualGoalPostOrBuilder
    */
   messages.PointOrBuilder getLeftBotOrBuilder();
 
-  // optional .messages.Point right_bot = 7;
   /**
    * <code>optional .messages.Point right_bot = 7;</code>
    */

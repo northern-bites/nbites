@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.HoughLine}
  */
-public  final class HoughLine extends
-    com.google.protobuf.GeneratedMessage
-    implements HoughLineOrBuilder {
+public final class HoughLine extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.HoughLine)
+    HoughLineOrBuilder {
   // Use HoughLine.newBuilder() to construct.
   private HoughLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -114,7 +115,6 @@ public  final class HoughLine extends
   }
 
   private int bitField0_;
-  // optional float r = 1;
   public static final int R_FIELD_NUMBER = 1;
   private float r_;
   /**
@@ -130,7 +130,6 @@ public  final class HoughLine extends
     return r_;
   }
 
-  // optional float t = 2;
   public static final int T_FIELD_NUMBER = 2;
   private float t_;
   /**
@@ -146,7 +145,6 @@ public  final class HoughLine extends
     return t_;
   }
 
-  // optional float ep0 = 3;
   public static final int EP0_FIELD_NUMBER = 3;
   private float ep0_;
   /**
@@ -162,7 +160,6 @@ public  final class HoughLine extends
     return ep0_;
   }
 
-  // optional float ep1 = 4;
   public static final int EP1_FIELD_NUMBER = 4;
   private float ep1_;
   /**
@@ -187,7 +184,8 @@ public  final class HoughLine extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -315,8 +313,9 @@ public  final class HoughLine extends
    * Protobuf type {@code messages.HoughLine}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.HoughLineOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.HoughLine)
+      messages.HoughLineOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_HoughLine_descriptor;
@@ -456,7 +455,6 @@ public  final class HoughLine extends
     }
     private int bitField0_;
 
-    // optional float r = 1;
     private float r_ ;
     /**
      * <code>optional float r = 1;</code>
@@ -489,7 +487,6 @@ public  final class HoughLine extends
       return this;
     }
 
-    // optional float t = 2;
     private float t_ ;
     /**
      * <code>optional float t = 2;</code>
@@ -522,7 +519,6 @@ public  final class HoughLine extends
       return this;
     }
 
-    // optional float ep0 = 3;
     private float ep0_ ;
     /**
      * <code>optional float ep0 = 3;</code>
@@ -555,7 +551,6 @@ public  final class HoughLine extends
       return this;
     }
 
-    // optional float ep1 = 4;
     private float ep1_ ;
     /**
      * <code>optional float ep1 = 4;</code>

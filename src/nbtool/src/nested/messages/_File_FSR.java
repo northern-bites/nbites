@@ -8,7 +8,7 @@ public final class _File_FSR {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FSR_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -28,23 +28,23 @@ public final class _File_FSR {
       "\013\n\003rrr\030\010 \001(\002B\rB\t_File_FSRP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_messages_FSR_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_messages_FSR_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_FSR_descriptor,
-              new java.lang.String[] { "Lfl", "Lfr", "Lrl", "Lrr", "Rfl", "Rfr", "Rrl", "Rrr", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_messages_FSR_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_messages_FSR_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_FSR_descriptor,
+        new java.lang.String[] { "Lfl", "Lfr", "Lrl", "Lrr", "Rfl", "Rfr", "Rrl", "Rrr", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

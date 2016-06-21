@@ -40,28 +40,28 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
     reset();
   }
 
-  // // update timeLastPenalty
-  // if(theRobotInfoBH.penalty != PENALTY_NONE && lastPenalty == PENALTY_NONE)
-  //   timeWhenPenalized = theFrameInfoBH.time;
+  // update timeLastPenalty
+  if(theRobotInfoBH.penalty != PENALTY_NONE && lastPenalty == PENALTY_NONE)
+    timeWhenPenalized = theFrameInfoBH.time;
 
   // detect changes in joint calibration
-// #ifndef RELEASE
-//   bool jointCalibrationChanged = false;
-//   for(int i = JointDataBH::LHipYawPitch; i <= JointDataBH::LAnkleRoll; ++i)
-//     if(theJointCalibrationBH.joints[i].offset != lastJointCalibration.joints[i].offset)
-//     {
-//       jointCalibrationChanged = true;
-//       lastJointCalibration.joints[i].offset = theJointCalibrationBH.joints[i].offset;
-//     }
-//   for(int i = JointDataBH::RHipYawPitch; i <= JointDataBH::RAnkleRoll; ++i)
-//     if(theJointCalibrationBH.joints[i].offset != lastJointCalibration.joints[i].offset)
-//     {
-//       jointCalibrationChanged = true;
-//       lastJointCalibration.joints[i].offset = theJointCalibrationBH.joints[i].offset;
-//     }
-//   if(jointCalibrationChanged)
-//     reset();
-// #endif
+#ifndef RELEASE
+  bool jointCalibrationChanged = false;
+  for(int i = JointDataBH::LHipYawPitch; i <= JointDataBH::LAnkleRoll; ++i)
+    if(theJointCalibrationBH.joints[i].offset != lastJointCalibration.joints[i].offset)
+    {
+      jointCalibrationChanged = true;
+      lastJointCalibration.joints[i].offset = theJointCalibrationBH.joints[i].offset;
+    }
+  for(int i = JointDataBH::RHipYawPitch; i <= JointDataBH::RAnkleRoll; ++i)
+    if(theJointCalibrationBH.joints[i].offset != lastJointCalibration.joints[i].offset)
+    {
+      jointCalibrationChanged = true;
+      lastJointCalibration.joints[i].offset = theJointCalibrationBH.joints[i].offset;
+    }
+  if(jointCalibrationChanged)
+    reset();
+#endif
 
   const Vector2BH<> gyro = Vector2BH<>(theSensorDataBH.data[SensorDataBH::gyroX], theSensorDataBH.data[SensorDataBH::gyroY]);
   const Vector3BH<> acc = Vector3BH<>(theSensorDataBH.data[SensorDataBH::accX], theSensorDataBH.data[SensorDataBH::accY], theSensorDataBH.data[SensorDataBH::accZ]);
@@ -78,36 +78,36 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
   }
 
   // detect unstable stuff...
-  // const MotionRequestBH::Motion& currentMotion(theMotionSelectionBH.targetMotion);
-  // bool unstable = false;
-  // if(currentMotion != lastMotion || // motion change
-  //    currentMotion != theMotionInfoBH.motion ||  // interpolating
-  //    theMotionInfoBH.motion != MotionRequestBH::stand) // only calibrate while standing
-  // {
-  //   unstable = true;
-  // }
-  // else if(currentMotion == MotionRequestBH::walk)
-  // {
-  //   unstable = true;
-  // }
-  // else if(currentMotion != MotionRequestBH::walk && currentMotion != MotionRequestBH::stand)
-  // {
-  //   unstable = true;
-  // }
-  // else if(theRobotInfoBH.penalty != PENALTY_NONE && ((theRobotInfoBH.secsTillUnpenalised * 1000 < (int) penalizedTimeFrame && theFrameInfoBH.getTimeSince(theGameInfoBH.timeLastPackageReceived) < 2000) || theFrameInfoBH.getTimeSince(timeWhenPenalized) < (int) penalizedTimeFrame))
-  // {
-  //   unstable = true;
-  // }
-  // else if(accValues.getNumberOfEntries() >= accValues.getMaxEntries())
-  // {
-  //   unstable = true;
-  // }
+  const MotionRequestBH::Motion& currentMotion(theMotionSelectionBH.targetMotion);
+  bool unstable = false;
+  if(currentMotion != lastMotion || // motion change
+     currentMotion != theMotionInfoBH.motion ||  // interpolating
+     theMotionInfoBH.motion != MotionRequestBH::stand) // only calibrate while standing
+  {
+    unstable = true;
+  }
+  else if(currentMotion == MotionRequestBH::walk)
+  {
+    unstable = true;
+  }
+  else if(currentMotion != MotionRequestBH::walk && currentMotion != MotionRequestBH::stand)
+  {
+    unstable = true;
+  }
+  else if(theRobotInfoBH.penalty != PENALTY_NONE && ((theRobotInfoBH.secsTillUnpenalised * 1000 < (int) penalizedTimeFrame && theFrameInfoBH.getTimeSince(theGameInfoBH.timeLastPackageReceived) < 2000) || theFrameInfoBH.getTimeSince(timeWhenPenalized) < (int) penalizedTimeFrame))
+  {
+    unstable = true;
+  }
+  else if(accValues.getNumberOfEntries() >= accValues.getMaxEntries())
+  {
+    unstable = true;
+  }
 
-  // // update cleanCollectionStartTime
-  // if(unstable)
-  //   cleanCollectionStartTime = 0;
-  // else if(!cleanCollectionStartTime)
-  //   cleanCollectionStartTime = theFrameInfoBH.time;
+  // update cleanCollectionStartTime
+  if(unstable)
+    cleanCollectionStartTime = 0;
+  else if(!cleanCollectionStartTime)
+    cleanCollectionStartTime = theFrameInfoBH.time;
 
   // restart sensor value collecting?
   const bool standing = currentMotion == MotionRequestBH::stand || (currentMotion == MotionRequestBH::walk && theWalkingEngineOutputBH.standing);
@@ -163,7 +163,7 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
       collections.removeFirst();
     }
   }
-  
+
   // collecting....
   if(!unstable)
   {

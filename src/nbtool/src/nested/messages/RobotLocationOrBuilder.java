@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface RobotLocationOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface RobotLocationOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.RobotLocation)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float x = 1;
   /**
    * <code>optional float x = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface RobotLocationOrBuilder
    */
   float getX();
 
-  // optional float y = 2;
   /**
    * <code>optional float y = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface RobotLocationOrBuilder
    */
   float getY();
 
-  // optional float h = 3;
   /**
    * <code>optional float h = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface RobotLocationOrBuilder
    */
   float getH();
 
-  // optional int64 timestamp = 4;
   /**
    * <code>optional int64 timestamp = 4;</code>
    */
@@ -46,7 +43,6 @@ public interface RobotLocationOrBuilder
    */
   long getTimestamp();
 
-  // optional float uncert = 5;
   /**
    * <code>optional float uncert = 5;</code>
    */
@@ -56,7 +52,6 @@ public interface RobotLocationOrBuilder
    */
   float getUncert();
 
-  // optional bool lost = 6;
   /**
    * <code>optional bool lost = 6;</code>
    */

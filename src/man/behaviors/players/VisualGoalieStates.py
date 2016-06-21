@@ -4,7 +4,6 @@ from ..headTracker.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
                                       FIXED_PITCH_SLOW_GOALIE_PAN)
 #from vision import certainty
 from ..navigator import Navigator as nav
-from ..navigator import BrunswickSpeeds as speeds
 from ..util import *
 #import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
@@ -94,10 +93,10 @@ def clearBall(player):
         return player.goNow('positionForGoalieKick')
     elif player.brain.ball.distance < constants.SLOW_DOWN_DIST:
         # print "Slowing down"
-        player.brain.nav.chaseBall(speeds.SPEED_FIVE, fast = True)
+        player.brain.nav.chaseBall(nav.MEDIUM_SPEED, fast = True)
     else:
         # print "approaching ball"
-        player.brain.nav.chaseBall(speeds.SPEED_EIGHT, fast = True)
+        player.brain.nav.chaseBall(nav.FAST_SPEED, fast = True)
 
     # if player.counter % 2 == 0:
     #     nball = player.brain.naiveBall
@@ -124,7 +123,7 @@ def positionForGoalieKick(player):
                                     ball.rel_y - player.kick.setupY,
                                     0)
         print("Kickpose:", positionForGoalieKick.kickPose.relX, positionForGoalieKick.kickPose.relY)
-        positionForGoalieKick.speed = speeds.SPEED_THREE
+        positionForGoalieKick.speed = nav.GRADUAL_SPEED
 
         player.brain.nav.goTo(positionForGoalieKick.kickPose,
                                             speed = positionForGoalieKick.speed,
@@ -171,7 +170,7 @@ def repositionAfterWhiff(player):
                                                          0.0)
         player.brain.nav.goTo(repositionAfterWhiff.ballDest,
                               nav.CLOSE_ENOUGH,
-                              speeds.SPEED_THREE)
+                              nav.GRADUAL_SPEED)
 
     # if it took more than 5 seconds, forget it
     if player.counter > 350:

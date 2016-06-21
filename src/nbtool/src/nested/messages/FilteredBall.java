@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.FilteredBall}
  */
-public  final class FilteredBall extends
-    com.google.protobuf.GeneratedMessage
-    implements FilteredBallOrBuilder {
+public final class FilteredBall extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.FilteredBall)
+    FilteredBallOrBuilder {
   // Use FilteredBall.newBuilder() to construct.
   private FilteredBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -252,7 +253,6 @@ public  final class FilteredBall extends
   }
 
   private int bitField0_;
-  // optional .messages.VBall vis = 1;
   public static final int VIS_FIELD_NUMBER = 1;
   private messages.VBall vis_;
   /**
@@ -274,7 +274,6 @@ public  final class FilteredBall extends
     return vis_;
   }
 
-  // optional float distance = 2;
   public static final int DISTANCE_FIELD_NUMBER = 2;
   private float distance_;
   /**
@@ -290,7 +289,6 @@ public  final class FilteredBall extends
     return distance_;
   }
 
-  // optional float bearing = 3;
   public static final int BEARING_FIELD_NUMBER = 3;
   private float bearing_;
   /**
@@ -306,7 +304,6 @@ public  final class FilteredBall extends
     return bearing_;
   }
 
-  // optional float rel_x = 4;
   public static final int REL_X_FIELD_NUMBER = 4;
   private float relX_;
   /**
@@ -330,7 +327,6 @@ public  final class FilteredBall extends
     return relX_;
   }
 
-  // optional float rel_y = 5;
   public static final int REL_Y_FIELD_NUMBER = 5;
   private float relY_;
   /**
@@ -346,7 +342,6 @@ public  final class FilteredBall extends
     return relY_;
   }
 
-  // optional float vel_x = 6;
   public static final int VEL_X_FIELD_NUMBER = 6;
   private float velX_;
   /**
@@ -362,7 +357,6 @@ public  final class FilteredBall extends
     return velX_;
   }
 
-  // optional float vel_y = 7;
   public static final int VEL_Y_FIELD_NUMBER = 7;
   private float velY_;
   /**
@@ -378,7 +372,6 @@ public  final class FilteredBall extends
     return velY_;
   }
 
-  // optional float var_rel_x = 8;
   public static final int VAR_REL_X_FIELD_NUMBER = 8;
   private float varRelX_;
   /**
@@ -394,7 +387,6 @@ public  final class FilteredBall extends
     return varRelX_;
   }
 
-  // optional float var_rel_y = 9;
   public static final int VAR_REL_Y_FIELD_NUMBER = 9;
   private float varRelY_;
   /**
@@ -410,7 +402,6 @@ public  final class FilteredBall extends
     return varRelY_;
   }
 
-  // optional float var_vel_x = 10;
   public static final int VAR_VEL_X_FIELD_NUMBER = 10;
   private float varVelX_;
   /**
@@ -426,7 +417,6 @@ public  final class FilteredBall extends
     return varVelX_;
   }
 
-  // optional float var_vel_y = 11;
   public static final int VAR_VEL_Y_FIELD_NUMBER = 11;
   private float varVelY_;
   /**
@@ -442,7 +432,6 @@ public  final class FilteredBall extends
     return varVelY_;
   }
 
-  // optional bool is_stationary = 12;
   public static final int IS_STATIONARY_FIELD_NUMBER = 12;
   private boolean isStationary_;
   /**
@@ -458,7 +447,6 @@ public  final class FilteredBall extends
     return isStationary_;
   }
 
-  // optional float bearing_deg = 13;
   public static final int BEARING_DEG_FIELD_NUMBER = 13;
   private float bearingDeg_;
   /**
@@ -474,7 +462,6 @@ public  final class FilteredBall extends
     return bearingDeg_;
   }
 
-  // optional float x = 14;
   public static final int X_FIELD_NUMBER = 14;
   private float x_;
   /**
@@ -490,7 +477,6 @@ public  final class FilteredBall extends
     return x_;
   }
 
-  // optional float y = 15;
   public static final int Y_FIELD_NUMBER = 15;
   private float y_;
   /**
@@ -506,7 +492,6 @@ public  final class FilteredBall extends
     return y_;
   }
 
-  // optional float rel_x_dest = 16;
   public static final int REL_X_DEST_FIELD_NUMBER = 16;
   private float relXDest_;
   /**
@@ -522,7 +507,6 @@ public  final class FilteredBall extends
     return relXDest_;
   }
 
-  // optional float rel_y_dest = 17;
   public static final int REL_Y_DEST_FIELD_NUMBER = 17;
   private float relYDest_;
   /**
@@ -538,7 +522,6 @@ public  final class FilteredBall extends
     return relYDest_;
   }
 
-  // optional float speed = 18;
   public static final int SPEED_FIELD_NUMBER = 18;
   private float speed_;
   /**
@@ -562,7 +545,6 @@ public  final class FilteredBall extends
     return speed_;
   }
 
-  // optional float rel_y_intersect_dest = 19;
   public static final int REL_Y_INTERSECT_DEST_FIELD_NUMBER = 19;
   private float relYIntersectDest_;
   /**
@@ -578,7 +560,6 @@ public  final class FilteredBall extends
     return relYIntersectDest_;
   }
 
-  // optional float stat_rel_x = 20;
   public static final int STAT_REL_X_FIELD_NUMBER = 20;
   private float statRelX_;
   /**
@@ -594,7 +575,6 @@ public  final class FilteredBall extends
     return statRelX_;
   }
 
-  // optional float stat_rel_y = 21;
   public static final int STAT_REL_Y_FIELD_NUMBER = 21;
   private float statRelY_;
   /**
@@ -610,7 +590,6 @@ public  final class FilteredBall extends
     return statRelY_;
   }
 
-  // optional float stat_distance = 22;
   public static final int STAT_DISTANCE_FIELD_NUMBER = 22;
   private float statDistance_;
   /**
@@ -626,7 +605,6 @@ public  final class FilteredBall extends
     return statDistance_;
   }
 
-  // optional float stat_bearing = 23;
   public static final int STAT_BEARING_FIELD_NUMBER = 23;
   private float statBearing_;
   /**
@@ -642,7 +620,6 @@ public  final class FilteredBall extends
     return statBearing_;
   }
 
-  // optional float mov_rel_x = 24;
   public static final int MOV_REL_X_FIELD_NUMBER = 24;
   private float movRelX_;
   /**
@@ -658,7 +635,6 @@ public  final class FilteredBall extends
     return movRelX_;
   }
 
-  // optional float mov_rel_y = 25;
   public static final int MOV_REL_Y_FIELD_NUMBER = 25;
   private float movRelY_;
   /**
@@ -674,7 +650,6 @@ public  final class FilteredBall extends
     return movRelY_;
   }
 
-  // optional float mov_distance = 26;
   public static final int MOV_DISTANCE_FIELD_NUMBER = 26;
   private float movDistance_;
   /**
@@ -690,7 +665,6 @@ public  final class FilteredBall extends
     return movDistance_;
   }
 
-  // optional float mov_bearing = 27;
   public static final int MOV_BEARING_FIELD_NUMBER = 27;
   private float movBearing_;
   /**
@@ -706,7 +680,6 @@ public  final class FilteredBall extends
     return movBearing_;
   }
 
-  // optional float mov_vel_x = 28;
   public static final int MOV_VEL_X_FIELD_NUMBER = 28;
   private float movVelX_;
   /**
@@ -722,7 +695,6 @@ public  final class FilteredBall extends
     return movVelX_;
   }
 
-  // optional float mov_vel_y = 29;
   public static final int MOV_VEL_Y_FIELD_NUMBER = 29;
   private float movVelY_;
   /**
@@ -738,7 +710,6 @@ public  final class FilteredBall extends
     return movVelY_;
   }
 
-  // optional float mov_speed = 30;
   public static final int MOV_SPEED_FIELD_NUMBER = 30;
   private float movSpeed_;
   /**
@@ -789,7 +760,8 @@ public  final class FilteredBall extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -1099,8 +1071,9 @@ public  final class FilteredBall extends
    * Protobuf type {@code messages.FilteredBall}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.FilteredBallOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.FilteredBall)
+      messages.FilteredBallOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_FilteredBall_descriptor;
@@ -1483,7 +1456,6 @@ public  final class FilteredBall extends
     }
     private int bitField0_;
 
-    // optional .messages.VBall vis = 1;
     private messages.VBall vis_ = messages.VBall.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VBall, messages.VBall.Builder, messages.VBallOrBuilder> visBuilder_;
@@ -1592,7 +1564,7 @@ public  final class FilteredBall extends
       if (visBuilder_ == null) {
         visBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VBall, messages.VBall.Builder, messages.VBallOrBuilder>(
-                vis_,
+                getVis(),
                 getParentForChildren(),
                 isClean());
         vis_ = null;
@@ -1600,7 +1572,6 @@ public  final class FilteredBall extends
       return visBuilder_;
     }
 
-    // optional float distance = 2;
     private float distance_ ;
     /**
      * <code>optional float distance = 2;</code>
@@ -1633,7 +1604,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float bearing = 3;
     private float bearing_ ;
     /**
      * <code>optional float bearing = 3;</code>
@@ -1666,7 +1636,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float rel_x = 4;
     private float relX_ ;
     /**
      * <code>optional float rel_x = 4;</code>
@@ -1715,7 +1684,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float rel_y = 5;
     private float relY_ ;
     /**
      * <code>optional float rel_y = 5;</code>
@@ -1748,7 +1716,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float vel_x = 6;
     private float velX_ ;
     /**
      * <code>optional float vel_x = 6;</code>
@@ -1781,7 +1748,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float vel_y = 7;
     private float velY_ ;
     /**
      * <code>optional float vel_y = 7;</code>
@@ -1814,7 +1780,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float var_rel_x = 8;
     private float varRelX_ ;
     /**
      * <code>optional float var_rel_x = 8;</code>
@@ -1847,7 +1812,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float var_rel_y = 9;
     private float varRelY_ ;
     /**
      * <code>optional float var_rel_y = 9;</code>
@@ -1880,7 +1844,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float var_vel_x = 10;
     private float varVelX_ ;
     /**
      * <code>optional float var_vel_x = 10;</code>
@@ -1913,7 +1876,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float var_vel_y = 11;
     private float varVelY_ ;
     /**
      * <code>optional float var_vel_y = 11;</code>
@@ -1946,7 +1908,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional bool is_stationary = 12;
     private boolean isStationary_ ;
     /**
      * <code>optional bool is_stationary = 12;</code>
@@ -1979,7 +1940,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float bearing_deg = 13;
     private float bearingDeg_ ;
     /**
      * <code>optional float bearing_deg = 13;</code>
@@ -2012,7 +1972,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float x = 14;
     private float x_ ;
     /**
      * <code>optional float x = 14;</code>
@@ -2045,7 +2004,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float y = 15;
     private float y_ ;
     /**
      * <code>optional float y = 15;</code>
@@ -2078,7 +2036,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float rel_x_dest = 16;
     private float relXDest_ ;
     /**
      * <code>optional float rel_x_dest = 16;</code>
@@ -2111,7 +2068,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float rel_y_dest = 17;
     private float relYDest_ ;
     /**
      * <code>optional float rel_y_dest = 17;</code>
@@ -2144,7 +2100,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float speed = 18;
     private float speed_ ;
     /**
      * <code>optional float speed = 18;</code>
@@ -2193,7 +2148,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float rel_y_intersect_dest = 19;
     private float relYIntersectDest_ ;
     /**
      * <code>optional float rel_y_intersect_dest = 19;</code>
@@ -2226,7 +2180,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float stat_rel_x = 20;
     private float statRelX_ ;
     /**
      * <code>optional float stat_rel_x = 20;</code>
@@ -2259,7 +2212,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float stat_rel_y = 21;
     private float statRelY_ ;
     /**
      * <code>optional float stat_rel_y = 21;</code>
@@ -2292,7 +2244,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float stat_distance = 22;
     private float statDistance_ ;
     /**
      * <code>optional float stat_distance = 22;</code>
@@ -2325,7 +2276,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float stat_bearing = 23;
     private float statBearing_ ;
     /**
      * <code>optional float stat_bearing = 23;</code>
@@ -2358,7 +2308,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float mov_rel_x = 24;
     private float movRelX_ ;
     /**
      * <code>optional float mov_rel_x = 24;</code>
@@ -2391,7 +2340,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float mov_rel_y = 25;
     private float movRelY_ ;
     /**
      * <code>optional float mov_rel_y = 25;</code>
@@ -2424,7 +2372,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float mov_distance = 26;
     private float movDistance_ ;
     /**
      * <code>optional float mov_distance = 26;</code>
@@ -2457,7 +2404,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float mov_bearing = 27;
     private float movBearing_ ;
     /**
      * <code>optional float mov_bearing = 27;</code>
@@ -2490,7 +2436,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float mov_vel_x = 28;
     private float movVelX_ ;
     /**
      * <code>optional float mov_vel_x = 28;</code>
@@ -2523,7 +2468,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float mov_vel_y = 29;
     private float movVelY_ ;
     /**
      * <code>optional float mov_vel_y = 29;</code>
@@ -2556,7 +2500,6 @@ public  final class FilteredBall extends
       return this;
     }
 
-    // optional float mov_speed = 30;
     private float movSpeed_ ;
     /**
      * <code>optional float mov_speed = 30;</code>

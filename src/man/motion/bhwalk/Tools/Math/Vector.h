@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "BHUtil/Streamable.h"
+#include "Tools/Streams/Streamable.h"
 #include "Platform/BHAssert.h"
 
 namespace vec {

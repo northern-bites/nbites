@@ -3,7 +3,6 @@ from . import RoleConstants as roleConstants
 import noggin_constants as nogginC
 from objects import Location
 from ..navigator import Navigator
-from ..navigator import BrunswickSpeeds as speeds
 from ..kickDecider import KickDecider
 import KickOffConstants as constants
 
@@ -26,7 +25,7 @@ def passToCorner(player):
         elif roleConstants.isSecondChaser(player.role) or roleConstants.isCherryPicker(player.role):
             player.brain.tracker.repeatFastTwoIntervalPan()
             passDestination = Location(nogginC.OPP_GOALBOX_LEFT_X, 60.)
-            player.brain.nav.goTo(passDestination, Navigator.GENERAL_AREA, speeds.SPEED_EIGHT, 
+            player.brain.nav.goTo(passDestination, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
         else:
             return player.goNow('playOffBall')
@@ -52,7 +51,7 @@ def passToFieldCross(player):
         if roleConstants.isFirstChaser(player.role):
             player.brain.tracker.repeatFastTwoIntervalPan()
             fieldCross = Location(nogginC.LANDMARK_OPP_FIELD_CROSS[0], nogginC.LANDMARK_OPP_FIELD_CROSS[1])
-            player.brain.nav.goTo(fieldCross, Navigator.GENERAL_AREA, speeds.SPEED_EIGHT, 
+            player.brain.nav.goTo(fieldCross, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
 
         elif roleConstants.isSecondChaser(player.role) or roleConstants.isCherryPicker(player.role):

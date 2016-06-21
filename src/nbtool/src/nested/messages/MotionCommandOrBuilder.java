@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface MotionCommandOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface MotionCommandOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.MotionCommand)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional .messages.MotionCommand.CommandType type = 1;
   /**
    * <code>optional .messages.MotionCommand.CommandType type = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface MotionCommandOrBuilder
    */
   messages.MotionCommand.CommandType getType();
 
-  // optional .messages.ScriptedMove script = 2;
   /**
    * <code>optional .messages.ScriptedMove script = 2;</code>
    */
@@ -30,7 +29,6 @@ public interface MotionCommandOrBuilder
    */
   messages.ScriptedMoveOrBuilder getScriptOrBuilder();
 
-  // optional .messages.DestinationWalk dest = 3;
   /**
    * <code>optional .messages.DestinationWalk dest = 3;</code>
    */
@@ -44,7 +42,6 @@ public interface MotionCommandOrBuilder
    */
   messages.DestinationWalkOrBuilder getDestOrBuilder();
 
-  // optional .messages.WalkCommand speed = 4;
   /**
    * <code>optional .messages.WalkCommand speed = 4;</code>
    */
@@ -58,7 +55,6 @@ public interface MotionCommandOrBuilder
    */
   messages.WalkCommandOrBuilder getSpeedOrBuilder();
 
-  // optional .messages.OdometryWalk odometry_dest = 5;
   /**
    * <code>optional .messages.OdometryWalk odometry_dest = 5;</code>
    */
@@ -72,7 +68,6 @@ public interface MotionCommandOrBuilder
    */
   messages.OdometryWalkOrBuilder getOdometryDestOrBuilder();
 
-  // optional .messages.Kick kick = 6;
   /**
    * <code>optional .messages.Kick kick = 6;</code>
    */
@@ -86,7 +81,6 @@ public interface MotionCommandOrBuilder
    */
   messages.KickOrBuilder getKickOrBuilder();
 
-  // optional int64 timestamp = 7;
   /**
    * <code>optional int64 timestamp = 7;</code>
    */

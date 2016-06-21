@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface CornerOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface CornerOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.Corner)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float x = 1;
   /**
    * <code>optional float x = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface CornerOrBuilder
    */
   float getX();
 
-  // optional float y = 2;
   /**
    * <code>optional float y = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface CornerOrBuilder
    */
   float getY();
 
-  // optional int32 id = 3;
   /**
    * <code>optional int32 id = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface CornerOrBuilder
    */
   int getId();
 
-  // optional int32 correspondence = 4;
   /**
    * <code>optional int32 correspondence = 4;</code>
    */
@@ -46,7 +43,6 @@ public interface CornerOrBuilder
    */
   int getCorrespondence();
 
-  // optional float prob = 5;
   /**
    * <code>optional float prob = 5;</code>
    */
@@ -56,7 +52,6 @@ public interface CornerOrBuilder
    */
   float getProb();
 
-  // optional int32 line1 = 6;
   /**
    * <code>optional int32 line1 = 6;</code>
    */
@@ -66,7 +61,6 @@ public interface CornerOrBuilder
    */
   int getLine1();
 
-  // optional int32 line2 = 7;
   /**
    * <code>optional int32 line2 = 7;</code>
    */
@@ -76,7 +70,6 @@ public interface CornerOrBuilder
    */
   int getLine2();
 
-  // optional float wz0 = 8;
   /**
    * <code>optional float wz0 = 8;</code>
    */

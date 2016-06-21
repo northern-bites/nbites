@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.FSR}
  */
-public  final class FSR extends
-    com.google.protobuf.GeneratedMessage
-    implements FSROrBuilder {
+public final class FSR extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.FSR)
+    FSROrBuilder {
   // Use FSR.newBuilder() to construct.
   private FSR(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -134,7 +135,6 @@ public  final class FSR extends
   }
 
   private int bitField0_;
-  // optional float lfl = 1;
   public static final int LFL_FIELD_NUMBER = 1;
   private float lfl_;
   /**
@@ -158,7 +158,6 @@ public  final class FSR extends
     return lfl_;
   }
 
-  // optional float lfr = 2;
   public static final int LFR_FIELD_NUMBER = 2;
   private float lfr_;
   /**
@@ -182,7 +181,6 @@ public  final class FSR extends
     return lfr_;
   }
 
-  // optional float lrl = 3;
   public static final int LRL_FIELD_NUMBER = 3;
   private float lrl_;
   /**
@@ -206,7 +204,6 @@ public  final class FSR extends
     return lrl_;
   }
 
-  // optional float lrr = 4;
   public static final int LRR_FIELD_NUMBER = 4;
   private float lrr_;
   /**
@@ -230,7 +227,6 @@ public  final class FSR extends
     return lrr_;
   }
 
-  // optional float rfl = 5;
   public static final int RFL_FIELD_NUMBER = 5;
   private float rfl_;
   /**
@@ -254,7 +250,6 @@ public  final class FSR extends
     return rfl_;
   }
 
-  // optional float rfr = 6;
   public static final int RFR_FIELD_NUMBER = 6;
   private float rfr_;
   /**
@@ -278,7 +273,6 @@ public  final class FSR extends
     return rfr_;
   }
 
-  // optional float rrl = 7;
   public static final int RRL_FIELD_NUMBER = 7;
   private float rrl_;
   /**
@@ -302,7 +296,6 @@ public  final class FSR extends
     return rrl_;
   }
 
-  // optional float rrr = 8;
   public static final int RRR_FIELD_NUMBER = 8;
   private float rrr_;
   /**
@@ -339,7 +332,8 @@ public  final class FSR extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -495,8 +489,9 @@ public  final class FSR extends
    * Protobuf type {@code messages.FSR}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.FSROrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.FSR)
+      messages.FSROrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_FSR.internal_static_messages_FSR_descriptor;
@@ -672,7 +667,6 @@ public  final class FSR extends
     }
     private int bitField0_;
 
-    // optional float lfl = 1;
     private float lfl_ ;
     /**
      * <code>optional float lfl = 1;</code>
@@ -721,7 +715,6 @@ public  final class FSR extends
       return this;
     }
 
-    // optional float lfr = 2;
     private float lfr_ ;
     /**
      * <code>optional float lfr = 2;</code>
@@ -770,7 +763,6 @@ public  final class FSR extends
       return this;
     }
 
-    // optional float lrl = 3;
     private float lrl_ ;
     /**
      * <code>optional float lrl = 3;</code>
@@ -819,7 +811,6 @@ public  final class FSR extends
       return this;
     }
 
-    // optional float lrr = 4;
     private float lrr_ ;
     /**
      * <code>optional float lrr = 4;</code>
@@ -868,7 +859,6 @@ public  final class FSR extends
       return this;
     }
 
-    // optional float rfl = 5;
     private float rfl_ ;
     /**
      * <code>optional float rfl = 5;</code>
@@ -917,7 +907,6 @@ public  final class FSR extends
       return this;
     }
 
-    // optional float rfr = 6;
     private float rfr_ ;
     /**
      * <code>optional float rfr = 6;</code>
@@ -966,7 +955,6 @@ public  final class FSR extends
       return this;
     }
 
-    // optional float rrl = 7;
     private float rrl_ ;
     /**
      * <code>optional float rrl = 7;</code>
@@ -1015,7 +1003,6 @@ public  final class FSR extends
       return this;
     }
 
-    // optional float rrr = 8;
     private float rrr_ ;
     /**
      * <code>optional float rrr = 8;</code>

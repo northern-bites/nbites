@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface StiffStatusOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface StiffStatusOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.StiffStatus)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional bool on = 1;
   /**
    * <code>optional bool on = 1;</code>
    */

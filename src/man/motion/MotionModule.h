@@ -14,7 +14,7 @@
 #include "MotionConstants.h"
 
 // Motion providers
-// #include "unswalk/UNSWalkProvider.h"
+#include "bhwalk/BHWalkProvider.h"
 #include "ScriptedProvider.h"
 #include "NullBodyProvider.h"
 #include "HeadProvider.h"
@@ -23,7 +23,6 @@
 // Motion commands
 #include "BodyJointCommand.h"
 #include "WalkCommand.h"
-#include "WalkInPlaceCommand.h"
 #include "DestinationCommand.h"
 #include "KickCommand.h"
 #include "StepCommand.h"
@@ -45,7 +44,7 @@
 #include "NBMath.h"
 
 // Default speed for destination and odometry walk
-#define DEFAULT_SPEED .3f
+#define DEFAULT_SPEED .5f
 
 namespace man
 {
@@ -85,7 +84,7 @@ public:
     void sendMotionCommand(const messages::PositionHeadCommand& command);
     void sendMotionCommand(const HeadJointCommand::ptr command);
     void sendMotionCommand(const messages::ScriptedHeadCommand command);
-    void sendMotionCommand(const WalkInPlaceCommand::ptr command);
+
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
 
@@ -163,18 +162,18 @@ public:
     void stopHeadMoves() { headProvider.requestStop(); }
     void stopBodyMoves() { curProvider->requestStop(); }
 
-    bool isWalkActive();// { return walkProvider.isWalkActive(); }
-    bool isStanding();//   { return walkProvider.isStanding(); }
+    bool isWalkActive() { return walkProvider.isWalkActive(); }
+    bool isStanding()   { return walkProvider.isStanding(); }
     bool isHeadActive() { return headProvider.isActive(); }
     bool isBodyActive() { return curProvider->isActive();}
 
-    void resetWalkProvider();//     { walkProvider.hardReset(); }
+    void resetWalkProvider()     { walkProvider.hardReset(); }
     void resetScriptedProvider() { scriptedProvider.hardReset(); }
 
     int getFrameCount() const { return frameCount; }
 
-    bool calibrated(); // { return walkProvider.calibrated(); }
-    bool upright(); // { return walkProvider.upright(); }
+    bool calibrated() { return walkProvider.calibrated(); }
+    bool upright() { return walkProvider.upright(); }
 
     /**
      * @brief Generates a JointAngles message from a series
@@ -250,7 +249,6 @@ private:
     void swapBodyProvider();
     void swapHeadProvider();
     int realityCheckJoints();
-    void adjustIMU();
 
     void processMotionInput();
 
@@ -276,7 +274,7 @@ private:
     // Update the hand speeds
     void updateHandSpeeds();
 
-    // UNSWalkProvider        walkProvider;
+    BHWalkProvider          walkProvider;
     ScriptedProvider        scriptedProvider;
     HeadProvider            headProvider;
     NullHeadProvider        nullHeadProvider;

@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.PositionHeadCommand}
  */
-public  final class PositionHeadCommand extends
-    com.google.protobuf.GeneratedMessage
-    implements PositionHeadCommandOrBuilder {
+public final class PositionHeadCommand extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.PositionHeadCommand)
+    PositionHeadCommandOrBuilder {
   // Use PositionHeadCommand.newBuilder() to construct.
   private PositionHeadCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -114,7 +115,6 @@ public  final class PositionHeadCommand extends
   }
 
   private int bitField0_;
-  // optional float head_yaw = 1;
   public static final int HEAD_YAW_FIELD_NUMBER = 1;
   private float headYaw_;
   /**
@@ -130,7 +130,6 @@ public  final class PositionHeadCommand extends
     return headYaw_;
   }
 
-  // optional float head_pitch = 2;
   public static final int HEAD_PITCH_FIELD_NUMBER = 2;
   private float headPitch_;
   /**
@@ -146,7 +145,6 @@ public  final class PositionHeadCommand extends
     return headPitch_;
   }
 
-  // optional float max_speed_yaw = 3 [default = -1];
   public static final int MAX_SPEED_YAW_FIELD_NUMBER = 3;
   private float maxSpeedYaw_;
   /**
@@ -162,7 +160,6 @@ public  final class PositionHeadCommand extends
     return maxSpeedYaw_;
   }
 
-  // optional float max_speed_pitch = 4 [default = -1];
   public static final int MAX_SPEED_PITCH_FIELD_NUMBER = 4;
   private float maxSpeedPitch_;
   /**
@@ -187,7 +184,8 @@ public  final class PositionHeadCommand extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -315,8 +313,9 @@ public  final class PositionHeadCommand extends
    * Protobuf type {@code messages.PositionHeadCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.PositionHeadCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.PositionHeadCommand)
+      messages.PositionHeadCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_PositionHeadCommand_descriptor;
@@ -456,7 +455,6 @@ public  final class PositionHeadCommand extends
     }
     private int bitField0_;
 
-    // optional float head_yaw = 1;
     private float headYaw_ ;
     /**
      * <code>optional float head_yaw = 1;</code>
@@ -489,7 +487,6 @@ public  final class PositionHeadCommand extends
       return this;
     }
 
-    // optional float head_pitch = 2;
     private float headPitch_ ;
     /**
      * <code>optional float head_pitch = 2;</code>
@@ -522,7 +519,6 @@ public  final class PositionHeadCommand extends
       return this;
     }
 
-    // optional float max_speed_yaw = 3 [default = -1];
     private float maxSpeedYaw_ = -1F;
     /**
      * <code>optional float max_speed_yaw = 3 [default = -1];</code>
@@ -555,7 +551,6 @@ public  final class PositionHeadCommand extends
       return this;
     }
 
-    // optional float max_speed_pitch = 4 [default = -1];
     private float maxSpeedPitch_ = -1F;
     /**
      * <code>optional float max_speed_pitch = 4 [default = -1];</code>

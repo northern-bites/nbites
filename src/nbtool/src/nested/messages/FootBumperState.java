@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.FootBumperState}
  */
-public  final class FootBumperState extends
-    com.google.protobuf.GeneratedMessage
-    implements FootBumperStateOrBuilder {
+public final class FootBumperState extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.FootBumperState)
+    FootBumperStateOrBuilder {
   // Use FootBumperState.newBuilder() to construct.
   private FootBumperState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -146,7 +147,6 @@ public  final class FootBumperState extends
   }
 
   private int bitField0_;
-  // optional .messages.ButtonState l_foot_bumper_left = 1;
   public static final int L_FOOT_BUMPER_LEFT_FIELD_NUMBER = 1;
   private messages.ButtonState lFootBumperLeft_;
   /**
@@ -180,7 +180,6 @@ public  final class FootBumperState extends
     return lFootBumperLeft_;
   }
 
-  // optional .messages.ButtonState l_foot_bumper_right = 2;
   public static final int L_FOOT_BUMPER_RIGHT_FIELD_NUMBER = 2;
   private messages.ButtonState lFootBumperRight_;
   /**
@@ -202,7 +201,6 @@ public  final class FootBumperState extends
     return lFootBumperRight_;
   }
 
-  // optional .messages.ButtonState r_foot_bumper_left = 3;
   public static final int R_FOOT_BUMPER_LEFT_FIELD_NUMBER = 3;
   private messages.ButtonState rFootBumperLeft_;
   /**
@@ -236,7 +234,6 @@ public  final class FootBumperState extends
     return rFootBumperLeft_;
   }
 
-  // optional .messages.ButtonState r_foot_bumper_right = 4;
   public static final int R_FOOT_BUMPER_RIGHT_FIELD_NUMBER = 4;
   private messages.ButtonState rFootBumperRight_;
   /**
@@ -267,7 +264,8 @@ public  final class FootBumperState extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -395,8 +393,9 @@ public  final class FootBumperState extends
    * Protobuf type {@code messages.FootBumperState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.FootBumperStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.FootBumperState)
+      messages.FootBumperStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_ButtonState.internal_static_messages_FootBumperState_descriptor;
@@ -572,7 +571,6 @@ public  final class FootBumperState extends
     }
     private int bitField0_;
 
-    // optional .messages.ButtonState l_foot_bumper_left = 1;
     private messages.ButtonState lFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder> lFootBumperLeftBuilder_;
@@ -717,7 +715,7 @@ public  final class FootBumperState extends
       if (lFootBumperLeftBuilder_ == null) {
         lFootBumperLeftBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder>(
-                lFootBumperLeft_,
+                getLFootBumperLeft(),
                 getParentForChildren(),
                 isClean());
         lFootBumperLeft_ = null;
@@ -725,7 +723,6 @@ public  final class FootBumperState extends
       return lFootBumperLeftBuilder_;
     }
 
-    // optional .messages.ButtonState l_foot_bumper_right = 2;
     private messages.ButtonState lFootBumperRight_ = messages.ButtonState.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder> lFootBumperRightBuilder_;
@@ -834,7 +831,7 @@ public  final class FootBumperState extends
       if (lFootBumperRightBuilder_ == null) {
         lFootBumperRightBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder>(
-                lFootBumperRight_,
+                getLFootBumperRight(),
                 getParentForChildren(),
                 isClean());
         lFootBumperRight_ = null;
@@ -842,7 +839,6 @@ public  final class FootBumperState extends
       return lFootBumperRightBuilder_;
     }
 
-    // optional .messages.ButtonState r_foot_bumper_left = 3;
     private messages.ButtonState rFootBumperLeft_ = messages.ButtonState.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder> rFootBumperLeftBuilder_;
@@ -987,7 +983,7 @@ public  final class FootBumperState extends
       if (rFootBumperLeftBuilder_ == null) {
         rFootBumperLeftBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder>(
-                rFootBumperLeft_,
+                getRFootBumperLeft(),
                 getParentForChildren(),
                 isClean());
         rFootBumperLeft_ = null;
@@ -995,7 +991,6 @@ public  final class FootBumperState extends
       return rFootBumperLeftBuilder_;
     }
 
-    // optional .messages.ButtonState r_foot_bumper_right = 4;
     private messages.ButtonState rFootBumperRight_ = messages.ButtonState.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder> rFootBumperRightBuilder_;
@@ -1104,7 +1099,7 @@ public  final class FootBumperState extends
       if (rFootBumperRightBuilder_ == null) {
         rFootBumperRightBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ButtonState, messages.ButtonState.Builder, messages.ButtonStateOrBuilder>(
-                rFootBumperRight_,
+                getRFootBumperRight(),
                 getParentForChildren(),
                 isClean());
         rFootBumperRight_ = null;

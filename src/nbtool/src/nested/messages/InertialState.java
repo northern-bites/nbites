@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.InertialState}
  */
-public  final class InertialState extends
-    com.google.protobuf.GeneratedMessage
-    implements InertialStateOrBuilder {
+public final class InertialState extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.InertialState)
+    InertialStateOrBuilder {
   // Use InertialState.newBuilder() to construct.
   private InertialState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -139,7 +140,6 @@ public  final class InertialState extends
   }
 
   private int bitField0_;
-  // optional float acc_x = 1;
   public static final int ACC_X_FIELD_NUMBER = 1;
   private float accX_;
   /**
@@ -163,7 +163,6 @@ public  final class InertialState extends
     return accX_;
   }
 
-  // optional float acc_y = 2;
   public static final int ACC_Y_FIELD_NUMBER = 2;
   private float accY_;
   /**
@@ -179,7 +178,6 @@ public  final class InertialState extends
     return accY_;
   }
 
-  // optional float acc_z = 3;
   public static final int ACC_Z_FIELD_NUMBER = 3;
   private float accZ_;
   /**
@@ -195,7 +193,6 @@ public  final class InertialState extends
     return accZ_;
   }
 
-  // optional float gyr_x = 4;
   public static final int GYR_X_FIELD_NUMBER = 4;
   private float gyrX_;
   /**
@@ -219,7 +216,6 @@ public  final class InertialState extends
     return gyrX_;
   }
 
-  // optional float gyr_y = 5;
   public static final int GYR_Y_FIELD_NUMBER = 5;
   private float gyrY_;
   /**
@@ -235,7 +231,6 @@ public  final class InertialState extends
     return gyrY_;
   }
 
-  // optional float gyr_z = 6;
   public static final int GYR_Z_FIELD_NUMBER = 6;
   private float gyrZ_;
   /**
@@ -251,7 +246,6 @@ public  final class InertialState extends
     return gyrZ_;
   }
 
-  // optional float angle_x = 7;
   public static final int ANGLE_X_FIELD_NUMBER = 7;
   private float angleX_;
   /**
@@ -275,7 +269,6 @@ public  final class InertialState extends
     return angleX_;
   }
 
-  // optional float angle_y = 8;
   public static final int ANGLE_Y_FIELD_NUMBER = 8;
   private float angleY_;
   /**
@@ -291,7 +284,6 @@ public  final class InertialState extends
     return angleY_;
   }
 
-  // optional float angle_z = 9;
   public static final int ANGLE_Z_FIELD_NUMBER = 9;
   private float angleZ_;
   /**
@@ -321,7 +313,8 @@ public  final class InertialState extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -484,8 +477,9 @@ public  final class InertialState extends
    * Protobuf type {@code messages.InertialState}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.InertialStateOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.InertialState)
+      messages.InertialStateOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_InertialState.internal_static_messages_InertialState_descriptor;
@@ -670,7 +664,6 @@ public  final class InertialState extends
     }
     private int bitField0_;
 
-    // optional float acc_x = 1;
     private float accX_ ;
     /**
      * <code>optional float acc_x = 1;</code>
@@ -719,7 +712,6 @@ public  final class InertialState extends
       return this;
     }
 
-    // optional float acc_y = 2;
     private float accY_ ;
     /**
      * <code>optional float acc_y = 2;</code>
@@ -752,7 +744,6 @@ public  final class InertialState extends
       return this;
     }
 
-    // optional float acc_z = 3;
     private float accZ_ ;
     /**
      * <code>optional float acc_z = 3;</code>
@@ -785,7 +776,6 @@ public  final class InertialState extends
       return this;
     }
 
-    // optional float gyr_x = 4;
     private float gyrX_ ;
     /**
      * <code>optional float gyr_x = 4;</code>
@@ -834,7 +824,6 @@ public  final class InertialState extends
       return this;
     }
 
-    // optional float gyr_y = 5;
     private float gyrY_ ;
     /**
      * <code>optional float gyr_y = 5;</code>
@@ -867,7 +856,6 @@ public  final class InertialState extends
       return this;
     }
 
-    // optional float gyr_z = 6;
     private float gyrZ_ ;
     /**
      * <code>optional float gyr_z = 6;</code>
@@ -900,7 +888,6 @@ public  final class InertialState extends
       return this;
     }
 
-    // optional float angle_x = 7;
     private float angleX_ ;
     /**
      * <code>optional float angle_x = 7;</code>
@@ -949,7 +936,6 @@ public  final class InertialState extends
       return this;
     }
 
-    // optional float angle_y = 8;
     private float angleY_ ;
     /**
      * <code>optional float angle_y = 8;</code>
@@ -982,7 +968,6 @@ public  final class InertialState extends
       return this;
     }
 
-    // optional float angle_z = 9;
     private float angleZ_ ;
     /**
      * <code>optional float angle_z = 9;</code>

@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.TeamPacket}
  */
-public  final class TeamPacket extends
-    com.google.protobuf.GeneratedMessage
-    implements TeamPacketOrBuilder {
+public final class TeamPacket extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.TeamPacket)
+    TeamPacketOrBuilder {
   // Use TeamPacket.newBuilder() to construct.
   private TeamPacket(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -55,8 +56,9 @@ public  final class TeamPacket extends
             break;
           }
           case 10: {
+            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000001;
-            header_ = input.readBytes();
+            header_ = bs;
             break;
           }
           case 16: {
@@ -132,7 +134,6 @@ public  final class TeamPacket extends
   }
 
   private int bitField0_;
-  // optional string header = 1;
   public static final int HEADER_FIELD_NUMBER = 1;
   private java.lang.Object header_;
   /**
@@ -175,7 +176,6 @@ public  final class TeamPacket extends
     }
   }
 
-  // optional int32 team_number = 2;
   public static final int TEAM_NUMBER_FIELD_NUMBER = 2;
   private int teamNumber_;
   /**
@@ -191,7 +191,6 @@ public  final class TeamPacket extends
     return teamNumber_;
   }
 
-  // optional int32 player_number = 3;
   public static final int PLAYER_NUMBER_FIELD_NUMBER = 3;
   private int playerNumber_;
   /**
@@ -207,7 +206,6 @@ public  final class TeamPacket extends
     return playerNumber_;
   }
 
-  // optional int32 sequence_number = 4;
   public static final int SEQUENCE_NUMBER_FIELD_NUMBER = 4;
   private int sequenceNumber_;
   /**
@@ -223,7 +221,6 @@ public  final class TeamPacket extends
     return sequenceNumber_;
   }
 
-  // optional int64 timestamp = 5;
   public static final int TIMESTAMP_FIELD_NUMBER = 5;
   private long timestamp_;
   /**
@@ -239,7 +236,6 @@ public  final class TeamPacket extends
     return timestamp_;
   }
 
-  // optional .messages.WorldModel payload = 6;
   public static final int PAYLOAD_FIELD_NUMBER = 6;
   private messages.WorldModel payload_;
   /**
@@ -272,7 +268,8 @@ public  final class TeamPacket extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -414,8 +411,9 @@ public  final class TeamPacket extends
    * Protobuf type {@code messages.TeamPacket}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.TeamPacketOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.TeamPacket)
+      messages.TeamPacketOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_TeamPacket.internal_static_messages_TeamPacket_descriptor;
@@ -584,7 +582,6 @@ public  final class TeamPacket extends
     }
     private int bitField0_;
 
-    // optional string header = 1;
     private java.lang.Object header_ = "";
     /**
      * <code>optional string header = 1;</code>
@@ -598,9 +595,12 @@ public  final class TeamPacket extends
     public java.lang.String getHeader() {
       java.lang.Object ref = header_;
       if (!(ref instanceof java.lang.String)) {
-        java.lang.String s = ((com.google.protobuf.ByteString) ref)
-            .toStringUtf8();
-        header_ = s;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          header_ = s;
+        }
         return s;
       } else {
         return (java.lang.String) ref;
@@ -658,7 +658,6 @@ public  final class TeamPacket extends
       return this;
     }
 
-    // optional int32 team_number = 2;
     private int teamNumber_ ;
     /**
      * <code>optional int32 team_number = 2;</code>
@@ -691,7 +690,6 @@ public  final class TeamPacket extends
       return this;
     }
 
-    // optional int32 player_number = 3;
     private int playerNumber_ ;
     /**
      * <code>optional int32 player_number = 3;</code>
@@ -724,7 +722,6 @@ public  final class TeamPacket extends
       return this;
     }
 
-    // optional int32 sequence_number = 4;
     private int sequenceNumber_ ;
     /**
      * <code>optional int32 sequence_number = 4;</code>
@@ -757,7 +754,6 @@ public  final class TeamPacket extends
       return this;
     }
 
-    // optional int64 timestamp = 5;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 5;</code>
@@ -790,7 +786,6 @@ public  final class TeamPacket extends
       return this;
     }
 
-    // optional .messages.WorldModel payload = 6;
     private messages.WorldModel payload_ = messages.WorldModel.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.WorldModel, messages.WorldModel.Builder, messages.WorldModelOrBuilder> payloadBuilder_;
@@ -899,7 +894,7 @@ public  final class TeamPacket extends
       if (payloadBuilder_ == null) {
         payloadBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.WorldModel, messages.WorldModel.Builder, messages.WorldModelOrBuilder>(
-                payload_,
+                getPayload(),
                 getParentForChildren(),
                 isClean());
         payload_ = null;

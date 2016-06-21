@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisualCornerOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface VisualCornerOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.VisualCorner)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional .messages.VisualDetection visual_detection = 1;
   /**
    * <code>optional .messages.VisualDetection visual_detection = 1;</code>
    */
@@ -20,7 +20,6 @@ public interface VisualCornerOrBuilder
    */
   messages.VisualDetectionOrBuilder getVisualDetectionOrBuilder();
 
-  // optional float orientation = 2;
   /**
    * <code>optional float orientation = 2;</code>
    */
@@ -30,7 +29,6 @@ public interface VisualCornerOrBuilder
    */
   float getOrientation();
 
-  // optional .messages.VisualCorner.shape corner_type = 3;
   /**
    * <code>optional .messages.VisualCorner.shape corner_type = 3;</code>
    */
@@ -40,7 +38,6 @@ public interface VisualCornerOrBuilder
    */
   messages.VisualCorner.shape getCornerType();
 
-  // optional float physical_orientation = 4;
   /**
    * <code>optional float physical_orientation = 4;</code>
    */
@@ -50,7 +47,6 @@ public interface VisualCornerOrBuilder
    */
   float getPhysicalOrientation();
 
-  // repeated .messages.VisualCorner.corner_id poss_id = 5;
   /**
    * <code>repeated .messages.VisualCorner.corner_id poss_id = 5;</code>
    */
@@ -64,7 +60,6 @@ public interface VisualCornerOrBuilder
    */
   messages.VisualCorner.corner_id getPossId(int index);
 
-  // optional sint32 x = 6;
   /**
    * <code>optional sint32 x = 6;</code>
    */
@@ -74,7 +69,6 @@ public interface VisualCornerOrBuilder
    */
   int getX();
 
-  // optional sint32 y = 7;
   /**
    * <code>optional sint32 y = 7;</code>
    */

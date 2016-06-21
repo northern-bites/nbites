@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.VisualLine}
  */
-public  final class VisualLine extends
-    com.google.protobuf.GeneratedMessage
-    implements VisualLineOrBuilder {
+public final class VisualLine extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.VisualLine)
+    VisualLineOrBuilder {
   // Use VisualLine.newBuilder() to construct.
   private VisualLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -117,7 +118,7 @@ public  final class VisualLine extends
             messages.VisualLine.line_id value = messages.VisualLine.line_id.valueOf(rawValue);
             if (value == null) {
               unknownFields.mergeVarintField(11, rawValue);
-            } else {
+              } else {
               if (!((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
                 possibilities_ = new java.util.ArrayList<messages.VisualLine.line_id>();
                 mutable_bitField0_ |= 0x00004000;
@@ -134,7 +135,7 @@ public  final class VisualLine extends
               messages.VisualLine.line_id value = messages.VisualLine.line_id.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(11, rawValue);
-              } else {
+                } else {
                 if (!((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
                   possibilities_ = new java.util.ArrayList<messages.VisualLine.line_id>();
                   mutable_bitField0_ |= 0x00004000;
@@ -468,7 +469,6 @@ public  final class VisualLine extends
   }
 
   private int bitField0_;
-  // optional .messages.VisualDetection visual_detection = 1;
   public static final int VISUAL_DETECTION_FIELD_NUMBER = 1;
   private messages.VisualDetection visualDetection_;
   /**
@@ -490,7 +490,6 @@ public  final class VisualLine extends
     return visualDetection_;
   }
 
-  // optional int32 start_x = 2;
   public static final int START_X_FIELD_NUMBER = 2;
   private int startX_;
   /**
@@ -506,7 +505,6 @@ public  final class VisualLine extends
     return startX_;
   }
 
-  // optional int32 start_y = 3;
   public static final int START_Y_FIELD_NUMBER = 3;
   private int startY_;
   /**
@@ -522,7 +520,6 @@ public  final class VisualLine extends
     return startY_;
   }
 
-  // optional float start_dist = 12;
   public static final int START_DIST_FIELD_NUMBER = 12;
   private float startDist_;
   /**
@@ -538,7 +535,6 @@ public  final class VisualLine extends
     return startDist_;
   }
 
-  // optional float start_bearing = 13;
   public static final int START_BEARING_FIELD_NUMBER = 13;
   private float startBearing_;
   /**
@@ -554,7 +550,6 @@ public  final class VisualLine extends
     return startBearing_;
   }
 
-  // optional int32 end_x = 4;
   public static final int END_X_FIELD_NUMBER = 4;
   private int endX_;
   /**
@@ -570,7 +565,6 @@ public  final class VisualLine extends
     return endX_;
   }
 
-  // optional int32 end_y = 5;
   public static final int END_Y_FIELD_NUMBER = 5;
   private int endY_;
   /**
@@ -586,7 +580,6 @@ public  final class VisualLine extends
     return endY_;
   }
 
-  // optional float end_dist = 14;
   public static final int END_DIST_FIELD_NUMBER = 14;
   private float endDist_;
   /**
@@ -602,7 +595,6 @@ public  final class VisualLine extends
     return endDist_;
   }
 
-  // optional float end_bearing = 15;
   public static final int END_BEARING_FIELD_NUMBER = 15;
   private float endBearing_;
   /**
@@ -618,7 +610,6 @@ public  final class VisualLine extends
     return endBearing_;
   }
 
-  // optional float angle = 6;
   public static final int ANGLE_FIELD_NUMBER = 6;
   private float angle_;
   /**
@@ -634,7 +625,6 @@ public  final class VisualLine extends
     return angle_;
   }
 
-  // optional float avg_width = 7;
   public static final int AVG_WIDTH_FIELD_NUMBER = 7;
   private float avgWidth_;
   /**
@@ -650,7 +640,6 @@ public  final class VisualLine extends
     return avgWidth_;
   }
 
-  // optional float length = 8;
   public static final int LENGTH_FIELD_NUMBER = 8;
   private float length_;
   /**
@@ -666,7 +655,6 @@ public  final class VisualLine extends
     return length_;
   }
 
-  // optional float slope = 9;
   public static final int SLOPE_FIELD_NUMBER = 9;
   private float slope_;
   /**
@@ -682,7 +670,6 @@ public  final class VisualLine extends
     return slope_;
   }
 
-  // optional float y_int = 10;
   public static final int Y_INT_FIELD_NUMBER = 10;
   private float yInt_;
   /**
@@ -698,7 +685,6 @@ public  final class VisualLine extends
     return yInt_;
   }
 
-  // repeated .messages.VisualLine.line_id possibilities = 11;
   public static final int POSSIBILITIES_FIELD_NUMBER = 11;
   private java.util.List<messages.VisualLine.line_id> possibilities_;
   /**
@@ -740,7 +726,8 @@ public  final class VisualLine extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -950,8 +937,9 @@ public  final class VisualLine extends
    * Protobuf type {@code messages.VisualLine}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.VisualLineOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.VisualLine)
+      messages.VisualLineOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionField.internal_static_messages_VisualLine_descriptor;
@@ -1207,7 +1195,6 @@ public  final class VisualLine extends
     }
     private int bitField0_;
 
-    // optional .messages.VisualDetection visual_detection = 1;
     private messages.VisualDetection visualDetection_ = messages.VisualDetection.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder> visualDetectionBuilder_;
@@ -1316,7 +1303,7 @@ public  final class VisualLine extends
       if (visualDetectionBuilder_ == null) {
         visualDetectionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder>(
-                visualDetection_,
+                getVisualDetection(),
                 getParentForChildren(),
                 isClean());
         visualDetection_ = null;
@@ -1324,7 +1311,6 @@ public  final class VisualLine extends
       return visualDetectionBuilder_;
     }
 
-    // optional int32 start_x = 2;
     private int startX_ ;
     /**
      * <code>optional int32 start_x = 2;</code>
@@ -1357,7 +1343,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional int32 start_y = 3;
     private int startY_ ;
     /**
      * <code>optional int32 start_y = 3;</code>
@@ -1390,7 +1375,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float start_dist = 12;
     private float startDist_ ;
     /**
      * <code>optional float start_dist = 12;</code>
@@ -1423,7 +1407,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float start_bearing = 13;
     private float startBearing_ ;
     /**
      * <code>optional float start_bearing = 13;</code>
@@ -1456,7 +1439,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional int32 end_x = 4;
     private int endX_ ;
     /**
      * <code>optional int32 end_x = 4;</code>
@@ -1489,7 +1471,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional int32 end_y = 5;
     private int endY_ ;
     /**
      * <code>optional int32 end_y = 5;</code>
@@ -1522,7 +1503,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float end_dist = 14;
     private float endDist_ ;
     /**
      * <code>optional float end_dist = 14;</code>
@@ -1555,7 +1535,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float end_bearing = 15;
     private float endBearing_ ;
     /**
      * <code>optional float end_bearing = 15;</code>
@@ -1588,7 +1567,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float angle = 6;
     private float angle_ ;
     /**
      * <code>optional float angle = 6;</code>
@@ -1621,7 +1599,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float avg_width = 7;
     private float avgWidth_ ;
     /**
      * <code>optional float avg_width = 7;</code>
@@ -1654,7 +1631,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float length = 8;
     private float length_ ;
     /**
      * <code>optional float length = 8;</code>
@@ -1687,7 +1663,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float slope = 9;
     private float slope_ ;
     /**
      * <code>optional float slope = 9;</code>
@@ -1720,7 +1695,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // optional float y_int = 10;
     private float yInt_ ;
     /**
      * <code>optional float y_int = 10;</code>
@@ -1753,7 +1727,6 @@ public  final class VisualLine extends
       return this;
     }
 
-    // repeated .messages.VisualLine.line_id possibilities = 11;
     private java.util.List<messages.VisualLine.line_id> possibilities_ =
       java.util.Collections.emptyList();
     private void ensurePossibilitiesIsMutable() {
@@ -1811,7 +1784,8 @@ public  final class VisualLine extends
     public Builder addAllPossibilities(
         java.lang.Iterable<? extends messages.VisualLine.line_id> values) {
       ensurePossibilitiesIsMutable();
-      super.addAll(values, possibilities_);
+      com.google.protobuf.AbstractMessageLite.Builder.addAll(
+          values, possibilities_);
       onChanged();
       return this;
     }

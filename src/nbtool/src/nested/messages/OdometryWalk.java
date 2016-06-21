@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.OdometryWalk}
  */
-public  final class OdometryWalk extends
-    com.google.protobuf.GeneratedMessage
-    implements OdometryWalkOrBuilder {
+public final class OdometryWalk extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.OdometryWalk)
+    OdometryWalkOrBuilder {
   // Use OdometryWalk.newBuilder() to construct.
   private OdometryWalk(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -114,7 +115,6 @@ public  final class OdometryWalk extends
   }
 
   private int bitField0_;
-  // optional float rel_x = 1;
   public static final int REL_X_FIELD_NUMBER = 1;
   private float relX_;
   /**
@@ -130,7 +130,6 @@ public  final class OdometryWalk extends
     return relX_;
   }
 
-  // optional float rel_y = 2;
   public static final int REL_Y_FIELD_NUMBER = 2;
   private float relY_;
   /**
@@ -146,7 +145,6 @@ public  final class OdometryWalk extends
     return relY_;
   }
 
-  // optional float rel_h = 3;
   public static final int REL_H_FIELD_NUMBER = 3;
   private float relH_;
   /**
@@ -162,7 +160,6 @@ public  final class OdometryWalk extends
     return relH_;
   }
 
-  // optional float gain = 4;
   public static final int GAIN_FIELD_NUMBER = 4;
   private float gain_;
   /**
@@ -187,7 +184,8 @@ public  final class OdometryWalk extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -315,8 +313,9 @@ public  final class OdometryWalk extends
    * Protobuf type {@code messages.OdometryWalk}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.OdometryWalkOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.OdometryWalk)
+      messages.OdometryWalkOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_OdometryWalk_descriptor;
@@ -456,7 +455,6 @@ public  final class OdometryWalk extends
     }
     private int bitField0_;
 
-    // optional float rel_x = 1;
     private float relX_ ;
     /**
      * <code>optional float rel_x = 1;</code>
@@ -489,7 +487,6 @@ public  final class OdometryWalk extends
       return this;
     }
 
-    // optional float rel_y = 2;
     private float relY_ ;
     /**
      * <code>optional float rel_y = 2;</code>
@@ -522,7 +519,6 @@ public  final class OdometryWalk extends
       return this;
     }
 
-    // optional float rel_h = 3;
     private float relH_ ;
     /**
      * <code>optional float rel_h = 3;</code>
@@ -555,7 +551,6 @@ public  final class OdometryWalk extends
       return this;
     }
 
-    // optional float gain = 4;
     private float gain_ ;
     /**
      * <code>optional float gain = 4;</code>

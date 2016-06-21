@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface MotionKickOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface MotionKickOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.MotionKick)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional bool perform_motion_kick = 1;
   /**
    * <code>optional bool perform_motion_kick = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface MotionKickOrBuilder
    */
   boolean getPerformMotionKick();
 
-  // optional int32 kick_type = 2;
   /**
    * <code>optional int32 kick_type = 2;</code>
    */

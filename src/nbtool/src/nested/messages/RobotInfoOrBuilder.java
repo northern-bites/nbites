@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface RobotInfoOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface RobotInfoOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.RobotInfo)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional uint32 penalty = 1;
   /**
    * <code>optional uint32 penalty = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface RobotInfoOrBuilder
    */
   int getPenalty();
 
-  // optional uint32 secs_left = 2;
   /**
    * <code>optional uint32 secs_left = 2;</code>
    */

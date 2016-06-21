@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.VisualFieldEdge}
  */
-public  final class VisualFieldEdge extends
-    com.google.protobuf.GeneratedMessage
-    implements VisualFieldEdgeOrBuilder {
+public final class VisualFieldEdge extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.VisualFieldEdge)
+    VisualFieldEdgeOrBuilder {
   // Use VisualFieldEdge.newBuilder() to construct.
   private VisualFieldEdge(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -109,7 +110,6 @@ public  final class VisualFieldEdge extends
   }
 
   private int bitField0_;
-  // optional float distance_l = 1;
   public static final int DISTANCE_L_FIELD_NUMBER = 1;
   private float distanceL_;
   /**
@@ -125,7 +125,6 @@ public  final class VisualFieldEdge extends
     return distanceL_;
   }
 
-  // optional float distance_m = 2;
   public static final int DISTANCE_M_FIELD_NUMBER = 2;
   private float distanceM_;
   /**
@@ -141,7 +140,6 @@ public  final class VisualFieldEdge extends
     return distanceM_;
   }
 
-  // optional float distance_r = 3;
   public static final int DISTANCE_R_FIELD_NUMBER = 3;
   private float distanceR_;
   /**
@@ -165,7 +163,8 @@ public  final class VisualFieldEdge extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -286,8 +285,9 @@ public  final class VisualFieldEdge extends
    * Protobuf type {@code messages.VisualFieldEdge}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.VisualFieldEdgeOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.VisualFieldEdge)
+      messages.VisualFieldEdgeOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionField.internal_static_messages_VisualFieldEdge_descriptor;
@@ -418,7 +418,6 @@ public  final class VisualFieldEdge extends
     }
     private int bitField0_;
 
-    // optional float distance_l = 1;
     private float distanceL_ ;
     /**
      * <code>optional float distance_l = 1;</code>
@@ -451,7 +450,6 @@ public  final class VisualFieldEdge extends
       return this;
     }
 
-    // optional float distance_m = 2;
     private float distanceM_ ;
     /**
      * <code>optional float distance_m = 2;</code>
@@ -484,7 +482,6 @@ public  final class VisualFieldEdge extends
       return this;
     }
 
-    // optional float distance_r = 3;
     private float distanceR_ ;
     /**
      * <code>optional float distance_r = 3;</code>

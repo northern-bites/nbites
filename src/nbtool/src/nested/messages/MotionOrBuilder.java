@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface MotionOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface MotionOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.Motion)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional int64 timestamp = 1;
   /**
    * <code>optional int64 timestamp = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface MotionOrBuilder
    */
   long getTimestamp();
 
-  // optional string current_body_provider = 2;
   /**
    * <code>optional string current_body_provider = 2;</code>
    */
@@ -31,7 +30,6 @@ public interface MotionOrBuilder
   com.google.protobuf.ByteString
       getCurrentBodyProviderBytes();
 
-  // optional string next_body_provider = 3;
   /**
    * <code>optional string next_body_provider = 3;</code>
    */
@@ -46,7 +44,6 @@ public interface MotionOrBuilder
   com.google.protobuf.ByteString
       getNextBodyProviderBytes();
 
-  // optional .messages.RobotLocation odometry = 4;
   /**
    * <code>optional .messages.RobotLocation odometry = 4;</code>
    */
@@ -60,7 +57,6 @@ public interface MotionOrBuilder
    */
   messages.RobotLocationOrBuilder getOdometryOrBuilder();
 
-  // optional .messages.WalkProvider walk_provider = 5;
   /**
    * <code>optional .messages.WalkProvider walk_provider = 5;</code>
    */
@@ -74,7 +70,6 @@ public interface MotionOrBuilder
    */
   messages.WalkProviderOrBuilder getWalkProviderOrBuilder();
 
-  // optional .messages.ScriptedProvider scripted_provider = 6;
   /**
    * <code>optional .messages.ScriptedProvider scripted_provider = 6;</code>
    */
@@ -88,7 +83,6 @@ public interface MotionOrBuilder
    */
   messages.ScriptedProviderOrBuilder getScriptedProviderOrBuilder();
 
-  // optional bool support_foot = 7;
   /**
    * <code>optional bool support_foot = 7;</code>
    */

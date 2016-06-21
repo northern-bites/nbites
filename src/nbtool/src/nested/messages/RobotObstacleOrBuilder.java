@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface RobotObstacleOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface RobotObstacleOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.RobotObstacle)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float closest_y = 1;
   /**
    * <code>optional float closest_y = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface RobotObstacleOrBuilder
    */
   float getClosestY();
 
-  // optional float box_bottom = 2;
   /**
    * <code>optional float box_bottom = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface RobotObstacleOrBuilder
    */
   float getBoxBottom();
 
-  // optional float box_left = 3;
   /**
    * <code>optional float box_left = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface RobotObstacleOrBuilder
    */
   float getBoxLeft();
 
-  // optional float box_right = 4;
   /**
    * <code>optional float box_right = 4;</code>
    */

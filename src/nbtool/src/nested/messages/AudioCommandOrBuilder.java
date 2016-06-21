@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface AudioCommandOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface AudioCommandOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.AudioCommand)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional string audio_file = 1;
   /**
    * <code>optional string audio_file = 1;</code>
    *

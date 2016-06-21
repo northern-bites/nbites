@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.FieldLine}
  */
-public  final class FieldLine extends
-    com.google.protobuf.GeneratedMessage
-    implements FieldLineOrBuilder {
+public final class FieldLine extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.FieldLine)
+    FieldLineOrBuilder {
   // Use FieldLine.newBuilder() to construct.
   private FieldLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -145,7 +146,6 @@ public  final class FieldLine extends
   }
 
   private int bitField0_;
-  // optional .messages.HoughLine inner = 1;
   public static final int INNER_FIELD_NUMBER = 1;
   private messages.HoughLine inner_;
   /**
@@ -167,7 +167,6 @@ public  final class FieldLine extends
     return inner_;
   }
 
-  // optional .messages.HoughLine outer = 2;
   public static final int OUTER_FIELD_NUMBER = 2;
   private messages.HoughLine outer_;
   /**
@@ -189,7 +188,6 @@ public  final class FieldLine extends
     return outer_;
   }
 
-  // optional int32 id = 3;
   public static final int ID_FIELD_NUMBER = 3;
   private int id_;
   /**
@@ -205,7 +203,6 @@ public  final class FieldLine extends
     return id_;
   }
 
-  // optional int32 correspondence = 4;
   public static final int CORRESPONDENCE_FIELD_NUMBER = 4;
   private int correspondence_;
   /**
@@ -221,7 +218,6 @@ public  final class FieldLine extends
     return correspondence_;
   }
 
-  // optional float prob = 5;
   public static final int PROB_FIELD_NUMBER = 5;
   private float prob_;
   /**
@@ -237,7 +233,6 @@ public  final class FieldLine extends
     return prob_;
   }
 
-  // optional int32 index = 6;
   public static final int INDEX_FIELD_NUMBER = 6;
   private int index_;
   /**
@@ -253,7 +248,6 @@ public  final class FieldLine extends
     return index_;
   }
 
-  // optional float wz0 = 7;
   public static final int WZ0_FIELD_NUMBER = 7;
   private float wz0_;
   /**
@@ -281,7 +275,8 @@ public  final class FieldLine extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -430,8 +425,9 @@ public  final class FieldLine extends
    * Protobuf type {@code messages.FieldLine}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.FieldLineOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.FieldLine)
+      messages.FieldLineOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_FieldLine_descriptor;
@@ -616,7 +612,6 @@ public  final class FieldLine extends
     }
     private int bitField0_;
 
-    // optional .messages.HoughLine inner = 1;
     private messages.HoughLine inner_ = messages.HoughLine.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.HoughLine, messages.HoughLine.Builder, messages.HoughLineOrBuilder> innerBuilder_;
@@ -725,7 +720,7 @@ public  final class FieldLine extends
       if (innerBuilder_ == null) {
         innerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.HoughLine, messages.HoughLine.Builder, messages.HoughLineOrBuilder>(
-                inner_,
+                getInner(),
                 getParentForChildren(),
                 isClean());
         inner_ = null;
@@ -733,7 +728,6 @@ public  final class FieldLine extends
       return innerBuilder_;
     }
 
-    // optional .messages.HoughLine outer = 2;
     private messages.HoughLine outer_ = messages.HoughLine.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.HoughLine, messages.HoughLine.Builder, messages.HoughLineOrBuilder> outerBuilder_;
@@ -842,7 +836,7 @@ public  final class FieldLine extends
       if (outerBuilder_ == null) {
         outerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.HoughLine, messages.HoughLine.Builder, messages.HoughLineOrBuilder>(
-                outer_,
+                getOuter(),
                 getParentForChildren(),
                 isClean());
         outer_ = null;
@@ -850,7 +844,6 @@ public  final class FieldLine extends
       return outerBuilder_;
     }
 
-    // optional int32 id = 3;
     private int id_ ;
     /**
      * <code>optional int32 id = 3;</code>
@@ -883,7 +876,6 @@ public  final class FieldLine extends
       return this;
     }
 
-    // optional int32 correspondence = 4;
     private int correspondence_ ;
     /**
      * <code>optional int32 correspondence = 4;</code>
@@ -916,7 +908,6 @@ public  final class FieldLine extends
       return this;
     }
 
-    // optional float prob = 5;
     private float prob_ ;
     /**
      * <code>optional float prob = 5;</code>
@@ -949,7 +940,6 @@ public  final class FieldLine extends
       return this;
     }
 
-    // optional int32 index = 6;
     private int index_ ;
     /**
      * <code>optional int32 index = 6;</code>
@@ -982,7 +972,6 @@ public  final class FieldLine extends
       return this;
     }
 
-    // optional float wz0 = 7;
     private float wz0_ ;
     /**
      * <code>optional float wz0 = 7;</code>

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisionRobotOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface VisionRobotOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.VisionRobot)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional .messages.Robot red1 = 1;
   /**
    * <code>optional .messages.Robot red1 = 1;</code>
    */
@@ -20,7 +20,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getRed1OrBuilder();
 
-  // optional .messages.Robot red2 = 2;
   /**
    * <code>optional .messages.Robot red2 = 2;</code>
    */
@@ -34,7 +33,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getRed2OrBuilder();
 
-  // optional .messages.Robot red3 = 3;
   /**
    * <code>optional .messages.Robot red3 = 3;</code>
    */
@@ -48,7 +46,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getRed3OrBuilder();
 
-  // optional .messages.Robot red4 = 4;
   /**
    * <code>optional .messages.Robot red4 = 4;</code>
    */
@@ -62,7 +59,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getRed4OrBuilder();
 
-  // optional .messages.Robot red5 = 5;
   /**
    * <code>optional .messages.Robot red5 = 5;</code>
    */
@@ -76,7 +72,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getRed5OrBuilder();
 
-  // optional .messages.Robot navy1 = 6;
   /**
    * <code>optional .messages.Robot navy1 = 6;</code>
    */
@@ -90,7 +85,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getNavy1OrBuilder();
 
-  // optional .messages.Robot navy2 = 7;
   /**
    * <code>optional .messages.Robot navy2 = 7;</code>
    */
@@ -104,7 +98,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getNavy2OrBuilder();
 
-  // optional .messages.Robot navy3 = 8;
   /**
    * <code>optional .messages.Robot navy3 = 8;</code>
    */
@@ -118,7 +111,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getNavy3OrBuilder();
 
-  // optional .messages.Robot navy4 = 9;
   /**
    * <code>optional .messages.Robot navy4 = 9;</code>
    */
@@ -132,7 +124,6 @@ public interface VisionRobotOrBuilder
    */
   messages.RobotOrBuilder getNavy4OrBuilder();
 
-  // optional .messages.Robot navy5 = 10;
   /**
    * <code>optional .messages.Robot navy5 = 10;</code>
    */

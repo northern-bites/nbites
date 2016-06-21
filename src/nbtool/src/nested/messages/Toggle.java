@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.Toggle}
  */
-public  final class Toggle extends
-    com.google.protobuf.GeneratedMessage
-    implements ToggleOrBuilder {
+public final class Toggle extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.Toggle)
+    ToggleOrBuilder {
   // Use Toggle.newBuilder() to construct.
   private Toggle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -99,7 +100,6 @@ public  final class Toggle extends
   }
 
   private int bitField0_;
-  // optional bool toggle = 1;
   public static final int TOGGLE_FIELD_NUMBER = 1;
   private boolean toggle_;
   /**
@@ -129,7 +129,8 @@ public  final class Toggle extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -236,8 +237,9 @@ public  final class Toggle extends
    * Protobuf type {@code messages.Toggle}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.ToggleOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.Toggle)
+      messages.ToggleOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Toggle.internal_static_messages_Toggle_descriptor;
@@ -350,7 +352,6 @@ public  final class Toggle extends
     }
     private int bitField0_;
 
-    // optional bool toggle = 1;
     private boolean toggle_ ;
     /**
      * <code>optional bool toggle = 1;</code>

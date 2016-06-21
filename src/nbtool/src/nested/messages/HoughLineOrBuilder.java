@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface HoughLineOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface HoughLineOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.HoughLine)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float r = 1;
   /**
    * <code>optional float r = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface HoughLineOrBuilder
    */
   float getR();
 
-  // optional float t = 2;
   /**
    * <code>optional float t = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface HoughLineOrBuilder
    */
   float getT();
 
-  // optional float ep0 = 3;
   /**
    * <code>optional float ep0 = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface HoughLineOrBuilder
    */
   float getEp0();
 
-  // optional float ep1 = 4;
   /**
    * <code>optional float ep1 = 4;</code>
    */

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface StiffnessControlOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface StiffnessControlOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.StiffnessControl)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional bool remove = 1;
   /**
    * <code>optional bool remove = 1;</code>
    */

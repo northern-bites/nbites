@@ -6,9 +6,10 @@ package messages;
 /**
  * Protobuf type {@code messages.FeetOnGround}
  */
-public  final class FeetOnGround extends
-    com.google.protobuf.GeneratedMessage
-    implements FeetOnGroundOrBuilder {
+public final class FeetOnGround extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:messages.FeetOnGround)
+    FeetOnGroundOrBuilder {
   // Use FeetOnGround.newBuilder() to construct.
   private FeetOnGround(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -99,7 +100,6 @@ public  final class FeetOnGround extends
   }
 
   private int bitField0_;
-  // optional bool on_ground = 1;
   public static final int ON_GROUND_FIELD_NUMBER = 1;
   private boolean onGround_;
   /**
@@ -121,7 +121,8 @@ public  final class FeetOnGround extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -228,8 +229,9 @@ public  final class FeetOnGround extends
    * Protobuf type {@code messages.FeetOnGround}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements messages.FeetOnGroundOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:messages.FeetOnGround)
+      messages.FeetOnGroundOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_FeetOnGround.internal_static_messages_FeetOnGround_descriptor;
@@ -342,7 +344,6 @@ public  final class FeetOnGround extends
     }
     private int bitField0_;
 
-    // optional bool on_ground = 1;
     private boolean onGround_ ;
     /**
      * <code>optional bool on_ground = 1;</code>

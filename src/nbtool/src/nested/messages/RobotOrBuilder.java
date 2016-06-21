@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface RobotOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface RobotOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.Robot)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional float distance = 1;
   /**
    * <code>optional float distance = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface RobotOrBuilder
    */
   float getDistance();
 
-  // optional float bearing = 2;
   /**
    * <code>optional float bearing = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface RobotOrBuilder
    */
   float getBearing();
 
-  // optional float bearing_deg = 3;
   /**
    * <code>optional float bearing_deg = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface RobotOrBuilder
    */
   float getBearingDeg();
 
-  // optional float angle_x_deg = 4;
   /**
    * <code>optional float angle_x_deg = 4;</code>
    */
@@ -46,7 +43,6 @@ public interface RobotOrBuilder
    */
   float getAngleXDeg();
 
-  // optional float angle_y_deg = 5;
   /**
    * <code>optional float angle_y_deg = 5;</code>
    */
@@ -56,7 +52,6 @@ public interface RobotOrBuilder
    */
   float getAngleYDeg();
 
-  // optional sint32 x = 6;
   /**
    * <code>optional sint32 x = 6;</code>
    */
@@ -66,7 +61,6 @@ public interface RobotOrBuilder
    */
   int getX();
 
-  // optional sint32 y = 7;
   /**
    * <code>optional sint32 y = 7;</code>
    */
@@ -76,7 +70,6 @@ public interface RobotOrBuilder
    */
   int getY();
 
-  // optional float elevation_deg = 8;
   /**
    * <code>optional float elevation_deg = 8;</code>
    */
@@ -86,7 +79,6 @@ public interface RobotOrBuilder
    */
   float getElevationDeg();
 
-  // optional bool on = 9;
   /**
    * <code>optional bool on = 9;</code>
    */
@@ -96,7 +88,6 @@ public interface RobotOrBuilder
    */
   boolean getOn();
 
-  // optional sint32 height = 10;
   /**
    * <code>optional sint32 height = 10;</code>
    */
@@ -106,7 +97,6 @@ public interface RobotOrBuilder
    */
   int getHeight();
 
-  // optional sint32 width = 11;
   /**
    * <code>optional sint32 width = 11;</code>
    */

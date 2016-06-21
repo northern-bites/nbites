@@ -8,72 +8,72 @@ public final class _File_PMotion {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_MotionRequest_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_MotionRequest_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_MotionCommand_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_MotionCommand_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_ScriptedMove_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_ScriptedMove_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_BodyJointCommand_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_BodyJointCommand_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_DestinationWalk_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_DestinationWalk_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_OdometryWalk_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_OdometryWalk_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_WalkCommand_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_WalkCommand_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_MotionKick_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_MotionKick_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_Kick_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_Kick_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_HeadMotionCommand_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_HeadMotionCommand_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_PositionHeadCommand_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_PositionHeadCommand_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_ScriptedHeadCommand_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_ScriptedHeadCommand_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_HeadJointCommand_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_HeadJointCommand_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_JointAngles_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -154,101 +154,101 @@ public final class _File_PMotion {
       "roll\030\032 \001(\002B\021B\r_File_PMotionP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_messages_MotionRequest_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_messages_MotionRequest_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_MotionRequest_descriptor,
-              new java.lang.String[] { "StopBody", "StopHead", "ResetOdometry", "RemoveStiffness", "EnableStiffness", "ResetProviders", "Timestamp", });
-          internal_static_messages_MotionCommand_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_messages_MotionCommand_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_MotionCommand_descriptor,
-              new java.lang.String[] { "Type", "Script", "Dest", "Speed", "OdometryDest", "Kick", "Timestamp", });
-          internal_static_messages_ScriptedMove_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_messages_ScriptedMove_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_ScriptedMove_descriptor,
-              new java.lang.String[] { "Command", });
-          internal_static_messages_BodyJointCommand_descriptor =
-            getDescriptor().getMessageTypes().get(3);
-          internal_static_messages_BodyJointCommand_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_BodyJointCommand_descriptor,
-              new java.lang.String[] { "Time", "Angles", "Stiffness", "Interpolation", });
-          internal_static_messages_DestinationWalk_descriptor =
-            getDescriptor().getMessageTypes().get(4);
-          internal_static_messages_DestinationWalk_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_DestinationWalk_descriptor,
-              new java.lang.String[] { "RelX", "RelY", "RelH", "Gain", "Kick", });
-          internal_static_messages_OdometryWalk_descriptor =
-            getDescriptor().getMessageTypes().get(5);
-          internal_static_messages_OdometryWalk_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_OdometryWalk_descriptor,
-              new java.lang.String[] { "RelX", "RelY", "RelH", "Gain", });
-          internal_static_messages_WalkCommand_descriptor =
-            getDescriptor().getMessageTypes().get(6);
-          internal_static_messages_WalkCommand_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_WalkCommand_descriptor,
-              new java.lang.String[] { "XPercent", "YPercent", "HPercent", });
-          internal_static_messages_MotionKick_descriptor =
-            getDescriptor().getMessageTypes().get(7);
-          internal_static_messages_MotionKick_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_MotionKick_descriptor,
-              new java.lang.String[] { "PerformMotionKick", "KickType", });
-          internal_static_messages_Kick_descriptor =
-            getDescriptor().getMessageTypes().get(8);
-          internal_static_messages_Kick_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_Kick_descriptor,
-              new java.lang.String[] { "Type", });
-          internal_static_messages_HeadMotionCommand_descriptor =
-            getDescriptor().getMessageTypes().get(9);
-          internal_static_messages_HeadMotionCommand_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_HeadMotionCommand_descriptor,
-              new java.lang.String[] { "Type", "PosCommand", "ScriptedCommand", "Timestamp", });
-          internal_static_messages_PositionHeadCommand_descriptor =
-            getDescriptor().getMessageTypes().get(10);
-          internal_static_messages_PositionHeadCommand_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_PositionHeadCommand_descriptor,
-              new java.lang.String[] { "HeadYaw", "HeadPitch", "MaxSpeedYaw", "MaxSpeedPitch", });
-          internal_static_messages_ScriptedHeadCommand_descriptor =
-            getDescriptor().getMessageTypes().get(11);
-          internal_static_messages_ScriptedHeadCommand_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_ScriptedHeadCommand_descriptor,
-              new java.lang.String[] { "Command", });
-          internal_static_messages_HeadJointCommand_descriptor =
-            getDescriptor().getMessageTypes().get(12);
-          internal_static_messages_HeadJointCommand_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_HeadJointCommand_descriptor,
-              new java.lang.String[] { "Time", "Angles", "Stiffness", "Interpolation", });
-          internal_static_messages_JointAngles_descriptor =
-            getDescriptor().getMessageTypes().get(13);
-          internal_static_messages_JointAngles_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_JointAngles_descriptor,
-              new java.lang.String[] { "HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "LHand", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw", "RHand", "LHipYawPitch", "RHipYawPitch", "LHipRoll", "LHipPitch", "LKneePitch", "LAnklePitch", "LAnkleRoll", "RHipRoll", "RHipPitch", "RKneePitch", "RAnklePitch", "RAnkleRoll", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_messages_MotionRequest_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_messages_MotionRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_MotionRequest_descriptor,
+        new java.lang.String[] { "StopBody", "StopHead", "ResetOdometry", "RemoveStiffness", "EnableStiffness", "ResetProviders", "Timestamp", });
+    internal_static_messages_MotionCommand_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_messages_MotionCommand_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_MotionCommand_descriptor,
+        new java.lang.String[] { "Type", "Script", "Dest", "Speed", "OdometryDest", "Kick", "Timestamp", });
+    internal_static_messages_ScriptedMove_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_messages_ScriptedMove_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_ScriptedMove_descriptor,
+        new java.lang.String[] { "Command", });
+    internal_static_messages_BodyJointCommand_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_messages_BodyJointCommand_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_BodyJointCommand_descriptor,
+        new java.lang.String[] { "Time", "Angles", "Stiffness", "Interpolation", });
+    internal_static_messages_DestinationWalk_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_messages_DestinationWalk_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_DestinationWalk_descriptor,
+        new java.lang.String[] { "RelX", "RelY", "RelH", "Gain", "Kick", });
+    internal_static_messages_OdometryWalk_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_messages_OdometryWalk_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_OdometryWalk_descriptor,
+        new java.lang.String[] { "RelX", "RelY", "RelH", "Gain", });
+    internal_static_messages_WalkCommand_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_messages_WalkCommand_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_WalkCommand_descriptor,
+        new java.lang.String[] { "XPercent", "YPercent", "HPercent", });
+    internal_static_messages_MotionKick_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_messages_MotionKick_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_MotionKick_descriptor,
+        new java.lang.String[] { "PerformMotionKick", "KickType", });
+    internal_static_messages_Kick_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_messages_Kick_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_Kick_descriptor,
+        new java.lang.String[] { "Type", });
+    internal_static_messages_HeadMotionCommand_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_messages_HeadMotionCommand_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_HeadMotionCommand_descriptor,
+        new java.lang.String[] { "Type", "PosCommand", "ScriptedCommand", "Timestamp", });
+    internal_static_messages_PositionHeadCommand_descriptor =
+      getDescriptor().getMessageTypes().get(10);
+    internal_static_messages_PositionHeadCommand_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_PositionHeadCommand_descriptor,
+        new java.lang.String[] { "HeadYaw", "HeadPitch", "MaxSpeedYaw", "MaxSpeedPitch", });
+    internal_static_messages_ScriptedHeadCommand_descriptor =
+      getDescriptor().getMessageTypes().get(11);
+    internal_static_messages_ScriptedHeadCommand_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_ScriptedHeadCommand_descriptor,
+        new java.lang.String[] { "Command", });
+    internal_static_messages_HeadJointCommand_descriptor =
+      getDescriptor().getMessageTypes().get(12);
+    internal_static_messages_HeadJointCommand_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_HeadJointCommand_descriptor,
+        new java.lang.String[] { "Time", "Angles", "Stiffness", "Interpolation", });
+    internal_static_messages_JointAngles_descriptor =
+      getDescriptor().getMessageTypes().get(13);
+    internal_static_messages_JointAngles_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_JointAngles_descriptor,
+        new java.lang.String[] { "HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "LHand", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw", "RHand", "LHipYawPitch", "RHipYawPitch", "LHipRoll", "LHipPitch", "LKneePitch", "LAnklePitch", "LAnkleRoll", "RHipRoll", "RHipPitch", "RKneePitch", "RAnklePitch", "RAnkleRoll", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface FieldLineOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface FieldLineOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.FieldLine)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional .messages.HoughLine inner = 1;
   /**
    * <code>optional .messages.HoughLine inner = 1;</code>
    */
@@ -20,7 +20,6 @@ public interface FieldLineOrBuilder
    */
   messages.HoughLineOrBuilder getInnerOrBuilder();
 
-  // optional .messages.HoughLine outer = 2;
   /**
    * <code>optional .messages.HoughLine outer = 2;</code>
    */
@@ -34,7 +33,6 @@ public interface FieldLineOrBuilder
    */
   messages.HoughLineOrBuilder getOuterOrBuilder();
 
-  // optional int32 id = 3;
   /**
    * <code>optional int32 id = 3;</code>
    */
@@ -44,7 +42,6 @@ public interface FieldLineOrBuilder
    */
   int getId();
 
-  // optional int32 correspondence = 4;
   /**
    * <code>optional int32 correspondence = 4;</code>
    */
@@ -54,7 +51,6 @@ public interface FieldLineOrBuilder
    */
   int getCorrespondence();
 
-  // optional float prob = 5;
   /**
    * <code>optional float prob = 5;</code>
    */
@@ -64,7 +60,6 @@ public interface FieldLineOrBuilder
    */
   float getProb();
 
-  // optional int32 index = 6;
   /**
    * <code>optional int32 index = 6;</code>
    */
@@ -74,7 +69,6 @@ public interface FieldLineOrBuilder
    */
   int getIndex();
 
-  // optional float wz0 = 7;
   /**
    * <code>optional float wz0 = 7;</code>
    */

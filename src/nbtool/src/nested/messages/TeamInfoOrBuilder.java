@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface TeamInfoOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface TeamInfoOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:messages.TeamInfo)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional uint32 team_number = 1;
   /**
    * <code>optional uint32 team_number = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface TeamInfoOrBuilder
    */
   int getTeamNumber();
 
-  // optional uint32 team_color = 2;
   /**
    * <code>optional uint32 team_color = 2;</code>
    */
@@ -26,7 +25,6 @@ public interface TeamInfoOrBuilder
    */
   int getTeamColor();
 
-  // optional uint32 score = 3;
   /**
    * <code>optional uint32 score = 3;</code>
    */
@@ -36,7 +34,6 @@ public interface TeamInfoOrBuilder
    */
   int getScore();
 
-  // optional uint32 goal_color = 4;
   /**
    * <code>optional uint32 goal_color = 4;</code>
    */
@@ -46,7 +43,6 @@ public interface TeamInfoOrBuilder
    */
   int getGoalColor();
 
-  // repeated .messages.RobotInfo player = 5;
   /**
    * <code>repeated .messages.RobotInfo player = 5;</code>
    */
