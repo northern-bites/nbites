@@ -18,6 +18,18 @@ def walkInPlace(nav):
     """
     Makes the motion engine walk in place. 
     """
+    command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.WALK_IN_PLACE #Destination Walk
+
+    # command.odometry_dest.rel_x = dest.relX
+    # command.odometry_dest.rel_y = dest.relY
+    # command.odometry_dest.rel_h = dest.relH
+
+    # command.odometry_dest.gain = gain
+
+    # Mark this message for sending
+    command.timestamp = int(nav.brain.time * 1000)
+
 
 
 def getRelativeDestination(my, dest):

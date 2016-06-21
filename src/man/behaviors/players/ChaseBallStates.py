@@ -441,6 +441,10 @@ def positionForKick(player):
     Get the ball in the sweet spot
     """
     if transitions.shouldRedecideKick(player):
+        print("I think I should redecide my kick! ball.rel_x:", player.brain.ball.rel_x)
+        if player.brain.ball.rel_x < 30.0:
+            return player.goLater('executeSweetKick')
+
         return player.goLater('approachBall')
 
     ball = player.brain.ball

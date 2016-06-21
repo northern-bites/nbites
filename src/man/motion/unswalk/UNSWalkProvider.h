@@ -92,6 +92,7 @@ public:
     }
 
     void adjustIMU(const ::messages::InertialState&	sensorInertials);
+    void resetIMU() { imuAdjuster->reset(); }
 
     bool isStanding() const;
     bool isWalkActive() const;
