@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -347,7 +348,15 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 		            String written = updateSet(offsets);
 
-		            ToolMessage.displayInfo("camera offsets written: %s", written);
+		            try {
+						Files.write(CameraOffset.getPath(),
+								offsets.serialize().print().getBytes(StandardCharsets.UTF_8));
+			            ToolMessage.displayWarn("camera offsets written: %s", written);
+
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						ToolMessage.displayError("could not write camera offsets.");
+					}
 				}
 
 			});
