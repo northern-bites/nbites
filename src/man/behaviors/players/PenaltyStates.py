@@ -6,6 +6,7 @@ hard reset to one of the two possible post-penalty positions.
 import ChaseBallTransitions as transitions
 import RoleConstants as roleConstants
 from noggin_constants import LineID
+import noggin_constants as Constants
 from math import copysign, fabs, pi
 from objects import RelRobotLocation
 from ..navigator import Navigator
@@ -295,6 +296,8 @@ def manualPlacement(player):
 
 @superState('gameControllerResponder')
 def overeagerWhistle(player):
+    player.brain.resetLocTo(player.brain.loc.x, player.brain.loc.y, player.brain.loc.h)
+    print "heading: " + str(player.brain.loc.h)
     player.brain.tracker.lookToAngle(0)
     return player.goNow('gamePlaying')
 

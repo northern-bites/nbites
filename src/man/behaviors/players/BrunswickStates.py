@@ -32,6 +32,8 @@ def gameInitial(player):
         #Reset role to player number
         player.role = player.brain.playerNumber
         roleConstants.setRoleConstants(player, player.role)
+        player.brain.whistled = False
+        player.brain.whistleCounter = 0
 
     # print "Current Angle: " + str(degrees(player.brain.interface.joints.head_yaw))
     # If stiffnesses were JUST turned on, then stand up.
