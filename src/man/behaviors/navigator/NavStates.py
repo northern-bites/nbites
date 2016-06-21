@@ -54,7 +54,7 @@ def goToPosition(nav):
     #                                             nav.brain.ball.loc.bearing)
 
     
-    if nav.firstFrame():
+    if nav.counter < 10:
         print("In go to position, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
@@ -345,11 +345,10 @@ def atPosition(nav):
     """
     Switches back if we're not at the destination anymore.
     """
-    if nav.firstFrame():
+    if nav.counter < 10:
         print("In at position, walking in place")
         helper.walkInPlace(nav)
-
-    if nav.counter > 20:
+    else:
         helper.stand(nav)
 
     return Transition.getNextState(nav, atPosition)
@@ -360,16 +359,25 @@ def stand(nav):
     So we can give new walk commands before we complete
     the stand if desired
     """
-    if nav.firstFrame():
+    if nav.brain.player.gameState == 'gameInitial' or nav.brain.player.gameState == 'gameSet':
         helper.stand(nav)
         return nav.stay()
 
-    if (nav.counter % 300 == 0):
-        helper.stand(nav)
+    if nav.counter < 20:
+        print("In stand, walking in place")
+        helper.walkInPlace(nav)
         return nav.stay()
+    # if nav.firstFrame():
+    #     helper.stand(nav)
+    #     return nav.stay()
+
+    # if (nav.counter % 300 == 0):
+    #     return nav.stay()
 
     if not nav.brain.interface.motionStatus.walk_is_active:
         return nav.goNow('standing')
+
+    helper.stand(nav)
 
     return nav.stay()
 
