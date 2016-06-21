@@ -1375,17 +1375,15 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     ImageLiteU16 smallerY;
     ImageLiteU8 smallerGreen;
 
-	// int horiz = 0;
-	// if (topCamera) {
-	// 	horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
- //        smallerY = ImageLiteU16(yImage, 0, horiz, yImage.width(), height - horiz);
- //        smallerGreen = ImageLiteU8(greenImage, 0, horiz, greenImage.width(), height - horiz);
-	// } else {
-    if(!topCamera) {
+	//int horiz = 0;
+	if (topCamera) {
+		//horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
+        smallerY = ImageLiteU16(yImage, 0, 0, yImage.width(), yImage.height());
+        smallerGreen = ImageLiteU8(greenImage, 0, 0, greenImage.width(),greenImage.height());
+	} else {
         smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
         smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
     }
-    //}
 
     if(!topCamera && (!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions())) {
         return false;
@@ -1394,7 +1392,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
 
-    if(darkSpotDetector.spotDetect(yImage, homography, &greenImage)) {
+    if(darkSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
         SpotList darkSpots = darkSpotDetector.spots();
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
 		if (debugBall && false) {
@@ -1446,7 +1444,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
-    if(whiteSpotDetector.spotDetect(yImage, homography, &greenImage)) {
+    if(whiteSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
 		if (debugBall && false) {
 			int max = field->horizonAt(0);
 			if (!topCamera) {
