@@ -31,8 +31,10 @@ def approachBall(player):
     player.brain.tracker.trackBall()
     if player.shouldKickOff:
         if player.inKickOffPlay:
+            print "giveAndGo"
             return player.goNow('giveAndGo')
         else:
+            print "positionAndKickBall"
             return player.goNow('positionAndKickBall')
 
     elif player.penaltyKicking:
@@ -299,7 +301,11 @@ def orbitBall(player):
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         player.kick.destinationX = destinationX
         player.kick.destinationY = destinationY
-        return player.goNow('positionForKick')
+
+        if transitions.shouldNotDribble(player):
+            return player.goNow('positionForKick')
+        return player.goNow('dribble')
+        
 
     if (transitions.orbitTooLong(player) or
         transitions.orbitBallTooFar(player)):
@@ -403,9 +409,18 @@ def orbitBall(player):
 orbitBall.X_SPEED = .35
 orbitBall.X_BACKUP_SPEED = .2
 
-# <<<<<
-
-
+@superState('positionAndKickBall')
+@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+@ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
+@ifSwitchLater(transitions.shouldFindBall, 'findBall')
+def dribble(player):
+    if transitions.shouldNotDribble(player)
+        return player.goNow('approachBall')
+    print "Dribble time"
+    ball = player.brain.ball
+    player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_THREE)
+    player.brain.walk(10, 0, 0)
+    return player.stay()
 
 @superState('positionAndKickBall')
 def spinToBall(player):
