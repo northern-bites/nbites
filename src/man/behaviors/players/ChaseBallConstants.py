@@ -79,8 +79,8 @@ SHOULD_KICK_AGAIN_Y = 15
 # Ball in position
 ## NOTE: important that these values slightly overestimate the values in
 ##        navigator's PFK. Otherwise there can be bad looping.
-BALL_X_OFFSET = 1.5
-BALL_Y_OFFSET = 1.5
+BALL_X_OFFSET = 3.5
+BALL_Y_OFFSET = 3.5
 GOOD_ENOUGH_H = 6
 
 # States' constants

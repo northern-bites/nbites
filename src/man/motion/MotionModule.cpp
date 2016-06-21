@@ -842,7 +842,6 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
             );
 
         noWalkTransitionCommand = true;
-        std::cout << "[MOTION MODULE] Swapping body providers \n";
 
         nextProvider = &scriptedProvider;
         scriptedProvider.setCommand(newCommand);

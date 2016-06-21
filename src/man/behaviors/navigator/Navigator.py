@@ -110,7 +110,7 @@ class Navigator(FSA.FSA):
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = speeds.SPEED_EIGHT,
-             avoidObstacles = False, adaptive = False, fast = False, pb = False):
+             avoidObstacles = False, adaptive = False, fast = False, pb = False, useLoc = True):
         """
         General go to method.
         Ideal for going to a field position, or for going to a relative location
@@ -170,6 +170,9 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.adaptive = adaptive
         NavStates.goToPosition.fast = fast
         NavStates.goToPosition.pb = pb
+        NavStates.goToPosition.useLoc = useLoc
+
+        # print speed
 
         # print speed
 
