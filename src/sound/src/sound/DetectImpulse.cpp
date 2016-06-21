@@ -254,6 +254,7 @@ bool detect(nbsound::SampleBuffer& buffer) {
 bool cleanup() {
     return true;
 }
+
 }
 
 #endif
