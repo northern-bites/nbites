@@ -33,7 +33,7 @@ def gamePenalized(player):
 def kick(player):
     if player.firstFrame():
         # player.brain.nav.callKickEngine(PMotion_proto.messages.Kick.M_Left_Chip_Shot)
-        player.executeMove(SweetMoves.MEGKOTE_DIAGONAL_FAST_KICK_LEFT)
+        player.executeMove(SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 
     return player.stay()
 

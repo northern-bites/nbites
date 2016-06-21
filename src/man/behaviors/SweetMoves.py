@@ -831,12 +831,6 @@ LEFT_SHORT_STRAIGHT_KICK = (
       (0.0, -0.1, -28.7, 49.9, -25.0, 0.2),
       (90.3, -9.3, -0.3, 2.7),
       1.2,0,stiff.NORMAL_STIFFNESSES),
-    # #stand for a bit
-    # ((90., 10., -90., -3.),
-    #   (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-    #   (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-    #   (90., -10., 90., 3.),
-    #   1,0,stiff.NORMAL_STIFFNESSES),
     )
 
 RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
