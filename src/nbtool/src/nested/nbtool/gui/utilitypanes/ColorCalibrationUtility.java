@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -569,6 +571,18 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				tab.imageSplitPane.setForeground(Color.BLACK);
 
 				tab.imageSplitPane.setDividerLocation(0.5);
+
+				tab.imageSplitPane.addComponentListener(new ComponentAdapter(){
+					@Override
+					public void componentResized(ComponentEvent e) {
+						tab.imageSplitPane.setDividerLocation(.5d);
+					}
+
+					@Override
+					public void componentMoved(ComponentEvent e) {
+						tab.imageSplitPane.setDividerLocation(.5d);
+					}
+				});
 
 				LogDND.makeComponentTarget(tab, top ? topCameraTarget : botCameraTarget);
 

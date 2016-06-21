@@ -79,7 +79,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 		CameraOffset offset;
 
-		String getRoll() { Debug.info("row %s top %B", name, top); return offset.d_roll + " rads";}
+		String getRoll() {return offset.d_roll + " rads";}
 
 		String getTilt() {return offset.d_tilt + " rads";}
 
@@ -219,7 +219,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 				ltst.name = topNames[i];
 				ltst.given = found_top.get(ltst.name).size();
 			}
-		
+
 			ltst.offset = new CameraOffset(Double.NaN, Double.NaN);
 
 			rowList.add(ltst);
