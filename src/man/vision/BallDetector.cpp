@@ -311,7 +311,7 @@ int BallDetector::getAzimuthColumnRestrictions(double az) {
     
     int val = percentOfImage * width;
     if(val <= 0) { return 0; }
-    if(val >= width) { return width; }
+    if(val >= width-1) { return width-1; }
     if(az > 0) { return -1*(width - val); }
     else { return val; }
 }
@@ -325,7 +325,7 @@ int BallDetector::getAzimuthRowRestrictions(double az) {
 
     int val = percentOfImage * height;
     if(val <= 0) { return 0; }
-    if(val >= height) { return height; }
+    if(val >= height-1) { return height-1; }
     return val;
 }
 
@@ -336,7 +336,7 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
     } else {
         startCol = c;
     }
-    if(startCol < 0) { startCol = 0; }
+    if(startCol <= 0) { startCol = 0; }
     if(endCol >= width-1) { endCol = width-1; }
 
     int r = getAzimuthRowRestrictions(homography->azimuth());
@@ -1268,12 +1268,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 
     if(debugBall) {
         std::cout<<"Top Camera: "<<topCamera<<std::endl;
-        // std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
-        // std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
-        // debugDraw.drawPoint(startCol, 10, MAROON);
-        // std::cout<<"EndRow: "<<endRow<<std::endl;
-        //debugDraw.drawPoint(20, endRow, ORANGE);
-        // debugDraw.drawPoint(endCol, 10, BLUE);
         if(!topCamera) { debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW); }
     }
 
@@ -1312,13 +1306,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
     }
     
-    // if(debugBall) {
-    //     for(int z = 0; z < blackSpots.size(); z++) {
-    //         std::pair<int, int> spot = blackSpots[z];
-    //         std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "
-				// 	 <<spot.second<<std::endl;
-    //     }
-    // }
+    if(debugBall) {
+        for(int z = 0; z < blackSpots.size(); z++) {
+            std::pair<int, int> spot = blackSpots[z];
+            std::cout<<"Dark Spot "<<z<<", X: "<<spot.first<<", Y: "
+					 <<spot.second<<std::endl;
+        }
+    }
 
 	// run blobber on parts of the image where spot detector won't work
 	int bottomThird = height * 2 / 3;
