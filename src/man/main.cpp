@@ -11,7 +11,6 @@
 int lockFD = 0;
 man::Man* instance;
 const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
     instance->preClose();
@@ -49,7 +48,7 @@ void error_signal_handler(int signal) {
 
     cleanup();
 
-    exit(-1);
+    abort();
 }
 
 // Deal with lock file. To ensure that we only have ONE instance of man
@@ -86,7 +85,7 @@ int main() {
     fprintf(stderr, "Man re-opening stderr...\n");
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
-     freopen(MAN_LOG_PATH, "w", stdout);
+    freopen(MAN_LOG_PATH, "w", stdout);
     
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
