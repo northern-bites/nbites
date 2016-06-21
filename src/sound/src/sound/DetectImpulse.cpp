@@ -182,78 +182,78 @@ struct Channel {
 
 Channel channels[2];    
 
-    bool init() {
-        if (inited) return false;
+bool init() {
+    if (inited) return false;
 
-        NBL_WARN(" [ whistle detector init running ] ")
-
-#ifdef DETECT_LOG_RESULTS
-        NBL_INFO("checking vector..")
-        NBL_INFO("\tsize %d.", detect_results.size())
-#endif
-
-        transform = new Transform(transform_input_length);
-        reset();
-
-        return (inited = true);
-    }
-
-    bool reset() {
-        for (int i = 0; i < 2; ++i)
-            channels[i].reset();
+    NBL_WARN(" [ whistle detector init running ] ")
 
 #ifdef DETECT_LOG_RESULTS
-        detect_results.clear();
+    NBL_INFO("checking vector..")
+    NBL_INFO("\tsize %d.", detect_results.size())
 #endif
 
-        return true;
-    }
-    bool detect(nbsound::SampleBuffer& buffer) {
+    transform = new Transform(transform_input_length);
+    reset();
 
-        init();
+    return (inited = true);
+}
+
+bool reset() {
+    for (int i = 0; i < 2; ++i)
+        channels[i].reset();
 
 #ifdef DETECT_LOG_RESULTS
-        detect_results.clear();
+    detect_results.clear();
 #endif
 
-        for (int i = 0; i < buffer.channels; ++i) {
-            int window_start = 0;
-            int window_end = transform_input_length;
+    return true;
+}
+bool detect(nbsound::SampleBuffer& buffer) {
 
-            while(buffer.is_in_bounds(i, window_end - 1)) {
-                SampleBuffer window = buffer.window(window_start, window_end);
-                transform->transform(window, i);
+    init();
 
-		bool heard = channels[i].analyze(transform->get_freq_buffer());
-		if (heard)
-			NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
-	
 #ifdef DETECT_LOG_RESULTS
-                nbl::Block block;
-                block.data = transform->get_all();
-                block.type = "WhistleDetection1";
-
-                block.dict["Channel"] = json::Number(i);
-                block.dict["window_start"] = json::Number(window_start);
-                block.dict["window_end"] = json::Number(window_end);
-
-                block.dict["WhistleWasHeard"] = json::Boolean(heard);
-
-                detect_results.push_back(block);
+    detect_results.clear();
 #endif
-                
-                if (heard) return true;
-                window_start += transform_input_length;
-                window_end += transform_input_length;
-            }
+
+    for (int i = 0; i < buffer.channels; ++i) {
+        int window_start = 0;
+        int window_end = transform_input_length;
+
+        while(buffer.is_in_bounds(i, window_end - 1)) {
+            SampleBuffer window = buffer.window(window_start, window_end);
+            transform->transform(window, i);
+
+    bool heard = channels[i].analyze(transform->get_freq_buffer());
+    if (heard)
+        NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
+
+#ifdef DETECT_LOG_RESULTS
+            nbl::Block block;
+            block.data = transform->get_all();
+            block.type = "WhistleDetection1";
+
+            block.dict["Channel"] = json::Number(i);
+            block.dict["window_start"] = json::Number(window_start);
+            block.dict["window_end"] = json::Number(window_end);
+
+            block.dict["WhistleWasHeard"] = json::Boolean(heard);
+
+            detect_results.push_back(block);
+#endif
+            
+            if (heard) return true;
+            window_start += transform_input_length;
+            window_end += transform_input_length;
         }
-        
-        return false;
     }
     
-    bool cleanup() {
-        return true;
-    }
+    return false;
+}
+
+bool cleanup() {
+    return true;
+}
 }
 
 #endif
