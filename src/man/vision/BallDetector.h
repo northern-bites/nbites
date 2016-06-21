@@ -82,7 +82,7 @@ namespace man {
 
 		typedef std::vector<std::pair<int, int>> intPairVector;
 		typedef std::vector<Spot> spotVector;
-		typedef std::pair<int, int> imagePoint;
+		typedef std::pair<double, double> imagePoint;
 
 		class BallDetector {
 		public:

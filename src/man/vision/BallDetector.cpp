@@ -264,15 +264,10 @@ int BallDetector::scanY(int startX, int startY, int direction, int stop) {
 int BallDetector::projectedBallRadius(imagePoint p) {
     double dwx1, dwy1, dwx2, dwy2 = 0.0;
     homography->fieldVector((double)p.first, (double)p.second, 1.0, 0.0, dwx1, dwy1);
-    // homography->fieldVector((double)p.first, (double)p.second, 0.0, 1.0, dwx2, dwy2);
 
     double pixel_width = sqrt(dwx1*dwx1 + dwy1*dwy1);
-    // double pixel_height = sqrt(dwx2*dwx2 + dwy2*dwy2);
+    double rw = std::round((BALL_RADIUS/pixel_width) + 0.5);
 
-    int rw = (int)(BALL_RADIUS/pixel_width);
-    // int rh = (int)(BALL_RADIUS/pixel_height);
-
-    // int avg_radius = (rw + rh) >> 1;
     return rw;
 }
 
@@ -341,7 +336,7 @@ int BallDetector::getAzimuthColumnRestrictions(double az) {
 
     int val = percentOfImage * width;
     if(val <= 0) { return 0; }
-    if(val >= width) { return width; }
+    if(val >= width-1) { return width-1; }
     if(az > 0) { return -1*(width - val); }
     else { return val; }
 }
@@ -355,7 +350,7 @@ int BallDetector::getAzimuthRowRestrictions(double az) {
 
     int val = percentOfImage * height;
     if(val <= 0) { return 0; }
-    if(val >= height) { return height; }
+    if(val >= height-1) { return height-1; }
     return val;
 }
 
@@ -366,8 +361,8 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
     } else {
         startCol = c;
     }
-    if(startCol < 0) { startCol = 0; }
-    if(endCol >= width) { endCol = width; }
+    if(startCol <= 0) { startCol = 0; }
+    if(endCol >= width-1) { endCol = width-1; }
 
     int r = getAzimuthRowRestrictions(homography->azimuth());
     if(r < 0) {
@@ -375,11 +370,11 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
     } else {
         endRow = r;
     }
-    if(endRow > height) {endRow = height; }
+    if(endRow > height-1) {endRow = height-1; }
 
     bool extendedBottom = false;
 
-    if(startCol-BOT_RESTRICTION_BUF >= 0 && endRow+BOT_RESTRICTION_BUF <= height) {
+    if(startCol-BOT_RESTRICTION_BUF >= 0 && endRow+BOT_RESTRICTION_BUF <= height-1) {
         getColor(startCol, endRow);
         if(isGreen()) {
             startCol -= BOT_RESTRICTION_BUF;
@@ -387,7 +382,7 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
             extendedBottom = true;
         }
     }
-    if(endCol+BOT_RESTRICTION_BUF <= width && endRow+BOT_RESTRICTION_BUF <= height) {
+    if(endCol+BOT_RESTRICTION_BUF <= width-1 && endRow+BOT_RESTRICTION_BUF <= height-1) {
         getColor(endCol, endRow);
         if(isGreen()) {
             endCol += BOT_RESTRICTION_BUF;
@@ -405,7 +400,7 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
             }
         }
     }
-    if(endCol+TOP_RESTRICTION_BUF <= width) {
+    if(endCol+TOP_RESTRICTION_BUF <= width-1) {
         getColor(startCol, 0);
         if(isGreen()) {
             if(extendedBottom) {
@@ -640,8 +635,7 @@ bool BallDetector::blobsAreClose(std::pair<int,int> first,
    @TODO: This method has become so ugly. Needs clean up.
 */
 bool BallDetector::findCorrelatedBlackSpots
-(std::vector<std::pair<int,int>> & blackSpots,
- std::vector<Spot> & actualBlobs,
+(intPairVector & blackSpots, spotVector & actualBlobs,
  double cameraHeight, bool & foundBall)
 {
     // loop through the filtered blobs and see if any are close together
@@ -741,28 +735,25 @@ bool BallDetector::findCorrelatedBlackSpots
                 Spot s1 = correlatedSpots[0];
                 Spot s2 = correlatedSpots[1];
 
+                ballSpotX = ((s1.ix()+s2.ix())/2);
+                ballSpotY = ((s1.iy()+s2.iy())/2);
+                int r = projectedBallRadius(std::make_pair(ballSpotX, ballSpotY));
+
                 double distance, upper, lower;
-                //IDEA: account for area and distance thresholds based on the camera?
-                if(topCamera) {
-                    lower = 9.5; //change from 9.5
-                    upper = 25.0; //change from 14
-                } else {
-                    lower = 9.4; //change from 19.0 //lower threshold because distance is smaller
-                    upper = 23.0; //when ball is in motion
-                }
+                upper = r * 2.5;
+                lower = (r >> 1) >> 1;
 
                 distance = sqrt(pow((s2.ix() - s1.ix()),2) + pow((s2.iy() - s1.iy()),2));
+
 				if (debugBall) {
-					std::cout<<"Distance: "<<distance<<std::endl;
+					std::cout<<"[BALL INFO] Distance Between Spots: "<<distance<<std::endl;
 				}
 
                 if(distance >= lower && distance <= upper) {
 					if (debugBall) {
-						std::cout<<"Distance is in the right range"<<std::endl;
+						std::cout<<"[BALL INFO] Distance OK"<<std::endl;
 					}
 
-                    ballSpotX = (s1.ix()+s2.ix())/2;
-                    ballSpotY = (s1.iy()+s2.iy())/2;
                     Spot ballSpot;
                     ballSpot.x = ballSpotX * 2;
                     ballSpot.y = ballSpotY * 2;
@@ -770,8 +761,7 @@ bool BallDetector::findCorrelatedBlackSpots
 					ballSpot.rawY = -1 * ballSpotY + height / 2;
 					ballSpot.innerDiam = 5;
 					if (debugBall) {
-						debugDraw.drawPoint(ballSpotX+width/2,
-											-1*ballSpotY + height/2,BLUE);
+						debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLUE);
 					}
                     makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
 #ifdef OFFLINE
@@ -785,19 +775,24 @@ bool BallDetector::findCorrelatedBlackSpots
                 Spot s2 = correlatedSpots[1];
                 Spot s3 = correlatedSpots[2];
 
-                double area, upper, lower;
-                if(topCamera) {
-                    upper = 181.1; //289 seen in the log
-                    lower = 70.0;
-                } else {
-                    upper = 210.0;
-                    lower = 22.0;
-                }
+                ballSpotX = (s1.ix()+s2.ix()+s3.ix())/3;
+                ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
+                int r = projectedBallRadius(std::make_pair(ballSpotX, ballSpotY));
 
-                area = abs((s1.ix()*(s2.iy()-s3.iy()) + s2.ix()*(s3.iy()-s1.iy()) + s3.ix()*(s1.iy()-s2.iy()))/2);
+                //equation below derives the maximum area a triangle could have, inscribed
+                //in a circle with radius r obtained above. Derivation was done using
+                //Heron's Formula and some trig. 1.73205 ~= sqrt(3)
+                //Max. Area = ((1.73205)^3 * radius^2) / 4
+                int upper = std::round((pow(1.73205, 3) * pow(r, 2)) + 0.5); //numerator
+                upper = (upper >> 1) >> 1; //divide by 4
+                int lower = (upper >> 1) >> 1;
+
+                double area = abs((s1.ix()*(s2.iy()-s3.iy()) + 
+                                   s2.ix()*(s3.iy()-s1.iy()) + 
+                                   s3.ix()*(s1.iy()-s2.iy())) / 2);
 
                 if(debugBall) {
-                    std::cout<<"Area: "<<area<<std::endl;
+                    std::cout<<"[BALL INFO] Area Between Spots: "<<area<<std::endl;
                 }
 
                 if(area >= lower && area <= upper) {
@@ -805,10 +800,9 @@ bool BallDetector::findCorrelatedBlackSpots
                     ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
 
                     if (debugBall) {
-                        std::cout<<"Area is in the right range"<<std::endl;
+                        std::cout<<"[BALL INFO] Area OK"<<std::endl;
                         debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
                     }
-                    debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
 
                     Spot ballSpot;
                     ballSpot.x = ballSpotX * 2; // in half pixels
@@ -905,9 +899,8 @@ void BallDetector::makeEdgeList(EdgeList & edges)
 /* The next two are very similar, but the first one assumes that the
    "spot" actually comes from the blob detector.
  */
-bool BallDetector::filterWhiteBlob(Spot spot,
-                                   std::vector<std::pair<int,int>> & blackSpots,
-								   std::vector<std::pair<int,int>> & badBlack)
+bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
+								   intPairVector & badBlack)
 {
     // convert back to raw coordinates
     int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
@@ -1004,7 +997,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	getColor(x, y);
 	int THRESHOLD = 110;
 	if (!checkGradientInSpot(spot)) {
-        std::cout<<"returning false 1\n";
+        // std::cout<<"returning false 1\n";
 		return false;
 	}
 	int length1, length2, length3, length4;
@@ -1069,11 +1062,9 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		getColor(x, y);
 	}
 	if (abs(length1 + length2 - length3 - length4) > 4) {
-		std::cout<<"returning false 2\n";
 		return false;
 	}
 	if (max(length1, length2) < 2 || max(length3, length4) < 2) {
-		std::cout<<"returning false 3\n";
 		return false;
 	}
 	if (bottomY < height - 8 && topY > 5) {
@@ -1224,9 +1215,8 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	return true;
 }
 
-bool BallDetector::filterWhiteSpot(Spot spot,
-                                   std::vector<std::pair<int,int>> & blackSpots,
-								   std::vector<std::pair<int,int>> & badBlack)
+bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
+								   intPairVector & badBlack)
 {
     // convert back to raw coordinates
     int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
@@ -1341,13 +1331,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 
     if(debugBall) {
         std::cout<<"Top Camera: "<<topCamera<<std::endl;
-        // std::cout<<"Azimuth: "<<homography->azimuth()<<std::endl;
-        // std::cout<<"Start Column: "<<startCol<<", End Column: "<<endCol<<std::endl;
-        // debugDraw.drawPoint(startCol, 10, MAROON);
-        // std::cout<<"EndRow: "<<endRow<<std::endl;
-        //debugDraw.drawPoint(20, endRow, ORANGE);
-        // debugDraw.drawPoint(endCol, 10, BLUE);
-        debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW);
+        if(!topCamera) { debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW); }
     }
 
     // Then we are going to filter out all of the blobs that obviously
@@ -1385,13 +1369,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
     }
 
-    // if(debugBall) {
-    //     for(int z = 0; z < blackSpots.size(); z++) {
-    //         std::pair<int, int> spot = blackSpots[z];
-    //         std::cout<<"Spot "<<z<<", X: "<<spot.first<<", Y: "
-				// 	 <<spot.second<<std::endl;
-    //     }
-    // }
+    if(debugBall) {
+        for(int z = 0; z < blackSpots.size(); z++) {
+            std::pair<int, int> spot = blackSpots[z];
+            std::cout<<"Dark Spot "<<z<<", X: "<<spot.first<<", Y: "
+					 <<spot.second<<std::endl;
+        }
+    }
 
 	// run blobber on parts of the image where spot detector won't work
 	int bottomThird = height * 2 / 3;
