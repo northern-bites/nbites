@@ -11,6 +11,7 @@ from ..navigator import BrunswickSpeeds as speeds
 from objects import Location, RobotLocation
 from ..util import *
 from math import hypot, fabs, atan2, degrees
+from ..headTracker import HeadMoves
 import random
 
 # IMPORTANT China 2015 bug found
@@ -103,8 +104,8 @@ def doFirstHalfSpin(player):
     if player.firstFrame():
         print "------------First half spin-------------"
 
-        player.setWalk(0, 0, speeds.SPEED_SIX)
-        player.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+        player.setWalk(0, 0, speeds.SPEED_FIVE)
+        player.brain.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
         # player.brain.tracker.lookToSpinDirection(1)
         
         # if player.brain.playerNumber == 3:
@@ -143,8 +144,8 @@ def doSecondHalfSpin(player):
     if player.firstFrame():
         print "--------------Second Half Spin---------------"
 
-        player.setWalk(0, 0, speeds.SPEED_SIX)
-        player.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+        player.setWalk(0, 0, speeds.SPEED_FIVE)
+        player.brain.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
         # player.brain.tracker.lookToSpinDirection(1)
 
         # if player.brain.playerNumber == 3:
