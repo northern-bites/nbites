@@ -98,11 +98,22 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
         int diam2 = (*i).secondPrincipalLength();
 		int cx = (*i).centerX();
 		int cy = (*i).centerY();
-		imagePoint p = imagePoint(cx, cy+bottomQuarter);
+		int bx = cx - width / 2;
+		int by = -(cy + bottomQuarter) + height / 2;
+		imagePoint p = imagePoint(bx, by);
 		int radius = projectedBallRadius(p);
-		std::cout << "Blob " << radius << " " << cx << " " << (cy+bottomQuarter) << std::endl;
+		int fudge = radius / 4;
+		bool goodSize = radius <= diam && diam < 2 * radius + fudge;
+		//if (!topCamera) {
+		//	goodSize = abs(diam - radius * 2) <= fudge;
+		//}
+		if (!goodSize && debugBall) {
+			std::cout << "Bad size on blob " << radius << " " <<
+				diam << " " << diam2 << " " << cx << " " <<
+				(cy+bottomQuarter) << std::endl;
+		}
 
-        if (diam < 26 && diam >= 6 && diam2 >= 5 && cy - diam > 0 &&
+        if (goodSize && diam2 >= radius / 2 && cy - diam > 0 &&
 			cx - diam > 0 && cx + diam < width &&
 			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
             // convert this blob to a Spot
@@ -128,10 +139,6 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
             }
             if (debugBall) {
                 debugWhiteSpots.push_back(s);
-            }
-        } else {
-            if (debugBall) {
-                std::cout << "Rejected blob " << diam << " " << diam2 << std::endl;
             }
         }
     }
@@ -661,7 +668,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     // grab this blob from our vector
                     foundThree = true;
 #ifdef OFFLINE
-                    std::cout << "Found correlated, punting for now" << std::endl;
+                    //std::cout << "Found correlated, punting for now" << std::endl;
 #endif
                     std::vector<Spot> correlatedSpots;
                     // find our correlated blobs and merge them in
@@ -1364,9 +1371,22 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
 
-    if(darkSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
+    if(darkSpotDetector.spotDetect(yImage, homography, &greenImage)) {
         SpotList darkSpots = darkSpotDetector.spots();
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
+		if (debugBall && false) {
+			ImageLiteU8 filteredImage = darkSpotDetector.filteredImage();
+			int max = field->horizonAt(0);
+			if (!topCamera) {
+				max = 0;
+			}
+			int box = 1;
+			for (int i = max; i < height && box != 0; i+= box) {
+				uint8_t* row = filteredImage.pixelAddr(0, i);
+				box = row[1];
+				debugDraw.drawBox(1, box + 1, i+box, i, BLUE);
+			}
+		}
     }
 
     if(debugBall) {
@@ -1403,7 +1423,25 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
-    if(whiteSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
+    if(whiteSpotDetector.spotDetect(yImage, homography, &greenImage)) {
+		if (debugBall && false) {
+			int max = field->horizonAt(0);
+			if (!topCamera) {
+				max = 0;
+			}
+			ImageLiteU8 filteredImage = whiteSpotDetector.filteredImage();
+			int box = 1;
+			for (int i = max; i < height && box > 0; i+= box) {
+				uint8_t* row = filteredImage.pixelAddr(0, i);
+				box = row[1];
+				int bx = 10 - width / 2;
+				int by = -i + height / 2;
+				imagePoint p = imagePoint(bx, by);
+				int radius = projectedBallRadius(p);
+				debugDraw.drawBox(10, box + 11, i+box, i, RED);
+				debugDraw.drawBox(12+box, 12+box+2*radius, i + 2*radius, i, BLUE);
+			}
+		}
         SpotList whiteSpots = whiteSpotDetector.spots();
         if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
                              cameraHeight,foundBall)) {
