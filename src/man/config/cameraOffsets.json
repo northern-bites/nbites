@@ -169,7 +169,7 @@
             0.001718
         }
     },
-  "shehulk" :
+  "jayne" :
     {
       "camera_TOP" :
         {
@@ -203,21 +203,38 @@
             0.016866
         }
     },
-  "jayne" :
+  "elektra" :
     {
       "camera_TOP" :
         {
           "d_roll" :
-            0,
+            -0.019501,
           "d_tilt" :
-            0
+            -0.039135
         },
       "camera_BOT" :
         {
           "d_roll" :
-            0,
+            0.018001,
           "d_tilt" :
-            0
+            0.016866
+        }
+    },
+  "shehulk" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            -0.114095,
+          "d_tilt" :
+            -0.002495
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            -0.070439,
+          "d_tilt" :
+            0.042918
         }
     },
   "kaylee" :
