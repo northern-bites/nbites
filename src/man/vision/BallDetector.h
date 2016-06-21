@@ -121,6 +121,7 @@ namespace man {
                                 	spotVector & actualWhiteSpots, double cameraHeight,
                                 	int bottomQuarer);
 
+			bool whiteBelowSpot(Spot spot);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
 			bool checkDiagonalCircle(Spot spot);
