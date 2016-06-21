@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface BatteryStateOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.BatteryState)
-    com.google.protobuf.MessageOrBuilder {
+public interface BatteryStateOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float charge = 1;
   /**
    * <code>optional float charge = 1;</code>
    */

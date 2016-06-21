@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface ButtonStateOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.ButtonState)
-    com.google.protobuf.MessageOrBuilder {
+public interface ButtonStateOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional bool pressed = 1;
   /**
    * <code>optional bool pressed = 1;</code>
    */

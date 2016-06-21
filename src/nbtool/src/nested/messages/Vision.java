@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.Vision}
  */
-public final class Vision extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Vision)
-    VisionOrBuilder {
+public  final class Vision extends
+    com.google.protobuf.GeneratedMessage
+    implements VisionOrBuilder {
   // Use Vision.newBuilder() to construct.
   private Vision(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -148,6 +147,7 @@ public final class Vision extends
   }
 
   private int bitField0_;
+  // repeated .messages.FieldLine line = 1;
   public static final int LINE_FIELD_NUMBER = 1;
   private java.util.List<messages.FieldLine> line_;
   /**
@@ -183,6 +183,7 @@ public final class Vision extends
     return line_.get(index);
   }
 
+  // repeated .messages.Corner corner = 2;
   public static final int CORNER_FIELD_NUMBER = 2;
   private java.util.List<messages.Corner> corner_;
   /**
@@ -218,6 +219,7 @@ public final class Vision extends
     return corner_.get(index);
   }
 
+  // optional .messages.CenterCircle circle = 3;
   public static final int CIRCLE_FIELD_NUMBER = 3;
   private messages.CenterCircle circle_;
   /**
@@ -239,6 +241,7 @@ public final class Vision extends
     return circle_;
   }
 
+  // optional .messages.VBall ball = 4;
   public static final int BALL_FIELD_NUMBER = 4;
   private messages.VBall ball_;
   /**
@@ -260,6 +263,7 @@ public final class Vision extends
     return ball_;
   }
 
+  // optional int32 horizon_dist = 5;
   public static final int HORIZON_DIST_FIELD_NUMBER = 5;
   private int horizonDist_;
   /**
@@ -285,8 +289,7 @@ public final class Vision extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -421,9 +424,8 @@ public final class Vision extends
    * Protobuf type {@code messages.Vision}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Vision)
-      messages.VisionOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.VisionOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_Vision_descriptor;
@@ -656,6 +658,7 @@ public final class Vision extends
     }
     private int bitField0_;
 
+    // repeated .messages.FieldLine line = 1;
     private java.util.List<messages.FieldLine> line_ =
       java.util.Collections.emptyList();
     private void ensureLineIsMutable() {
@@ -797,8 +800,7 @@ public final class Vision extends
         java.lang.Iterable<? extends messages.FieldLine> values) {
       if (lineBuilder_ == null) {
         ensureLineIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, line_);
+        super.addAll(values, line_);
         onChanged();
       } else {
         lineBuilder_.addAllMessages(values);
@@ -896,6 +898,7 @@ public final class Vision extends
       return lineBuilder_;
     }
 
+    // repeated .messages.Corner corner = 2;
     private java.util.List<messages.Corner> corner_ =
       java.util.Collections.emptyList();
     private void ensureCornerIsMutable() {
@@ -1037,8 +1040,7 @@ public final class Vision extends
         java.lang.Iterable<? extends messages.Corner> values) {
       if (cornerBuilder_ == null) {
         ensureCornerIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, corner_);
+        super.addAll(values, corner_);
         onChanged();
       } else {
         cornerBuilder_.addAllMessages(values);
@@ -1136,6 +1138,7 @@ public final class Vision extends
       return cornerBuilder_;
     }
 
+    // optional .messages.CenterCircle circle = 3;
     private messages.CenterCircle circle_ = messages.CenterCircle.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.CenterCircle, messages.CenterCircle.Builder, messages.CenterCircleOrBuilder> circleBuilder_;
@@ -1244,7 +1247,7 @@ public final class Vision extends
       if (circleBuilder_ == null) {
         circleBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.CenterCircle, messages.CenterCircle.Builder, messages.CenterCircleOrBuilder>(
-                getCircle(),
+                circle_,
                 getParentForChildren(),
                 isClean());
         circle_ = null;
@@ -1252,6 +1255,7 @@ public final class Vision extends
       return circleBuilder_;
     }
 
+    // optional .messages.VBall ball = 4;
     private messages.VBall ball_ = messages.VBall.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.VBall, messages.VBall.Builder, messages.VBallOrBuilder> ballBuilder_;
@@ -1360,7 +1364,7 @@ public final class Vision extends
       if (ballBuilder_ == null) {
         ballBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.VBall, messages.VBall.Builder, messages.VBallOrBuilder>(
-                getBall(),
+                ball_,
                 getParentForChildren(),
                 isClean());
         ball_ = null;
@@ -1368,6 +1372,7 @@ public final class Vision extends
       return ballBuilder_;
     }
 
+    // optional int32 horizon_dist = 5;
     private int horizonDist_ ;
     /**
      * <code>optional int32 horizon_dist = 5;</code>
