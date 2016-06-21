@@ -1305,14 +1305,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         SpotList darkSpots = darkSpotDetector.spots();
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
     }
-    
-    if(debugBall) {
-        for(int z = 0; z < blackSpots.size(); z++) {
-            std::pair<int, int> spot = blackSpots[z];
-            std::cout<<"Dark Spot "<<z<<", X: "<<spot.first<<", Y: "
-					 <<spot.second<<std::endl;
-        }
-    }
 
 	// run blobber on parts of the image where spot detector won't work
 	int bottomThird = height * 2 / 3;
