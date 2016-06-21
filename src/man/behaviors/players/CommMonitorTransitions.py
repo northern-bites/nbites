@@ -14,7 +14,6 @@ def checkCommDropOffs(player):
     offCommFromTheBeginning = 0
     droppedOffComm = 0
     off = 0
-    print("testing comm dropoffs")
     for mate in player.brain.teamMembers:
         if mate.playerNumber == 1 or mate.playerNumber == player.brain.playerNumber:
             continue
