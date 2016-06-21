@@ -715,17 +715,18 @@ bool BallDetector::findCorrelatedBlackSpots
                 int r = projectedBallRadius(std::make_pair(ballSpotX, ballSpotY));
 
                 double distance, upper, lower;
-                upper = r*2;
-                lower = r/4;
+                upper = r * 2.5;
+                lower = (r >> 1) >> 1;
 
                 distance = sqrt(pow((s2.ix() - s1.ix()),2) + pow((s2.iy() - s1.iy()),2));
+
 				if (debugBall) {
-					std::cout<<"Distance: "<<distance<<std::endl;
+					std::cout<<"[BALL INFO] Distance Between Spots: "<<distance<<std::endl;
 				}
 
                 if(distance >= lower && distance <= upper) {
 					if (debugBall) {
-						std::cout<<"Distance is in the right range"<<std::endl;
+						std::cout<<"[BALL INFO] Distance OK"<<std::endl;
 					}
 
                     Spot ballSpot;
@@ -752,25 +753,21 @@ bool BallDetector::findCorrelatedBlackSpots
                 ballSpotX = (s1.ix()+s2.ix()+s3.ix())/3;
                 ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
                 int r = projectedBallRadius(std::make_pair(ballSpotX, ballSpotY));
-                std::cout<<"Projected Radius: "<<r<<std::endl;
-                int upper = std::round((pow(1.73205, 3) * pow(r, 2))+0.5);
-                std::cout<<"Upper Pre-Shift: "<<upper<<std::endl;
-                upper = (upper >> 1) >> 1;
-                std::cout<<"Upper: "<<upper<<std::endl;
 
-                double area, lower;
-                if(topCamera) {
-                    upper = 181.1; //289 seen in the log
-                    lower = 70.0;
-                } else {
-                    upper = 210.0;
-                    lower = 22.0;
-                }
+                //equation below derives the maximum area a triangle could have, inscribed
+                //in a circle with radius r obtained above. Derivation was done using
+                //Heron's Formula and some trig. 1.73205 ~= sqrt(3)
+                //Max. Area = ((1.73205)^3 * radius^2) / 4
+                int upper = std::round((pow(1.73205, 3) * pow(r, 2)) + 0.5); //numerator
+                upper = (upper >> 1) >> 1; //divide by 4
+                int lower = (upper >> 1) >> 1;
 
-                area = abs((s1.ix()*(s2.iy()-s3.iy()) + s2.ix()*(s3.iy()-s1.iy()) + s3.ix()*(s1.iy()-s2.iy()))/2);
+                double area = abs((s1.ix()*(s2.iy()-s3.iy()) + 
+                                   s2.ix()*(s3.iy()-s1.iy()) + 
+                                   s3.ix()*(s1.iy()-s2.iy())) / 2);
 
                 if(debugBall) {
-                    std::cout<<"Area: "<<area<<std::endl;
+                    std::cout<<"[BALL INFO] Area Between Spots: "<<area<<std::endl;
                 }
 
                 if(area >= lower && area <= upper) {
@@ -778,7 +775,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
 
                     if (debugBall) {
-                        std::cout<<"Area is in the right range"<<std::endl;
+                        std::cout<<"[BALL INFO] Area OK"<<std::endl;
                         debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
                     }
 
