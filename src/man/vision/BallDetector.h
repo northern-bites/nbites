@@ -82,7 +82,7 @@ namespace man {
 
 		typedef std::vector<std::pair<int, int>> intPairVector;
 		typedef std::vector<Spot> spotVector;
-		typedef std::pair<int, int> imagePoint;
+		typedef std::pair<double, double> imagePoint;
 
 		class BallDetector {
 		public:
@@ -99,8 +99,7 @@ namespace man {
 
             int projectedBallRadius(imagePoint p);
             imagePoint findPointsCentroid(intPairVector & v);
-            void centroidEquidistantPoints(intPairVector & v, int projectedBallRadius,
-            								intPairVector & goodPoints);
+            bool pointsEquidistantFromCentroid(intPairVector & v, int projectedBallRadius);
             
             int getAzimuthColumnRestrictions(double az);
             int getAzimuthRowRestrictions(double az);
