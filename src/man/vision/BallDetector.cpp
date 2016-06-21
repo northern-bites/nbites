@@ -1144,6 +1144,27 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
 	return false;
 }
 
+bool BallDetector::greenBelowBallFromCentroid(imagePoint p) {
+    int THRESHOLD = 110;
+    int WAYDOWN = 35;
+
+    double bx = 0, by = 0;
+    imageToBillCoordinates(p.first, p.second, bx, by);
+    int r = projectedBallRadius(std::make_pair(bx, by));
+
+    int bottomY = std::round(p.second + r + 0.5);
+    getColor(p.first, bottomY);
+    int greenMagnituteSums = 0;
+    for(int i = bottomY; i < WAYDOWN; i++) {
+        greenMagnituteSums += getGreen();
+    }
+    if((greenMagnituteSums / WAYDOWN) >= THRESHOLD) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool BallDetector::whiteNoBlack(Spot spot) {
 	int THRESHOLD = 110;
     // convert back to raw coordinates
