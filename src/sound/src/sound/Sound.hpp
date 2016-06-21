@@ -5,25 +5,6 @@
 
 #include "/Users/pkoch/Robotics/nonbuild-includes/alsa-lib-1.0.29/include/asoundlib.h"
 
-//
-//#include "asoundef.h"
-//#include "version.h"
-//#include "global.h"
-//#include "input.h"
-//#include "output.h"
-//#include "error.h"
-//#include "conf.h"
-//#include "pcm.h"
-//#include "rawmidi.h"
-//#include "timer.h"
-//#include "hwdep.h"
-//#include "control.h"
-//#include "mixer.h"
-//#include "seq_event.h"
-//#include "seq.h"
-//#include "seqmid.h"
-//#include "seq_midi_event.h"
-
 #else
 #include <alsa/asoundlib.h>
 //#include <asoundlib.h>

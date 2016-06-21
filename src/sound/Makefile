@@ -34,7 +34,7 @@ nowifi: sendr recvr
 cross:
 	@echo $(CYAN) compiling cross executable $(NORMAL)
 	$(BUILD) -ggdb -I $(NBCROSS_DIR) $(NBCROSS_SRC) -D DETECT_LOG_RESULTS $(SOUND_SRC) $(NBC_SND_SRC) -lasound -lrt lib/libfftw3f.a -o cross
-	./cross -s 10.211.55.2
+	./cross
 
 record:
 	@echo $(CYAN) compiling record executable $(NORMAL)

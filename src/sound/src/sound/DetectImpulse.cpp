@@ -1,9 +1,11 @@
 #include "Detect.hpp"
 #include "Transform.hpp"
+#include "utilities-pp.hpp"
 
 #include <iostream>
 #include <cmath>
 #include <signal.h>
+#include <cmath>
 
 #if DETECT_METHOD == DETECT_WITH_IMPULSE
 
@@ -11,130 +13,174 @@ using namespace nbsound;
 
 namespace detect {
 
-    bool inited = false;
-    Transform * transform = nullptr;
+bool inited = false;
+Transform * transform = nullptr;
 
-    const int transform_input_length = 4096;
-    const int transform_output_length = SPECTRUM_LENGTH( transform_input_length );
+const int transform_input_length = 4096;
+const int transform_output_length = SPECTRUM_LENGTH( transform_input_length );
 
-    double spectrum_last_frame[2][transform_output_length];
+typedef std::pair<int,int> Range;
+typedef std::pair<int,float> Peak;
 
-    const std::pair<int, int> start_range = {70,160};
-    const float start_min_thresh = 50.0;
-    //const float start_min_thresh = 0.0;
+const int frequency_output_length = 2049;
+const Range full_range = {0, frequency_output_length};
+const Range peak_range = {70,160};
+const int min_frames_on = 4;
+const int max_frames_off = 2;
 
-    const int mid_integral_radius = 15;
-    const int mid_vary_radius = 10;
+const int peak_radius = 10;
 
-    const float sdev_min = 600.0;
+Range range_around(int i, int r) { return {i - r, i + r}; }
 
-    const int on_windows_target = 4;
-    const int off_windows_fail = 2;
+bool in_range(int i, Range range) {
+    return i >= range.first && i <= range.second;
+}
 
-    int on_count[2];
-    int off_count[2];
-    int middle[2];
+bool in_range(const Peak& p, Range r) { return in_range(p.first, r); }
 
-    void window_on(int ch) {
-        ++on_count[ch];
-        off_count[ch] = 0;
-    }
-
-    void window_off(int ch) {
-        ++off_count[ch];
-        if (off_count[ch] >= off_windows_fail) {
-            off_count[ch] = 0;
-            on_count[ch] = 0;
-            middle[ch] = 0;
+Peak peak(float * spec, const Range range = full_range ) {
+    Peak max = {-1,-1};
+    for (int i = range.first; i < range.second; ++i) {
+        if (spec[i] > max.second) {
+            max.first = i;
+            max.second = spec[i];
         }
     }
+    
+    return max;
+}
 
-    std::pair<int, float> peak1() {
-        int ri = -1;
-        float rv = 0;
-        for (int i = 0; i < transform->get_freq_len(); ++i) {
-            double iv = std::abs(transform->get(i));
-            if (iv > rv) {
-                rv = iv;
-                ri = i;
+double sum(float * spec, const Range range = full_range) {
+    double total = 0;
+    for (int i = range.first; i < range.second; ++i) {
+        total += spec[i];
+    }
+    
+    return total;
+}
+
+double mean(float * spectrum) {
+    return sum(spectrum) / frequency_output_length;
+}
+
+double sdev(float * spectrum) {
+    double _mean = mean(spectrum);
+    double _sdev = 0;
+    
+    for (int i = 0; i < frequency_output_length; ++i) {
+        double val = spectrum[i] - _mean;
+        _sdev += (val*val);
+    }
+    
+    return std::sqrt(_sdev);
+}
+
+class NullOut {
+public:
+    template<typename T>
+    NullOut& operator<<(T thing) {return *this;}
+};
+
+NullOut _NULL_OUT_;
+
+#if true
+
+#define START(i) debug(i)
+#define END << std::endl;
+
+#else
+
+#define START(i) _NULL_OUT_
+#define END ;
+
+#endif
+
+
+struct Channel {
+    size_t _frame_index_;
+    int _channel_;
+    
+    std::ostream& debug(size_t i) {
+        std::string prefix(i, '\t');
+        
+        std::cout << prefix << "[" << _channel_ << "]" << "[" << _frame_index_ << "] ";
+        return std::cout;
+    }
+    
+    float last_frame_spectrum[frequency_output_length];
+    int last_frame_peak;
+    float last_frame_sdev;
+    
+    int frames_on;
+    int frames_off;
+    
+    Channel() {
+        last_frame_peak = -1;
+        frames_on = 0;
+        frames_off = 0;
+        
+        _frame_index_ = 0;
+    }
+
+    void reset() {
+        frames_on = frames_off = 0;
+        last_frame_peak = -1;
+        last_frame_sdev = 0.0;
+    }
+    
+    bool count(bool on) {
+        if (on) {
+            ++frames_on;
+            frames_off = 0;
+            return frames_on >= min_frames_on;
+        } else {
+            ++frames_off;
+            
+            if (frames_off >= max_frames_off) {
+                frames_off = 0;
+                frames_on = 0;
+                
+                last_frame_peak = -1;
             }
+            
+            return false;
         }
-
-        return {ri, rv};
     }
-
-    double sum(int start, int end) {
-        double total = 0;
-        int _s = std::max(start, 0);
-        int _e = std::min(transform->get_freq_len(), end);
-
-        for (int i = _s; i < _e; ++i) {
-            float val = transform->get(i);
-            total += val*val;
+    
+    void take(float * spectrum_buffer) {
+        memcpy(last_frame_spectrum, spectrum_buffer, sizeof(float) * frequency_output_length);
+    }
+    
+    bool analyze(float * spectrum) {
+        ++_frame_index_;
+        bool on = false;
+        
+        Peak this_peak = peak(spectrum);
+        double this_sdev = sdev(spectrum);
+        
+        if (in_range(this_peak.first, peak_range)) {
+            
+            START(0) << "inside peak range" END;
+            
+            START(1) << "sdev: " << last_frame_sdev << " -> " << this_sdev
+                << " ratio " << this_sdev / last_frame_sdev END;
+            
+            double peak_sum_now = sum(spectrum, range_around(this_peak.first, peak_radius));
+            double peak_sum_thn = sum(last_frame_spectrum, range_around(this_peak.first, peak_radius));
+            
+            START(1) << "peak sum " << peak_sum_thn << " -> " << peak_sum_now << " ratio " << peak_sum_now / peak_sum_thn END
+            
+        } else {
+            START(0) << "outside peak range" END;
         }
-
-        return total;
+        
+        take(spectrum);
+        last_frame_sdev = this_sdev;
+        return count(on);
     }
+};
 
-    double mean() {
-        double fullsum = sum(0, transform->get_freq_len());
-        return fullsum / transform->get_freq_len() ;
-    }
-
-    double stddev(double mean) {
-        double sdev = 0;
-
-        for (int i = 0; i < transform->get_freq_len(); ++i) {
-            double val = transform->get(i) - mean;
-            sdev += (val*val);
-        }
-
-        return std::sqrt(sdev);
-    }
-
-    bool window_check(int i, int start, int end) {
-        std::pair<int, float> peak = peak1();
-        printf("c(%d) m(%d) on/off %d/%d w{%d -> %d} peak = {%d, %f}\n",
-               i, middle[i], on_count[i], off_count[i],
-               start, end, peak.first, peak.second);
-
-        if (peak.first >= start_range.first && peak.first <= start_range.second) {
-            printf("\tranged\n");
-            if (peak.second >= start_min_thresh) {
-                printf("\tmin_threshed\n");
-
-                double total = sum(peak.first - mid_integral_radius, peak.first + mid_integral_radius);
-                printf("\t\tsum %lf\n", total);
-
-                double theMean = mean();
-                double theDev = stddev(theMean);
-
-                printf("\t\tmean %lf stddev %lf (needs %lf)\n",
-                       theMean, theDev, sdev_min);
-
-                if (theDev < sdev_min) {
-                    return false;
-                }
-
-                if (middle[i] <= 0) {
-                    middle[i] = peak.first;
-                    printf("\t\tMIDDLE SET TO %d\n", peak.first);
-                    window_on(i);
-                    return true;
-
-                } else if ( std::abs(middle[i] - peak.first) < mid_vary_radius ) {
-                    window_on(i);
-                    return true;
-
-                } else {
-                    printf("\t\t%d is %d from %d\n",
-                           peak.first, std::abs(middle[i] - peak.first), middle[i]);
-                }
-            }
-        }
-
-        return false;
-    }
+Channel channels[2];    
 
     bool init() {
         if (inited) return false;
@@ -153,11 +199,8 @@ namespace detect {
     }
 
     bool reset() {
-        for (int i = 0; i < 2; ++i) {
-            on_count[i] = 0;
-            off_count[i] = 0;
-            middle[1] = 0;
-        }
+        for (int i = 0; i < 2; ++i)
+            channels[i].reset();
 
 #ifdef DETECT_LOG_RESULTS
         detect_results.clear();
@@ -181,18 +224,10 @@ namespace detect {
                 SampleBuffer window = buffer.window(window_start, window_end);
                 transform->transform(window, i);
 
-
-                if (!window_check(i, window_start, window_end)) {
-                    window_off(i);
-                }
-
-                bool heard = false;
-
-                if (on_count[i] >= on_windows_target) {
-                    NBL_WARN(" [ whistle detector HEARD ] ")
-                    heard = true;
-                }
-
+		bool heard = channels[i].analyze(transform->get_freq_buffer());
+		if (heard)
+			NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
+	
 #ifdef DETECT_LOG_RESULTS
                 nbl::Block block;
                 block.data = transform->get_all();
@@ -204,16 +239,6 @@ namespace detect {
 
                 block.dict["WhistleWasHeard"] = json::Boolean(heard);
 
-                json::Array ja_off, ja_on, ja_mid;
-                for (int i = 0; i < 2; ++i) {
-                    ja_on.push_back(json::Number(off_count[i]));
-                    ja_off.push_back(json::Number(on_count[i]));
-                    ja_mid.push_back(json::Number(middle[i]));
-                }
-
-                block.dict["WhistleOff"] = ja_off;
-                block.dict["WhistleOn"] = ja_on;
-                block.dict["WhistleMiddle"] = ja_mid;
                 detect_results.push_back(block);
 #endif
                 

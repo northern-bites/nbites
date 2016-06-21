@@ -22,6 +22,7 @@ NBCROSS_FUNCTION(whistle_detect, true )
         nbl::logptr ptr = arguments[0];
         nbl::Block& block = ptr->blocks[0];
 
+        int 
         SampleBuffer buffer{2, 32768};
         NBL_ASSERT_EQ(buffer.size_bytes(), block.data.size())
         memcpy(buffer.buffer, block.data.data(), block.data.size());

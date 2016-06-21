@@ -284,7 +284,7 @@ public class LogReference {
 
 	private String tempName() {
 		return String.format("%s_%s_v%d_id%d_u%s.nblog", this.host_name, this.logClass, ToolSettings.VERSION,
-				this.savedID, Utility.getRandomHexString(10));
+				this.thisID, Utility.getRandomHexString(10));
 	}
 
 	private void initializeTemp() {
