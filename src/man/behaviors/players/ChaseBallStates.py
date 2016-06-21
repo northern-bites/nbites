@@ -163,85 +163,9 @@ def prepareForKick(player):
 
     # only orbit is small orbit
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
-    if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
+    if fabs(relH) < constants.SHOULD_ORBIT_BEARING and player.brain.loc.x < 800:
         return player.goNow('orbitBall')
-    return player.goNow('orbitBall')
-
-
-#Josh's code
-    # player.motionKick = True
-    # return player.goNow('lineUp')
-#dans potential field stuff
-    # # only orbit is small orbit
-    # relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
-    # if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
-    #     return player.goNow('orbitBall')
-    # return player.goNow('followPotentialField')
-
-# @superState('gameControllerResponder')
-# @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
-# @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
-# @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
-# @ifSwitchNow(transitions.shouldFindBall, 'findBall')
-# def followPotentialField(player):
-#     """
-#     This state is based on electric field potential vector paths. The ball is treated as an
-#     attractive force where on the side that will be kicked. The opposite side is treated as 
-#     a repulsive force of smaller magnitude.
-#     """
-#     if player.brain.nav.dodging:
-#         return player.stay()
-
-#     if player.firstFrame():
-#         player.brain.tracker.trackBall()  
-
-#     ball = player.brain.ball
-#     heading = player.brain.loc.h
-#     relH = player.decider.normalizeAngle(player.kick.setupH - heading)
-
-#     if (transitions.shouldPositionForKick(player, ball, relH)):
-#         player.brain.nav.stand()
-#         destinationX = player.kick.destinationX
-#         destinationY = player.kick.destinationY
-#         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
-#         player.kick.destinationX = destinationX
-#         player.kick.destinationY = destinationY
-#         return player.goNow('positionForKick')
-
-#     else:
-#         attractorX = ball.rel_x - constants.ATTRACTOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
-#         attractorY = ball.rel_y - constants.ATTRACTOR_BALL_DIST*sin(-radians(heading - player.kick.setupH))
-#         attractorDist = (attractorX**2 + attractorY**2)**.5
-#         if attractorDist == 0:
-#             attractorDist = .00000000001
-
-#         repulsorX = ball.rel_x - constants.REPULSOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
-#         repulsorY = ball.rel_y - constants.REPULSOR_BALL_DIST*sin(-radians(heading - player.kick.setupH))
-#         repulsorDist = (repulsorX**2 + repulsorY**2)**.5
-
-#         if repulsorDist == 0:
-#             repulsorDist = .00000000001
-
-#         # super position of an attractive potential field and arepulsive one
-#         xComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorX/attractorDist**3 - repulsorX/repulsorDist**3
-#         yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 - repulsorY/repulsorDist**3
-
-#         if xComp == 0 and yComp == 0:
-#             player.setWalk(0, 0, copysign(MAX_SPEED, ball.bearing_deg))
-
-#         else:
-#             normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
-
-#             if fabs(ball.bearing_deg) < 2*constants.FACING_KICK_ACCEPTABLE_BEARING:
-#                 hComp = 0
-#             elif attractorDist < constants.CLOSE_TO_ATTRACTOR_DIST:
-#                 hComp = copysign(Navigator.FAST_SPEED, ball.bearing_deg)
-#             else:
-#                 hComp = copysign(Navigator.MEDIUM_SPEED, ball.bearing_deg)
-            
-#             player.setWalk(normalizer*xComp, normalizer*yComp, hComp)
-
-#     return player.stay()
+    return player.goNow('positionForKick')
 
 @superState('positionAndKickBall')
 def lineUp(player):
@@ -302,8 +226,8 @@ def orbitBall(player):
         player.kick.destinationX = destinationX
         player.kick.destinationY = destinationY
 
-        if transitions.shouldNotDribble(player):
-            return player.goNow('positionForKick')
+        # if transitions.shouldNotDribble(player):
+        #     return player.goNow('positionForKick')
         return player.goNow('dribble')
         
 
@@ -414,12 +338,12 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
-    if transitions.shouldNotDribble(player)
+    if transitions.shouldNotDribble(player):
         return player.goNow('approachBall')
     print "Dribble time"
     ball = player.brain.ball
     player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_THREE)
-    player.brain.walk(10, 0, 0)
+    player.brain.nav.walk(10, 0, 0)
     return player.stay()
 
 @superState('positionAndKickBall')
@@ -439,7 +363,7 @@ def spinToBall(player):
     spinToBall.isFacingBall = fabs(theta) <= 2*constants.FACING_KICK_ACCEPTABLE_BEARING
 
     if spinToBall.isFacingBall:
-        return player.goLater('approachBall')
+        return player.goLater('dribble')
 
     # spins the appropriate direction
     if theta < 0:

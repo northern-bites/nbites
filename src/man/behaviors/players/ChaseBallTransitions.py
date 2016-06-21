@@ -220,5 +220,4 @@ def shouldChangeKickingStrategy(player):
             player.brain.theirScore > player.brain.ourScore)
 
 def shouldNotDribble(player):
-    return (player.brain.game.secs_remaining <= 30 or
-            player.brain.loc.x > 600)
+    return (player.brain.game.secs_remaining <= 30)
