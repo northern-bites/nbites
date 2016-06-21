@@ -15,7 +15,9 @@ namespace detect {
     Transform * transform = nullptr;
 
     const int transform_input_length = 4096;
-    const int transform_output_length = transform_input_length / 2;
+    const int transform_output_length = SPECTRUM_LENGTH( transform_input_length );
+
+    double spectrum_last_frame[2][transform_output_length];
 
     const std::pair<int, int> start_range = {70,160};
     const float start_min_thresh = 50.0;

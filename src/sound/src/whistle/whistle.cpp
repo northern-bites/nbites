@@ -18,6 +18,8 @@
 
 #include "../sound/Detect.hpp"
 
+#include "Logging.hpp"
+
 const char * LAST_MODIFIED = "6/12 19:53";
 const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
@@ -30,10 +32,16 @@ whistle::SharedMemory shared;
 
 int whistleSingleFD = 0;
 
+bool useLogging = false;
+
 void whistle_cleanup() {
     NBL_WARN("clearing up whistle process...");
 
     detect::cleanup();
+
+    if (useLogging) {
+	nbl::teardownLogging();
+    }
 
     if (whistleSingleFD > 0) {
         flock(whistleSingleFD, LOCK_UN);
@@ -82,6 +90,17 @@ size_t iteration = 0;
 
 void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
 
+    if (useLogging) {
+        int length = buffer.size_bytes();
+        std::string newData( (const char *) buffer.buffer, length);
+
+        printf("sending....\n");
+        nbl::logptr newLog = nbl::Log::emptyLog();
+        newLog->logClass = "DetectAmplitude";
+        newLog->blocks.push_back(nbl::Block{newData, "SoundAmplitude"});
+        nbl::NBLog(newLog);
+    }
+
     if (shared.isOpen()) {
         shared.whistle_heartbeat() = time(NULL);
     }
@@ -128,6 +147,12 @@ int main(int argc, const char * argv[]) {
     if (argc > 1) {
         NBL_WARN("--------------------------\nwhistle stand"
                  "alone mode\n--------------------------");
+
+	if (std::string{argv[1]} == std::string{"log"}) {
+		NBL_WARN("using logging (connect via nbtool)")
+		useLogging = true;
+		nbl::initiateLogging();
+	}
     } else {
         NBL_WARN("whistle server mode");
 

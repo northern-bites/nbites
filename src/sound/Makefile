@@ -58,3 +58,6 @@ recvr:
 clean:
 	rm src/**.o
 	rm *.o
+	rm whistle cross sendr recvr
+
+
