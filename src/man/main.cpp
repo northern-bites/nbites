@@ -101,6 +101,10 @@ int main() {
         // (Diagram threads are daemon threads, and man will exit if they're the
         // only ones left)
         sleep(10);
+
+        // clear zombie mans
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
+
     return 1;
 }
