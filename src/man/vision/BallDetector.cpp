@@ -337,7 +337,7 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
         startCol = c;
     }
     if(startCol < 0) { startCol = 0; }
-    if(endCol >= width) { endCol = width; }
+    if(endCol >= width-1) { endCol = width-1; }
 
     int r = getAzimuthRowRestrictions(homography->azimuth());
     if(r < 0) {
@@ -345,11 +345,11 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
     } else {
         endRow = r;
     }
-    if(endRow > height) {endRow = height; }
+    if(endRow > height-1) {endRow = height-1; }
 
     bool extendedBottom = false;
 
-    if(startCol-BOT_RESTRICTION_BUF >= 0 && endRow+BOT_RESTRICTION_BUF <= height) {
+    if(startCol-BOT_RESTRICTION_BUF >= 0 && endRow+BOT_RESTRICTION_BUF <= height-1) {
         getColor(startCol, endRow);
         if(isGreen()) {
             startCol -= BOT_RESTRICTION_BUF;
@@ -357,7 +357,7 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
             extendedBottom = true;
         }
     }
-    if(endCol+BOT_RESTRICTION_BUF <= width && endRow+BOT_RESTRICTION_BUF <= height) {
+    if(endCol+BOT_RESTRICTION_BUF <= width-1 && endRow+BOT_RESTRICTION_BUF <= height-1) {
         getColor(endCol, endRow);
         if(isGreen()) {
             endCol += BOT_RESTRICTION_BUF;
@@ -375,7 +375,7 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
             }
         }
     }
-    if(endCol+TOP_RESTRICTION_BUF <= width) {
+    if(endCol+TOP_RESTRICTION_BUF <= width-1) {
         getColor(startCol, 0);
         if(isGreen()) {
             if(extendedBottom) {
@@ -972,7 +972,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	getColor(x, y);
 	int THRESHOLD = 110;
 	if (!checkGradientInSpot(spot)) {
-        std::cout<<"returning false 1\n";
+        // std::cout<<"returning false 1\n";
 		return false;
 	}
     intPairVector gp;
@@ -1020,11 +1020,11 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			" " << length4 << std::endl;
 	}
 	if (abs(length1 + length2 - length3 - length4) > 4) {
-        std::cout<<"returning false 2\n";
+        // std::cout<<"returning false 2\n";
 		return false;
 	}
 	if (max(length1, length2) < 4 && max(length3, length4) < 4) {
-        std::cout<<"returning false 3\n";
+        // std::cout<<"returning false 3\n";
 		return false;
 	}
 
@@ -1078,11 +1078,11 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			return false;
 		}
 	}
-    std::cout<<"GP SIZE: "<<gp.size()<<std::endl;
+    // std::cout<<"GP SIZE: "<<gp.size()<<std::endl;
     if(debugBall) {
-        std::cout<<"here\n";
+        // std::cout<<"here\n";
         for(int i=0; i<gp.size(); i++) {
-            std::cout<<"drawing\n";
+            // std::cout<<"drawing\n";
             debugDraw.drawPoint(gp[i].first, gp[i].second, RED);
         }
     }
@@ -1274,7 +1274,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         // std::cout<<"EndRow: "<<endRow<<std::endl;
         //debugDraw.drawPoint(20, endRow, ORANGE);
         // debugDraw.drawPoint(endCol, 10, BLUE);
-        debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW);
+        if(!topCamera) { debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW); }
     }
 
     // Then we are going to filter out all of the blobs that obviously
