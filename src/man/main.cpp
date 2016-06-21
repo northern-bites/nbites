@@ -6,6 +6,9 @@
 #include "SharedData.h"
 
 #include <sys/file.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <errno.h>
 
 int lockFD = 0;
@@ -102,6 +105,7 @@ int main() {
         // only ones left)
         sleep(10);
 
+        int status;
         // clear zombie mans
         while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
