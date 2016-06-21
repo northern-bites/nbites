@@ -1375,17 +1375,19 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     ImageLiteU16 smallerY;
     ImageLiteU8 smallerGreen;
 
-	int horiz = 0;
-	if (topCamera) {
-		horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
-        smallerY = ImageLiteU16(yImage, 0, horiz, yImage.width(), height - horiz);
-        smallerGreen = ImageLiteU8(greenImage, 0, horiz, greenImage.width(), height - horiz);
-	} else {
+	// int horiz = 0;
+	// if (topCamera) {
+	// 	horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
+ //        smallerY = ImageLiteU16(yImage, 0, horiz, yImage.width(), height - horiz);
+ //        smallerGreen = ImageLiteU8(greenImage, 0, horiz, greenImage.width(), height - horiz);
+	// } else {
+    if(!topCamera) {
         smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
         smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
     }
+    //}
 
-    if(!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions()) {
+    if(!topCamera && (!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions())) {
         return false;
     }
     SpotDetector darkSpotDetector;
