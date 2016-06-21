@@ -356,7 +356,11 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				Debug.print("undoing!");
 				ignoreChangeEvents = true;
 
-				Change latest = undoStack.remove(undoStack.size() - 1);
+				int index = Math.max(undoStack.size() - 10, 0);
+				Change latest = undoStack.get(index);
+
+				undoStack.removeAll(undoStack.subList(index, undoStack.size()));
+
 				latest.group.slider.setValue(latest.previousValue);
 				latest.group.spinner.setValue(latest.previousValue);
 
