@@ -169,7 +169,7 @@ strikerTriangle = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 1
 # Made for when striker alternates between two home positions
 strikerLeftHome = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
                                 NogginConstants.MIDFIELD_Y + 200,
-                                225)
+                                -45)
 strikerRightHome = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
                                 NogginConstants.MIDFIELD_Y - 200,
                                 135)
