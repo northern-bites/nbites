@@ -56,7 +56,7 @@ def lineUpKick(player):
 @superState('lineUpKick')
 def walkToWayPoint(player):
     if player.brain.nav.dodging:
-        return player.stay()    
+        return player.stay()
 
     if player.firstFrame():
         player.decider = KickDecider.KickDecider(player.brain)
@@ -89,7 +89,7 @@ def walkToWayPoint(player):
         player.brain.nav.chaseBall(speed, fast = True)
 
         if transitions.shouldPrepareForKick(player):
-            return player.goLater('positionAndKickBall')
+            return player.goLater('dribble')
 
     return player.stay()
 
@@ -110,7 +110,7 @@ def spinToKickHeading(player):
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
     if fabs(relH) <= constants.FACING_KICK_ACCEPTABLE_BEARING:
-        return player.goNow('positionForKick')
+        return player.goNow('dribble')
 
     if fabs(relH) <= constants.FACING_BALL_ACCEPTABLE_BEARING:
         speed = speeds.SPEED_FOUR
@@ -143,7 +143,6 @@ def prepareForKick(player):
     if player.firstFrame():
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
-
     # print "prepareForKick"
 
     if not player.inKickOffPlay:
@@ -165,7 +164,7 @@ def prepareForKick(player):
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
     if fabs(relH) < constants.SHOULD_ORBIT_BEARING and player.brain.loc.x < 800:
         return player.goNow('orbitBall')
-    return player.goNow('positionForKick')
+    return player.goNow('dribble')
 
 @superState('positionAndKickBall')
 def lineUp(player):
@@ -334,16 +333,18 @@ orbitBall.X_SPEED = .35
 orbitBall.X_BACKUP_SPEED = .2
 
 @superState('positionAndKickBall')
+@ifSwitchNow(transitions.shouldSpinToKickHeading, 'orbitBall')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
+        print "It's no longer dribble time"
         return player.goNow('approachBall')
     print "Dribble time"
     ball = player.brain.ball
-    player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_THREE)
-    player.brain.nav.walk(10, 0, 0)
+    player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_FIVE)
+    # player.brain.nav.walk(10, 0, 0)
     return player.stay()
 
 @superState('positionAndKickBall')
