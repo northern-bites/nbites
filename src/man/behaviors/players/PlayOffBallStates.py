@@ -268,8 +268,11 @@ def playerFourSearchBehavior(player):
         if playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 0:
             adjustHeading.desiredHeading = 180
             return player.goNow("adjustHeading")
+        else if playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 1:
+            adjustHeading.desiredHeading = 90
+            return player.goNow("adjustHeading")
         else:
-            adjustHeading.desiredHeading = 0
+            adjustHeading.desiredHeading = -90
             return player.goNow("adjustHeading")
 
     player.brain.nav.updateDest(playerFourSearchBehavior.dest)

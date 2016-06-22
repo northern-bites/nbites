@@ -55,7 +55,7 @@ def spinSearch(player):
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
         player.setWalk(0, 0, spinDir*speeds.SPEED_FIVE)
-        player.brain.tracker.lookToSpinDirection(spinDir)
+        player.brain.tracker.repeatFixedPitchLookAhead()
 
 @superState('gameControllerResponder')
 @stay
