@@ -1,11 +1,25 @@
 #include "MotionModule.h"
 #include "Profiler.h"
 #include <fstream>
+#include "unswalk/UNSWalkProvider.h"
+
 
 namespace man
 {
 namespace motion
 {
+    // TODO Refactor and figure out a better way to do this... 
+    // Multiple includes of Eigen were causing issues
+    // I'm sorry
+    UNSWalkProvider        walkProvider;
+
+    bool MotionModule::calibrated() { return walkProvider.calibrated(); }
+    bool MotionModule::upright() { return walkProvider.upright(); }
+
+    bool MotionModule::isWalkActive() { return walkProvider.isWalkActive(); }
+    bool MotionModule::isStanding()   { return walkProvider.isStanding(); }
+    void MotionModule::resetWalkProvider()     { walkProvider.hardReset(); }
+
 MotionModule::MotionModule()
   : jointsOutput_(base()),
     stiffnessOutput_(base()),
@@ -28,7 +42,7 @@ MotionModule::MotionModule()
     gainsOn(false),
     stiff(false)
 {
-
+    std::cout << "Constructing MM" << std::endl;
 }
 
 MotionModule::~MotionModule()
@@ -65,8 +79,25 @@ void MotionModule::run_()
 
     newInputJoints = false;
 
+    // if (curProvider != &walkProvider) {
+    //     std::cout << "Curprovider is NOT the walk provider!\n";
+    //     if (curProvider == &nullBodyProvider) {
+    //         std::cout << "Curprovider is NULL PROVIDER!\n";
+    //     }
+    //     if (curProvider == &scriptedProvider) {
+    //         std::cout << "Curprovider is scriptedProvider!\n";
+    //     }
+    // }
+    if (curProvider )
+
     // (2) If motion is enabled, perform a single iteration
     //     of the main motion loop.
+    if (frameCount % 800 == 0) {
+        std::cout << "RESETTING ODOMETRY oh god! \n";
+        resetOdometry();
+    }
+
+
     if(running)
     {
         // (3) Do any necessary preprocessing of joint angles
@@ -94,9 +125,21 @@ void MotionModule::run_()
 
         newInputJoints = false;
         frameCount++;
+
+        if (!walkProvider.calibrated()) {
+            // TODO bella hack fix this, love nikki :) 
+            // std::cout << "NOT CALIBRATED DONt move\n";
+            adjustIMU(); }
     }
 
     PROF_EXIT(P_MOTION);
+}
+
+void MotionModule::adjustIMU() {
+    if (!walkProvider.calibrated()) {
+        // std::cout << "Walkprovider not calibrated!!" << std::endl;
+        walkProvider.adjustIMU(inertialsInput_.message());
+    }
 }
 
 void MotionModule::resetOdometry()
@@ -210,6 +253,10 @@ void MotionModule::processBodyJoints()
             curProvider->calculateNextJointsAndStiffnesses(
                 sensorAngles, sensorCurrents,
                 inertialsInput_.message(), fsrInput_.message());
+
+            // std::cout << "Resetting calibration inertials\n";
+            walkProvider.resetIMU();
+
         }
         else
         {
@@ -228,22 +275,33 @@ void MotionModule::processBodyJoints()
         const std::vector<float> larmJoints =
             curProvider->getChainJoints(Kinematics::LARM_CHAIN);
 
+        // std::cout << "[MOTION MODULE] LEG JOINTS: ";
+
+
         //copy and clip joints for safety
         for(unsigned int i = 0; i < Kinematics::LEG_JOINTS; i ++)
         {
+
             nextJoints[Kinematics::R_HIP_YAW_PITCH + i] =
                 NBMath::clip(rlegJoints.at(i),
                              Kinematics::RIGHT_LEG_BOUNDS[i][0],
                              Kinematics::RIGHT_LEG_BOUNDS[i][1]);
+            // std::cout << "FROM CHAIN: " << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << RAD2DEG(rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << RAD2DEG(llegJoints.at(i)) << std::endl;
 
             nextJoints[Kinematics::L_HIP_YAW_PITCH + i]
                 = NBMath::clip(llegJoints.at(i),
                                Kinematics::LEFT_LEG_BOUNDS[i][0],
                                Kinematics::LEFT_LEG_BOUNDS[i][1]);
+
+            // std::cout << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << (rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << (llegJoints.at(i)) << std::endl;
+
         }
 
         for(unsigned int i = 0; i < Kinematics::ARM_JOINTS; i ++)
         {
+
+            // std::cout << "FROM CHAIN: " << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << RAD2DEG(rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << RAD2DEG(llegJoints.at(i)) << std::endl;
+            
             nextJoints[Kinematics::L_SHOULDER_PITCH + i] =
                 NBMath::clip(larmJoints.at(i),
                              Kinematics::LEFT_ARM_BOUNDS[i][0],
@@ -371,6 +429,14 @@ void MotionModule::processMotionInput()
             sendMotionCommand(bodyCommandInput_.message().speed());
         }
         else if (bodyCommandInput_.message().type() ==
+                 messages::MotionCommand::WALK_IN_PLACE)
+        {
+            WalkInPlaceCommand::ptr newCommand(new WalkInPlaceCommand());
+            nextProvider = &walkProvider;
+            walkProvider.setCommand(newCommand);
+
+        }
+        else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::KICK)
         {
               sendMotionCommand(bodyCommandInput_.message().kick(), bodyCommandInput_.message().timestamp());
@@ -423,6 +489,7 @@ void MotionModule::preProcessBody()
 
         if (!curProvider->isActive())
         {
+            std::cout << "[MOTION MODULE] Swapping body providers \n";
             swapBodyProvider();
         }
     }
@@ -578,6 +645,10 @@ void MotionModule::swapBodyProvider()
         // ONCE (Maybe twice?), instead of doing this forever.
         //The potential symptoms of such a bug would be jittering when standing
         //We need to ensure we are in the correct gait before walking
+
+        // std::cout << "Resetting calibration inertials\n";
+        // walkProvider.resetIMU();
+
         if(noWalkTransitionCommand){//only enqueue one
             noWalkTransitionCommand = false;
             transitions = generateNextBodyProviderTransitions();
@@ -586,6 +657,7 @@ void MotionModule::swapBodyProvider()
                 for(unsigned int i = 0; i< transitions.size(); i++){
                     scriptedProvider.setCommand(transitions[i]);
                 }
+                // std::cout << "Switching to scripted provider!\n";
                 curProvider = static_cast<MotionProvider * >(&scriptedProvider);
                 break;
             }
@@ -692,6 +764,8 @@ void MotionModule::sendMotionCommand(messages::WalkCommand command)
 
 void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
 {
+    // std::cout << "[MOTION MODULE] Switching to scripted body providers \n";
+
     noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
     scriptedProvider.setCommand(command);
@@ -699,6 +773,8 @@ void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
 
 void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands)
 {
+    // std::cout << "[MOTION MODULE] Switching to scripted body providers \n";
+
     noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
     for(std::vector<BodyJointCommand::ptr>::const_iterator iter = commands.begin();
@@ -778,6 +854,7 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
             );
 
         noWalkTransitionCommand = true;
+
         nextProvider = &scriptedProvider;
         scriptedProvider.setCommand(newCommand);
     }
@@ -877,6 +954,8 @@ void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
 
 void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
 {
+    // std::cout << "[MOTION MODULE] Switching to NULL body providers \n";
+
     nextProvider = &nullBodyProvider;
     nextHeadProvider = &nullHeadProvider;
 
@@ -903,6 +982,12 @@ void MotionModule::sendMotionCommand(const StepCommand::ptr command)
 }
 
 void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
+{
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
+}
+
+void MotionModule::sendMotionCommand(const WalkInPlaceCommand::ptr command)
 {
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
@@ -966,6 +1051,7 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
         gain = command.gain();
     else
         gain = DEFAULT_SPEED;
+    // std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
 
     nextProvider = &walkProvider;
     StepCommand::ptr newCommand(
@@ -980,12 +1066,16 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 
 void MotionModule::sendMotionCommand(const KickCommand::ptr command)
 {
+    // std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
+
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }
 
 void MotionModule::sendMotionCommand(messages::Kick command, int time)
 {
+    // std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
+
     nextProvider = &walkProvider;
     KickCommand::ptr newCommand(new KickCommand(command.type(), time));
     walkProvider.setCommand(newCommand);

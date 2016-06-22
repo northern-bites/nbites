@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface SonarStateOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.SonarState)
-    com.google.protobuf.MessageOrBuilder {
+public interface SonarStateOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float us_left = 1;
   /**
    * <code>optional float us_left = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface SonarStateOrBuilder extends
    */
   float getUsLeft();
 
+  // optional float us_right = 2;
   /**
    * <code>optional float us_right = 2;</code>
    */

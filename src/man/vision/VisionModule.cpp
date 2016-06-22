@@ -612,6 +612,11 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
 		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
 		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
+		nbl::SExpr *spot = params->get(1)->find("ShowSpotSizes");
+		int debugSpots = 0;
+		if (spot != NULL) {
+			debugSpots = spot->get(1)->valueAsInt();
+		}
 		int filterDark = params->get(1)->find("FilterDark")->get(1)->valueAsInt();
 		int greenDark = params->get(1)->find("GreenDark")->get(1)->valueAsInt();
 		int filterBrite = params->get(1)->find("FilterBrite")->get(1)->valueAsInt();
@@ -622,6 +627,8 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		ballDetector[0]->setDebugSpots(debugSpots);
+		ballDetector[1]->setDebugSpots(debugSpots);
 		ballDetector[0]->setDebugFilterDark(filterDark);
 		ballDetector[1]->setDebugFilterDark(filterDark);
 		ballDetector[0]->setDebugGreenDark(greenDark);
@@ -632,6 +639,7 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		ballDetector[1]->setDebugGreenBrite(greenBrite);
 		debugImage[0]->reset();
 		debugImage[1]->reset();
+		//std::cout << "out" << std::endl;
 	}
 #endif
 
