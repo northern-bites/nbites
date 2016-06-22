@@ -35,8 +35,13 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       colorParamsMonitor( calibration::colorParamsPath().c_str(), false),
       camOffsetsMonitor( calibration::cameraOffsetsPath().c_str(), false)
 {
-    NBL_ASSERT_EQ( robotName.find(".local"), std::string::npos )
-    name = robotName;
+    size_t dot_local_pos = robotName.find(".local");
+
+    if (dot_local_pos != std::string::npos) {
+        name = robotName.substr(0, dot_local_pos);
+    } else {
+        name = robotName;
+    }
 
     for (int i = 0; i < 2; ++i) {
         colorParams[i] = NULL;

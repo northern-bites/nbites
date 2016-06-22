@@ -5,14 +5,15 @@
 #include "Man.h"
 #include "SharedData.h"
 
-
 #include <sys/file.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <errno.h>
 
 int lockFD = 0;
 man::Man* instance;
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
 
 void cleanup() {
     instance->preClose();
@@ -50,7 +51,7 @@ void error_signal_handler(int signal) {
 
     cleanup();
 
-    exit(-1);
+    abort();
 }
 
 // Deal with lock file. To ensure that we only have ONE instance of man
@@ -73,6 +74,7 @@ void establishLock()
 
 int main() {
     signal(SIGTERM, handler);
+    signal(SIGINT, handler);
 
     establishLock();
 
@@ -86,8 +88,8 @@ int main() {
     fprintf(stderr, "Man re-opening stderr...\n");
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
-//    freopen(MAN_LOG_PATH, "w", stdout);
-     freopen(MAN_LOG_PATH, "wa", stdout);
+    freopen(MAN_LOG_PATH, "w", stdout);
+    
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     
@@ -102,6 +104,11 @@ int main() {
         // (Diagram threads are daemon threads, and man will exit if they're the
         // only ones left)
         sleep(10);
+
+        int status;
+        // clear zombie mans
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
+
     return 1;
 }
