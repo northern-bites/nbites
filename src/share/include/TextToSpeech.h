@@ -4,7 +4,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#ifndef NBL_STANDALONE
 #include "DebugConfig.h"
+#endif
 
 enum say_when {
     IN_DEBUG,
@@ -17,7 +19,7 @@ namespace man {
 
         static const say_when CURRENT_LEVEL = IN_DEBUG;
 
-#if !defined(OFFLINE) && defined(USE_ROBOT_TTS)
+#if (!defined(OFFLINE) && defined(USE_ROBOT_TTS)) || defined(NBL_STANDALONE)
         static inline void internal_say(const char * line) {
             if (!fork()) {
                 static const int line_size = 500;

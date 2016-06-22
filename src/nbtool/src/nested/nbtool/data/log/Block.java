@@ -52,7 +52,9 @@ public class Block {
 		this(data, null, type, null, 0, 0);
 	}
 
-	public Block() { }
+	public Block() {
+		this(null, null, null, null, 0, 0);
+	}
 
 	public static Block empty() {
 		return new Block();
@@ -115,8 +117,6 @@ public class Block {
 		return new Y8Image(pair.a, pair.b, this.data);
 	}
 
-
-
 	public Message parseAsProtobufOfClass(Class<? extends Message> pclass) {
 		if (pclass == null) {
 			throw new BlockParseException(this.type, String.format("protobuf<null>") );
@@ -146,6 +146,7 @@ public class Block {
 		public BlockParseException(String type, String ... rtype) {
 			super(String.format("Block of type '%s' cannot be parsed as any of '%s'",
 					type, Arrays.toString(rtype)));
+
 		}
 	}
 }
