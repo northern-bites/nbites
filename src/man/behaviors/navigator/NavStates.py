@@ -47,6 +47,10 @@ def goToPosition(nav):
     """
     relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
 
+    if nav.firstFrame():
+        print("Resetting at position transition!!")
+        nav.atLocPositionTransition.reset()
+
     # if nav.counter % 10 is 0:
     # print "\ngoing to " + str(relDest)
     #    print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX,
