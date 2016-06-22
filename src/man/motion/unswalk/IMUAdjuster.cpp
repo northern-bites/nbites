@@ -48,6 +48,9 @@ namespace motion
 		gyr_y = gyr_y - gyr_zero_y;
 		adj_gyr_y = adj_gyr_y * OLD_SCALE + gyr_y * (1.0 - OLD_SCALE);
 
+		// std::cout << "Angle_Y degrees: " << angle_y * 180 / M_PI;
+		// std::cout << "          Angle_X degrees: " << angle_x * 180 / M_PI << std::endl;
+
 		if (angle_x >= fallDownAngleX || angle_y >= fallDownAngleY) {
 			// std::cout << "FALLING IS TRUUUUE\n";
 			falling = true;
