@@ -19,10 +19,14 @@ namespace man {
 
 #if !defined(OFFLINE) && defined(USE_ROBOT_TTS)
         static inline void internal_say(const char * line) {
+            static const int line_size = 500;
+            char buffer[line_size];
+            snprintf(buffer, line_size, "say \"%s\"", line);
+
             if (!fork()) {
-                static const int line_size = 500;
-                char buffer[line_size];
-                snprintf(buffer, line_size, "say \"%s\"", line);
+                freopen("/dev/null", "w", stdout);
+                freopen("/dev/null", "w", stderr);
+
                 system( (const char *) buffer );
                 exit(0);
             }
