@@ -85,7 +85,7 @@ int main() {
     signal(SIGSEGV, error_signal_handler);
 
     printf("forking for whistle...\n");
-    whistlePID = start_whistle_process();
+    whistlePID = whistle::start_whistle_process();
 
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     
