@@ -65,7 +65,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edges[i] = new EdgeList(32000);
         rejectedEdges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
-        calibrationParams[i] = new CalibrationParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
