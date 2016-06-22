@@ -23,7 +23,7 @@ namespace man {
 #if (!defined(OFFLINE) && defined(USE_ROBOT_TTS)) || defined(NBL_STANDALONE)
         static inline void internal_say(const char * line) {
             if (!fork()) {
-                execl("/usr/bin/say", line, NULL);
+                execl("/usr/bin/say", "", line, NULL);
                 exit(0);
                 kill(getpid(), SIGKILL);
             }
