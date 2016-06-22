@@ -53,6 +53,12 @@ def goToPosition(nav):
     #                                             nav.brain.ball.loc.relY,
     #                                             nav.brain.ball.loc.bearing)
 
+    
+    if nav.counter < 2:
+        print("In go to position, walking in place")
+        helper.walkInPlace(nav)
+        return nav.stay()
+
     goToPosition.speed = nav.velocity
     if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
         nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
@@ -228,6 +234,11 @@ def destinationWalkingTo(nav):
     if nav.firstFrame():
         destinationWalkingTo.enqueAZeroVector = False
 
+    if nav.counter < 4:
+        print("In dest walking to, walking in place")
+        helper.walkInPlace(nav)
+        return nav.stay()
+
     destinationWalkingTo.speed = nav.velocity
     if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
             nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
@@ -295,11 +306,11 @@ def walkingTo(nav):
         print("I think i'm there!")
         return nav.goNow('standing')
 
-    if nav.counter % 10 == 0:
-        print "Current odo:"
-        print ("x:", walkingTo.currentOdo.relX)
-        print ("y:", walkingTo.currentOdo.relY)
-        print ("h:", walkingTo.currentOdo.relH)
+    # if nav.counter % 10 == 0:
+    #     print "Current odo:"
+    #     print ("x:", walkingTo.currentOdo.relX)
+    #     print ("y:", walkingTo.currentOdo.relY)
+    #     print ("h:", walkingTo.currentOdo.relH)
 
     return nav.stay()
 
@@ -326,11 +337,23 @@ walking.transitions = {}
 def stopped(nav):
     return nav.stay()
 
+def walkInPlace(nav):
+    if nav.firstFrame():
+        helper.walkInPlace(nav)
+
+    # if nav.counter > 20:
+    #     return nav.goLater('atPosition')    
+
+    return nav.stay()
+
 def atPosition(nav):
     """
     Switches back if we're not at the destination anymore.
     """
     if nav.firstFrame():
+        # print("In at position, walking in place")
+        helper.walkInPlace(nav)
+    elif nav.counter == 5:
         helper.stand(nav)
 
     return Transition.getNextState(nav, atPosition)
@@ -341,16 +364,29 @@ def stand(nav):
     So we can give new walk commands before we complete
     the stand if desired
     """
-    if nav.firstFrame():
+    if ((nav.brain.player.gameState == 'gameInitial' or nav.brain.player.gameState == 'gameSet') 
+    and nav.firstFrame()):
         helper.stand(nav)
         return nav.stay()
 
-    if (nav.counter % 300 == 0):
-        helper.stand(nav)
+    if nav.counter < 10:
+        # print("In stand, walking in place")
+        helper.walkInPlace(nav)
         return nav.stay()
+
+    elif nav.counter < 15:
+        helper.stand(nav)
+    # if nav.firstFrame():
+    #     helper.stand(nav)
+    #     return nav.stay()
+
+    # if (nav.counter % 300 == 0):
+    #     return nav.stay()
 
     if not nav.brain.interface.motionStatus.walk_is_active:
         return nav.goNow('standing')
+
+    # helper.stand(nav)
 
     return nav.stay()
 
