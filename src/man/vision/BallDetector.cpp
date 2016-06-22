@@ -989,17 +989,11 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		for ( ; x < width && y >= 0 && getGreen() < THRESHOLD; x++, y--) {
 			getColor(x, y);
 		}
-		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
-		}
 		length1 = x - rightX;
 		// top left corner
 		getColor(leftX, topY);
 		for (x = leftX, y = topY; x >= 0 && y >= 0 && getGreen() < THRESHOLD; x--, y--) {
 			getColor(x, y);
-		}
-		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
 		}
 		length2 = leftX - x;
 		// bottom right corner
@@ -1007,17 +1001,11 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		for (x = rightX, y = bottomY; x < width && y < height && getGreen() < THRESHOLD; x++, y++) {
 			getColor(x, y);
 		}
-		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
-		}
 		length3 = x - rightX;
 		// bottom left
 		getColor(leftX, bottomY);
 		for (x = leftX, y = bottomY; x >= 0 && y < height && getGreen() < THRESHOLD; x--, y++) {
 			getColor(x, y);
-		}
-		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
 		}
 		length4 = leftX - x;
 		if (debugBall) {
@@ -1068,17 +1056,11 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		for (x = midX, y = topY; y > 0 && getGreen() < THRESHOLD; y--) {
 			getColor(x, y);
 		}
-		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
-		}
 		int length5 = topY - y;
 		// straight down
 		getColor(midX, bottomY);
 		for (x = midX, y = bottomY; y < height && getGreen() < THRESHOLD; y++) {
 			getColor(x, y);
-		}
-		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
 		}
 		int elength5 = y - bottomY;
 		// left
@@ -1086,17 +1068,11 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		for (x = leftX, y = midY; x > 0 && getGreen() < THRESHOLD; x--) {
 			getColor(x, y);
 		}
-		if (debugBall) {
-			 debugDraw.drawPoint(x, y, RED);
-		}
 		int length6 = leftX - x;
 		// right
 		getColor(rightX, midY);
 		for (x = rightX, y = midY; x < width && getGreen() < THRESHOLD; x++) {
 			getColor(x, y);
-		}
-		if (debugBall) {
-			debugDraw.drawPoint(x, y, RED);
 		}
 		length6 += x - rightX;
 		// allow extra leeway because bottom is generally really dark
