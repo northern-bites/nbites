@@ -88,7 +88,7 @@ public class DebugImageView extends VisionView implements
     ChangeListener sliderListener;
     static int thresh = 128;
 
-    static final int NUMBER_OF_PARAMS = 9; // update as new params are added
+    static final int NUMBER_OF_PARAMS = 10; // update as new params are added
     static int displayParams[] = new int[NUMBER_OF_PARAMS];
 	int filterThresholdDark;
 	int greenThresholdDark;
@@ -155,10 +155,10 @@ public class DebugImageView extends VisionView implements
 			greenThresholdDark = 60;
 			filterThresholdBrite = 150;
 			greenThresholdBrite = 120;
-			displayParams[5] = filterThresholdDark;
-			displayParams[6] = greenThresholdDark;
-			displayParams[7] = filterThresholdBrite;
-			displayParams[8] = greenThresholdBrite;
+			displayParams[6] = filterThresholdDark;
+			displayParams[7] = greenThresholdDark;
+			displayParams[8] = filterThresholdBrite;
+			displayParams[9] = greenThresholdBrite;
 
 			firstLoad = false;
 			currentBottom = ORIGINAL;
@@ -200,10 +200,11 @@ public class DebugImageView extends VisionView implements
 										SExpr.newKeyValue("DebugHorizon", displayParams[2]),
 										SExpr.newKeyValue("DebugField", displayParams[3]),
 										SExpr.newKeyValue("DebugBall", displayParams[4]),
-										SExpr.newKeyValue("FilterDark", displayParams[5]),
-										SExpr.newKeyValue("GreenDark", displayParams[6]),
-										SExpr.newKeyValue("FilterBrite", displayParams[7]),
-										SExpr.newKeyValue("GreenBrite", displayParams[8]));
+										SExpr.newKeyValue("ShowSpotSizes", displayParams[5]),
+										SExpr.newKeyValue("FilterDark", displayParams[6]),
+										SExpr.newKeyValue("GreenDark", displayParams[7]),
+										SExpr.newKeyValue("FilterBrite", displayParams[8]),
+										SExpr.newKeyValue("GreenBrite", displayParams[9]));
 
 
         // Look for existing Params atom in current this.log description
@@ -536,6 +537,7 @@ public class DebugImageView extends VisionView implements
 		JCheckBox debugFieldEdge;
 		JCheckBox debugBall;
 		JCheckBox showFieldLines;
+		JCheckBox showSpotSizes;
 		boolean displayFieldLines;
 		boolean drawAllBalls;
 		DebugImageView parent;
@@ -553,6 +555,7 @@ public class DebugImageView extends VisionView implements
 			debugFieldEdge = new JCheckBox("Debug Field Edge");
 			debugBall = new JCheckBox("Debug Ball");
 			showFieldLines = new JCheckBox("Hide Field Lines");
+			showSpotSizes = new JCheckBox("Show Spot Sizes");
 
 			// add their listeners
 			showCameraHorizon.addItemListener(this);
@@ -561,6 +564,7 @@ public class DebugImageView extends VisionView implements
 			debugFieldEdge.addItemListener(this);
 			debugBall.addItemListener(this);
 			showFieldLines.addItemListener(this);
+			showSpotSizes.addItemListener(this);
 
 			// put them into one panel
 			checkBoxPanel = new JPanel();
@@ -571,6 +575,7 @@ public class DebugImageView extends VisionView implements
 			checkBoxPanel.add(debugFieldEdge);
 			checkBoxPanel.add(debugBall);
 			checkBoxPanel.add(showFieldLines);
+			checkBoxPanel.add(showSpotSizes);
 
 			// default all checkboxes to false
 			showCameraHorizon.setSelected(false);
@@ -579,15 +584,16 @@ public class DebugImageView extends VisionView implements
 			debugFieldEdge.setSelected(false);
 			debugBall.setSelected(false);
 			showFieldLines.setSelected(false);
+			showSpotSizes.setSelected(false);
 
 			SpinnerModel filterDarkModel = new
-				SpinnerNumberModel(parent.displayParams[5], 0, 512, 4);
+				SpinnerNumberModel(parent.displayParams[6], 0, 512, 4);
 			SpinnerModel greenDarkModel = new
-				SpinnerNumberModel(parent.displayParams[6], 0, 255, 4);
+				SpinnerNumberModel(parent.displayParams[7], 0, 255, 4);
 			SpinnerModel filterBriteModel = new
-				SpinnerNumberModel(parent.displayParams[7], 0, 512, 4);
+				SpinnerNumberModel(parent.displayParams[8], 0, 512, 4);
 			SpinnerModel greenBriteModel = new
-				SpinnerNumberModel(parent.displayParams[8], 0, 255, 4);
+				SpinnerNumberModel(parent.displayParams[9], 0, 255, 4);
 			paramPanel = new JPanel();
 			paramPanel.setLayout(new GridLayout(0, 2));
 			filterDark = addLabeledSpinner(paramPanel, "filterThresholdDark",
@@ -620,10 +626,10 @@ public class DebugImageView extends VisionView implements
 		}
 
 		public void stateChanged(ChangeEvent e) {
-			parent.displayParams[5] = ((Integer)filterDark.getValue()).intValue();
-			parent.displayParams[6] = ((Integer)greenDark.getValue()).intValue();
-			parent.displayParams[7] = ((Integer)filterBrite.getValue()).intValue();
-			parent.displayParams[8] = ((Integer)greenBrite.getValue()).intValue();
+			parent.displayParams[6] = ((Integer)filterDark.getValue()).intValue();
+			parent.displayParams[7] = ((Integer)greenDark.getValue()).intValue();
+			parent.displayParams[8] = ((Integer)filterBrite.getValue()).intValue();
+			parent.displayParams[9] = ((Integer)greenBrite.getValue()).intValue();
 			parent.adjustParams();
 			parent.repaint();
 		}
@@ -649,6 +655,8 @@ public class DebugImageView extends VisionView implements
 			} else if (source == showFieldLines) {
 				index = -1;
 				displayFieldLines = !displayFieldLines;
+			} else if (source == showSpotSizes) {
+				index = 5;
 			}
 			// flip the value of the parameter checked
 			if (index >= 0) {

@@ -1376,7 +1376,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     if(darkSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
         SpotList darkSpots = darkSpotDetector.spots();
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
-		if (debugBall && false) {
+		if (debugSpots) {
 			ImageLiteU8 filteredImage = darkSpotDetector.filteredImage();
 			int max = field->horizonAt(0);
 			if (!topCamera) {
@@ -1426,7 +1426,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
     if(whiteSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
-		if (debugBall && false) {
+		if (debugSpots) {
 			int max = field->horizonAt(0);
 			if (!topCamera) {
 				max = 0;
@@ -1441,7 +1441,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 				imagePoint p = imagePoint(bx, by);
 				int radius = projectedBallRadius(p);
 				debugDraw.drawBox(10, box + 11, i+box, i, RED);
-				debugDraw.drawBox(12+box, 12+box+2*radius, i + 2*radius, i, BLUE);
+				debugDraw.drawBox(width - 2* radius - 1, width - 1, i + 2*radius, i, BLUE);
 			}
 		}
         SpotList whiteSpots = whiteSpotDetector.spots();
