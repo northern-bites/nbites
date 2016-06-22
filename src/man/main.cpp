@@ -6,6 +6,7 @@
 #include <sys/file.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 int lockFD = 0;
 man::Man* instance;
@@ -110,6 +111,8 @@ int main() {
         // (Diagram threads are daemon threads, and man will exit if they're the
         // only ones left)
         sleep(10);
+        int status;
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
     return 1;
 }
