@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface HeaderOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.Header)
-    com.google.protobuf.MessageOrBuilder {
+public interface HeaderOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional int64 timestamp = 1;
   /**
    * <code>optional int64 timestamp = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface HeaderOrBuilder extends
    */
   long getTimestamp();
 
+  // required string name = 2;
   /**
    * <code>required string name = 2;</code>
    */
@@ -30,6 +31,7 @@ public interface HeaderOrBuilder extends
   com.google.protobuf.ByteString
       getNameBytes();
 
+  // required int32 version = 3;
   /**
    * <code>required int32 version = 3;</code>
    */
@@ -39,6 +41,7 @@ public interface HeaderOrBuilder extends
    */
   int getVersion();
 
+  // optional bool top_camera = 4;
   /**
    * <code>optional bool top_camera = 4;</code>
    */

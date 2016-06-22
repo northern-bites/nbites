@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface KickOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.Kick)
-    com.google.protobuf.MessageOrBuilder {
+public interface KickOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional .messages.Kick.KickType type = 2;
   /**
    * <code>optional .messages.Kick.KickType type = 2;</code>
    */

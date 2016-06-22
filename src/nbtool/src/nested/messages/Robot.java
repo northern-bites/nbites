@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.Robot}
  */
-public final class Robot extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Robot)
-    RobotOrBuilder {
+public  final class Robot extends
+    com.google.protobuf.GeneratedMessage
+    implements RobotOrBuilder {
   // Use Robot.newBuilder() to construct.
   private Robot(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -150,6 +149,7 @@ public final class Robot extends
   }
 
   private int bitField0_;
+  // optional float distance = 1;
   public static final int DISTANCE_FIELD_NUMBER = 1;
   private float distance_;
   /**
@@ -165,6 +165,7 @@ public final class Robot extends
     return distance_;
   }
 
+  // optional float bearing = 2;
   public static final int BEARING_FIELD_NUMBER = 2;
   private float bearing_;
   /**
@@ -180,6 +181,7 @@ public final class Robot extends
     return bearing_;
   }
 
+  // optional float bearing_deg = 3;
   public static final int BEARING_DEG_FIELD_NUMBER = 3;
   private float bearingDeg_;
   /**
@@ -195,6 +197,7 @@ public final class Robot extends
     return bearingDeg_;
   }
 
+  // optional float angle_x_deg = 4;
   public static final int ANGLE_X_DEG_FIELD_NUMBER = 4;
   private float angleXDeg_;
   /**
@@ -210,6 +213,7 @@ public final class Robot extends
     return angleXDeg_;
   }
 
+  // optional float angle_y_deg = 5;
   public static final int ANGLE_Y_DEG_FIELD_NUMBER = 5;
   private float angleYDeg_;
   /**
@@ -225,6 +229,7 @@ public final class Robot extends
     return angleYDeg_;
   }
 
+  // optional sint32 x = 6;
   public static final int X_FIELD_NUMBER = 6;
   private int x_;
   /**
@@ -240,6 +245,7 @@ public final class Robot extends
     return x_;
   }
 
+  // optional sint32 y = 7;
   public static final int Y_FIELD_NUMBER = 7;
   private int y_;
   /**
@@ -255,6 +261,7 @@ public final class Robot extends
     return y_;
   }
 
+  // optional float elevation_deg = 8;
   public static final int ELEVATION_DEG_FIELD_NUMBER = 8;
   private float elevationDeg_;
   /**
@@ -270,6 +277,7 @@ public final class Robot extends
     return elevationDeg_;
   }
 
+  // optional bool on = 9;
   public static final int ON_FIELD_NUMBER = 9;
   private boolean on_;
   /**
@@ -285,6 +293,7 @@ public final class Robot extends
     return on_;
   }
 
+  // optional sint32 height = 10;
   public static final int HEIGHT_FIELD_NUMBER = 10;
   private int height_;
   /**
@@ -300,6 +309,7 @@ public final class Robot extends
     return height_;
   }
 
+  // optional sint32 width = 11;
   public static final int WIDTH_FIELD_NUMBER = 11;
   private int width_;
   /**
@@ -331,8 +341,7 @@ public final class Robot extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -509,9 +518,8 @@ public final class Robot extends
    * Protobuf type {@code messages.Robot}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Robot)
-      messages.RobotOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.RobotOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_VisionRobot.internal_static_messages_Robot_descriptor;
@@ -714,6 +722,7 @@ public final class Robot extends
     }
     private int bitField0_;
 
+    // optional float distance = 1;
     private float distance_ ;
     /**
      * <code>optional float distance = 1;</code>
@@ -746,6 +755,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional float bearing = 2;
     private float bearing_ ;
     /**
      * <code>optional float bearing = 2;</code>
@@ -778,6 +788,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional float bearing_deg = 3;
     private float bearingDeg_ ;
     /**
      * <code>optional float bearing_deg = 3;</code>
@@ -810,6 +821,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional float angle_x_deg = 4;
     private float angleXDeg_ ;
     /**
      * <code>optional float angle_x_deg = 4;</code>
@@ -842,6 +854,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional float angle_y_deg = 5;
     private float angleYDeg_ ;
     /**
      * <code>optional float angle_y_deg = 5;</code>
@@ -874,6 +887,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional sint32 x = 6;
     private int x_ ;
     /**
      * <code>optional sint32 x = 6;</code>
@@ -906,6 +920,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional sint32 y = 7;
     private int y_ ;
     /**
      * <code>optional sint32 y = 7;</code>
@@ -938,6 +953,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional float elevation_deg = 8;
     private float elevationDeg_ ;
     /**
      * <code>optional float elevation_deg = 8;</code>
@@ -970,6 +986,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional bool on = 9;
     private boolean on_ ;
     /**
      * <code>optional bool on = 9;</code>
@@ -1002,6 +1019,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional sint32 height = 10;
     private int height_ ;
     /**
      * <code>optional sint32 height = 10;</code>
@@ -1034,6 +1052,7 @@ public final class Robot extends
       return this;
     }
 
+    // optional sint32 width = 11;
     private int width_ ;
     /**
      * <code>optional sint32 width = 11;</code>

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface GameStateOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.GameState)
-    com.google.protobuf.MessageOrBuilder {
+public interface GameStateOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional uint32 state = 1;
   /**
    * <code>optional uint32 state = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface GameStateOrBuilder extends
    */
   int getState();
 
+  // optional bool first_half = 2 [default = true];
   /**
    * <code>optional bool first_half = 2 [default = true];</code>
    */
@@ -25,6 +26,7 @@ public interface GameStateOrBuilder extends
    */
   boolean getFirstHalf();
 
+  // optional uint32 kick_off_team = 3;
   /**
    * <code>optional uint32 kick_off_team = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface GameStateOrBuilder extends
    */
   int getKickOffTeam();
 
+  // optional uint32 secondary_state = 4;
   /**
    * <code>optional uint32 secondary_state = 4;</code>
    */
@@ -43,6 +46,7 @@ public interface GameStateOrBuilder extends
    */
   int getSecondaryState();
 
+  // optional uint32 drop_in_team = 5;
   /**
    * <code>optional uint32 drop_in_team = 5;</code>
    */
@@ -52,6 +56,7 @@ public interface GameStateOrBuilder extends
    */
   int getDropInTeam();
 
+  // optional sint32 drop_in_time = 6 [default = -1];
   /**
    * <code>optional sint32 drop_in_time = 6 [default = -1];</code>
    */
@@ -61,6 +66,7 @@ public interface GameStateOrBuilder extends
    */
   int getDropInTime();
 
+  // optional uint32 secs_remaining = 7 [default = 600];
   /**
    * <code>optional uint32 secs_remaining = 7 [default = 600];</code>
    */
@@ -70,6 +76,7 @@ public interface GameStateOrBuilder extends
    */
   int getSecsRemaining();
 
+  // optional bool have_remote_gc = 8;
   /**
    * <code>optional bool have_remote_gc = 8;</code>
    */
@@ -79,6 +86,7 @@ public interface GameStateOrBuilder extends
    */
   boolean getHaveRemoteGc();
 
+  // repeated .messages.TeamInfo team = 9;
   /**
    * <code>repeated .messages.TeamInfo team = 9;</code>
    */
