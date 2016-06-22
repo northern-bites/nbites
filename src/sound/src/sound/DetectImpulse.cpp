@@ -339,7 +339,7 @@ bool detect(nbsound::SampleBuffer& buffer) {
             if (heard)
                 NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
 
-    #ifdef DETECT_LOG_RESULTS
+#ifdef DETECT_LOG_RESULTS
             nbl::Block block;
             block.data = transform->get_all();
             block.type = "WhistleDetection1";
@@ -351,7 +351,7 @@ bool detect(nbsound::SampleBuffer& buffer) {
             block.dict["WhistleWasHeard"] = json::Boolean(heard);
 
             detect_results.push_back(block);
-    #endif
+#endif
             
             if (heard) return true;
             window_start += transform_input_length;
