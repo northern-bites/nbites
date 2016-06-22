@@ -1041,7 +1041,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	if (abs(length1 + length3 - length2 - length4) > 4) {
 		return false;
 	}
-	if (abs(length1 - length2) > 4) {
+	if (abs(length1 - length2) > 5) {
 		return false;
 	}
 	if (max(length1, length2) < 2 || max(length3, length4) < 2) {
@@ -1288,7 +1288,10 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 			return false;
 		}
     } else if (spots == 1) {
-		if (!checkGradientInSpot(spot) || !checkDiagonalCircle(spot)) {
+		// circle detection can be hard if the ball is on a line or in front of a robot
+		// check whiteness?
+		//std::cout << "Checking one spot " << spot.green << " " << std::endl;
+		if (!checkGradientInSpot(spot) || spot.green > 3) {
 			return false;
 		}
 	}
