@@ -22,13 +22,23 @@ const int transform_output_length = SPECTRUM_LENGTH( transform_input_length );
 typedef std::pair<int,int> Range;
 typedef std::pair<int,float> Peak;
 
+NBL_OSTREAM_OVERLOAD(Range, range, "r{" << range.first << "," << range.second << "}")
+NBL_OSTREAM_OVERLOAD(Peak, peak, "p{" << peak.first << "," << peak.second << "}")
+
 const int frequency_output_length = 2049;
 const Range full_range = {0, frequency_output_length};
-const Range peak_range = {70,160};
+const Range whistle_peak_range = {70,160};
+
 const int min_frames_on = 4;
 const int max_frames_off = 2;
 
-const int peak_radius = 10;
+const int peak_radius = 15;
+
+const float min_sdev_start_ratio = 3.0;
+const float min_integral_start_ratio = 6.0;
+
+const float min_sdev_cont_ratio = .6;
+const float min_integral_cont_ratio = 0.8;
 
 Range range_around(int i, int r) { return {i - r, i + r}; }
 
@@ -95,7 +105,6 @@ NullOut _NULL_OUT_;
 
 #endif
 
-
 struct Channel {
     size_t _frame_index_;
     int _channel_;
@@ -103,33 +112,45 @@ struct Channel {
     std::ostream& debug(size_t i) {
         std::string prefix(i, '\t');
         
-        std::cout << prefix << "[" << _channel_ << "]" << "[" << _frame_index_ << "] ";
+        std::cout << prefix << "[" << _channel_ << "]" << "[" << _frame_index_
+            << "]" << "[" << frames_on << ":" << frames_off << "] ";
         return std::cout;
     }
     
     float last_frame_spectrum[frequency_output_length];
-    Peak last_frame_peak {-1,0.0};
     float last_frame_sdev;
+
+    void set_last_peak(Peak pk, float sd, float * spectrum) {
+        last_peak = pk; last_peak_sdev = sd;
+        last_peak_integral = sum(spectrum, range_around(pk.first, peak_radius));
+    }
+    Peak last_peak = {-1,0.0};
+    float last_peak_sdev;
+    float last_peak_integral;
     
     int frames_on;
     int frames_off;
 
     bool hearing() {
-        return last_frame_peak.first > 0;
+        return last_peak.first > 0;
     }
-    
+
+    void stop_hearing() {
+        last_peak = {-1, 0.0};
+        last_peak_sdev = 0.01f;
+    }
+
     Channel() {
-        last_frame_peak = -1;
-        frames_on = 0;
-        frames_off = 0;
-        
         _frame_index_ = 0;
+
+        reset();
     }
 
     void reset() {
         frames_on = frames_off = 0;
-        last_frame_peak = -1;
-        last_frame_sdev = 0.0;
+        last_frame_sdev = 0.01f;
+
+        stop_hearing();
     }
     
     bool count(bool on) {
@@ -143,8 +164,8 @@ struct Channel {
             if (frames_off >= max_frames_off) {
                 frames_off = 0;
                 frames_on = 0;
-                
-                last_frame_peak = -1;
+
+                stop_hearing();
             }
             
             return false;
@@ -161,23 +182,101 @@ struct Channel {
         
         Peak this_peak = peak(spectrum);
         double this_sdev = sdev(spectrum);
+
+        START(0) << "this_peak " << this_peak << " this_sdev " << this_sdev END;
         
-        if (in_range(this_peak.first, peak_range)) {
+        if (in_range(this_peak.first, whistle_peak_range)) {
+            //----------detection----------------
+
+            if (!hearing()) {
+                START(1) << "looking for new peak..." END;
+                float sdev_ratio = this_sdev / last_frame_sdev;
+
+                Range integral_range = range_around(this_peak.first, peak_radius);
+
+                float sum_ratio =   sum(spectrum, integral_range) /
+                            sum(last_frame_spectrum, integral_range);
+
+                if ( sdev_ratio > min_sdev_start_ratio ) {
+                     START(1) << "sdev_ratio " << sdev_ratio << " above thresh" END;
+                } else {
+                    START(1) << "sdev_ratio " << sdev_ratio << " FAILS" END;
+                    goto failed;
+                }
+
+                if ( sum_ratio > min_integral_start_ratio ) {
+                    START(1) << "sum_ratio " << sum_ratio << " above thresh" END;
+                } else {
+                    START(1) << "sum_ratio " << sum_ratio << " FAILS" END;
+                    goto failed;
+                }
+
+                START(2) << "found new peak:" << this_peak.first END;
+                set_last_peak(this_peak, this_sdev, spectrum);
+                on = true;
+
+            } else {
+                START(1) << "continuing peak at " << last_peak.first << "..." END;
+
+                if ( this_peak.second > last_peak.second ) {
+                    START(1) << "magnitude increased to " << last_peak.second << "" END;
+
+                    if (in_range(this_peak.first,
+                                 range_around(last_peak.first, peak_radius))
+                        ) {
+                        START(2) << "updating last_peak!" END;
+                        set_last_peak(this_peak, this_sdev, spectrum);
+                        on = true;
+                    } else {
+                        START(2) << "NOT COUNTING AS PART OF LAST PEAK" END;
+                        reset();
+                        set_last_peak(this_peak, this_sdev, spectrum);
+                        on = true;
+
+                        START(2) << "RESET COUNT AND PEAK TO " << last_peak END;
+                    }
+
+                } else {
+                    float sdev_ratio = this_sdev / last_peak_sdev;
+                    Range integral_range = range_around(this_peak.first, peak_radius);
+
+                    float sum_ratio = sum(spectrum, integral_range) / last_peak_integral;
+
+                    if ( sdev_ratio < min_sdev_cont_ratio ) {
+                        START(2) << "sdev ratio " << sdev_ratio << " fails to meet min!" END;
+                        on = false;
+                        goto failed;
+                    }
+
+                    if ( sum_ratio < min_integral_cont_ratio ) {
+                        START(2) << "sum ratio " << sum_ratio << " fails to meet min!" END;
+                        on = false;
+                        goto failed;
+                    }
+
+                    START(3) << "this_peak good enough for continuation, frame on!" << last_peak END;
+                    on = true;
+                }
+            }
+
+            //----------printouts----------------
             
-            START(0) << "inside peak range" END;
-            
-            START(1) << "sdev: " << last_frame_sdev << " -> " << this_sdev
-                << " ratio " << this_sdev / last_frame_sdev END;
-            
-            double peak_sum_now = sum(spectrum, range_around(this_peak.first, peak_radius));
-            double peak_sum_thn = sum(last_frame_spectrum, range_around(this_peak.first, peak_radius));
-            
-            START(1) << "peak sum " << peak_sum_thn << " -> " << peak_sum_now << " ratio " << peak_sum_now / peak_sum_thn END
-            
+//            START(0) << "inside peak range" END;
+//            
+//            START(1) << "sdev: " << last_frame_sdev << " -> " << this_sdev
+//                << " ratio " << this_sdev / last_frame_sdev END;
+//            
+//            double peak_sum_now = sum(spectrum, range_around(this_peak.first, peak_radius));
+//            double peak_sum_thn = sum(last_frame_spectrum, range_around(this_peak.first, peak_radius));
+//            
+//            START(1) << "peak sum " << peak_sum_thn << " -> " << peak_sum_now << " ratio " << peak_sum_now / peak_sum_thn END
+
         } else {
             START(0) << "outside peak range" END;
+            on = false;
         }
-        
+
+    failed:
         take(spectrum);
         last_frame_sdev = this_sdev;
         return count(on);
@@ -206,8 +305,10 @@ bool init() {
 }
 
 bool reset() {
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 2; ++i) {
         channels[i].reset();
+        channels[i]._frame_index_ = 0;
+    }
 
 #ifdef DETECT_LOG_RESULTS
     detect_results.clear();
@@ -229,15 +330,16 @@ bool detect(nbsound::SampleBuffer& buffer) {
         int window_end = transform_input_length;
 
         while(buffer.is_in_bounds(i, window_end - 1)) {
+            
             SampleBuffer window = buffer.window(window_start, window_end);
             transform->transform(window, i);
 
-    bool heard = channels[i].analyze(transform->get_freq_buffer());
+            bool heard = channels[i].analyze(transform->get_freq_buffer());
 
-    if (heard)
-        NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
+            if (heard)
+                NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
 
-#ifdef DETECT_LOG_RESULTS
+    #ifdef DETECT_LOG_RESULTS
             nbl::Block block;
             block.data = transform->get_all();
             block.type = "WhistleDetection1";
@@ -249,7 +351,7 @@ bool detect(nbsound::SampleBuffer& buffer) {
             block.dict["WhistleWasHeard"] = json::Boolean(heard);
 
             detect_results.push_back(block);
-#endif
+    #endif
             
             if (heard) return true;
             window_start += transform_input_length;
