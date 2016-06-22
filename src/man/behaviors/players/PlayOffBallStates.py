@@ -8,7 +8,7 @@ from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findStrike
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from ..navigator import BrunswickSpeeds as speeds
-from objects import Location, RobotLocation
+from objects import Location, RobotLocation, RelRobotLocation
 from ..util import *
 from math import hypot, fabs, atan2, degrees
 from ..headTracker import HeadMoves
@@ -107,7 +107,7 @@ def doFirstHalfSpin(player):
         player.setWalk(0, 0, speeds.SPEED_FIVE)
         player.brain.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
         # player.brain.tracker.lookToSpinDirection(1)
-        
+
         # if player.brain.playerNumber == 3:
         #     player.setWalk(0, 0, speeds.SPEED_EIGHT)
         #     player.brain.tracker.lookToSpinDirection(1) #Clockwise
@@ -336,7 +336,11 @@ def adjustHeading(player):
     if player.firstFrame():
         # Spin to home heading
         player.stand()
-        player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
+        dest = RelRobotLocation(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
+        player.brain.nav.goTo(dest, precision = nav.HOME,
+                          speed = speeds.SPEED_FOUR, avoidObstacles = False,
+                          fast = True, pb = False)
+        # player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
 
         # or math.fabs()
     while fabs(player.brain.loc.h - adjustHeading.desiredHeading) > 25:
