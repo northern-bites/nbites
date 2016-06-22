@@ -84,6 +84,10 @@ def watchForBall(player):
     while player.stateTime < 8:
         return player.stay()
 
+    if role.isStriker(player.role):
+        while player.stateTime < 12:
+            return player.stay()
+
     return player.goNow('spinAtHome')
 
 @defaultState('doFirstHalfSpin')
@@ -104,16 +108,12 @@ def doFirstHalfSpin(player):
     if player.firstFrame():
         print "------------First half spin-------------"
 
-        player.setWalk(0, 0, speeds.SPEED_FIVE)
-        player.brain.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
-        # player.brain.tracker.lookToSpinDirection(1)
+        player.brain.tracker.repeatFixedPitchLookAhead()
         
-        # if player.brain.playerNumber == 3:
-        #     player.setWalk(0, 0, speeds.SPEED_EIGHT)
-        #     player.brain.tracker.lookToSpinDirection(1) #Clockwise
-        # else:
-        #     player.setWalk(0, 0, -speeds.SPEED_EIGHT)
-        #     player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
+        if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, speeds.SPEED_EIGHT)
+        else:
+            player.setWalk(0, 0, -speeds.SPEED_EIGHT)
 
     while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME / 2:
         return player.stay()
@@ -126,13 +126,16 @@ def doPan(player):
     Wide pan for 5 seconds.
     """
     if player.firstFrame():
-        print "------------Doing Pan-------------"
 
         player.stand()
         player.brain.tracker.trackBall()
 
     while player.stateTime < 8: #Should use constant here.
         return player.stay()
+
+    if role.isStriker(player.role):
+        while player.stateTime < 12:
+            return player.stay()
 
     return player.goNow('doSecondHalfSpin')
 
@@ -142,18 +145,13 @@ def doSecondHalfSpin(player):
     Keep spinning in the same direction.
     """
     if player.firstFrame():
-        print "--------------Second Half Spin---------------"
 
-        player.setWalk(0, 0, speeds.SPEED_FIVE)
-        player.brain.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
-        # player.brain.tracker.lookToSpinDirection(1)
+        player.brain.tracker.repeatFixedPitchLookAhead()
 
-        # if player.brain.playerNumber == 3:
-        #     player.setWalk(0, 0, speeds.SPEED_EIGHT)
-        #     player.brain.tracker.lookToSpinDirection(1) #Clockwise
-        # else:
-        #     player.setWalk(0, 0, -speeds.SPEED_EIGHT)
-        #     player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
+        if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, speeds.SPEED_EIGHT)
+        else:
+            player.setWalk(0, 0, -speeds.SPEED_EIGHT)
 
     while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME / 2:
         return player.stay()
@@ -336,7 +334,7 @@ def adjustHeading(player):
     if player.firstFrame():
         # Spin to home heading
         player.stand()
-        player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
+        player.setWalk(0, 0, -(player.brain.loc.h - adjustHeading.desiredHeading))
 
         # or math.fabs()
     while fabs(player.brain.loc.h - adjustHeading.desiredHeading) > 25:
@@ -349,7 +347,6 @@ def adjustHeading(player):
 def panAtWayPoint(player):
 
     if player.firstFrame():
-        print "------------Doing Pan-------------"
 
         player.stand()
         player.brain.tracker.trackBall()
@@ -366,6 +363,7 @@ def spinAtWayPoint(player):
     """
     if player.firstFrame():
         player.stand()
+        player.brain.tracker.repeatFixedPitchLookAhead()
         player.setWalk(0, 0, speeds.SPEED_FOUR)
 
     while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME:
