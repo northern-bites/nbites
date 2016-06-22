@@ -99,6 +99,7 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
     angleChanged = 0.0;
 
     counter = 0;
+    generator->readOptions("/home/nao/nbites/Config");
 	
 	resetAll();
 }
