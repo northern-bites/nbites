@@ -20,7 +20,7 @@
 
 #include "Logging.hpp"
 
-const char * LAST_MODIFIED = "6/21 19:50";
+const char * LAST_MODIFIED = "6/22 16:00";
 const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
 using namespace nbl;
@@ -30,8 +30,6 @@ pthread_t capture_thread;
 Capture * capture = nullptr;
 whistle::SharedMemory shared;
 
-int whistleSingleFD = 0;
-
 bool useLogging = false;
 
 void whistle_cleanup() {
@@ -40,12 +38,7 @@ void whistle_cleanup() {
     detect::cleanup();
 
     if (useLogging) {
-	nbl::teardownLogging();
-    }
-
-    if (whistleSingleFD > 0) {
-        flock(whistleSingleFD, LOCK_UN);
-        close(whistleSingleFD);
+        nbl::teardownLogging();
     }
 
     if (shared.isOpen()) {
@@ -83,7 +76,7 @@ void do_heard() {
     }
 }
 
-Config used_config{48000, 32768};
+Config used_config{ 48000, 16384 };
 
 size_t iteration = 0;
 
@@ -119,23 +112,6 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
     ++iteration;
 }
 
-void establishLock() {
-    whistleSingleFD = open("/home/nao/nbites/whistle.lock", O_CREAT | O_RDWR, 0666);
-
-    if (whistleSingleFD < 0) {
-        int err = errno;
-        nbl::utilities::safe_perror(err);
-        NBL_ERROR("could not open lock file.")
-        exit(0);
-    }
-
-    int result = flock(whistleSingleFD, LOCK_EX | LOCK_NB);
-    if (result == -1) {
-        NBL_ERROR("could not lock file – is whistle already running?")
-        exit(0);
-    }
-}
-
 int main(int argc, const char * argv[]) {
 
     signal(SIGINT, handler);
@@ -148,15 +124,13 @@ int main(int argc, const char * argv[]) {
         NBL_WARN("-------------------------- whistle stand"
                  "alone mode --------------------------");
 
-	if (std::string{argv[1]} == std::string{"log"}) {
-		NBL_WARN("using logging (connect via nbtool)")
-		useLogging = true;
-		nbl::initiateLogging();
-	}
+        if (std::string{argv[1]} == std::string{"log"}) {
+            NBL_WARN("using logging (connect via nbtool)")
+            useLogging = true;
+            nbl::initiateLogging();
+        }
     } else {
         NBL_WARN("whistle server mode");
-
-        establishLock();
 
         NBL_WARN("( whistle reopening to %s now )",
                  WHISTLE_LOG_PATH);

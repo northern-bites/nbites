@@ -4,6 +4,7 @@
 
 #include "Man.h"
 #include "SharedData.h"
+#include "whistle.hpp"
 
 #include <sys/file.h>
 #include <errno.h>
@@ -13,7 +14,6 @@ int lockFD = 0;
 man::Man* instance;
 pid_t whistlePID = 0;
 const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
 
@@ -86,13 +86,7 @@ int main() {
     signal(SIGSEGV, error_signal_handler);
 
     printf("forking for whistle...\n");
-    whistlePID = fork();
-    if (whistlePID == 0) {
-        execl("/home/nao/whistle", "", NULL);
-
-        printf("WHISTLE FAILED TO LOAD!!\n");
-        exit(-1);
-    }
+    whistlePID = start_whistle_process();
 
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     
