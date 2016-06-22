@@ -4,11 +4,9 @@
 #include <vector>
 #include <utility>
 #include "Images.h"
-// #include "FuzzyThr.h"
 #include "Gradient.h"
 #include "Edge.h"
-// #include "Vision.h"
-#include "VisionRobot.pb.h"
+
 
 namespace man {
 namespace vision {
@@ -34,23 +32,9 @@ public:
     bool getWhiteGradImage(ImageLiteU8 whiteImage,
                            EdgeDetector* ed, EdgeList& edges,
                            FieldHomography* hom, bool is_top);
-    uint8_t getFuzzyValue(uint8_t gradientValue);
-    void removeHoughLines(EdgeList& edges);
-    void findCandidates(bool is_top);
-    void mergeCandidate(int lf, int rt, int tp, int bt);
-    // Tells us which part of the image to ignore if we are looking too
-    // far to the right or to the left (would pick up shoulder)
-    int findAzimuthRestrictions(FieldHomography* hom);
-    void getCurrentDirection(FieldHomography* hom);
-    void getDetectedRobots(bool* detectedObstacles, int size);
-    void printCandidates(std::string message);
 
-    struct box {
-        int left;
-        int right;
-        int top;
-        int bottom;
-    };
+    void getDetectedRobots(bool* detectedObstacles, int size);
+    const std::vector<Robot>& getRobotList() const { return candidates; }
 
 #ifdef OFFLINE
     ImageLiteU8 getImage() { return WGImage; }
@@ -59,6 +43,16 @@ public:
 #endif
 
 private:
+    uint8_t getFuzzyValue(uint8_t gradientValue);
+    void removeHoughLines(EdgeList& edges);
+    void findCandidates(bool is_top);
+    void mergeCandidate(int lf, int rt, int tp, int bt);
+    // Tells us which part of the image to ignore if we are looking too
+    // far to the right or to the left (would pick up shoulder)
+    int findAzimuthRestrictions(FieldHomography* hom);
+    void getCurrentDirection(FieldHomography* hom);
+    void printCandidates(std::string message);
+
     enum Direction { none, north, northeast, east, southeast,
                      south, southwest, west, northwest };
 
