@@ -9,6 +9,15 @@ namespace motion
 	static const float OLD_SCALE = 0.8;
 
 	IMUAdjuster::IMUAdjuster() {
+		init();
+
+	}
+
+	void IMUAdjuster::reset() {
+		init();
+	}
+
+	void IMUAdjuster::init() {
 		initted = false;
 		falling = false;
 
@@ -17,7 +26,6 @@ namespace motion
 		adj_gyr_x = 0.0f;
 		adj_gyr_y = 0.0f;
 		counter = 0;
-
 	}
 
 	IMUAdjuster::~IMUAdjuster() { }
