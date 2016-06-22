@@ -123,7 +123,8 @@ class Brain(object):
             self.ballMem.append(0)
 
         # New defender positioning
-        self.defendingStateTime = 0
+        self.defendingStateTime = 0 #Number of frames.
+        self.staggeredPositioning = False
 
     def initTeamMembers(self):
         self.teamMembers = []

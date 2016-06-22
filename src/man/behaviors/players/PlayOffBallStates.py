@@ -4,7 +4,7 @@ import RoleConstants as role
 import ChaseBallTransitions as chase
 import ChaseBallConstants as chaseConstants
 import ClaimTransitions as claims
-from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findStrikerHome, findDefenderHome, calculateHomePosition
+from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, calculateHomePosition
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from ..navigator import BrunswickSpeeds as speeds
@@ -63,36 +63,41 @@ def positionAtHome(player):
 
     player.brain.nav.updateDest(home)
 
-    player.defendingStateTime = 0
-
 @superState('playOffBall')
 @stay
+@ifSwitchNow(transitions.shouldChangeDefenderPosition, 'positionAtHome')
 @ifSwitchNow(transitions.shouldSpinSearchFromWatching, 'spinAtHome')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within box.
     """
+
     if player.firstFrame():
+        print "-----------Player at home-----------"
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
-    player.defendingStateTime++
+    player.brain.defendingStateTime += 1
 
     if transitions.tooFarFromHome(player, 50, 20):
-        return player.goLater('positionAtHome')
+        fastWalk = role.isChaser(player.role)
+        player.brain.nav.goTo(player.homePosition, precision = nav.HOME,
+                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                              fast = True, pb = False)
+        
+    while player.stateTime < 8:
+        return player.stay()
 
-    if player.defendingStateTime >= 20:
-        return player.goNow('positionAtHome')
+    return player.goNow('spinAtHome')
 
 @defaultState('doFirstHalfSpin')
 @superState('playOffBall')
-@ifSwitchNow(transitions.stopSpinning, 'positionAtHome')
+@ifSwitchNow(transitions.shouldChangeDefenderPosition, 'positionAtHome')
+# @ifSwitchNow(transitions.stopSpinning, 'positionAtHome')
 def spinAtHome(player):
     """
     Spin while at home.
     """
-
-    player.defendingStateTime++
     
     pass
 
@@ -101,9 +106,18 @@ def doFirstHalfSpin(player):
     """
     Spin to where we think the ball is.
     """
+
+    player.brain.defendingStateTime += 1
+
     if player.firstFrame():
-        player.setWalk(0, 0, speeds.SPEED_EIGHT)
-        player.brain.tracker.lookToSpinDirection(1)
+        print "------------First half spin-------------"
+        
+        if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, speeds.SPEED_FOUR)
+            player.brain.tracker.lookToSpinDirection(1) #Clockwise
+        else:
+            player.setWalk(0, 0, -speeds.SPEED_FOUR)
+            player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
         return player.stay()
@@ -111,15 +125,21 @@ def doFirstHalfSpin(player):
     return player.goNow('doPan')
 
 @superState('spinAtHome')
+@ifSwitchNow(transitions.shouldChangeDefenderPosition, 'positionAtHome')
 def doPan(player):
     """
     Wide pan for 5 seconds.
     """
+
+    player.brain.defendingStateTime += 1
+
     if player.firstFrame():
+        print "------------Doing Pan-------------"
+
         player.stand()
         player.brain.tracker.repeatWideSnapPan()
 
-    while player.stateTime < 5:
+    while player.stateTime < 4: #Should use constant for 1 pan here.
         return player.stay()
 
     return player.goNow('doSecondHalfSpin')
@@ -129,9 +149,18 @@ def doSecondHalfSpin(player):
     """
     Keep spinning in the same direction.
     """
+
+    player.brain.defendingStateTime += 1
+
     if player.firstFrame():
-        player.setWalk(0, 0, speeds.SPEED_EIGHT)
-        player.brain.tracker.lookToSpinDirection(1)
+        print "--------------Second Half Spin---------------"
+
+        if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, speeds.SPEED_FOUR)
+            player.brain.tracker.lookToSpinDirection(1) #Clockwise
+        else:
+            player.setWalk(0, 0, -speeds.SPEED_FOUR)
+            player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
         return player.stay()
@@ -223,7 +252,7 @@ def searchFieldForFlippedSharedBall(player):
         player.sharedBallOffCount += 1
     else:
         player.sharedBallOffCount = 0
-
+        
     player.brain.nav.updateDest(sharedball)
 
 @superState('playOffBall')

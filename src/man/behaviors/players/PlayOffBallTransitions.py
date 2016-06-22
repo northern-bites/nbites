@@ -107,3 +107,8 @@ def shouldNotBeSupporter(player):
     if role.isChaser(player.role):
         return shared.ballOffForNFrames(120)(player)
     return not shouldBeSupporter(player)
+
+def shouldChangeDefenderPosition(player):
+    if player.brain.defendingStateTime >= 750: #Number of frames. #Should change to constant.
+        player.brain.defendingStateTime = 0
+        return True
