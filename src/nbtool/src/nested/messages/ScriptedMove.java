@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.ScriptedMove}
  */
-public final class ScriptedMove extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.ScriptedMove)
-    ScriptedMoveOrBuilder {
+public  final class ScriptedMove extends
+    com.google.protobuf.GeneratedMessage
+    implements ScriptedMoveOrBuilder {
   // Use ScriptedMove.newBuilder() to construct.
   private ScriptedMove(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -105,6 +104,7 @@ public final class ScriptedMove extends
     return PARSER;
   }
 
+  // repeated .messages.BodyJointCommand command = 1;
   public static final int COMMAND_FIELD_NUMBER = 1;
   private java.util.List<messages.BodyJointCommand> command_;
   /**
@@ -146,8 +146,7 @@ public final class ScriptedMove extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -254,9 +253,8 @@ public final class ScriptedMove extends
    * Protobuf type {@code messages.ScriptedMove}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.ScriptedMove)
-      messages.ScriptedMoveOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.ScriptedMoveOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_ScriptedMove_descriptor;
@@ -400,6 +398,7 @@ public final class ScriptedMove extends
     }
     private int bitField0_;
 
+    // repeated .messages.BodyJointCommand command = 1;
     private java.util.List<messages.BodyJointCommand> command_ =
       java.util.Collections.emptyList();
     private void ensureCommandIsMutable() {
@@ -541,8 +540,7 @@ public final class ScriptedMove extends
         java.lang.Iterable<? extends messages.BodyJointCommand> values) {
       if (commandBuilder_ == null) {
         ensureCommandIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, command_);
+        super.addAll(values, command_);
         onChanged();
       } else {
         commandBuilder_.addAllMessages(values);

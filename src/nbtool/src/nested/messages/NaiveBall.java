@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.NaiveBall}
  */
-public final class NaiveBall extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.NaiveBall)
-    NaiveBallOrBuilder {
+public  final class NaiveBall extends
+    com.google.protobuf.GeneratedMessage
+    implements NaiveBallOrBuilder {
   // Use NaiveBall.newBuilder() to construct.
   private NaiveBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -191,10 +190,10 @@ public final class NaiveBall extends
     return PARSER;
   }
 
-  public interface PositionOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:messages.NaiveBall.Position)
-      com.google.protobuf.MessageOrBuilder {
+  public interface PositionOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // optional float x = 1;
     /**
      * <code>optional float x = 1;</code>
      */
@@ -204,6 +203,7 @@ public final class NaiveBall extends
      */
     float getX();
 
+    // optional float y = 2;
     /**
      * <code>optional float y = 2;</code>
      */
@@ -217,9 +217,8 @@ public final class NaiveBall extends
    * Protobuf type {@code messages.NaiveBall.Position}
    */
   public static final class Position extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:messages.NaiveBall.Position)
-      PositionOrBuilder {
+      com.google.protobuf.GeneratedMessage
+      implements PositionOrBuilder {
     // Use Position.newBuilder() to construct.
     private Position(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -315,6 +314,7 @@ public final class NaiveBall extends
     }
 
     private int bitField0_;
+    // optional float x = 1;
     public static final int X_FIELD_NUMBER = 1;
     private float x_;
     /**
@@ -330,6 +330,7 @@ public final class NaiveBall extends
       return x_;
     }
 
+    // optional float y = 2;
     public static final int Y_FIELD_NUMBER = 2;
     private float y_;
     /**
@@ -352,8 +353,7 @@ public final class NaiveBall extends
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       memoizedIsInitialized = 1;
       return true;
@@ -467,9 +467,8 @@ public final class NaiveBall extends
      * Protobuf type {@code messages.NaiveBall.Position}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:messages.NaiveBall.Position)
-        messages.NaiveBall.PositionOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements messages.NaiveBall.PositionOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages._File_Vision.internal_static_messages_NaiveBall_Position_descriptor;
@@ -591,6 +590,7 @@ public final class NaiveBall extends
       }
       private int bitField0_;
 
+      // optional float x = 1;
       private float x_ ;
       /**
        * <code>optional float x = 1;</code>
@@ -623,6 +623,7 @@ public final class NaiveBall extends
         return this;
       }
 
+      // optional float y = 2;
       private float y_ ;
       /**
        * <code>optional float y = 2;</code>
@@ -667,6 +668,7 @@ public final class NaiveBall extends
   }
 
   private int bitField0_;
+  // optional float velocity = 1;
   public static final int VELOCITY_FIELD_NUMBER = 1;
   private float velocity_;
   /**
@@ -682,6 +684,7 @@ public final class NaiveBall extends
     return velocity_;
   }
 
+  // optional bool stationary = 2;
   public static final int STATIONARY_FIELD_NUMBER = 2;
   private boolean stationary_;
   /**
@@ -697,6 +700,7 @@ public final class NaiveBall extends
     return stationary_;
   }
 
+  // optional float yintercept = 3;
   public static final int YINTERCEPT_FIELD_NUMBER = 3;
   private float yintercept_;
   /**
@@ -712,6 +716,7 @@ public final class NaiveBall extends
     return yintercept_;
   }
 
+  // repeated .messages.NaiveBall.Position position = 4;
   public static final int POSITION_FIELD_NUMBER = 4;
   private java.util.List<messages.NaiveBall.Position> position_;
   /**
@@ -747,6 +752,7 @@ public final class NaiveBall extends
     return position_.get(index);
   }
 
+  // repeated .messages.NaiveBall.Position dest_buffer = 5;
   public static final int DEST_BUFFER_FIELD_NUMBER = 5;
   private java.util.List<messages.NaiveBall.Position> destBuffer_;
   /**
@@ -782,6 +788,7 @@ public final class NaiveBall extends
     return destBuffer_.get(index);
   }
 
+  // optional float x_vel = 6;
   public static final int X_VEL_FIELD_NUMBER = 6;
   private float xVel_;
   /**
@@ -797,6 +804,7 @@ public final class NaiveBall extends
     return xVel_;
   }
 
+  // optional float y_vel = 7;
   public static final int Y_VEL_FIELD_NUMBER = 7;
   private float yVel_;
   /**
@@ -812,6 +820,7 @@ public final class NaiveBall extends
     return yVel_;
   }
 
+  // optional float start_avg_x = 8;
   public static final int START_AVG_X_FIELD_NUMBER = 8;
   private float startAvgX_;
   /**
@@ -827,6 +836,7 @@ public final class NaiveBall extends
     return startAvgX_;
   }
 
+  // optional float start_avg_y = 9;
   public static final int START_AVG_Y_FIELD_NUMBER = 9;
   private float startAvgY_;
   /**
@@ -842,6 +852,7 @@ public final class NaiveBall extends
     return startAvgY_;
   }
 
+  // optional float end_avg_x = 10;
   public static final int END_AVG_X_FIELD_NUMBER = 10;
   private float endAvgX_;
   /**
@@ -857,6 +868,7 @@ public final class NaiveBall extends
     return endAvgX_;
   }
 
+  // optional float end_avg_y = 11;
   public static final int END_AVG_Y_FIELD_NUMBER = 11;
   private float endAvgY_;
   /**
@@ -872,6 +884,7 @@ public final class NaiveBall extends
     return endAvgY_;
   }
 
+  // optional float avg_start_index = 12;
   public static final int AVG_START_INDEX_FIELD_NUMBER = 12;
   private float avgStartIndex_;
   /**
@@ -887,6 +900,7 @@ public final class NaiveBall extends
     return avgStartIndex_;
   }
 
+  // optional float avg_end_index = 13;
   public static final int AVG_END_INDEX_FIELD_NUMBER = 13;
   private float avgEndIndex_;
   /**
@@ -902,6 +916,7 @@ public final class NaiveBall extends
     return avgEndIndex_;
   }
 
+  // optional float alt_x_vel = 14;
   public static final int ALT_X_VEL_FIELD_NUMBER = 14;
   private float altXVel_;
   /**
@@ -917,6 +932,7 @@ public final class NaiveBall extends
     return altXVel_;
   }
 
+  // optional float x_v_1 = 15;
   public static final int X_V_1_FIELD_NUMBER = 15;
   private float xV1_;
   /**
@@ -932,6 +948,7 @@ public final class NaiveBall extends
     return xV1_;
   }
 
+  // optional float x_v_2 = 16;
   public static final int X_V_2_FIELD_NUMBER = 16;
   private float xV2_;
   /**
@@ -947,6 +964,7 @@ public final class NaiveBall extends
     return xV2_;
   }
 
+  // optional float x_v_3 = 17;
   public static final int X_V_3_FIELD_NUMBER = 17;
   private float xV3_;
   /**
@@ -984,8 +1002,7 @@ public final class NaiveBall extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -1204,9 +1221,8 @@ public final class NaiveBall extends
    * Protobuf type {@code messages.NaiveBall}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.NaiveBall)
-      messages.NaiveBallOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.NaiveBallOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_NaiveBall_descriptor;
@@ -1529,6 +1545,7 @@ public final class NaiveBall extends
     }
     private int bitField0_;
 
+    // optional float velocity = 1;
     private float velocity_ ;
     /**
      * <code>optional float velocity = 1;</code>
@@ -1561,6 +1578,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional bool stationary = 2;
     private boolean stationary_ ;
     /**
      * <code>optional bool stationary = 2;</code>
@@ -1593,6 +1611,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float yintercept = 3;
     private float yintercept_ ;
     /**
      * <code>optional float yintercept = 3;</code>
@@ -1625,6 +1644,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // repeated .messages.NaiveBall.Position position = 4;
     private java.util.List<messages.NaiveBall.Position> position_ =
       java.util.Collections.emptyList();
     private void ensurePositionIsMutable() {
@@ -1766,8 +1786,7 @@ public final class NaiveBall extends
         java.lang.Iterable<? extends messages.NaiveBall.Position> values) {
       if (positionBuilder_ == null) {
         ensurePositionIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, position_);
+        super.addAll(values, position_);
         onChanged();
       } else {
         positionBuilder_.addAllMessages(values);
@@ -1865,6 +1884,7 @@ public final class NaiveBall extends
       return positionBuilder_;
     }
 
+    // repeated .messages.NaiveBall.Position dest_buffer = 5;
     private java.util.List<messages.NaiveBall.Position> destBuffer_ =
       java.util.Collections.emptyList();
     private void ensureDestBufferIsMutable() {
@@ -2006,8 +2026,7 @@ public final class NaiveBall extends
         java.lang.Iterable<? extends messages.NaiveBall.Position> values) {
       if (destBufferBuilder_ == null) {
         ensureDestBufferIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, destBuffer_);
+        super.addAll(values, destBuffer_);
         onChanged();
       } else {
         destBufferBuilder_.addAllMessages(values);
@@ -2105,6 +2124,7 @@ public final class NaiveBall extends
       return destBufferBuilder_;
     }
 
+    // optional float x_vel = 6;
     private float xVel_ ;
     /**
      * <code>optional float x_vel = 6;</code>
@@ -2137,6 +2157,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float y_vel = 7;
     private float yVel_ ;
     /**
      * <code>optional float y_vel = 7;</code>
@@ -2169,6 +2190,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float start_avg_x = 8;
     private float startAvgX_ ;
     /**
      * <code>optional float start_avg_x = 8;</code>
@@ -2201,6 +2223,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float start_avg_y = 9;
     private float startAvgY_ ;
     /**
      * <code>optional float start_avg_y = 9;</code>
@@ -2233,6 +2256,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float end_avg_x = 10;
     private float endAvgX_ ;
     /**
      * <code>optional float end_avg_x = 10;</code>
@@ -2265,6 +2289,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float end_avg_y = 11;
     private float endAvgY_ ;
     /**
      * <code>optional float end_avg_y = 11;</code>
@@ -2297,6 +2322,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float avg_start_index = 12;
     private float avgStartIndex_ ;
     /**
      * <code>optional float avg_start_index = 12;</code>
@@ -2329,6 +2355,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float avg_end_index = 13;
     private float avgEndIndex_ ;
     /**
      * <code>optional float avg_end_index = 13;</code>
@@ -2361,6 +2388,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float alt_x_vel = 14;
     private float altXVel_ ;
     /**
      * <code>optional float alt_x_vel = 14;</code>
@@ -2393,6 +2421,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float x_v_1 = 15;
     private float xV1_ ;
     /**
      * <code>optional float x_v_1 = 15;</code>
@@ -2425,6 +2454,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float x_v_2 = 16;
     private float xV2_ ;
     /**
      * <code>optional float x_v_2 = 16;</code>
@@ -2457,6 +2487,7 @@ public final class NaiveBall extends
       return this;
     }
 
+    // optional float x_v_3 = 17;
     private float xV3_ ;
     /**
      * <code>optional float x_v_3 = 17;</code>

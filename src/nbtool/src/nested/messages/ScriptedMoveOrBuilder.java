@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface ScriptedMoveOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.ScriptedMove)
-    com.google.protobuf.MessageOrBuilder {
+public interface ScriptedMoveOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // repeated .messages.BodyJointCommand command = 1;
   /**
    * <code>repeated .messages.BodyJointCommand command = 1;</code>
    */
