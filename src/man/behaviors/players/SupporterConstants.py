@@ -114,8 +114,18 @@ def distanceToPosition(player):
         return hypot(player.brain.loc.x - position.x, player.brain.loc.y - position.y)
     return distToPositionHelper
 
-def findDefenderHome(left, ball, hh):
-    bY = ball.y
+#left = role of defender. Left/Right.
+#ball = ball position
+#hh = heading?
+
+#May need to change position of defenderForward + defenderBack?
+
+NogginConstants.CENTER_CIRCLE_RADIUS
+
+def findDefenderHomeWithBall(left, ball, hh): 
+
+    ballY = ball.y
+
     if ball.x < NogginConstants.MIDFIELD_X:
         if left:
             home = closePointOnSeg(role.evenDefenderBack.x, role.evenDefenderBack.y,
@@ -130,51 +140,94 @@ def findDefenderHome(left, ball, hh):
 
     else:
         if left:
-            if bY >= role.evenDefenderForward.y:
+            if bY >= (NogginConstants.MIDFIELD_Y + NogginConstants.CENTER_CIRCLE_RADIUS):
                 return RobotLocation(role.evenDefenderForward.x,
                                     role.evenDefenderForward.y,
                                     hh)
-            elif bY <= role.oddDefenderBack.y:
+            else:
                 return RobotLocation(role.evenDefenderBack.x,
                                     role.evenDefenderBack.y,
                                     hh)
-            else:
-                # ball is between the two defenders:
-                # linear relationship between ball and where defender stands on their line
-                
-                xDist = role.evenDefenderForward.x - role.evenDefenderBack.x
-                yDist = role.evenDefenderForward.y - role.evenDefenderBack.y
-
-                t = ((bY - role.oddDefenderForward.y) / 
-                    (role.evenDefenderForward.y - role.oddDefenderForward.y))
-
-                hx = role.evenDefenderBack.x + t*xDist
-                hy = role.evenDefenderBack.y + t*yDist
-
-                return RobotLocation(hx, hy, hh)
         else:
-            if bY <= role.oddDefenderForward.y:
+            if bY <= (NogginConstants.MIDFIELD_Y - NogginConstants.CENTER_CIRCLE_RADIUS):
                 return RobotLocation(role.oddDefenderForward.x,
                                     role.oddDefenderForward.y,
                                     hh)
-            elif bY >= role.evenDefenderBack.y:
+            else
                 return RobotLocation(role.oddDefenderBack.x,
                                     role.oddDefenderBack.y,
                                     hh)
-            else:
-                # ball is between the two defenders:
-                # linear relationship between ball and where defender stands on their line
+ 
+#ballPrev = previous position of ball
+def findDefenderHomeNoBall(left, ball, timeSince, hh):
+
+
+
+
+
+
+    
+# def staggeredDefenderHome(left, ball, hh):
+#     bY = ball.y
+#     if ball.x < NogginConstants.MIDFIELD_X:
+#         if left:
+#             home = closePointOnSeg(role.evenDefenderBack.x, role.evenDefenderBack.y,
+#                                     role.evenDefenderForward.x, role.evenDefenderForward.y,
+#                                     ball.x, ball.y)
+#             return RobotLocation(home[0], home[1], hh)
+#         else:
+#             home = closePointOnSeg(role.oddDefenderBack.x, role.oddDefenderBack.y,
+#                                     role.oddDefenderForward.x, role.oddDefenderForward.y,
+#                                     ball.x, ball.y)
+#             return RobotLocation(home[0], home[1], hh)
+
+#     else:
+#         if left:
+#             if bY >= role.evenDefenderForward.y:
+#                 return RobotLocation(role.evenDefenderForward.x,
+#                                     role.evenDefenderForward.y,
+#                                     hh)
+#             elif bY <= role.oddDefenderBack.y:
+#                 return RobotLocation(role.evenDefenderBack.x,
+#                                     role.evenDefenderBack.y,
+#                                     hh)
+#             else:
+#                 # ball is between the two defenders:
+#                 # linear relationship between ball and where defender stands on their line
                 
-                xDist = role.oddDefenderForward.x - role.oddDefenderBack.x
-                yDist = role.oddDefenderForward.y - role.oddDefenderBack.y
+#                 xDist = role.evenDefenderForward.x - role.evenDefenderBack.x
+#                 yDist = role.evenDefenderForward.y - role.evenDefenderBack.y
 
-                t = ((bY - role.evenDefenderForward.y) / 
-                    (role.oddDefenderForward.y - role.evenDefenderForward.y))
+#                 t = ((bY - role.oddDefenderForward.y) / 
+#                     (role.evenDefenderForward.y - role.oddDefenderForward.y))
 
-                hx = role.oddDefenderBack.x + t*xDist
-                hy = role.oddDefenderBack.y + t*yDist
+#                 hx = role.evenDefenderBack.x + t*xDist
+#                 hy = role.evenDefenderBack.y + t*yDist
 
-                return RobotLocation(hx, hy, hh)
+#                 return RobotLocation(hx, hy, hh)
+#         else:
+#             if bY <= role.oddDefenderForward.y:
+#                 return RobotLocation(role.oddDefenderForward.x,
+#                                     role.oddDefenderForward.y,
+#                                     hh)
+#             elif bY >= role.evenDefenderBack.y:
+#                 return RobotLocation(role.oddDefenderBack.x,
+#                                     role.oddDefenderBack.y,
+#                                     hh)
+#             else:
+#                 # ball is between the two defenders:
+#                 # linear relationship between ball and where defender stands on their line
+                
+#                 xDist = role.oddDefenderForward.x - role.oddDefenderBack.x
+#                 yDist = role.oddDefenderForward.y - role.oddDefenderBack.y
+
+#                 t = ((bY - role.evenDefenderForward.y) / 
+#                     (role.oddDefenderForward.y - role.evenDefenderForward.y))
+
+#                 hx = role.oddDefenderBack.x + t*xDist
+#                 hy = role.oddDefenderBack.y + t*yDist
+
+#                 return RobotLocation(hx, hy, hh)
 
 def findStrikerHome(ball, hh):
     if not hasattr(findStrikerHome, 'upperHalf'):

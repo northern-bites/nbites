@@ -63,6 +63,8 @@ def positionAtHome(player):
 
     player.brain.nav.updateDest(home)
 
+    player.defendingStateTime = 0
+
 @superState('playOffBall')
 @stay
 @ifSwitchNow(transitions.shouldSpinSearchFromWatching, 'spinAtHome')
@@ -74,8 +76,13 @@ def watchForBall(player):
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
+    player.defendingStateTime++
+
     if transitions.tooFarFromHome(player, 50, 20):
         return player.goLater('positionAtHome')
+
+    if player.defendingStateTime >= 20:
+        return player.goNow('positionAtHome')
 
 @defaultState('doFirstHalfSpin')
 @superState('playOffBall')
@@ -84,6 +91,9 @@ def spinAtHome(player):
     """
     Spin while at home.
     """
+
+    player.defendingStateTime++
+    
     pass
 
 @superState('spinAtHome')
