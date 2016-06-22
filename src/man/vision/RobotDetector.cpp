@@ -18,8 +18,8 @@ Robot::Robot(int l, int r, int t, int b)
 RobotDetector::RobotDetector(int wd_, int ht_)
     : img_wd(wd_),
       img_ht(ht_),
-      low_fuzzy_thresh(2),
-      high_fuzzy_thresh(11),
+      low_fuzzy_thresh(LOWER_FUZZY_GRAD_THRESH),
+      high_fuzzy_thresh(UPPER_FUZZY_GRAD_THRESH),
       current_direction(none)
 {
     std::cout<<"[ ROBOT DETECTOR] width = "<<wd_<<", height = "<<ht_<<std::endl;
@@ -35,8 +35,11 @@ RobotDetector::RobotDetector(int wd_, int ht_)
 }
 
 RobotDetector::~RobotDetector() {
+    delete[] WGImage.pixelAddr();
     candidates.clear();
+#ifdef OFFLINE
     unmergedCandidates.clear();
+#endif
 }
 
 // Run every frame from VisionModule.cpp
@@ -45,12 +48,12 @@ bool RobotDetector::detectRobots(ImageLiteU8 whiteImage,
                                  FieldHomography* hom, bool is_top)
 {
     candidates.clear();
+#ifdef OFFLINE
     unmergedCandidates.clear();
+#endif
 
-    uint8_t min = 255;
-    uint8_t max = 0;
-
-    // HACK: Do this better -> might impact other things
+    // TODO: Germany 2016 Hack
+    // Do this better -> setting lower gradient thresh may affect other systems
     ed->gradientThreshold(low_fuzzy_thresh);
 
     int startCol = 1;
@@ -85,9 +88,6 @@ bool RobotDetector::detectRobots(ImageLiteU8 whiteImage,
             } else {
                 *WGImage.pixelAddr(i,j) = whiteVal;
             }
-
-            if (grad < min) { min = grad; }
-            if (grad > max) { max = grad; }
         }
     }
 
@@ -134,6 +134,7 @@ int RobotDetector::findAzimuthRestrictions(FieldHomography* hom)
 
 void RobotDetector::getCurrentDirection(FieldHomography* hom)
 {
+    // TODO: These numbers should be computed with a function
     double az = hom->azimuth();
     if (az > 1.825) { current_direction = southeast; }
     else if (az > 1.125) { current_direction = east; }
@@ -171,18 +172,14 @@ void RobotDetector::removeHoughLines(EdgeList& edges)
 
 void RobotDetector::findCandidates(bool is_top)
 {
-    int boxW = 90;
-    int boxH = 140;
-    unsigned long brightness_thresh = 120;
+    int boxW = UPPER_BOX_WIDTH;
+    int boxH = UPPER_BOX_HEIGHT;
+    unsigned long brightness_thresh = UPPER_BRIGHT_CONFIDENCE_THRESH;
     if (!is_top) {
-        boxW = 50;
-        boxH = 60;
-        brightness_thresh = 150;
+        boxW = LOWER_BOX_WIDTH;
+        boxH = LOWER_BOX_HEIGHT;
+        brightness_thresh = LOWER_BRIGHT_CONFIDENCE_THRESH;
     }
-
-    // Just for me to see what size box I'm using
-    // Robot testRobot(0, boxW, 0, boxH);
-    // candidates.push_back(testRobot);
 
     // Just for now, find best box candidate
     unsigned int bestID = 0;
@@ -193,9 +190,7 @@ void RobotDetector::findCandidates(bool is_top)
     unsigned long grid[img_wd - boxW + 1][img_ht - boxH + 1];
     unsigned long currSum = 0;
 
-    // initialize accumulators for each column
-    //    as sum of box height in that column, and
-    // init current sum
+    // initialize accumulators for each column as sum of box height in that column
     for (int i = 0; i < img_wd; ++i) {
         accumulators[i] = 0;
         for (int j = 0; j < boxH; ++j) {
@@ -251,31 +246,17 @@ void RobotDetector::findCandidates(bool is_top)
 
             // I am above thresh and am greater than all neighbors: I AM ROBOT
             if (amPeak) {
+#ifdef OFFLINE
                 unmergedCandidates.push_back(Robot(i, i+boxW, j, j+boxH));
+#endif
                 if (candidates.empty()) {
-                    // std::cout<<"candidates empty"<<std::endl;
                     candidates.push_back(Robot(i, i+boxW, j, j+boxH));
                 } else {
-                    // std::cout<<"candidates not empty"<<std::endl;
-                    // std::cout<<"Box before merge: "<<i<<", "<<i+boxW<<", "<<j<<", "<<j+boxH<<std::endl;
                     mergeCandidate(i, i+boxW, j, j+boxH);
                 }
             }
         }
     }
-    // int c1, c2;
-    // c1 = 50;
-    // c2 = 70;
-    // // candidates.push_back(Robot(c1, c1+boxW, c1, c1+boxH));
-    // candidates.push_back(Robot(c2+boxW/2, c2+boxW/2+boxW, c2, c2+boxH));
-    // unmergedCandidates.push_back(Robot(c1, c1+boxW, c1, c1+boxH));
-    // unmergedCandidates.push_back(Robot(c2+boxW/2, c2+boxW/2+boxW, c2, c2+boxH));
-    // std::cout<<"First Candidate: "<<c1<<", "<<c1+boxW<<", "<<c1<<", "<<c1+boxH<<std::endl;
-    // std::cout<<"Second Candidate: "<<c2+boxW/2<<", "<<c2+boxW/2+boxW<<", "<<c2<<", "<<c2+boxH<<std::endl;
-    // // mergeCandidate(c2+boxW/2, c2+boxW+boxW/2, c2, c2+boxH);
-    // mergeCandidate(c1, c1+boxW, c1, c1+boxH);
-
-    // printCandidates("[ ROBOT DETECTOR ] FINAL CANDIDATES:");
 }
 
 void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
@@ -320,54 +301,6 @@ void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
     candidates.push_back(Robot(lf, rt, tp, bt));
 }
 
-// This should be different, just testing bottom camera stuff out right now.
-// void RobotDetector::toFieldCoordinates(FieldHomography* hom, float* obstacleBox, int lowestCol)
-// {
-//     // If we haven't found an obstacle:
-//     if (lowestCol == -1) { return; }
-
-//     // Homography takes an image coordinate as a parameter, so we must
-//     // convert to that coordinate system
-//     //      FROM: y+ forward, x+ right, TO: x+ forward, y+ left
-
-//     // let's map the lowest point to field coordinates
-//     double x1, y1, xb, yb;
-//     x1 = (double)lowestCol - (double)img_wd/2;
-//     y1 = (double)img_ht/2 - (double)obstacleBox[1]; // bottom of obstacle box
-//     if (!hom->fieldCoords(x1, y1, xb, yb)) {
-//         // we were not successful in our first mapping
-//         resetObstacleBox(obstacleBox);
-//         return;
-//     }
-
-//     // now let's map the left point of the box
-//     double x2, y2, xl, yl;
-//     x2 = (double)obstacleBox[2] - (double)img_wd/2; // left side of obstacle box
-//     if (!hom->fieldCoords(x2, y1, xl, yl)) {
-//         // we were not successful in our second mapping
-//         resetObstacleBox(obstacleBox);
-//         return;
-//     }
-
-//     // finally let's map the right point of the box
-//     double x3, y3, xr, yr;
-//     x3 = (double)obstacleBox[3] - (double)img_wd/2; // left side of obstacle box
-//     if (!hom->fieldCoords(x3, y1, xr, yr)) {
-//         // we were not successful in our third mapping
-//         resetObstacleBox(obstacleBox);
-//         return;
-//     }
-
-//     // All the mapping was successful!
-//     // now that we have them in robot relative coordinates... we have to
-//     // convert them to the correct coordinate system, with same origin:
-//     // FROM: y+ forward, x+ right, TO: x+ forward, y+ to left
-//     obstacleBox[0] = -1.f*(float)xb;     // bottom x coordinate (now y)
-//     obstacleBox[1] = (float)yb;          // bottom y coordinate (now x)
-//     obstacleBox[2] = -1.f*(float)xl;     // left x coordinate (now y)
-//     obstacleBox[3] = -1.f*(float)xr;     // right x coordinate (now y)
-// }
-
 // Right now, to figure out the robot's position, we are using the left and right coordinates of
 // the box to determine in which direction the obstructing robot is. This could definitely be
 // improved, but right now we don't know the distance to the robot because the box doesn't
@@ -386,24 +319,16 @@ void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
 //                  |           |           |
 //
 void RobotDetector::getDetectedRobots(bool* detectedObstacles, int size) {
-    // Now we take information and return relevant obstacles
-    // portals::Message<messages::RobotObstacle> current(0);
-
     // Make array bigger than 8 directions so we can do direction +- 1 without error
     for (int i = 0; i < size; ++i) {
         detectedObstacles[i] = false;
     }
 
-    // int left_barrier = img_wd / 4;
-    // int right_barrier = (img_wd / 4)*3;
-    // int left_halfway = img_wd / 8;
-    // int middle_halfway = img_wd / 2;
-    // int right_halfway = (img_wd / 8)*7;
-    int left_barrier = img_wd / 3;
-    int right_barrier = (img_wd / 3)*2;
-    int left_halfway = img_wd / 6;
+    int left_barrier = img_wd / 4;
+    int right_barrier = (img_wd / 4)*3;
+    int left_halfway = img_wd / 8;
     int middle_halfway = img_wd / 2;
-    int right_halfway = (img_wd / 6)*5;
+    int right_halfway = (img_wd / 8)*7;
 
     std::vector<Robot>::iterator it;
     for(it = candidates.begin(); it != candidates.end(); ++it) {
@@ -451,6 +376,54 @@ void RobotDetector::getDetectedRobots(bool* detectedObstacles, int size) {
     if (detectedObstacles[0]) { detectedObstacles[8] = true; }
     if (detectedObstacles[9]) { detectedObstacles[1] = true; }
 }
+
+// Once we find the bottom of the box = bottom of robot (bottom image) - can find actual field coord.
+// void RobotDetector::toFieldCoordinates(FieldHomography* hom, float* obstacleBox, int lowestCol)
+// {
+//     // If we haven't found an obstacle:
+//     if (lowestCol == -1) { return; }
+
+//     // Homography takes an image coordinate as a parameter, so we must
+//     // convert to that coordinate system
+//     //      FROM: y+ forward, x+ right, TO: x+ forward, y+ left
+
+//     // let's map the lowest point to field coordinates
+//     double x1, y1, xb, yb;
+//     x1 = (double)lowestCol - (double)img_wd/2;
+//     y1 = (double)img_ht/2 - (double)obstacleBox[1]; // bottom of obstacle box
+//     if (!hom->fieldCoords(x1, y1, xb, yb)) {
+//         // we were not successful in our first mapping
+//         resetObstacleBox(obstacleBox);
+//         return;
+//     }
+
+//     // now let's map the left point of the box
+//     double x2, y2, xl, yl;
+//     x2 = (double)obstacleBox[2] - (double)img_wd/2; // left side of obstacle box
+//     if (!hom->fieldCoords(x2, y1, xl, yl)) {
+//         // we were not successful in our second mapping
+//         resetObstacleBox(obstacleBox);
+//         return;
+//     }
+
+//     // finally let's map the right point of the box
+//     double x3, y3, xr, yr;
+//     x3 = (double)obstacleBox[3] - (double)img_wd/2; // left side of obstacle box
+//     if (!hom->fieldCoords(x3, y1, xr, yr)) {
+//         // we were not successful in our third mapping
+//         resetObstacleBox(obstacleBox);
+//         return;
+//     }
+
+//     // All the mapping was successful!
+//     // now that we have them in robot relative coordinates... we have to
+//     // convert them to the correct coordinate system, with same origin:
+//     // FROM: y+ forward, x+ right, TO: x+ forward, y+ to left
+//     obstacleBox[0] = -1.f*(float)xb;     // bottom x coordinate (now y)
+//     obstacleBox[1] = (float)yb;          // bottom y coordinate (now x)
+//     obstacleBox[2] = -1.f*(float)xl;     // left x coordinate (now y)
+//     obstacleBox[3] = -1.f*(float)xr;     // right x coordinate (now y)
+// }
 
 void RobotDetector::printCandidates(std::string message) {
     std::cout<<message<<std::endl;
