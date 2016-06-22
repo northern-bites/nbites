@@ -22,11 +22,9 @@ namespace man {
 #if (!defined(OFFLINE) && defined(USE_ROBOT_TTS)) || defined(NBL_STANDALONE)
         static inline void internal_say(const char * line) {
             if (!fork()) {
-                static const int line_size = 500;
-                char buffer[line_size];
-                snprintf(buffer, line_size, "say \"%s\"", line);
-                system( (const char *) buffer );
+                execl("/usr/bin/say", line, NULL);
                 exit(0);
+                kill(getpid(), SIGKILL);
             }
         }
 
