@@ -122,7 +122,7 @@ namespace man {
                                 	int bottomQuarer);
 
 			bool whiteBelowSpot(Spot spot);
-			bool greenBelowBallFromCentroid(imagePoint p);
+			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
 			bool checkDiagonalCircle(Spot spot);
