@@ -73,7 +73,6 @@ void Enactor::noStiff()
     catch (AL::ALError e) {
         std::cout << "Couldn't kill stiffness because: " << e.toString() << std::endl;
     }
-
 }
 
 double interp(double start, double end, int index, int outof) {

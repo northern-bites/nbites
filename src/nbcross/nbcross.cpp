@@ -27,6 +27,11 @@ namespace nbl {
 
         int nbcross_main(int argc, char ** argv) {
 
+            if ( getenv("NBCROSS_SERVER_ADDR") ) {
+                SERVER_NAME = getenv("NBCROSS_SERVER_ADDR");
+                NBL_WARN("taking server address from environment: %s", SERVER_NAME.c_str())
+            }
+
             char flag;
             while ( (flag = getopt(argc, argv, "qn:s:")) != -1) {
                 switch (flag) {

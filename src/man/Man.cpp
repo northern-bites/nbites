@@ -8,6 +8,8 @@
 
 #include "Logging.hpp"
 
+#include "TextToSpeech.h"
+
 #ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
 SET_POOL_SIZE(messages::JointAngles, 24);
@@ -266,6 +268,8 @@ Man::Man() :
 #ifdef USE_TIME_PROFILING
         Profiler::getInstance()->profileFrames(1400);
 #endif
+
+        man::tts::say(IN_GAME, nbl::utilities::format("%s has started", robotName.c_str()).c_str() );
 
         startSubThreads();
         std::cout << "Man constructed" << std::endl;

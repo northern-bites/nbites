@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#ifndef NBL_STANDALONE
+#include "DebugConfig.h"
+#endif
+
 enum say_when {
     IN_DEBUG,
     IN_SCRIMMAGE,
@@ -16,17 +20,12 @@ namespace man {
 
         static const say_when CURRENT_LEVEL = IN_DEBUG;
 
+#if (!defined(OFFLINE) && defined(USE_ROBOT_TTS)) || defined(NBL_STANDALONE)
         static inline void internal_say(const char * line) {
             if (!fork()) {
-                static const int line_size = 500;
-                char buffer[line_size];
-                snprintf(buffer, line_size, "say \"%s\"", line);
-                system( (const char *) buffer );
-                for (;;) {                  //forever
-                    ::exit(0);              //in some cases, this does not seem to be enough (weird naoqi process?)
-
-                    kill(getpid(), SIGKILL);//so send SIGKILL too
-                }
+                execl("/usr/bin/say", line, NULL);
+                exit(0);
+                kill(getpid(), SIGKILL);
             }
         }
 
@@ -38,6 +37,11 @@ namespace man {
                 printf("say [blocked]: %s\n", line);
             }
         }
+#else
+        static inline void internal_say(const char * line){}
+        static inline void say(say_when upTo, const char * line){}
+#endif
+
     }
 }
 

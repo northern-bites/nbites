@@ -21,7 +21,6 @@ import nbtool.data.log.Log;
 import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
-
 public class Utility {
 
 	/* true if top, false if bot */
@@ -205,6 +204,14 @@ public class Utility {
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(b,BorderLayout.EAST);
 		p.add(f,BorderLayout.CENTER);
+
+		return p;
+	}
+
+	public static JPanel labelWithPanel(JLabel lbl, JPanel pnl) {
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(lbl,BorderLayout.WEST);
+		p.add(pnl,BorderLayout.CENTER);
 
 		return p;
 	}
