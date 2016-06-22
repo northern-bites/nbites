@@ -368,8 +368,8 @@ def stand(nav):
     So we can give new walk commands before we complete
     the stand if desired
     """
-    if ((nav.brain.player.gameState == 'gameInitial' or nav.brain.player.gameState == 'gameSet') 
-    and nav.firstFrame()):
+    if (nav.brain.player.gameState == 'gameInitial'
+     or nav.brain.player.gameState == 'gameSet'):
         helper.stand(nav)
         return nav.stay()
 

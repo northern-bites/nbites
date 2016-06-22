@@ -495,7 +495,6 @@ void UNSWalkProvider::resetOdometry() {
 
 void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
 	if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
-		std::cout << "Stand command!\n";
 		this->stand();
 		return;
 	}
