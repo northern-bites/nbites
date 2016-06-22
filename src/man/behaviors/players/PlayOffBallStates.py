@@ -74,7 +74,6 @@ def watchForBall(player):
     """
 
     if player.firstFrame():
-        print "-----------Player at home-----------"
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
@@ -106,8 +105,6 @@ def doFirstHalfSpin(player):
     """
 
     if player.firstFrame():
-        print "------------First half spin-------------"
-
         player.brain.tracker.repeatFixedPitchLookAhead()
         
         if player.brain.playerNumber == 3:
@@ -126,7 +123,6 @@ def doPan(player):
     Wide pan for 5 seconds.
     """
     if player.firstFrame():
-
         player.stand()
         player.brain.tracker.trackBall()
 
@@ -145,7 +141,6 @@ def doSecondHalfSpin(player):
     Keep spinning in the same direction.
     """
     if player.firstFrame():
-
         player.brain.tracker.repeatFixedPitchLookAhead()
 
         if player.brain.playerNumber == 3:
