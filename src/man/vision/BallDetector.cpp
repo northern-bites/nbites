@@ -582,55 +582,27 @@ bool BallDetector::lookForFarAwayBalls(Blob blob)
    part of the same ball.
 */
 
-bool BallDetector::blobsAreClose(std::pair<int,int> first,
-                                 std::pair<int,int> second)
+bool BallDetector::blobsAreClose(std::pair<int,int> p, std::pair<int,int> q)
 {
-    int BOTTOM_CAMERA_BLOB_NEARNESS = 25;
-    int TOP_CAMERA_BLOB_NEARNESS = 28;
-    int TOTAL_CLOSENESS = 45;
-    int closeness = TOP_CAMERA_BLOB_NEARNESS;
-    int xdiff = abs(first.first - second.first);
-    int ydiff = abs(first.second - second.second);
-    int ymax = max(first.second, second.second);
-    if (!topCamera) {
-        closeness = BOTTOM_CAMERA_BLOB_NEARNESS;
+
+    double cx = (p.first + q.first) / 2;
+    double cy = (p.second + q.second) / 2;
+
+    double bcx = 0, bcy = 0;
+    imageToBillCoordinates(cx, cy, bcx, bcy);
+
+    int upper = projectedBallRadius(std::make_pair(bcx, bcy)) * 2;
+    int lower = (upper >> 1) >> 1; //divide by 4
+    int xdiff = abs(p.first - q.first);
+    int ydiff = abs(p.second - q.second);
+
+    int dist = sqrt(pow(xdiff,2) + pow(ydiff,2));
+
+    if(dist >= lower && dist <= upper) {
+        return true; //blobs are close
     } else {
-        if (ymax > 200) {
-            closeness = TOP_CAMERA_BLOB_NEARNESS;
-        } else if (ymax > 160) {
-            closeness = 24;
-            TOTAL_CLOSENESS = 35;
-        } else if (ymax > 120) {
-            closeness = 17;
-            TOTAL_CLOSENESS = 30;
-        } else {
-            closeness = 15;
-            TOTAL_CLOSENESS = 25;
-        }
+        return false; //blobs are either too far or too close
     }
-    if (xdiff < closeness && ydiff < closeness &&
-        (xdiff + ydiff) < TOTAL_CLOSENESS &&
-        (xdiff > 0 || ydiff > 0)) {
-		int yMid = (first.second + second.second) / 2;
-		int xMid = (first.first + second.first) / 2;
-		int count = 0;
-		int count2 = 0;
-		for (int i = min(first.first, second.first);
-			 i < max(first.first, second.first); i++) {
-			getColor(i, yMid);
-			if (isGreen()) {
-				count++;
-			}
-			if (isWhite()) {
-				count2++;
-			}
-		}
-		if (count > 1 || count2 == 0) {
-			return false;
-		}
-        return true;
-    }
-    return false;
 }
 
 /* Sometimes our balls are not tidy blobs (e.g. they are up against a
@@ -757,19 +729,21 @@ bool BallDetector::findCorrelatedBlackSpots
 				}
 
                 if(distance >= lower && distance <= upper) {
-					if (debugBall) {
-						std::cout<<"[BALL INFO] Distance OK"<<std::endl;
-					}
+    				if (debugBall) {
+    					std::cout<<"[BALL INFO] Distance OK"<<std::endl;
+    				}
+                    double ix = 0, iy = 0;
+                    billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
 
                     Spot ballSpot;
                     ballSpot.x = ballSpotX * 2;
                     ballSpot.y = ballSpotY * 2;
-					ballSpot.rawX = ballSpotX + width / 2;
-					ballSpot.rawY = -1 * ballSpotY + height / 2;
+					ballSpot.rawX = ix;
+					ballSpot.rawY = iy;
 					ballSpot.innerDiam = 5;
-					if (debugBall) {
-						debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLUE);
-					}
+				    if (debugBall) {
+					  debugDraw.drawPoint(ix,iy,BLUE);
+				    }
                     makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
 #ifdef OFFLINE
                     foundBall = true;
@@ -805,17 +779,19 @@ bool BallDetector::findCorrelatedBlackSpots
                 if(area >= lower && area <= upper) {
                     ballSpotX = (s1.ix()+s2.ix()+s3.ix())/3;
                     ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
+                    double ix = 0, iy = 0;
+                    billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
 
                     if (debugBall) {
                         std::cout<<"[BALL INFO] Area OK"<<std::endl;
-                        debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
+                        debugDraw.drawPoint(ix,iy,BLACK);
                     }
 
                     Spot ballSpot;
                     ballSpot.x = ballSpotX * 2; // in half pixels
                     ballSpot.y = ballSpotY * 2;
-    				ballSpot.rawX = ballSpotX + width / 2;
-    				ballSpot.rawY = -1 * ballSpotY + height / 2;
+    				ballSpot.rawX = ix;
+    				ballSpot.rawY = iy;
     				ballSpot.innerDiam = 5;
 
                     makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
@@ -1153,19 +1129,24 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
 
 bool BallDetector::greenBelowBallFromCentroid(imagePoint p) {
     int THRESHOLD = 110;
-    int WAYDOWN = 35;
 
     double bx = 0, by = 0;
     imageToBillCoordinates(p.first, p.second, bx, by);
     int r = projectedBallRadius(std::make_pair(bx, by));
+    int bottomY = std::round(p.second + r + 1.5);
 
-    int bottomY = std::round(p.second + r + 0.5);
-    getColor(p.first, bottomY);
-    int greenMagnituteSums = 0;
-    for(int i = bottomY; i < WAYDOWN; i++) {
-        greenMagnituteSums += getGreen();
+    if(debugBall) {
+        debugDraw.drawDot(p.first, bottomY, RED);
+        debugDraw.drawDot(p.first, bottomY+r, RED);
     }
-    if((greenMagnituteSums / WAYDOWN) >= THRESHOLD) {
+    getColor(p.first, bottomY);
+    int greenMagnitudeSums = 0;
+    for(int i = 0; i < r; i++) {
+        greenMagnitudeSums += getGreen();
+        getColor(p.first, bottomY+i);
+    }
+
+    if((greenMagnitudeSums / r) >= THRESHOLD) {
         return true;
     } else {
         return false;
