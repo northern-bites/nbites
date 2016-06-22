@@ -21,6 +21,9 @@ import nbtool.util.Debug;
 
 public class DetectView extends ViewParent implements IOFirstResponder {
 
+	static boolean play = false;
+	static final int SPECTRUM_OUTPUT_LENGTH = 2049;
+
 	FloatBuffer buff = null;
 	SoundPane pane = null;
 	JScrollPane scroll = new JScrollPane();
@@ -33,8 +36,22 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 		Debug.info("view!");
 		this.setLayout(new BorderLayout());
 
-		final byte[] dataToPlay = displayedLog.blocks.get(0).data;
-		PlaySound.play(dataToPlay);
+		final JCheckBox playBox = new JCheckBox();
+		playBox.setText("play sound on selection");
+		playBox.setSelected(play);
+		playBox.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				play = playBox.isSelected();
+			}
+		});
+
+		this.add(playBox, BorderLayout.SOUTH);
+
+		if (play) {
+			final byte[] dataToPlay = displayedLog.blocks.get(0).data;
+			PlaySound.play(dataToPlay);
+		}
 
 		if (displayedLog.logClass.equals("DetectAmplitude")) {
 			CrossInstance ci = CrossServer.instanceByIndex(0);
@@ -51,7 +68,9 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 			this.add(container, BorderLayout.NORTH);
 //			this.add(heardBox, BorderLayout.NORTH);
 
-			containsBox.setSelected(displayedLog.topLevelDictionary.get("WhistleHeard").asBoolean().bool());
+			if (displayedLog.topLevelDictionary.get("WhistleHeard") != null)
+				containsBox.setSelected(displayedLog.topLevelDictionary.get("WhistleHeard").asBoolean().bool());
+
 			containsBox.addChangeListener(new ChangeListener() {
 				@Override
 				public void stateChanged(ChangeEvent e) {
@@ -93,7 +112,8 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 			offset += b.data.length;
 		}
 
-		buff = new FloatBuffer(new Block(all, ""), out[0].blocks.size(), 2048);
+		buff = new FloatBuffer(new Block(all, ""), out[0].blocks.size(),
+				SPECTRUM_OUTPUT_LENGTH);
 
 		if (pane != null) {
 			scroll.remove(pane);

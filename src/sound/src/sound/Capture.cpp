@@ -86,7 +86,7 @@ namespace nbsound {
 
         snd_pcm_uframes_t rframe;
         err = snd_pcm_hw_params_get_buffer_size(hw_params, &rframe);
-        NBL_ASSERT_GE(rframe, config.window_size)
+//        NBL_ASSERT_GE(rframe, config.window_size)
 //        NBL_ASSERT_EQ(err, 0)
 //        NBL_ASSERT_GE(rframe, 4096)
 //        NBL_ASSERT_LE(rframe, 32000)

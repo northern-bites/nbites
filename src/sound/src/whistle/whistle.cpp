@@ -20,7 +20,7 @@
 
 #include "Logging.hpp"
 
-const char * LAST_MODIFIED = "6/12 19:53";
+const char * LAST_MODIFIED = "6/21 19:50";
 const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
 using namespace nbl;
@@ -83,10 +83,9 @@ void do_heard() {
     }
 }
 
-Config used_config{48000, 16384};
+Config used_config{48000, 32768};
 
 size_t iteration = 0;
-
 
 void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
 
@@ -114,7 +113,7 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
         }
 
     } else {
-        printf(".");
+        std::cout << "." << std::endl;
     }
 
     ++iteration;
@@ -144,9 +143,10 @@ int main(int argc, const char * argv[]) {
     signal(SIGSEGV, handler);
 
     NBL_INFO("\twhistle ( %s )", LAST_MODIFIED);
+    
     if (argc > 1) {
-        NBL_WARN("--------------------------\nwhistle stand"
-                 "alone mode\n--------------------------");
+        NBL_WARN("-------------------------- whistle stand"
+                 "alone mode --------------------------");
 
 	if (std::string{argv[1]} == std::string{"log"}) {
 		NBL_WARN("using logging (connect via nbtool)")

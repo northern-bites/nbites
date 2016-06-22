@@ -108,11 +108,15 @@ struct Channel {
     }
     
     float last_frame_spectrum[frequency_output_length];
-    int last_frame_peak;
+    Peak last_frame_peak {-1,0.0};
     float last_frame_sdev;
     
     int frames_on;
     int frames_off;
+
+    bool hearing() {
+        return last_frame_peak.first > 0;
+    }
     
     Channel() {
         last_frame_peak = -1;
@@ -192,6 +196,9 @@ bool init() {
     NBL_INFO("\tsize %d.", detect_results.size())
 #endif
 
+    channels[0]._channel_ = 0;
+    channels[1]._channel_ = 1;
+
     transform = new Transform(transform_input_length);
     reset();
 
@@ -208,6 +215,7 @@ bool reset() {
 
     return true;
 }
+
 bool detect(nbsound::SampleBuffer& buffer) {
 
     init();
@@ -225,6 +233,7 @@ bool detect(nbsound::SampleBuffer& buffer) {
             transform->transform(window, i);
 
     bool heard = channels[i].analyze(transform->get_freq_buffer());
+
     if (heard)
         NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
 
