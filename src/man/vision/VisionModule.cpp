@@ -343,10 +343,10 @@ void VisionModule::run_()
         // Detect obstacles
         PROF_ENTER2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
         bool detectedRobot = false; // used for selective logging
-        if (i == 1) {
-        detectedRobot = robotDetector[i]->getWhiteGradImage(frontEnd[i]->whiteImage(),
-                                            edgeDetector[i], *(edges[i]),
-                                            homography[i], i==0);
+        if (i == 1) { // HACK GERMANY 2016 -> only detect robots in bottom camera
+        detectedRobot = robotDetector[i]->detectRobots(frontEnd[i]->whiteImage(),
+                                                       edgeDetector[i], *(edges[i]),
+                                                       homography[i], i==0);
         }
         PROF_EXIT2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
         times[i][12] = timer.end();

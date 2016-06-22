@@ -29,9 +29,10 @@ public:
     RobotDetector(int wd_, int ht_);
     ~RobotDetector();
 
-    bool getWhiteGradImage(ImageLiteU8 whiteImage,
-                           EdgeDetector* ed, EdgeList& edges,
-                           FieldHomography* hom, bool is_top);
+    /* Run every frame from vision module */
+    bool detectRobots(ImageLiteU8 whiteImage,
+                      EdgeDetector* ed, EdgeList& edges,
+                      FieldHomography* hom, bool is_top);
 
     void getDetectedRobots(bool* detectedObstacles, int size);
     const std::vector<Robot>& getRobotList() const { return candidates; }

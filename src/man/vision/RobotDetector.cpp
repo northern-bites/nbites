@@ -40,9 +40,9 @@ RobotDetector::~RobotDetector() {
 }
 
 // Run every frame from VisionModule.cpp
-bool RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
-                                      EdgeDetector* ed, EdgeList& edges,
-                                      FieldHomography* hom, bool is_top)
+bool RobotDetector::detectRobots(ImageLiteU8 whiteImage,
+                                 EdgeDetector* ed, EdgeList& edges,
+                                 FieldHomography* hom, bool is_top)
 {
     candidates.clear();
     unmergedCandidates.clear();
@@ -280,67 +280,38 @@ void RobotDetector::findCandidates(bool is_top)
 
 void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
 {
-    // std::cout<<"Current merging box: "<<lf<<", "<<rt<<", "<<tp<<", "<<bt<<std::endl;
-    // printCandidates("Printing candidates before merging:");
     // Merge box with existing candidates:
     std::vector<Robot>::iterator it;
     for(it = candidates.begin(); it != candidates.end(); ++it) {
-        // std::cout<<"candidate box: "<<(*it).left<<", "<<(*it).right<<", "<<(*it).top<<", "<<(*it).bottom<<std::endl;
-        // return;
-        // std::cout<<"Robot merge: "<<it->
-        /* std::cout << *it; ... */
-        // std::cout<<lf<<"<="<<(*it).left<<" && "<<(*it).left<<"<="<<((rt+lf)/2)<<"?"<<std::endl;
-        // std::cout<<(*it).left<<"<="<<lf<<" && "<<lf<<"<="<<(((*it).left+(*it).right)/2)<<"?"<<std::endl;
         if (lf <= (*it).left && (*it).left <= ((rt+lf)/2)) {
-            // std::cout<<"yes!"<<std::endl;
             // I'm halfway overlapping in the x direction
             // new box is to left of old box
-            // std::cout<<tp<<"<="<<(*it).top<<" && "<<(*it).top<<"<="<<((tp+bt)/2)<<"?"<<std::endl;
-            // std::cout<<(*it).top<<"<="<<tp<<" && "<<tp<<"<="<<(((*it).top+(*it).bottom)/2)<<"?"<<std::endl;
             if (tp <= (*it).top && (*it).top <= ((tp+bt)/2)) {
-                // std::cout<<"yes1.1!"<<std::endl;
                 // new box is upper left of candidate box
                 bt = (*it).bottom;
                 rt = (*it).right;
-
-                // printCandidates("printing candidates after merging 1");
-                // return;
                 candidates.erase(it);
                 it = candidates.begin()-1; // loop through them all again
             } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2)) {
-                // std::cout<<"yes1.2!"<<std::endl;
                 // new box is to lower left of candidate box
                 tp = (*it).top;
                 rt = (*it).right;
-                // printCandidates("printing candidates after merging 2");
-                // return;
+                candidates.erase(it);
                 it = candidates.begin()-1; // loop through them all again
             }
         } else if ((*it).left <= lf && lf <= (((*it).left+(*it).right)/2)) {
-            // std::cout<<"yes2!"<<std::endl;
-            // I'm halfway overlapping in the x direction
-            // new box is to left of old box
-            // std::cout<<tp<<"<="<<(*it).top<<" && "<<(*it).top<<"<="<<((tp+bt)/2)<<"?"<<std::endl;
-            // std::cout<<(*it).top<<"<="<<tp<<" && "<<tp<<"<="<<(((*it).top+(*it).bottom)/2)<<"?"<<std::endl;
+            // I'm halfway overlapping in the y direction
+            // new box is above old box
             if (tp <= (*it).top && (*it).top <= ((tp+bt)/2)) {
-                // std::cout<<"yes2.1"<<std::endl;
                 // new box is upper right of candidate box
                 bt = (*it).bottom;
                 lf = (*it).left;
-
-                // printCandidates("printing candidates after merging 3");
-                // return;
-                // does this start at the second one actually?
                 candidates.erase(it);
                 it = candidates.begin()-1; // loop through them all again
             } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2)) {
-                // std::cout<<"yes2.2"<<std::endl;
                 // new box is to lower right of candidate box
                 tp = (*it).top;
                 lf = (*it).left;
-                // return;
-                // printCandidates("printing candidates after merging 4");
-                // does this start at the second one actually?
                 candidates.erase(it);
                 it = candidates.begin()-1; // loop through them all again
             }
