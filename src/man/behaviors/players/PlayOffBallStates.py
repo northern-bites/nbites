@@ -8,7 +8,7 @@ from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findStrike
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from ..navigator import BrunswickSpeeds as speeds
-from objects import Location, RobotLocation
+from objects import Location, RobotLocation, RelRobotLocation
 from ..util import *
 from math import hypot, fabs, atan2, degrees
 from ..headTracker import HeadMoves

@@ -40,7 +40,7 @@ void MotionSystem::update(ParticleSet& particles,
     float dY_R = curOdometry.y() - lastOdometry.y();
     float dH_R = curOdometry.h() - lastOdometry.h();
 
-    if( (std::fabs(dX_R) > 3.f) || (std::fabs(dY_R) > 3.f) || (std::fabs(dH_R) > 0.5f) ) {
+    if( (std::fabs(dX_R) > 3.f) || (std::fabs(dY_R) > 3.f) || (std::fabs(dH_R) > 0.35f) ) {
         // Probably reset odometry somewhere, so skip frame
         // std::cout << "std::fabs(dX_R) = " << std::fabs(dX_R) << " std::fabs(dY_R) = " << std::fabs(dY_R) << std::endl;
         // std::cout << "curOdometry.x() = " << curOdometry.x() << " curOdometry.y() = " << curOdometry.y() << std::endl;
