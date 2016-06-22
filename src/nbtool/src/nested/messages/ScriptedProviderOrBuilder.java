@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface ScriptedProviderOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.ScriptedProvider)
-    com.google.protobuf.MessageOrBuilder {
+public interface ScriptedProviderOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional bool active = 1;
   /**
    * <code>optional bool active = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface ScriptedProviderOrBuilder extends
    */
   boolean getActive();
 
+  // optional bool stopping = 2;
   /**
    * <code>optional bool stopping = 2;</code>
    */

@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.CameraParams}
  */
-public final class CameraParams extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.CameraParams)
-    CameraParamsOrBuilder {
+public  final class CameraParams extends
+    com.google.protobuf.GeneratedMessage
+    implements CameraParamsOrBuilder {
   // Use CameraParams.newBuilder() to construct.
   private CameraParams(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -56,9 +55,8 @@ public final class CameraParams extends
             break;
           }
           case 10: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000001;
-            whichCamera_ = bs;
+            whichCamera_ = input.readBytes();
             break;
           }
           case 16: {
@@ -171,6 +169,7 @@ public final class CameraParams extends
   }
 
   private int bitField0_;
+  // optional string whichCamera = 1;
   public static final int WHICHCAMERA_FIELD_NUMBER = 1;
   private java.lang.Object whichCamera_;
   /**
@@ -213,6 +212,7 @@ public final class CameraParams extends
     }
   }
 
+  // optional int32 H_FLIP = 2;
   public static final int H_FLIP_FIELD_NUMBER = 2;
   private int hFLIP_;
   /**
@@ -228,6 +228,7 @@ public final class CameraParams extends
     return hFLIP_;
   }
 
+  // optional int32 V_FLIP = 3;
   public static final int V_FLIP_FIELD_NUMBER = 3;
   private int vFLIP_;
   /**
@@ -243,6 +244,7 @@ public final class CameraParams extends
     return vFLIP_;
   }
 
+  // optional int32 auto_exposure = 4;
   public static final int AUTO_EXPOSURE_FIELD_NUMBER = 4;
   private int autoExposure_;
   /**
@@ -258,6 +260,7 @@ public final class CameraParams extends
     return autoExposure_;
   }
 
+  // optional int32 brightness = 5;
   public static final int BRIGHTNESS_FIELD_NUMBER = 5;
   private int brightness_;
   /**
@@ -273,6 +276,7 @@ public final class CameraParams extends
     return brightness_;
   }
 
+  // optional int32 contrast = 6;
   public static final int CONTRAST_FIELD_NUMBER = 6;
   private int contrast_;
   /**
@@ -288,6 +292,7 @@ public final class CameraParams extends
     return contrast_;
   }
 
+  // optional int32 saturation = 7;
   public static final int SATURATION_FIELD_NUMBER = 7;
   private int saturation_;
   /**
@@ -303,6 +308,7 @@ public final class CameraParams extends
     return saturation_;
   }
 
+  // optional int32 hue = 8;
   public static final int HUE_FIELD_NUMBER = 8;
   private int hue_;
   /**
@@ -318,6 +324,7 @@ public final class CameraParams extends
     return hue_;
   }
 
+  // optional int32 sharpness = 9;
   public static final int SHARPNESS_FIELD_NUMBER = 9;
   private int sharpness_;
   /**
@@ -333,6 +340,7 @@ public final class CameraParams extends
     return sharpness_;
   }
 
+  // optional int32 gamma = 10;
   public static final int GAMMA_FIELD_NUMBER = 10;
   private int gamma_;
   /**
@@ -348,6 +356,7 @@ public final class CameraParams extends
     return gamma_;
   }
 
+  // optional int32 autoWhiteBalance = 11;
   public static final int AUTOWHITEBALANCE_FIELD_NUMBER = 11;
   private int autoWhiteBalance_;
   /**
@@ -363,6 +372,7 @@ public final class CameraParams extends
     return autoWhiteBalance_;
   }
 
+  // optional int32 exposure = 12;
   public static final int EXPOSURE_FIELD_NUMBER = 12;
   private int exposure_;
   /**
@@ -378,6 +388,7 @@ public final class CameraParams extends
     return exposure_;
   }
 
+  // optional int32 gain = 13;
   public static final int GAIN_FIELD_NUMBER = 13;
   private int gain_;
   /**
@@ -393,6 +404,7 @@ public final class CameraParams extends
     return gain_;
   }
 
+  // optional int32 whiteBalance = 14;
   public static final int WHITEBALANCE_FIELD_NUMBER = 14;
   private int whiteBalance_;
   /**
@@ -408,6 +420,7 @@ public final class CameraParams extends
     return whiteBalance_;
   }
 
+  // optional int32 fadeToBlack = 15;
   public static final int FADETOBLACK_FIELD_NUMBER = 15;
   private int fadeToBlack_;
   /**
@@ -443,8 +456,7 @@ public final class CameraParams extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -649,9 +661,8 @@ public final class CameraParams extends
    * Protobuf type {@code messages.CameraParams}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.CameraParams)
-      messages.CameraParamsOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.CameraParamsOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_CameraParams.internal_static_messages_CameraParams_descriptor;
@@ -892,6 +903,7 @@ public final class CameraParams extends
     }
     private int bitField0_;
 
+    // optional string whichCamera = 1;
     private java.lang.Object whichCamera_ = "";
     /**
      * <code>optional string whichCamera = 1;</code>
@@ -905,12 +917,9 @@ public final class CameraParams extends
     public java.lang.String getWhichCamera() {
       java.lang.Object ref = whichCamera_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          whichCamera_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        whichCamera_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
@@ -968,6 +977,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 H_FLIP = 2;
     private int hFLIP_ ;
     /**
      * <code>optional int32 H_FLIP = 2;</code>
@@ -1000,6 +1010,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 V_FLIP = 3;
     private int vFLIP_ ;
     /**
      * <code>optional int32 V_FLIP = 3;</code>
@@ -1032,6 +1043,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 auto_exposure = 4;
     private int autoExposure_ ;
     /**
      * <code>optional int32 auto_exposure = 4;</code>
@@ -1064,6 +1076,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 brightness = 5;
     private int brightness_ ;
     /**
      * <code>optional int32 brightness = 5;</code>
@@ -1096,6 +1109,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 contrast = 6;
     private int contrast_ ;
     /**
      * <code>optional int32 contrast = 6;</code>
@@ -1128,6 +1142,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 saturation = 7;
     private int saturation_ ;
     /**
      * <code>optional int32 saturation = 7;</code>
@@ -1160,6 +1175,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 hue = 8;
     private int hue_ ;
     /**
      * <code>optional int32 hue = 8;</code>
@@ -1192,6 +1208,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 sharpness = 9;
     private int sharpness_ ;
     /**
      * <code>optional int32 sharpness = 9;</code>
@@ -1224,6 +1241,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 gamma = 10;
     private int gamma_ ;
     /**
      * <code>optional int32 gamma = 10;</code>
@@ -1256,6 +1274,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 autoWhiteBalance = 11;
     private int autoWhiteBalance_ ;
     /**
      * <code>optional int32 autoWhiteBalance = 11;</code>
@@ -1288,6 +1307,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 exposure = 12;
     private int exposure_ ;
     /**
      * <code>optional int32 exposure = 12;</code>
@@ -1320,6 +1340,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 gain = 13;
     private int gain_ ;
     /**
      * <code>optional int32 gain = 13;</code>
@@ -1352,6 +1373,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 whiteBalance = 14;
     private int whiteBalance_ ;
     /**
      * <code>optional int32 whiteBalance = 14;</code>
@@ -1384,6 +1406,7 @@ public final class CameraParams extends
       return this;
     }
 
+    // optional int32 fadeToBlack = 15;
     private int fadeToBlack_ ;
     /**
      * <code>optional int32 fadeToBlack = 15;</code>

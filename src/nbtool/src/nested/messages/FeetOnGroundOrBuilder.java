@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface FeetOnGroundOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.FeetOnGround)
-    com.google.protobuf.MessageOrBuilder {
+public interface FeetOnGroundOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional bool on_ground = 1;
   /**
    * <code>optional bool on_ground = 1;</code>
    */
