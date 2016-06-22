@@ -3,8 +3,11 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 
+#ifndef NBL_STANDALONE
 #include "DebugConfig.h"
+#endif
 
 enum say_when {
     IN_DEBUG,
@@ -17,18 +20,12 @@ namespace man {
 
         static const say_when CURRENT_LEVEL = IN_DEBUG;
 
-#if !defined(OFFLINE) && defined(USE_ROBOT_TTS)
+#if (!defined(OFFLINE) && defined(USE_ROBOT_TTS)) || defined(NBL_STANDALONE)
         static inline void internal_say(const char * line) {
-            static const int line_size = 500;
-            char buffer[line_size];
-            snprintf(buffer, line_size, "say \"%s\"", line);
-
             if (!fork()) {
-                freopen("/dev/null", "w", stdout);
-                freopen("/dev/null", "w", stderr);
-
-                system( (const char *) buffer );
+                execl("/usr/bin/say", line, NULL);
                 exit(0);
+                kill(getpid(), SIGKILL);
             }
         }
 
