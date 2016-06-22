@@ -1,19 +1,18 @@
-/**
- * Specified in http://www.aldebaran-robotics.com/documentation/dev/cpp/tutos/create_module.html#how-to-create-a-local-module
- **/
 
 #include "Man.h"
 #include "SharedData.h"
+#include "whistle.hpp"
 
 #include <sys/file.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 int lockFD = 0;
 man::Man* instance;
+
 pid_t whistlePID = 0;
 const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
 
@@ -86,13 +85,7 @@ int main() {
     signal(SIGSEGV, error_signal_handler);
 
     printf("forking for whistle...\n");
-    whistlePID = fork();
-    if (whistlePID == 0) {
-        execl("/home/nao/whistle", "", NULL);
-
-        printf("WHISTLE FAILED TO LOAD!!\n");
-        exit(-1);
-    }
+    whistlePID = whistle::start_whistle_process();
 
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     
@@ -118,6 +111,8 @@ int main() {
         // (Diagram threads are daemon threads, and man will exit if they're the
         // only ones left)
         sleep(10);
+        int status;
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
     return 1;
 }

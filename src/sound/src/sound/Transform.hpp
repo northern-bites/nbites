@@ -15,13 +15,17 @@
 
 #include <fftw3.h>
 
+#define SPECTRUM_LENGTH( nsamp ) ((int) ((nsamp / 2) + 1))
+
 namespace nbsound {
     class Transform {
     public:
         Transform(int frames);
         void transform(SampleBuffer& buffer, int channel);
+
         int get_freq_len() {return frequency_length;}
         float get(int f) { return outputmag[f]; }
+        float* get_freq_buffer() { return outputmag; }
 
         std::string get_all();
 

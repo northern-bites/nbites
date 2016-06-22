@@ -19,6 +19,22 @@
 
 namespace whistle {
 
+    static inline pid_t start_whistle_process() {
+        pid_t wpid = fork();
+
+        if (!wpid) {
+            execl("/home/nao/whistle", "", NULL);
+
+            for(;;) {
+                printf("WHISTLE FAILED TO LOAD!!\n");
+                exit(-1);
+                kill(getpid(), SIGKILL);
+            }
+        }
+
+        return wpid;
+    }
+
     class SharedMemory {
         int shared_fd;
         SharedData * shared;
@@ -78,12 +94,13 @@ namespace whistle {
             static time_t last_complain = 0;
 
             double dt = difftime(time(NULL), whistle_heartbeat() );
-            if (dt > 5) {
-                NBL_WARN("gamestate hasn't heard from whistle for %lf seconds!", dt);
 
-                if (difftime(time(NULL), last_complain) > 10) {
+            if (dt > 10) {
+                if (difftime(time(NULL), last_complain) > 15) {
                     last_complain = time(NULL);
+                    NBL_WARN("gamestate hasn't heard from whistle for %lf seconds!", dt);
                     man::tts::say(IN_SCRIMMAGE, "whistle is not running!");
+                    start_whistle_process();
                 }
 
                 return false;

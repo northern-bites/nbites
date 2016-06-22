@@ -45,7 +45,7 @@ public class PlaySound {
 		public void run() {
 			try {
 				_play(data);
-			} catch (LineUnavailableException e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 		}
@@ -69,6 +69,7 @@ public class PlaySound {
 
 	    sdl.drain();
 	    sdl.stop();
+	    sdl.close();
 	}
 
 	public static void play(byte[] parts) {

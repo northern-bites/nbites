@@ -15,6 +15,7 @@ extern std::vector<nbl::Block> detect_results;
 #define DETECT_WITH_SDEV 1
 #define DETECT_WITH_IMPULSE 2
 
+//#define DETECT_METHOD DETECT_WITH_SDEV
 #define DETECT_METHOD DETECT_WITH_IMPULSE
 
 namespace detect {

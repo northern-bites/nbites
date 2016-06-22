@@ -21,7 +21,6 @@ import nbtool.data.log.Log;
 import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
-
 public class Utility {
 
 	/* true if top, false if bot */

@@ -22,7 +22,10 @@ NBCROSS_FUNCTION(whistle_detect, true )
         nbl::logptr ptr = arguments[0];
         nbl::Block& block = ptr->blocks[0];
 
-        SampleBuffer buffer{2, 32768};
+        static const int bytes_per_frame = 2 * 2;   //2 channels, 2 bytes per sample
+        int num_frames = block.data.size() / bytes_per_frame;
+
+        SampleBuffer buffer{2, num_frames};
         NBL_ASSERT_EQ(buffer.size_bytes(), block.data.size())
         memcpy(buffer.buffer, block.data.data(), block.data.size());
 

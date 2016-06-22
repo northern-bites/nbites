@@ -5,6 +5,8 @@
 #include "SensorTypes.h"
 #include <alerror/alerror.h>
 
+#include "utilities-pp.hpp"
+
 namespace boss {
 namespace enactor {
 
@@ -12,12 +14,15 @@ Enactor::Enactor(boost::shared_ptr<AL::DCMProxy> dcm_) :
     dcm(dcm_)
 {
     initEnactor();
+
 }
 
 Enactor::~Enactor()
 {
     // TODO
 }
+
+long tester = 0;
 
 void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffness)
 {
@@ -27,8 +32,10 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
     jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
     jointStiffnesses.erase(jointStiffnesses.begin() + Kinematics::R_HIP_YAW_PITCH);
 
-    for (unsigned int i = 0; i < jointAngles.size(); ++i)
-    {
+    for (unsigned int i = 0; i < jointAngles.size(); ++i) {
+        NBL_ASSERT(i < 21);
+        lastSet[i] = jointAngles[i];
+
         jointCommand[5][i][0] = jointAngles[i];
         stiffnessCommand[5][i][0] = jointStiffnesses[i];
     }
@@ -39,7 +46,7 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
         dcm->setAlias(jointCommand);
     }
     catch (AL::ALError e) {
-        std::cout << "Couldn't set joint angles becasue: " << e.toString() << std::endl;
+        std::cout << "Couldn't set joint angles because: " << e.toString() << std::endl;
     }
     try
     {
@@ -47,7 +54,7 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
         dcm->setAlias(stiffnessCommand);
     }
     catch (AL::ALError e) {
-        std::cout << "Couldn't set stiffness becasue: " << e.toString() << std::endl;
+        std::cout << "Couldn't set stiffness because: " << e.toString() << std::endl;
     }
 }
 
@@ -64,10 +71,78 @@ void Enactor::noStiff()
         dcm->setAlias(stiffnessCommand);
     }
     catch (AL::ALError e) {
-        std::cout << "Couldn't kill stiffness becasue: " << e.toString() << std::endl;
+        std::cout << "Couldn't kill stiffness because: " << e.toString() << std::endl;
     }
 }
 
+double interp(double start, double end, int index, int outof) {
+    double diff = end - start;
+    double frac = ((double) index) / ((double) outof);
+    double ret = start + (diff * frac);
+//    printf("%lf -> %lf @ %lf == %lf\n", start, end, frac, ret);
+    return ret;
+}
+
+    //#define DEBUG_MAN_DIED
+
+long nextFrame = 0;
+bool Enactor::manDied() {
+    static const int num_frames_interpolate = 400;
+    bool is_finished = false;
+
+#ifdef V5_ROBOT
+    double jointCrash[numJoints] = { -0.0890141, -0.0276539, 1.66128, 0.0137641, -1.56165, -0.0429101, -0.0168321, 
+    					-0.113474, -0.826784, 2.15369, -1.20883, 0.10282, 0.0859461, -0.829936, 2.15224, -1.21949, 
+    					-0.053648, 1.67977, -0.04146, 1.56464, 0.0997519 };
+#else
+    double jointCrash[numJoints] = { -0.214802, 0.35, 1.57538, 0.131882, -1.56165, -0.0229681, -0.0475121, -0.0137641,
+                        -0.811444, 2.16443, -1.22111, 0.00771189,  0.0261199, -0.81613, 2.17986, -1.23023,
+                        -0.0352399, 1.58466, -0.046062, 1.5631, 0.0353239};
+#endif
+
+    if (nextFrame >= 0 && nextFrame < num_frames_interpolate) {
+        for (unsigned int i = 0; i < numJoints; ++i) {
+            double value = interp(lastSet[i], jointCrash[i], nextFrame, num_frames_interpolate);
+            jointCommand[5][i][0] = value;
+        }
+
+#ifdef DEBUG_MAN_DIED
+        printf("[DEBUG] manDied() in %d frame!\n", nextFrame);
+        std::cout << std::endl;
+#endif
+
+        nextFrame++;
+    } else {
+
+#ifdef DEBUG_MAN_DIED
+        printf("[DEBUG] manDied() in last frame!\n");
+        std::cout << std::endl;
+#endif
+
+        noStiff();
+        is_finished = true;
+        nextFrame = 0;
+    }
+
+    try
+    {
+        jointCommand[4][0] = dcm->getTime(0);
+        dcm->setAlias(jointCommand);
+    }
+    catch (AL::ALError e) {
+        std::cout << "Couldn't set joint angles because: " << e.toString() << std::endl;
+    }
+    try
+    {
+        stiffnessCommand[4][0] = dcm->getTime(0);
+        dcm->setAlias(stiffnessCommand);
+    }
+    catch (AL::ALError e) {
+        std::cout << "Couldn't set stiffness because: " << e.toString() << std::endl;
+    }
+
+    return is_finished;
+}
 // Based on (stolen from) the original JointEnactorModule by Ellis Ratner
 void Enactor::initEnactor()
 {

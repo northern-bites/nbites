@@ -18,7 +18,9 @@
 
 #include "../sound/Detect.hpp"
 
-const char * LAST_MODIFIED = "6/12 19:53";
+#include "Logging.hpp"
+
+const char * LAST_MODIFIED = "6/22 16:00";
 const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
 using namespace nbl;
@@ -28,16 +30,15 @@ pthread_t capture_thread;
 Capture * capture = nullptr;
 whistle::SharedMemory shared;
 
-int whistleSingleFD = 0;
+bool useLogging = false;
 
 void whistle_cleanup() {
     NBL_WARN("clearing up whistle process...");
 
     detect::cleanup();
 
-    if (whistleSingleFD > 0) {
-        flock(whistleSingleFD, LOCK_UN);
-        close(whistleSingleFD);
+    if (useLogging) {
+        nbl::teardownLogging();
     }
 
     if (shared.isOpen()) {
@@ -75,12 +76,22 @@ void do_heard() {
     }
 }
 
-Config used_config{48000, 16384};
+Config used_config{ 48000, 16384 };
 
 size_t iteration = 0;
 
-
 void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
+
+    if (useLogging) {
+        int length = buffer.size_bytes();
+        std::string newData( (const char *) buffer.buffer, length);
+
+        printf("sending....\n");
+        nbl::logptr newLog = nbl::Log::emptyLog();
+        newLog->logClass = "DetectAmplitude";
+        newLog->blocks.push_back(nbl::Block{newData, "SoundAmplitude"});
+        nbl::NBLog(newLog);
+    }
 
     if (shared.isOpen()) {
         shared.whistle_heartbeat() = time(NULL);
@@ -95,27 +106,10 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
         }
 
     } else {
-        printf(".");
+        std::cout << "." << std::endl;
     }
 
     ++iteration;
-}
-
-void establishLock() {
-    whistleSingleFD = open("/home/nao/nbites/whistle.lock", O_CREAT | O_RDWR, 0666);
-
-    if (whistleSingleFD < 0) {
-        int err = errno;
-        nbl::utilities::safe_perror(err);
-        NBL_ERROR("could not open lock file.")
-        exit(0);
-    }
-
-    int result = flock(whistleSingleFD, LOCK_EX | LOCK_NB);
-    if (result == -1) {
-        NBL_ERROR("could not lock file – is whistle already running?")
-        exit(0);
-    }
 }
 
 int main(int argc, const char * argv[]) {
@@ -125,13 +119,18 @@ int main(int argc, const char * argv[]) {
     signal(SIGSEGV, handler);
 
     NBL_INFO("\twhistle ( %s )", LAST_MODIFIED);
+    
     if (argc > 1) {
-        NBL_WARN("--------------------------\nwhistle stand"
-                 "alone mode\n--------------------------");
+        NBL_WARN("-------------------------- whistle stand"
+                 "alone mode --------------------------");
+
+        if (std::string{argv[1]} == std::string{"log"}) {
+            NBL_WARN("using logging (connect via nbtool)")
+            useLogging = true;
+            nbl::initiateLogging();
+        }
     } else {
         NBL_WARN("whistle server mode");
-
-        establishLock();
 
         NBL_WARN("( whistle reopening to %s now )",
                  WHISTLE_LOG_PATH);

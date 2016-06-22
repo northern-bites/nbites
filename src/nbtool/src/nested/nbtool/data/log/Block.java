@@ -52,7 +52,6 @@ public class Block {
 		this(data, null, type, null, 0, 0);
 	}
 
-
 	public Block() {
 		this(null, null, null, null, 0, 0);
 	}
