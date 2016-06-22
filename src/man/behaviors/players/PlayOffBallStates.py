@@ -110,7 +110,7 @@ def doFirstHalfSpin(player):
 
     if player.firstFrame():
         player.brain.tracker.repeatFixedPitchLookAhead()
-        
+
         if player.brain.playerNumber == 3:
             player.setWalk(0, 0, speeds.SPEED_SIX)
         else:
@@ -341,7 +341,11 @@ def adjustHeading(player):
     if player.firstFrame():
         # Spin to home heading
         player.stand()
-        player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
+        dest = RelRobotLocation(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
+        player.brain.nav.goTo(dest, precision = nav.HOME,
+                          speed = speeds.SPEED_FOUR, avoidObstacles = False,
+                          fast = True, pb = False)
+        # player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
 
         # or math.fabs()
     while fabs(player.brain.loc.h - adjustHeading.desiredHeading) > 25:
