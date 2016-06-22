@@ -93,12 +93,12 @@ class KickDecider(object):
             return None
 
     def diagonalKickoff(self):
-        return kicks.LEFT_DIAGONAL_KICK
+        return kicks.LEFT_FAST_FRONT_KICK
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_DIAGONAL_KICK)
-        self.kicks.append(kicks.RIGHT_DIAGONAL_KICK)
+        self.kicks.append(kicks.LEFT_FAST_FRONT_KICK)
+        self.kicks.append(kicks.RIGHT_FAST_FRONT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -648,9 +648,10 @@ class KickDecider(object):
 
     """ THIS IS THE ONE WE'RE USING NOW"""
     def new2016KickStrategy(self):
-        return self.frontKicksOrbit()
+        #return self.frontKicksOrbit() comment this back in
+        return self.diagonalKickoff()
 
-    def diagonalKickoffStrategy(self):
+    def diagonalKickoffStrategy(self): #this is going to do quick straight
         return self.diagonalKickoff()
 
     # def usOpenStrategy2016(self): # TODO REMOVE UNDO POOP

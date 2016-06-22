@@ -82,14 +82,24 @@ RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight",
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 LEFT_DIAGONAL_KICK = Kick("Left_Diagonal", 
-                                 x = 23.5, y = 5,
+                                 x = 19.0, y = 20,
                                  dist = 270,
                                  move=SweetMoves.MEGKOTE_DIAGONAL_FAST_KICK_LEFT)
 
 RIGHT_DIAGONAL_KICK = Kick("Right_Diagonal", 
-                                 x = 23.5, y = 5,
+                                 x = 19.0, y = -20,
                                  dist = 270,
                                  move=SweetMoves.MEGKOTE_DIAGONAL_FAST_KICK_RIGHT)
+
+LEFT_FAST_FRONT_KICK = Kick("Left_Fast_Front_Kick", 
+                                 x = 19.5, y = 5,
+                                 dist = 270,
+                                 move=SweetMoves.FAST_FRONT_KICK_LEFT)
+
+RIGHT_FAST_FRONT_KICK = Kick("Right_Fast_Front_Kick", 
+                                 x = 19.5, y = -5,
+                                 dist = 270,
+                                 move=SweetMoves.FAST_FRONT_KICK_RIGHT)
 
 
 # LEFT_BIG_KICK =  Kick("L_Big_Straight", 
@@ -162,6 +172,12 @@ def chooseAlignedKickFromKick(player, kick):
             return LEFT_DIAGONAL_KICK
         else:
             return RIGHT_DIAGONAL_KICK
+    if (kick == LEFT_FAST_FRONT_KICK or
+          kick == RIGHT_FAST_FRONT_KICK):
+        if ballRelY > 0:
+            return LEFT_FAST_FRONT_KICK
+        else:
+            return RIGHT_FAST_FRONT_KICK
 
     # if (kick == LEFT_STRAIGHT_KICK or
     #     kick == RIGHT_STRAIGHT_KICK):
