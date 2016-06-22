@@ -436,7 +436,6 @@ def spinToBall(player):
 
 @superState('positionAndKickBall')
 def positionForKick(player):
-    print "positionForKick"
     """
     Get the ball in the sweet spot
     """
@@ -452,7 +451,7 @@ def positionForKick(player):
                                                 ball.rel_y - player.kick.setupY,
                                                 0)
 
-    print("Ball.rel_x:", ball.rel_x, "rel_y:", ball.rel_y)
+    # print("Ball.rel_x:", ball.rel_x, "rel_y:", ball.rel_y)
 
     if player.firstFrame():
         # print("IN position for kick, should kick off: ", player.shouldKickOff)
@@ -463,7 +462,7 @@ def positionForKick(player):
         # else:
         positionForKick.speed = speeds.SPEED_TWO
         # print("In position for kick! Setting walk speed")
-        print("My location:", str(positionForKick.kickPose))
+        # print("My location:", str(positionForKick.kickPose))
         player.brain.nav.goTo(positionForKick.kickPose, Navigator.CLOSE_ENOUGH, 
             speeds.SPEED_THREE, True, fast = True, useLoc = False)
         # player.brain.nav.walkTo(positionForKick.kickPose, speeds.SPEED_THREE)
