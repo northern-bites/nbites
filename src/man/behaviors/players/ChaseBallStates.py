@@ -441,12 +441,16 @@ def positionForKick(player):
     Get the ball in the sweet spot
     """
     if transitions.shouldRedecideKick(player):
+        print("I think I should redecide my kick!!")
         return player.goLater('approachBall')
 
     ball = player.brain.ball
     positionForKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
                                                 ball.rel_y - player.kick.setupY,
                                                 0)
+
+    # print("Ball is: ", ball.rel_x, ball.rel_y)
+    # print("My setup is: ", player.kick.setupX)
 
     # print("Ball.rel_x:", ball.rel_x, "rel_y:", ball.rel_y)
 
@@ -461,7 +465,7 @@ def positionForKick(player):
         # print("In position for kick! Setting walk speed")
         # print("My location:", str(positionForKick.kickPose))
         player.brain.nav.goTo(positionForKick.kickPose, Navigator.CLOSE_ENOUGH, 
-            speeds.SPEED_FOUR, True, fast = True, useLoc = False)
+            speeds.SPEED_FIVE, True, fast = True, useLoc = False)
         # player.brain.nav.walkTo(positionForKick.kickPose, speeds.SPEED_THREE)
 
         # player.setWalk()
