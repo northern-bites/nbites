@@ -43,6 +43,8 @@ public:
 
 	bool isFalling() { return falling; }
 
+	void reset();
+
 private:
 
 	// Take a long running average of the gyroscope's values,  making the assumption
@@ -65,6 +67,8 @@ private:
 	static const float fallDownAngleX = 55 * M_PI / 180;
 	static const float fallDownAngleY = 55 * M_PI / 180;
 	static const float onGroundAngle = 75 * M_PI / 180;
+
+	void init();
 
     // RingBufferWithSumBH<Vector3BH<>, 300> accValues; *< Ringbuffer for collecting the acceleration sensor values of one walking phase or 1 secBH. 
     // RingBufferWithSumBH<float, 15> accXBuffer; // *< Ringbuffer for collecting the gyro sensor values of one walking phase or 1 secBH. 

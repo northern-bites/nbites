@@ -10,7 +10,7 @@ SLOW_CHASE_DIST = 80.
 
 # Should position for kick
 BALL_PFK_LEFT_Y = 16.0
-PREPARE_FOR_KICK_DIST = 50.0
+PREPARE_FOR_KICK_DIST = 60.0
 SETUP_DISTANCE_X = 6
 SLOW_DOWN_TO_BALL_DIST = 25.
 WAIT_COUNT = 0
@@ -49,20 +49,20 @@ ORBIT_GOOD_BEARING = 10
 SHOULD_CANCEL_ORBIT_BALL_DIST = APPROACH_BALL_AGAIN_DIST
 ORBIT_TOO_LONG_THR = 8
 ORBIT_Y_SPEED = speeds.SPEED_THREE
-ORBIT_X = 15
+ORBIT_X = 25
 
 # # Orbit PID params
-# ORBIT_XP = 0.01
-# ORBIT_XI = 0.01
-# ORBIT_XD = 0.0
+ORBIT_XP = 0.01
+ORBIT_XI = 0.01
+ORBIT_XD = 0.0
 
-# ORBIT_YP = 0.007
-# ORBIT_YI = 0.0
-# ORBIT_YD = 0.0
+ORBIT_YP = 0.007
+ORBIT_YI = 0.0
+ORBIT_YD = 0.0
 
-# ORBIT_HP = 0.8
-# ORBIT_HI = 0.2
-# ORBIT_HD = 0.0
+ORBIT_HP = 0.8
+ORBIT_HI = 0.2
+ORBIT_HD = 0.0
 
 ORBIT_BALL_DISTANCE = 25
 ORBIT_DISTANCE_FAR = 10
@@ -79,8 +79,8 @@ SHOULD_KICK_AGAIN_Y = 15
 # Ball in position
 ## NOTE: important that these values slightly overestimate the values in
 ##        navigator's PFK. Otherwise there can be bad looping.
-BALL_X_OFFSET = 1.5
-BALL_Y_OFFSET = 1.5
+BALL_X_OFFSET = 3.5
+BALL_Y_OFFSET = 3.5
 GOOD_ENOUGH_H = 6
 
 # States' constants

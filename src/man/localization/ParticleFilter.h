@@ -19,6 +19,7 @@
 #include "DebugConfig.h"
 
 #include "ParticleSwarm.pb.h"
+#include "ParticleStruct.h"
 
 #include <vector>
 #include <iostream>
@@ -133,6 +134,9 @@ public:
                     float x_, float y_, float h_,
                     LocNormalParams params1 = LocNormalParams(),
                     LocNormalParams params2 = LocNormalParams());
+
+    void resetLocToMany(std::vector<particleLocationStruct> particles, 
+                        LocNormalParams params = LocNormalParams());
 
     /*
      * @Brief - Reset the system by injecting particles throughout one side

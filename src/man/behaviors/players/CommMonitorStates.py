@@ -8,17 +8,36 @@ import CommMonitorTransitions as transitions
 import RoleConstants
 from ..util import *
 
-# TODO China 2015
-#      this clearly needs major rethinking
-#      turn back on role switching after china
+# TODO stop defaulting to player number everywhere
+# This is where we can switch our strategies based on comm quality
+# Should add time stamps for how we switch strategies but also how we determine comm quality
 
 @defaultState('gameControllerResponder')
 @superState('roleSwitcher')
 def commMonitor(player):
+    
     if player.commMode == -1:
         pass
-    elif player.commMode != 2 and transitions.awfulComm(player):
+
+    elif player.commMode != 0 and player.brain.game.have_remote_gc:
+        
+        print "Switched to good comm mode because we are on the GC BABAY!"
+        
+        player.role = player.brain.playerNumber
+    
+        if player.commMode == 2: 
+            RoleConstants.roleConfiguration = player.prevRoleConfig
+        
+        RoleConstants.oddDefenderBox = RoleConstants.defenderBox
+        RoleConstants.evenDefenderBox = RoleConstants.defenderBox
+        RoleConstants.setRoleConstants(player, player.role)
+        player.roleSwitching = False # HACK switched this off for testing; TODO back on for Germany!
+        player.commMode = 0
+
+    elif not player.brain.game.have_remote_gc and player.commMode != 2 and transitions.awfulComm(player):
+        
         print "Switched to awful comm mode!"
+        
         player.role = player.brain.playerNumber
         player.prevRoleConfig = RoleConstants.roleConfiguration
         RoleConstants.roleConfiguration = RoleConstants.spread
@@ -27,23 +46,33 @@ def commMonitor(player):
         RoleConstants.setRoleConstants(player, player.role)
         player.roleSwitching = False
         player.commMode = 2
-    elif player.commMode != 1 and transitions.mediocreComm(player):
+    
+    elif not player.brain.game.have_remote_gc and player.commMode != 1 and transitions.mediocreComm(player):
+
         print "Switched to mediocre comm mode!"
+    
         player.role = player.brain.playerNumber
+    
         if player.commMode == 2: 
             RoleConstants.roleConfiguration = player.prevRoleConfig
+    
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
         player.roleSwitching = False
         player.commMode = 1
+
     elif player.commMode != 0 and transitions.goodComm(player):
-        print "Switched to good comm mode! ROLE SWITCHING IS ON."
+        
+        print "Switched to good comm mode! ROLE SWITCHING SHOULD BE TURNED ON."
+        
         player.role = player.brain.playerNumber
+        
         if player.commMode == 2: 
             RoleConstants.roleConfiguration = player.prevRoleConfig
+        
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = True
+        player.roleSwitching = False # HACK TODO turn this back on for Germany
         player.commMode = 0

@@ -1,22 +1,26 @@
 def goodComm(player):
-    off = checkCommDropOffs(player)
-    return off == 0
+    fromBeginning, after = checkCommDropOffs(player)
+    return fromBeginning + after == 0
 
 def mediocreComm(player):
-    off = checkCommDropOffs(player)
-    return off == 1
+    fromBeginning, after = checkCommDropOffs(player)
+    return fromBeginning + after == 0
 
 def awfulComm(player):
-    return True
-    off = checkCommDropOffs(player)
-    return off >= 2
+    fromBeginning, after = checkCommDropOffs(player)
+    return fromBeginning + after == 1
 
 def checkCommDropOffs(player):
+    offCommFromTheBeginning = 0
+    droppedOffComm = 0
     off = 0
     for mate in player.brain.teamMembers:
         if mate.playerNumber == 1 or mate.playerNumber == player.brain.playerNumber:
             continue
+        if mate.framesWithoutPacket == -1:
+            offCommFromTheBeginning += 1
+        elif mate.framesWithoutPacket > 20*30:
+            droppedOffComm += 1
         if not mate.alive:
             off += 1
-    
-    return off
+    return offCommFromTheBeginning, droppedOffComm
