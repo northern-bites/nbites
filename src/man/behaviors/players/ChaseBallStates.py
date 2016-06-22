@@ -315,33 +315,25 @@ def orbitBall(player):
     if relH < 0:
         if relH < -20:
             xSpeed = 0.0
-            ySpeed = 0.8
-            hSpeed = -0.25
+            ySpeed = 0.85
+            hSpeed = -0.45
             # player.setWalk(0, 0.7, -0.25)
         else:
             xSpeed = 0.0
-            ySpeed = 0.5
-            hSpeed = -0.15
+            ySpeed = 0.6
+            hSpeed = -0.2
             # player.setWalk(0, 0.5, -0.15)
     elif relH > 0:
         if relH > 20:
             xSpeed = 0.0
-            ySpeed = -0.8
-            hSpeed = 0.25
+            ySpeed = -0.85
+            hSpeed = 0.45
             # player.setWalk(0, -0.7, 0.25)
         else:
             xSpeed = 0.0
-            ySpeed = -0.5
-            hSpeed = 0.15
+            ySpeed = -0.6
+            hSpeed = 0.2
             # player.setWalk(0, -0.5, 0.15)
-
-    # DEBUGGING PRINT OUTS
-    if constants.DEBUG_ORBIT and player.counter%20 == 0:
-        print "desiredHeading is:  | ", player.kick.setupH
-        print "player heading:     | ", player.brain.loc.h
-        print "orbit heading:      | ", relH
-        print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
-        print "==============================="
 
     # X correction
     if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR <
@@ -397,7 +389,14 @@ def orbitBall(player):
                 # player.brain.nav.setHSpeed(0.15)
 
     player.setWalk(xSpeed, ySpeed, hSpeed)
-    # print("Orbit speedx: ", xSpeed, "speedY:", ySpeed, "hSpeed:", hSpeed)
+    # DEBUGGING PRINT OUTS
+    if constants.DEBUG_ORBIT and player.counter%10 == 0:
+        print "desiredHeading is:  | ", player.kick.setupH
+        print "player heading:     | ", player.brain.loc.h
+        print "orbit heading:      | ", relH
+        print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
+        print "==============================="
+        
     return player.stay()
 
 orbitBall.X_SPEED = .35
@@ -464,8 +463,8 @@ def positionForKick(player):
         positionForKick.speed = speeds.SPEED_TWO
         # print("In position for kick! Setting walk speed")
         # print("My location:", str(positionForKick.kickPose))
-        player.brain.nav.goTo(positionForKick.kickPose, Navigator.CLOSE_ENOUGH, 
-            speeds.SPEED_FIVE, True, fast = True, useLoc = False)
+        player.brain.nav.goTo(positionForKick.kickPose, Navigator.CLOSE_ENOUGH,
+                              speeds.SPEED_FIVE, True, fast = True, useLoc = False)
         # player.brain.nav.walkTo(positionForKick.kickPose, speeds.SPEED_THREE)
 
         # player.setWalk()
