@@ -126,7 +126,10 @@ void MotionModule::run_()
         newInputJoints = false;
         frameCount++;
 
-        if (!walkProvider.calibrated()) { adjustIMU(); }
+        if (!walkProvider.calibrated()) {
+            // TODO bella hack fix this, love nikki :) 
+            // std::cout << "NOT CALIBRATED DONt move\n";
+            adjustIMU(); }
     }
 
     PROF_EXIT(P_MOTION);
@@ -250,6 +253,10 @@ void MotionModule::processBodyJoints()
             curProvider->calculateNextJointsAndStiffnesses(
                 sensorAngles, sensorCurrents,
                 inertialsInput_.message(), fsrInput_.message());
+
+            // std::cout << "Resetting calibration inertials\n";
+            walkProvider.resetIMU();
+
         }
         else
         {
@@ -638,8 +645,8 @@ void MotionModule::swapBodyProvider()
         //The potential symptoms of such a bug would be jittering when standing
         //We need to ensure we are in the correct gait before walking
 
-        std::cout << "Resetting calibration inertials\n";
-        walkProvider.resetIMU();
+        // std::cout << "Resetting calibration inertials\n";
+        // walkProvider.resetIMU();
 
         if(noWalkTransitionCommand){//only enqueue one
             noWalkTransitionCommand = false;

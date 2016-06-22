@@ -10,7 +10,6 @@ def stand(nav):
     Makes the motion engine stand.
     Right now this is done by sending a (0, 0, 0) velocity vector.
     """
-    print("In stand in nav!")
 
     createAndSendWalkVector(nav, 0, 0, 0)
 
@@ -18,6 +17,11 @@ def walkInPlace(nav):
     """
     Makes the motion engine walk in place. 
     """
+    status = nav.brain.interface.motionStatus.calibrated
+    if not status:
+        createAndSendWalkVector(nav, 0, 0, 0)
+        return
+
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.WALK_IN_PLACE #Destination Walk
 

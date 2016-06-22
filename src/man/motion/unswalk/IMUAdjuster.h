@@ -64,8 +64,8 @@ private:
 	float adj_gyr_x;
 	float adj_gyr_y;
 
-	static const float fallDownAngleX = 55 * M_PI / 180;
-	static const float fallDownAngleY = 55 * M_PI / 180;
+	static const float fallDownAngleX = 25 * M_PI / 180;
+	static const float fallDownAngleY = 50 * M_PI / 180;
 	static const float onGroundAngle = 75 * M_PI / 180;
 
 	void init();
