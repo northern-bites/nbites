@@ -16,7 +16,6 @@
 #include "nblogio.h"
 #include "utilities.hpp"
 
-
 //Redefine NBL_PRINT_ to take NBCROSS_PRINTOUTS_ON into account
 //will affect all derivative macros (NBL_WARN, NBL_ERROR, etc)
 #undef NBL_PRINT_

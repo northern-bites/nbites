@@ -174,6 +174,8 @@ class Navigator(FSA.FSA):
 
         # print speed
 
+        # print speed
+
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
 
