@@ -658,54 +658,6 @@ void BallDetector::makeBall(Spot spot, double cameraHeight, double conf,
 #endif
 }
 
-void BallDetector::sanityChecks(int bx, int by, int radius)
-{
-
-}
-
-void BallDetector::edgeSanityCheck(int bx, int by, int radius)
-{
-    int count = 0;
-    radius = max(12, radius);
-    if (by > ( 2 * height ) / 2) {
-        radius = max(20, radius);
-    }
-    // Get edges from vision
-    for (int i = 0; i < goodEdges.size(); i++) {
-        int x = goodEdges[i].x() + width/2;
-        int y = height/2 - goodEdges[i].y();
-        int ang = goodEdges[i].angle();
-
-        if (abs(bx - x) < radius && abs(by - y) < radius) {
-            if (debugBall) {
-                debugDraw.drawPoint(x, y, BLUE);
-            }
-            count++;
-        }
-    }
-    if (debugBall) {
-        std::cout << "Edge count: " << count << std::endl;
-    }
-
-}
-
-/* Filter the edge list down to possible balls */
-void BallDetector::makeEdgeList(EdgeList & edges)
-{
-    // Get edges from vision
-    goodEdges.clear();
-    AngleBinsIterator<Edge> abi(edges);
-    for (Edge* e = *abi; e; e = *++abi){
-        // If we are part of a hough line, we are not a ball edge
-        if (e->memberOf()) { continue; }
-
-        int x = e->x() + width/2;
-        int y = height/2 - e->y();
-        // if we're off the field we aren't a ball edge
-        if (y < field->horizonAt(x)) { continue; }
-        goodEdges.push_back(*e);
-    }
-}
 
 /* The next two are very similar, but the first one assumes that the
    "spot" actually comes from the blob detector.
@@ -1046,29 +998,6 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	if (!checkDiagonalCircle(spot)) {
 		return false;
 	}
-	/*greens = 0;
-	total = 0;
-	int whiteTotal = 0;
-	for (int i = leftX; i < rightX; i+=2) {
-		for (int j = topY; j < bottomY; j+=2) {
-			getColor(i, j);
-			if (debugBall) {
-				debugDraw.drawDot(i, j, BLUE);
-			}
-			if (isGreen()) {
-				greens++;
-			}
-			whiteTotal += getWhite();
-			total++;
-		}
-	}
-	if (whiteTotal  < (THRESHOLD - 10) * total) {
-		if (debugBall) {
-			std::cout << "Rejecting ball because not white enough " << midX <<
-				" " << midY << " " << whiteTotal << " " << total << std::endl;
-		}
-		return false;
-		}*/
 	return true;
 }
 
