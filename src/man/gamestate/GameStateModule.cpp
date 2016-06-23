@@ -215,16 +215,19 @@ namespace man{
                         bp_state = FIRST_PENALTY;
                     }
                     break;
+
                 case STATE_READY:
                     latest_data.set_state(STATE_PLAYING);
                     keep_time = true;
                     start_time = realtime_micro_time();
                     break;
+
                 case STATE_SET:
                     latest_data.set_state(STATE_PLAYING);
                     keep_time = true;
                     start_time = realtime_micro_time();
                     break;
+
                 case STATE_PLAYING:
                     if (bp_state == FIRST_PENALTY) {
                         NBL_WARN("spl button presses FIRST_PENALTY -> NORMAL_PLAYING");

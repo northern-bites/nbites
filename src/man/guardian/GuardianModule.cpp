@@ -74,6 +74,8 @@ void GuardianModule::run_()
 
     PROF_ENTER(P_GUARDIAN);
 
+    printf("acc_z %f\n", inertialInput.message().acc_z());
+
     countButtonPushes();
     checkFalling();
     checkFallen();
@@ -312,6 +314,7 @@ void GuardianModule::checkFeetOnGround()
 
     if (groundOffCounter > GROUND_FRAMES_THRESH)
     {
+        printf("\t feet off ground\n");
         feetOnGround = false;
         groundOnCounter = groundOffCounter = 0;
 
@@ -321,6 +324,7 @@ void GuardianModule::checkFeetOnGround()
     }
     else if (groundOnCounter > GROUND_FRAMES_THRESH)
     {
+        printf("\t feet on ground\n");
         feetOnGround = true;
         groundOnCounter = groundOffCounter = 0;
 

@@ -124,6 +124,11 @@ private:
     std::queue<std::string> audioQueue;
 
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
+
+    static const int PICKUP_FRAMES = 50;
+    float pickupFrames[PICKUP_FRAMES];
+    bool pickupCalibrated;
+    float pickupZCalibration;
 };
 
 }

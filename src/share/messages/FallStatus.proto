@@ -10,4 +10,13 @@ message FallStatus
     optional bool falling  = 1;
     optional bool fallen   = 2;
     optional bool on_front = 3; //On back if false, undefined if not fallen.
+
+    enum PickupStatus
+    {
+        PICKED_UP = 0;
+        NONE = 1;
+        PUT_DOWN = 2;
+    }
+
+    optional PickupStatus pickup = 4;
 }
