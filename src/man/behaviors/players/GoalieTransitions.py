@@ -79,7 +79,7 @@ def getLines(player):
         GoalieStates.watchWithLineChecks.lines.append(visionLines(i).inner)
 
     if len(GoalieStates.watchWithLineChecks.lines) > constants.MEM_THRESH:
-        print("[WATCHDEBUG] HERE - resetting goalie.lines, num lines = ", len(GoalieStates.watchWithLineChecks.lines))
+        # print("[WATCHDEBUG] HERE - resetting goalie.lines, num lines = ", len(GoalieStates.watchWithLineChecks.lines))
         GoalieStates.watchWithLineChecks.lines = []
 
     if len(player.corners) > constants.CORNER_MEM_THRESH:
@@ -87,15 +87,6 @@ def getLines(player):
 
     if len(player.homeDirections) > constants.BUFFER_THRESH:
         player.homeDirections = []
-
-        # r = line.inner.r
-        # t = line.inner.t
-        # x0 = r * math.cos(t)
-        # y0 = r * math.sin(t)
-        # x1 = x0 + line.inner.ep0 * math.sin(t)
-        # y1 = y0 + -line.inner.ep0 * math.cos(t)
-        # x2 = x0 + line.inner.ep1 * math.sin(t)
-        # y2 = y0 + -line.inner.ep1 * math.cos(t)
 
 def frontLineCheckShouldReposition(player):
     # getLines(player)

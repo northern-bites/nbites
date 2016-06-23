@@ -90,7 +90,7 @@ def shouldRedecideKick(player):
     """
     We've been in position for kick too long
     """
-    return player.counter > 200
+    return player.counter > 400
 
 def ballInPosition(player, kickPose):
     """

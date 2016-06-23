@@ -39,7 +39,7 @@ void LocalizationModule::update()
     for (int i = 0; i < 2; i++) {
         if (lastReset[i] != resetInput[i].message().timestamp())
         {
-            std::cout << "RESET LOC ON " << i << std::endl;
+            // std::cout << "RESET LOC ON " << i << std::endl;
             lastReset[i] = resetInput[i].message().timestamp();
 
             // See PenaltyStates.py in the manualPlacement state
