@@ -34,6 +34,9 @@ class Boss : public AL::ALModule
 public:
     Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name);
     ~Boss();
+    bool manDiedOverride;
+    pid_t manPID;
+    bool manRunning;
 
 private:
     void DCMPreProcessCallback();
@@ -45,6 +48,7 @@ private:
     void listener();
     int startMan();
     int killMan();
+
 
     // To handle naoqi stuff
     boost::shared_ptr<AL::ALBroker> broker;
@@ -58,9 +62,6 @@ private:
     led::LedEnactor led;
 
     // Vars relating to Man
-    pid_t manPID;
-    bool manRunning;
-
     int shared_fd;
     volatile SharedData* shared;
     pthread_mutexattr_t shared_mutex_attr;

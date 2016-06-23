@@ -1,6 +1,3 @@
-/**
- * Specified in http://www.aldebaran-robotics.com/documentation/dev/cpp/tutos/create_module.html#how-to-create-a-local-module
- **/
 
 #include "Man.h"
 #include "SharedData.h"
