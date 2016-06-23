@@ -670,6 +670,7 @@ bool BallDetector::findCorrelatedBlackSpots
 
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
+                    if (debugBall) { debugDraw.drawPoint(ix,iy,MAROON); }
                     
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
@@ -679,9 +680,7 @@ bool BallDetector::findCorrelatedBlackSpots
 					    ballSpot.rawX = ix;
 					    ballSpot.rawY = iy;
 					    ballSpot.innerDiam = 5;
-					    if (debugBall) {
-						  debugDraw.drawPoint(ix,iy,MAROON);
-					   }
+					    
                         makeBall(ballSpot, cameraHeight, 0.8, foundBall, true);
 #ifdef OFFLINE
                         foundBall = true;
@@ -736,6 +735,7 @@ bool BallDetector::findCorrelatedBlackSpots
     				if (debugBall) { std::cout<<"[BALL INFO] Distance OK"<<std::endl; }
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
+                    if (debugBall) { debugDraw.drawPoint(ix,iy,BLUE); }
 
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
@@ -744,9 +744,7 @@ bool BallDetector::findCorrelatedBlackSpots
     					ballSpot.rawX = ix;
     					ballSpot.rawY = iy;
     					ballSpot.innerDiam = 5;
-    				    if (debugBall) {
-    					  debugDraw.drawPoint(ix,iy,BLUE);
-    				    }
+    				    
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
 #ifdef OFFLINE
                         foundBall = true;
