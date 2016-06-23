@@ -128,7 +128,10 @@ def doPan(player):
 
     if not role.isStriker(player.role):
         if player.stateTime >= 4:
-            return player.goNow('doSecondHalfSpin')
+            if role.isFirstChaser(player.role):
+                return player.goNow('playerFourSearchBehavior')
+            else:
+                return player.goNow('doSecondHalfSpin')
 
     else:
         if player.stateTime >= 8:
@@ -347,7 +350,7 @@ def panAtWayPoint(player):
         player.brain.tracker.trackBall()
 
     if player.stateTime >= 8: #Should use constant for 1 pan here.
-        if role.isFirstChaser(player.role):
+        if role.isFirstChaser(player.role) and not playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 0:
             return player.goNow("playerFourSearchBehavior")
         else:
             return player.goNow("spinAtHome")
