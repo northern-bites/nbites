@@ -205,6 +205,9 @@ def spunOnce(player):
     """
     return player.stateTime > constants.SPUN_ONCE_TIME_THRESH
 
+def didOnePan(player):
+    return player.stateTime > 8 # Should use constant for one snap pan
+
 def shouldWalkFindBall(player):
     """
     If we've been spinFindBall-ing too long we should walk

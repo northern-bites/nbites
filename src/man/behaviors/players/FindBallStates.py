@@ -36,15 +36,11 @@ def searchInFront(player):
         player.stand()
         player.brain.tracker.performCenterSnapPan()
 
-    # playerTracker = player.brain.tracker
-
     if not player.brain.tracker.brain.motion.head_is_active and player.brain.tracker.isStopped():
-        # print "-------HEAD IS NOT ACTIVE, GOING TO SPINNING--------------\n"
         return player.goNow('spinSearch')
 
 @superState('gameControllerResponder')
 @stay
-@ifSwitchLater(transitions.spunOnce, 'playOffBall')
 @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def spinSearch(player):
     """
@@ -55,8 +51,26 @@ def spinSearch(player):
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
-        player.setWalk(0, 0, spinDir*speeds.SPEED_FOUR)
+        player.setWalk(0, 0, spinDir*speeds.SPEED_SIX)
         player.brain.tracker.repeatFixedPitchLookAhead()
+
+    while player.stateTime < constants.SPEED_SIX_SPUN_ONCE_TIME / 2:
+        return player.stay()
+
+    return player.goNow("fastPan")
+
+@superState('gameControllerResponder')
+@stay
+def fastPan(player):
+
+    if player.firstFrame():
+        player.stand()
+        player.brain.tracker.repeatWideSnapPan()
+
+    while player.stateTime < 8:
+        return player.stay()
+
+    return player.goNow("playOffBall")
 
 @superState('gameControllerResponder')
 @stay

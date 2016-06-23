@@ -91,10 +91,7 @@ def watchForBall(player):
         while player.stateTime < 12:
             return player.stay()
 
-    if role.isFirstChaser(player.role):
-        return player.goNow('playerFourSearchBehavior')
-    else:
-        return player.goNow('spinAtHome')
+    return player.goNow('spinAtHome')
 
 @defaultState('doFirstHalfSpin')
 @superState('playOffBall')
@@ -115,11 +112,11 @@ def doFirstHalfSpin(player):
         player.brain.tracker.repeatFixedPitchLookAhead()
         
         if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_FOUR)
+            player.setWalk(0, 0, speeds.SPEED_SIX)
         else:
-            player.setWalk(0, 0, -speeds.SPEED_FOUR)
+            player.setWalk(0, 0, -speeds.SPEED_SIX)
 
-    while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME / 2:
+    while player.stateTime < chaseConstants.SPEED_SIX_SPUN_ONCE_TIME / 2:
         return player.stay()
 
     return player.goNow('doPan')
@@ -140,8 +137,8 @@ def doPan(player):
         while player.stateTime < 12:
             return player.stay()
 
-    # if role.isFirstChaser(player.role):
-    #     return player.goNow('playerFourSearchBehavior')
+    if role.isFirstChaser(player.role):
+        return player.goNow('playerFourSearchBehavior')
     if role.isStriker(player.role):
         return player.goNow('playerFiveSearchBehavior')
     else:
@@ -156,11 +153,11 @@ def doSecondHalfSpin(player):
         player.brain.tracker.repeatFixedPitchLookAhead()
 
         if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_FOUR)
+            player.setWalk(0, 0, speeds.SPEED_SIX)
         else:
-            player.setWalk(0, 0, -speeds.SPEED_FOUR)
+            player.setWalk(0, 0, -speeds.SPEED_SIX)
 
-    while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME / 2:
+    while player.stateTime < chaseConstants.SPEED_SIX_SPUN_ONCE_TIME / 2:
         return player.stay()
 
     # if role.isFirstChaser(player.role):
@@ -344,7 +341,7 @@ def adjustHeading(player):
     if player.firstFrame():
         # Spin to home heading
         player.stand()
-        player.setWalk(0, 0, -(player.brain.loc.h - adjustHeading.desiredHeading))
+        player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
 
         # or math.fabs()
     while fabs(player.brain.loc.h - adjustHeading.desiredHeading) > 25:
@@ -373,9 +370,9 @@ def spinAtWayPoint(player):
     if player.firstFrame():
         player.stand()
         player.brain.tracker.repeatFixedPitchLookAhead()
-        player.setWalk(0, 0, speeds.SPEED_FOUR)
+        player.setWalk(0, 0, speeds.SPEED_SIX)
 
-    while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME:
+    while player.stateTime < chaseConstants.SPEED_SIX_SPUN_ONCE_TIME:
         return player.stay()
 
     return player.goNow('playerFiveSearchBehavior')
