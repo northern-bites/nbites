@@ -154,6 +154,7 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.new2016KickStrategy()
             print("Decided kick: ", str(player.kick))
+            return player.goNow('positionForKick')
         else:
             player.shouldKickOff = False
             # print("PREPAREFOREKICK THIS CASE")
@@ -338,10 +339,10 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchNow(transitions.shouldSpinToKickHeading, 'orbitBall')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
-@ifSwitchLater(transitions.shouldFindBall, 'playOffBall')
+@ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
-        print "It's no longer poo dribble time"
+        print "It's no longer dribble time"
         return player.goNow('positionForKick')
     print "Dribble time"
     ball = player.brain.ball
