@@ -17,7 +17,6 @@ bool inited = false;
 Transform * transform = nullptr;
 
 const int transform_input_length = 4096;
-const int transform_output_length = SPECTRUM_LENGTH( transform_input_length );
 
 typedef std::pair<int,int> Range;
 typedef std::pair<int,float> Peak;
@@ -25,7 +24,7 @@ typedef std::pair<int,float> Peak;
 NBL_OSTREAM_OVERLOAD(Range, range, "r{" << range.first << "," << range.second << "}")
 NBL_OSTREAM_OVERLOAD(Peak, peak, "p{" << peak.first << "," << peak.second << "}")
 
-const int frequency_output_length = 2049;
+const int frequency_output_length = SPECTRUM_LENGTH( transform_input_length );
 const Range full_range = {0, frequency_output_length};
 const Range whistle_peak_range = {70,160};
 
