@@ -213,11 +213,13 @@ def shouldWalkFindBall(player):
 
 def shouldChangeKickingStrategy(player):
     """
-    It is the end of the game and we are loosing. Time to kick more aggresively!
+    It is the end of the game and we are losing. Time to kick more aggresively!
     """
     return (player.brain.game.have_remote_gc and 
             player.brain.game.secs_remaining <= 30 and
             player.brain.theirScore > player.brain.ourScore)
 
 def shouldNotDribble(player):
-    return (player.brain.game.secs_remaining <= 30)
+    return (player.brain.game.secs_remaining <= 30 or
+            # player.brain.game.secs_remaining > (NogginConstants.LENGTH_OF_HALF - 20) or # don't dribble for the first 20 seconds
+            player.brain.nav.x > NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X) 

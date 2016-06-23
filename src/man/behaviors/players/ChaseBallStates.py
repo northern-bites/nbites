@@ -343,7 +343,7 @@ def dribble(player):
         return player.goNow('approachBall')
     print "Dribble time"
     ball = player.brain.ball
-    player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_FIVE)
+    player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_THREE)
     # player.brain.nav.walk(10, 0, 0)
     return player.stay()
 
