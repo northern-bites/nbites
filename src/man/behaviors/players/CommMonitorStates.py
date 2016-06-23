@@ -23,6 +23,7 @@ def commMonitor(player):
         
         if player.firstFrame():
             print "Switched to good comm mode because we are on the GC BABAY!"
+            print "Player role switch is", str(player.roleSwitching)
         
         player.role = player.brain.playerNumber
     
@@ -39,7 +40,8 @@ def commMonitor(player):
         
         if player.firstFrame():
             print "Switched to awful comm mode!"
-        
+            print "Player role switch is", str(player.roleSwitching)
+
         player.role = player.brain.playerNumber
         player.prevRoleConfig = RoleConstants.roleConfiguration
         RoleConstants.roleConfiguration = RoleConstants.spread
@@ -53,7 +55,7 @@ def commMonitor(player):
 
         if player.firstFrame():
             print "Switched to mediocre comm mode!"
-    
+            print "Player role switch is", str(player.roleSwitching)
         player.role = player.brain.playerNumber
     
         if player.commMode == 2: 
@@ -69,6 +71,7 @@ def commMonitor(player):
         
         if player.firstFrame():
             print "Switched to good comm mode! ROLE SWITCHING SHOULD BE TURNED ON."
+            print "Player role switch is", str(player.roleSwitching)   
         
         player.role = player.brain.playerNumber
         
