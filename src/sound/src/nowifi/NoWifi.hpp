@@ -32,7 +32,7 @@ namespace nowifi {
         bool isRunning() const { return running; }
         bool isSending() const { return sending; }
 
-        virtual void send(std::string data) = 0;
+        virtual void send(std::string data);
         virtual void fill(nbsound::SampleBuffer& buffer, nbsound::Config& conf) = 0;
 
         NBL_DISALLOW_COPY(SendrBase)
@@ -55,11 +55,12 @@ namespace nowifi {
         NBL_DISALLOW_COPY(RecvrBase)
     };
 
-
     SendrBase * getSender();
     RecvrBase * getRecvr();
 }
 
 #include "SimpleFSK.hpp"
+
+#define NOWIFI_CHECK(val) if (val) { NBL_ERROR(
 
 #endif /* NoWifi_h */
