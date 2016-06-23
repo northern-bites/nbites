@@ -159,6 +159,7 @@ def afterKick(player):
 def chaseAfterBall(player):
     if player.firstFrame():
         print "in chaseAfterBall"
+        player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         player.brain.nav.destinationWalkTo(RelRobotLocation(200, 0, 0))
         return player.stay()
     if transitions.shouldChaseBall(player):
