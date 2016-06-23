@@ -82,6 +82,8 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses(
     PROF_ENTER(P_SCRIPTED);
 
     if (currCommandEmpty())
+        std::cout << "Command empty\n";
+    if (currCommandEmpty())
 	setNextBodyCommand(sensorAngles);
 
     // Go through the chains and enqueue the next
@@ -93,9 +95,11 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses(
     for (unsigned int id=0; id< Kinematics::NUM_CHAINS; ++id ) {
         Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
 	if ( currCommand->isDone() ){
+        // std::cout << "SCRIPTED_PROVIDER setting joints\n";
 	    setNextChainJoints( cid,
 				currentChains->at(cid) );
 	}else{
+        // std::cout << "SCRIPTED_PROVIDER setting joints\n";
 	    setNextChainJoints( cid,
 				currCommand->getNextJoints(cid) );
 	}

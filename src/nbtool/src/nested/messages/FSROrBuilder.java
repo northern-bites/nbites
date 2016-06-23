@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface FSROrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.FSR)
-    com.google.protobuf.MessageOrBuilder {
+public interface FSROrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float lfl = 1;
   /**
    * <code>optional float lfl = 1;</code>
    *
@@ -24,6 +24,7 @@ public interface FSROrBuilder extends
    */
   float getLfl();
 
+  // optional float lfr = 2;
   /**
    * <code>optional float lfr = 2;</code>
    *
@@ -41,6 +42,7 @@ public interface FSROrBuilder extends
    */
   float getLfr();
 
+  // optional float lrl = 3;
   /**
    * <code>optional float lrl = 3;</code>
    *
@@ -58,6 +60,7 @@ public interface FSROrBuilder extends
    */
   float getLrl();
 
+  // optional float lrr = 4;
   /**
    * <code>optional float lrr = 4;</code>
    *
@@ -75,6 +78,7 @@ public interface FSROrBuilder extends
    */
   float getLrr();
 
+  // optional float rfl = 5;
   /**
    * <code>optional float rfl = 5;</code>
    *
@@ -92,6 +96,7 @@ public interface FSROrBuilder extends
    */
   float getRfl();
 
+  // optional float rfr = 6;
   /**
    * <code>optional float rfr = 6;</code>
    *
@@ -109,6 +114,7 @@ public interface FSROrBuilder extends
    */
   float getRfr();
 
+  // optional float rrl = 7;
   /**
    * <code>optional float rrl = 7;</code>
    *
@@ -126,6 +132,7 @@ public interface FSROrBuilder extends
    */
   float getRrl();
 
+  // optional float rrr = 8;
   /**
    * <code>optional float rrr = 8;</code>
    *

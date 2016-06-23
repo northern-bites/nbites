@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.AudioCommand}
  */
-public final class AudioCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.AudioCommand)
-    AudioCommandOrBuilder {
+public  final class AudioCommand extends
+    com.google.protobuf.GeneratedMessage
+    implements AudioCommandOrBuilder {
   // Use AudioCommand.newBuilder() to construct.
   private AudioCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -56,9 +55,8 @@ public final class AudioCommand extends
             break;
           }
           case 10: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000001;
-            audioFile_ = bs;
+            audioFile_ = input.readBytes();
             break;
           }
         }
@@ -101,6 +99,7 @@ public final class AudioCommand extends
   }
 
   private int bitField0_;
+  // optional string audio_file = 1;
   public static final int AUDIO_FILE_FIELD_NUMBER = 1;
   private java.lang.Object audioFile_;
   /**
@@ -161,8 +160,7 @@ public final class AudioCommand extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -269,9 +267,8 @@ public final class AudioCommand extends
    * Protobuf type {@code messages.AudioCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.AudioCommand)
-      messages.AudioCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.AudioCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_AudioCommand.internal_static_messages_AudioCommand_descriptor;
@@ -386,6 +383,7 @@ public final class AudioCommand extends
     }
     private int bitField0_;
 
+    // optional string audio_file = 1;
     private java.lang.Object audioFile_ = "";
     /**
      * <code>optional string audio_file = 1;</code>
@@ -407,12 +405,9 @@ public final class AudioCommand extends
     public java.lang.String getAudioFile() {
       java.lang.Object ref = audioFile_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          audioFile_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        audioFile_ = s;
         return s;
       } else {
         return (java.lang.String) ref;

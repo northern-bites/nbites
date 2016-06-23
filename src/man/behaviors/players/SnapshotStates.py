@@ -37,7 +37,7 @@ def gameSet(player):
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
-        player.brain.tracker.repeatWidePan()
+        player.brain.tracker.repeatWideSnapPan()
 
     # player.brain.resetInitialLocalization()
     return player.stay()

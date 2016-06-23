@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisionFieldOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.VisionField)
-    com.google.protobuf.MessageOrBuilder {
+public interface VisionFieldOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional int64 timestamp = 1;
   /**
    * <code>optional int64 timestamp = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface VisionFieldOrBuilder extends
    */
   long getTimestamp();
 
+  // optional .messages.VisualGoalPost goal_post_l = 2;
   /**
    * <code>optional .messages.VisualGoalPost goal_post_l = 2;</code>
    */
@@ -29,6 +30,7 @@ public interface VisionFieldOrBuilder extends
    */
   messages.VisualGoalPostOrBuilder getGoalPostLOrBuilder();
 
+  // optional .messages.VisualGoalPost goal_post_r = 3;
   /**
    * <code>optional .messages.VisualGoalPost goal_post_r = 3;</code>
    */
@@ -42,6 +44,7 @@ public interface VisionFieldOrBuilder extends
    */
   messages.VisualGoalPostOrBuilder getGoalPostROrBuilder();
 
+  // repeated .messages.VisualCorner visual_corner = 4;
   /**
    * <code>repeated .messages.VisualCorner visual_corner = 4;</code>
    */
@@ -66,6 +69,7 @@ public interface VisionFieldOrBuilder extends
   messages.VisualCornerOrBuilder getVisualCornerOrBuilder(
       int index);
 
+  // repeated .messages.VisualCorner bottom_corner = 9;
   /**
    * <code>repeated .messages.VisualCorner bottom_corner = 9;</code>
    */
@@ -90,6 +94,7 @@ public interface VisionFieldOrBuilder extends
   messages.VisualCornerOrBuilder getBottomCornerOrBuilder(
       int index);
 
+  // repeated .messages.VisualLine visual_line = 5;
   /**
    * <code>repeated .messages.VisualLine visual_line = 5;</code>
    */
@@ -114,6 +119,7 @@ public interface VisionFieldOrBuilder extends
   messages.VisualLineOrBuilder getVisualLineOrBuilder(
       int index);
 
+  // repeated .messages.VisualLine bottom_line = 8;
   /**
    * <code>repeated .messages.VisualLine bottom_line = 8;</code>
    */
@@ -138,6 +144,7 @@ public interface VisionFieldOrBuilder extends
   messages.VisualLineOrBuilder getBottomLineOrBuilder(
       int index);
 
+  // optional .messages.VisualDetection visual_cross = 6;
   /**
    * <code>optional .messages.VisualDetection visual_cross = 6;</code>
    */
@@ -151,6 +158,7 @@ public interface VisionFieldOrBuilder extends
    */
   messages.VisualDetectionOrBuilder getVisualCrossOrBuilder();
 
+  // optional .messages.VisualFieldEdge visual_field_edge = 7;
   /**
    * <code>optional .messages.VisualFieldEdge visual_field_edge = 7;</code>
    */

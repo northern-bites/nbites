@@ -243,9 +243,8 @@ void VisionModule::run_()
             homography[i]->roll(calibrationParams[i]->getRoll());
 
             homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
-#ifndef OFFLINE
+
             homography[i]->azimuth(kinematics[i]->azimuth());
-#endif
         }
 
         times[i][1] = timer.end();
@@ -332,7 +331,7 @@ void VisionModule::run_()
         PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
 			//ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 		ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
-                                   frontEnd[i]->orangeImage(), yImage);
+                                   frontEnd[i]->orangeImage(), yImage, edgeDetector[i]);
 		ballDetected |= ballDetector[i]->findBall(whiteImage,
                                                   kinematics[i]->wz0(), *(edges[i]));
         PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
@@ -602,14 +601,34 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
 		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
 		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
+		nbl::SExpr *spot = params->get(1)->find("ShowSpotSizes");
+		int debugSpots = 0;
+		if (spot != NULL) {
+			debugSpots = spot->get(1)->valueAsInt();
+		}
+		int filterDark = params->get(1)->find("FilterDark")->get(1)->valueAsInt();
+		int greenDark = params->get(1)->find("GreenDark")->get(1)->valueAsInt();
+		int filterBrite = params->get(1)->find("FilterBrite")->get(1)->valueAsInt();
+		int greenBrite = params->get(1)->find("GreenBrite")->get(1)->valueAsInt();
 		field->setDrawCameraHorizon(cameraHorizon);
 		field->setDrawFieldHorizon(fieldHorizon);
 		field->setDebugHorizon(debugHorizon);
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		ballDetector[0]->setDebugSpots(debugSpots);
+		ballDetector[1]->setDebugSpots(debugSpots);
+		ballDetector[0]->setDebugFilterDark(filterDark);
+		ballDetector[1]->setDebugFilterDark(filterDark);
+		ballDetector[0]->setDebugGreenDark(greenDark);
+		ballDetector[1]->setDebugGreenDark(greenDark);
+		ballDetector[0]->setDebugFilterBrite(filterBrite);
+		ballDetector[1]->setDebugFilterBrite(filterBrite);
+		ballDetector[0]->setDebugGreenBrite(greenBrite);
+		ballDetector[1]->setDebugGreenBrite(greenBrite);
 		debugImage[0]->reset();
 		debugImage[1]->reset();
+		//std::cout << "out" << std::endl;
 	}
 #endif
 

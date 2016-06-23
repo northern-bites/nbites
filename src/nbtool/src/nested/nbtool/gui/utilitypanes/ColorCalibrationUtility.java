@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -36,8 +37,11 @@ import nbtool.nio.CrossServer;
 import nbtool.nio.CrossServer.CrossInstance;
 import nbtool.nio.LogRPC;
 import nbtool.nio.RobotConnection;
+import nbtool.util.Center;
 import nbtool.util.Debug;
+import nbtool.util.Events;
 import nbtool.util.SharedConstants;
+import nbtool.util.Utility;
 
 public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, ColorCalibrationListener> {
 
@@ -98,11 +102,12 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 		}
 	}
 
-	private static class Display extends JFrame {
+	private static class Display extends JFrame implements Events.LogSelected {
 
 		JTabbedPane tabs = new JTabbedPane();
 		TabHandler[] handlers = new TabHandler[4];
-		boolean applyGlobally = false;
+		boolean applyGlobally = true;
+		boolean takeSelection = false;
 
 		private ActionListener saveListener = new ActionListener() {
 			@Override
@@ -156,6 +161,32 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				applyGlobally = nv;
 			}
 		};
+
+		private ChangeListener takeListener = new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				boolean nv = ((JCheckBox) e.getSource()).isSelected();
+				for (TabHandler th : handlers) {
+					th.tab.takeCheckBox.setSelected(nv);
+				}
+
+				takeSelection = nv;
+			}
+		};
+
+		@Override
+		public void logSelected(Object source, Log first, List<Log> alsoSelected) {
+			if (takeSelection) {
+				if (first.logClass.equals("tripoint")) {
+					for (TabHandler handler : handlers) {
+						if (handler.top == Utility.camera(first)) {
+							handler.useLog(first);
+						}
+					}
+				}
+			}
+		}
 
 		private LogDNDTarget topCameraTarget = new LogDNDTarget() {
 			@Override
@@ -261,6 +292,7 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				th.tab.SaveButton.addActionListener(saveListener);
 				th.tab.SendButton.addActionListener(sendListener);
 				th.tab.globalCheckBox.addChangeListener(globalListener);
+				th.tab.takeCheckBox.addChangeListener(takeListener);
 			}
 
 			for (int i = 0; i < handlers.length; ++i) {
@@ -274,6 +306,8 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 			Dimension minSize = new Dimension(tabs.getMinimumSize());
 			minSize.width += 50;
 			minSize.height += 50;
+
+			Center.listen(Events.LogSelected.class, this, true);
 
 			this.setContentPane(tabs);
 			this.setMinimumSize(minSize);
