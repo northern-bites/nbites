@@ -231,7 +231,7 @@ void VisionModule::run_()
 
         // Offset to hackily adjust tilt for high-azimuth error
         double azOffset = 0;
-        if (name != "ringo")
+        if (name != "blt")
             azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
 
         // Calculate kinematics and adjust homography
