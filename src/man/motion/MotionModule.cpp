@@ -489,6 +489,7 @@ void MotionModule::preProcessBody()
 
         if (!curProvider->isActive())
         {
+            std::cout << "[MOTION MODULE] Swapping body providers \n";
             swapBodyProvider();
         }
     }

@@ -99,6 +99,7 @@ def goToPosition(nav):
             relDest = goToPosition.dest
 
 
+
         HEADING_ADAPT_CUTOFF = 103
         DISTANCE_ADAPT_CUTOFF = 10
 
@@ -153,7 +154,12 @@ def goToPosition(nav):
         if relDest.relY < DISTANCE_ADAPT_CUTOFF:
             velY = 0.0
 
-        goToPosition.speeds = (velX, velY, velH)
+        if (fabs(relDest.relH) > 20.0):
+            goToPosition.speeds = (0, 0, velH)
+        else:
+            goToPosition.speeds = (velX, velY, velH)
+        # print("My speeds:", velX, velY, velH)
+
         helper.setSpeed(nav, goToPosition.speeds)
 
     else:
