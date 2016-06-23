@@ -571,7 +571,7 @@ bool BallDetector::findCorrelatedBlackSpots
     					ballSpot.rawX = ix;
     					ballSpot.rawY = iy;
     					ballSpot.innerDiam = 5;
-    				    
+
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
 #ifdef OFFLINE
                         foundBall = true;
@@ -897,8 +897,8 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
 
 bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
     int THRESHOLD = 110;
-    int topCheckedPixels = 0, bottomCheckedPixels = 0;
-    int topGreenSum = 0, bottomGreenSum = 0;
+    int topCheckedPixels = 0, botCheckedPixels = 0;
+    int topGreenSum = 0, botGreenSum = 0;
 
     double bx = 0, by = 0;
     imageToBillCoordinates(p.first, p.second, bx, by);
@@ -908,33 +908,37 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
     int bottomY = std::round(p.second + r + 1);
 
     getColor(p.first, topY);
-    for(int i = 0; i < 1.5*r && (topY - i) >= 0; i++) {
+    for(int i = 0; i < r && (topY - i) >= 0; i++) {
         topGreenSum += getGreen();
         topCheckedPixels++;
         getColor(p.first, topY - i);
     }
 
     getColor(p.first, bottomY);
-    for(int i = 0; i < 1.5*r && (bottomY + i <= width); i++) {
-        bottomGreenSum += getGreen();
-        bottomCheckedPixels++;
+    for(int i = 0; i < r && (bottomY + i <= width); i++) {
+        botGreenSum += getGreen();
+        botCheckedPixels++;
         getColor(p.first, bottomY + i);
     }
 
     if(debugBall) {
         debugDraw.drawDot(p.first, bottomY, RED);
-        debugDraw.drawDot(p.first, bottomY + bottomCheckedPixels, RED);
+        debugDraw.drawDot(p.first, bottomY + botCheckedPixels, RED);
         debugDraw.drawDot(p.first, topY, BLUE);
         debugDraw.drawDot(p.first, topY - topCheckedPixels, BLUE); //wont draw if too close to top
     }
 
-    if((topGreenSum / topCheckedPixels >= THRESHOLD) || (bottomGreenSum / bottomCheckedPixels >= THRESHOLD)) {
+    int topGreenAvg = 0, botGreenAvg = 0;
+    ((topCheckedPixels > 0) ? topGreenAvg = topGreenSum / topCheckedPixels : topGreenAvg = 0);
+    ((botCheckedPixels > 0) ? botGreenAvg = botGreenSum / botCheckedPixels : botGreenAvg = 0);
+
+    if(topGreenAvg >= THRESHOLD || botGreenAvg >= THRESHOLD) {
         if(debugBall) { 
             std::cout<<"[BALL INFO] Green Test Passed\n"; 
             for(int i = 0; i < topCheckedPixels; i++) {
                 debugDraw.drawDot(p.first, topY - i, GREEN);
             }
-            for(int i = 0; i < bottomCheckedPixels; i++) {
+            for(int i = 0; i < botCheckedPixels; i++) {
                 debugDraw.drawDot(p.first, bottomY + i, GREEN);
             }
         }
