@@ -1404,7 +1404,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
 
-    if(darkSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
+    if(darkSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
         SpotList darkSpots = darkSpotDetector.spots();
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
 		if (debugSpots) {
@@ -1456,7 +1456,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
-    if(whiteSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
+    if(whiteSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
 		if (debugSpots) {
 			int max = field->horizonAt(0);
 			if (!topCamera) {
