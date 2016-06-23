@@ -28,7 +28,6 @@ namespace nbl {
                 provider(p) {}
             void threadLoop();
         };
-
     }
 }
 
