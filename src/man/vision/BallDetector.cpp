@@ -938,7 +938,7 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
     }
     // for now, if there are several bad spots then it is too dangerous
     if (badspots > 1) {
-        return false;
+        //return false;
     }
     return true;
 }
@@ -1019,6 +1019,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 				" " << length4 << std::endl;
 		}
+		// anything way off is bad
 		if (length1 > 15 || length2 > 15 || length3 > 15 || length4 > 15) {
 			return false;
 		}
@@ -1042,6 +1043,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		y = topY;
 		getColor(x, y);
 	}
+	// bunch of checks to ensure uniformity
 	if (abs(length1 + length2 - length3 - length4) > 4) {
 		return false;
 	}
@@ -1051,14 +1053,15 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	if (abs(length1 - length2) > 5) {
 		return false;
 	}
-	if (max(length1, length2) < 2 || max(length3, length4) < 2) {
+	int minl = min(min(length1, length2), min(length3, length4));
+	if (minl < 3) {
 		return false;
 	}
 	if (bottomY < height - 8 && topY > 5) {
 		// straight up
 		midX = (rightX + leftX) / 2;
 		midY = (bottomY + topY) / 2;
-		debugDraw.drawPoint(midX, midY, BLUE);
+		//debugDraw.drawPoint(midX, midY, BLUE);
 		getColor(midX, topY);
 		for (x = midX, y = topY; y > 0 && getGreen() < THRESHOLD; y--) {
 			getColor(x, y);
@@ -1269,7 +1272,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 	if (spot.innerDiam < 4) {
 		return false;
 	}
-    if (spot.innerDiam < 8) {
+    if (spot.innerDiam <= 8) {
 		if (spot.green > 0) {
 			return false;
 		}
@@ -1303,7 +1306,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
     } else if (spots == 1) {
 		// circle detection can be hard if the ball is on a line or in front of a robot
 		// check whiteness?
-		if (!checkGradientInSpot(spot) || spot.green > 10) {
+		if (!checkGradientInSpot(spot) || spot.green > 40) {
 			if (debugBall) {
 				std::cout << "Checking one spot " << spot.green << " " << std::endl;
 			}
@@ -1454,7 +1457,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
 	// run blobber on parts of the image where spot detector won't work
-	int bottomThird = height * 2 / 3;
+	int bottomThird = max(field->horizonAt(width / 2), 60); //height * 1 /2;
 	if (topCamera) {
 		ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
 								height - bottomThird);
