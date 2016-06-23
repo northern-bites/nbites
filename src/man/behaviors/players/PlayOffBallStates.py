@@ -49,6 +49,9 @@ def positionAtHome(player):
     """
     Go to the player's home position.
     """
+
+    print "Position at home"
+
     if role.isDefender(player.role):
         home = calculateHomePosition(player)
     else:

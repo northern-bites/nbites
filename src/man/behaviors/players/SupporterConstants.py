@@ -122,6 +122,8 @@ def distanceToPosition(player):
 
 def findDefenderHomeWithBall(player, left, ball, hh): 
 
+    print "Find Defender Home WITH ball"
+
     if ball.x < NogginConstants.MIDFIELD_X:
         player.brain.staggeredPositioning = True
         if left:
@@ -149,6 +151,8 @@ def findDefenderHomeWithBall(player, left, ball, hh):
  
 #ballPrev = previous position of ball
 def findDefenderHomeNoBall(player, left):
+
+    print "Find defender home WITHOUT ball"
 
     if player.brain.staggeredPositioning:
         if left:
@@ -280,6 +284,9 @@ def calculateHomePosition(player):
     """
     Calculate home position.
     """
+
+    print "Calculate home position"
+
     if player.brain.ball.vis.frames_off < 10:
         ball = player.brain.ball
         bearing = ball.bearing_deg
