@@ -47,7 +47,8 @@ echo $HOSTNAME > /etc/hostname
 echo "Adding nbites config to profile..."
 echo "# NBites Config below:" >> /etc/profile
 echo "alias naolog='tail -f /home/nao/nbites/log/nblog'" >> /etc/profile
-echo "alias done='sudo shutdown -h now && exit'" >> /etc/profile
+echo "alias manlog='tail -f /home/nao/nbites/log/manlog'" >> /etc/profile
+echo "alias done='killall man; killall naoqi-bin; sudo shutdown -h now && exit'" >> /etc/profile
 echo "ulimit -S -c unlimited" >> /etc/profile
 
 # Move the etc config
@@ -56,8 +57,11 @@ mv $FOLDER/naoqi-init /etc/init.d/naoqi
 
 # Move the autoload files
 echo "Moving autoload.ini files into place..."
-mv $FOLDER/sys_autoload.ini /etc/naoqi/autoload.ini
+#mv $FOLDER/sys_autoload.ini /etc/naoqi/autoload.ini
 mv $FOLDER/usr_autoload.ini naoqi/preferences/autoload.ini
+
+echo "USING TTS ENABLED autoload.ini -- are you sure this is the right branch?"
+mv tts_autoload.ini /etc/naoqi/autoload.ini
 
 # Move the config files for wpa_supplicant
 echo "Moving config files for wpa_supplicant"

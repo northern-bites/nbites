@@ -35,8 +35,13 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       colorParamsMonitor( calibration::colorParamsPath().c_str(), false),
       camOffsetsMonitor( calibration::cameraOffsetsPath().c_str(), false)
 {
-    NBL_ASSERT_EQ( robotName.find(".local"), std::string::npos )
-    name = robotName;
+    size_t dot_local_pos = robotName.find(".local");
+
+    if (dot_local_pos != std::string::npos) {
+        name = robotName.substr(0, dot_local_pos);
+    } else {
+        name = robotName;
+    }
 
     for (int i = 0; i < 2; ++i) {
         colorParams[i] = NULL;
@@ -60,7 +65,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edges[i] = new EdgeList(32000);
         rejectedEdges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
-        calibrationParams[i] = new CalibrationParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
@@ -231,7 +235,7 @@ void VisionModule::run_()
 
         // Offset to hackily adjust tilt for high-azimuth error
         double azOffset = 0;
-        if (name != "ringo")
+        if (name != "blt")
             azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
 
         // Calculate kinematics and adjust homography
@@ -604,6 +608,11 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
 		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
 		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
+		nbl::SExpr *spot = params->get(1)->find("ShowSpotSizes");
+		int debugSpots = 0;
+		if (spot != NULL) {
+			debugSpots = spot->get(1)->valueAsInt();
+		}
 		int filterDark = params->get(1)->find("FilterDark")->get(1)->valueAsInt();
 		int greenDark = params->get(1)->find("GreenDark")->get(1)->valueAsInt();
 		int filterBrite = params->get(1)->find("FilterBrite")->get(1)->valueAsInt();
@@ -614,6 +623,8 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		ballDetector[0]->setDebugSpots(debugSpots);
+		ballDetector[1]->setDebugSpots(debugSpots);
 		ballDetector[0]->setDebugFilterDark(filterDark);
 		ballDetector[1]->setDebugFilterDark(filterDark);
 		ballDetector[0]->setDebugGreenDark(greenDark);
@@ -624,6 +635,7 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		ballDetector[1]->setDebugGreenBrite(greenBrite);
 		debugImage[0]->reset();
 		debugImage[1]->reset();
+		//std::cout << "out" << std::endl;
 	}
 #endif
 

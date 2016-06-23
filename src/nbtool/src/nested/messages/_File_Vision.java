@@ -8,52 +8,52 @@ public final class _File_Vision {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_HoughLine_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_HoughLine_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FieldLine_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_FieldLine_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_Corner_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_Corner_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_CenterCircle_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_CenterCircle_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_Vision_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_Vision_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_VBall_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_VBall_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FilteredBall_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_FilteredBall_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_SharedBall_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_SharedBall_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_NaiveBall_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_NaiveBall_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_NaiveBall_Position_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -121,77 +121,77 @@ public final class _File_Vision {
       "File_VisionP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_messages_HoughLine_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_messages_HoughLine_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_HoughLine_descriptor,
+              new java.lang.String[] { "R", "T", "Ep0", "Ep1", });
+          internal_static_messages_FieldLine_descriptor =
+            getDescriptor().getMessageTypes().get(1);
+          internal_static_messages_FieldLine_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_FieldLine_descriptor,
+              new java.lang.String[] { "Inner", "Outer", "Id", "Correspondence", "Prob", "Index", "Wz0", });
+          internal_static_messages_Corner_descriptor =
+            getDescriptor().getMessageTypes().get(2);
+          internal_static_messages_Corner_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_Corner_descriptor,
+              new java.lang.String[] { "X", "Y", "Id", "Correspondence", "Prob", "Line1", "Line2", "Wz0", });
+          internal_static_messages_CenterCircle_descriptor =
+            getDescriptor().getMessageTypes().get(3);
+          internal_static_messages_CenterCircle_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_CenterCircle_descriptor,
+              new java.lang.String[] { "On", "X", "Y", "Prob", "Wz0", });
+          internal_static_messages_Vision_descriptor =
+            getDescriptor().getMessageTypes().get(4);
+          internal_static_messages_Vision_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_Vision_descriptor,
+              new java.lang.String[] { "Line", "Corner", "Circle", "Ball", "HorizonDist", });
+          internal_static_messages_VBall_descriptor =
+            getDescriptor().getMessageTypes().get(5);
+          internal_static_messages_VBall_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_VBall_descriptor,
+              new java.lang.String[] { "Distance", "Bearing", "AngleXDeg", "AngleYDeg", "BearingSd", "InTopCam", "Radius", "Confidence", "On", "FramesOn", "FramesOff", "RelXVariance", "RelYVariance", "BearingDeg", "X", "Y", "Wz0", });
+          internal_static_messages_FilteredBall_descriptor =
+            getDescriptor().getMessageTypes().get(6);
+          internal_static_messages_FilteredBall_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_FilteredBall_descriptor,
+              new java.lang.String[] { "Vis", "Distance", "Bearing", "RelX", "RelY", "VelX", "VelY", "VarRelX", "VarRelY", "VarVelX", "VarVelY", "IsStationary", "BearingDeg", "X", "Y", "RelXDest", "RelYDest", "Speed", "RelYIntersectDest", "StatRelX", "StatRelY", "StatDistance", "StatBearing", "MovRelX", "MovRelY", "MovDistance", "MovBearing", "MovVelX", "MovVelY", "MovSpeed", });
+          internal_static_messages_SharedBall_descriptor =
+            getDescriptor().getMessageTypes().get(7);
+          internal_static_messages_SharedBall_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_SharedBall_descriptor,
+              new java.lang.String[] { "X", "Y", "BallOn", "Reliability", });
+          internal_static_messages_NaiveBall_descriptor =
+            getDescriptor().getMessageTypes().get(8);
+          internal_static_messages_NaiveBall_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_NaiveBall_descriptor,
+              new java.lang.String[] { "Velocity", "Stationary", "Yintercept", "Position", "DestBuffer", "XVel", "YVel", "StartAvgX", "StartAvgY", "EndAvgX", "EndAvgY", "AvgStartIndex", "AvgEndIndex", "AltXVel", "XV1", "XV2", "XV3", });
+          internal_static_messages_NaiveBall_Position_descriptor =
+            internal_static_messages_NaiveBall_descriptor.getNestedTypes().get(0);
+          internal_static_messages_NaiveBall_Position_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_messages_NaiveBall_Position_descriptor,
+              new java.lang.String[] { "X", "Y", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_messages_HoughLine_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_HoughLine_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_HoughLine_descriptor,
-        new java.lang.String[] { "R", "T", "Ep0", "Ep1", });
-    internal_static_messages_FieldLine_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_messages_FieldLine_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_FieldLine_descriptor,
-        new java.lang.String[] { "Inner", "Outer", "Id", "Correspondence", "Prob", "Index", "Wz0", });
-    internal_static_messages_Corner_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_messages_Corner_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_Corner_descriptor,
-        new java.lang.String[] { "X", "Y", "Id", "Correspondence", "Prob", "Line1", "Line2", "Wz0", });
-    internal_static_messages_CenterCircle_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_messages_CenterCircle_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_CenterCircle_descriptor,
-        new java.lang.String[] { "On", "X", "Y", "Prob", "Wz0", });
-    internal_static_messages_Vision_descriptor =
-      getDescriptor().getMessageTypes().get(4);
-    internal_static_messages_Vision_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_Vision_descriptor,
-        new java.lang.String[] { "Line", "Corner", "Circle", "Ball", "HorizonDist", });
-    internal_static_messages_VBall_descriptor =
-      getDescriptor().getMessageTypes().get(5);
-    internal_static_messages_VBall_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_VBall_descriptor,
-        new java.lang.String[] { "Distance", "Bearing", "AngleXDeg", "AngleYDeg", "BearingSd", "InTopCam", "Radius", "Confidence", "On", "FramesOn", "FramesOff", "RelXVariance", "RelYVariance", "BearingDeg", "X", "Y", "Wz0", });
-    internal_static_messages_FilteredBall_descriptor =
-      getDescriptor().getMessageTypes().get(6);
-    internal_static_messages_FilteredBall_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_FilteredBall_descriptor,
-        new java.lang.String[] { "Vis", "Distance", "Bearing", "RelX", "RelY", "VelX", "VelY", "VarRelX", "VarRelY", "VarVelX", "VarVelY", "IsStationary", "BearingDeg", "X", "Y", "RelXDest", "RelYDest", "Speed", "RelYIntersectDest", "StatRelX", "StatRelY", "StatDistance", "StatBearing", "MovRelX", "MovRelY", "MovDistance", "MovBearing", "MovVelX", "MovVelY", "MovSpeed", });
-    internal_static_messages_SharedBall_descriptor =
-      getDescriptor().getMessageTypes().get(7);
-    internal_static_messages_SharedBall_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_SharedBall_descriptor,
-        new java.lang.String[] { "X", "Y", "BallOn", "Reliability", });
-    internal_static_messages_NaiveBall_descriptor =
-      getDescriptor().getMessageTypes().get(8);
-    internal_static_messages_NaiveBall_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_NaiveBall_descriptor,
-        new java.lang.String[] { "Velocity", "Stationary", "Yintercept", "Position", "DestBuffer", "XVel", "YVel", "StartAvgX", "StartAvgY", "EndAvgX", "EndAvgY", "AvgStartIndex", "AvgEndIndex", "AltXVel", "XV1", "XV2", "XV3", });
-    internal_static_messages_NaiveBall_Position_descriptor =
-      internal_static_messages_NaiveBall_descriptor.getNestedTypes().get(0);
-    internal_static_messages_NaiveBall_Position_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_NaiveBall_Position_descriptor,
-        new java.lang.String[] { "X", "Y", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -42,7 +42,7 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 
 		naoVersion = new JButton("V5 Camera Parameters");
 		naoVersion.addActionListener(this);
-		naoVersion.setPreferredSize(new Dimension(180,25));
+		naoVersion.setPreferredSize(new Dimension(200,25));
 		canvas.add(naoVersion);
 		
 		topCameraPrefs = new CameraPrefs("Top Camera",5);
@@ -53,17 +53,17 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 		
 		startStreaming = new JButton("stream");
 		startStreaming.addActionListener(this);
-		startStreaming.setPreferredSize(new Dimension(80,25));
+		startStreaming.setPreferredSize(new Dimension(100,25));
 		canvas.add(startStreaming);
 
 		saveParamsV4 = new JButton("saveV4");
 		saveParamsV4.addActionListener(this);
-		saveParamsV4.setPreferredSize(new Dimension(80,25));
+		saveParamsV4.setPreferredSize(new Dimension(100,25));
 		canvas.add(saveParamsV4);
 
 		saveParamsV5 = new JButton("saveV5");
 		saveParamsV5.addActionListener(this);
-		saveParamsV5.setPreferredSize(new Dimension(80,25));
+		saveParamsV5.setPreferredSize(new Dimension(100,25));
 		canvas.add(saveParamsV5);
 		
 		sp = new JScrollPane();
