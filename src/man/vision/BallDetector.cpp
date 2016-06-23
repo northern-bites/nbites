@@ -697,7 +697,7 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
 	}
 
     // count up how many bad black spots are inside
-    int badspots = 0;
+    /*int badspots = 0;
     for (int j = 0; j < badBlack.size(); j++) {
         std::pair<int,int> blackspot = badBlack[j];
         if (blackspot.first > spot.xLo() + width / 2 &&
@@ -706,11 +706,11 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
             blackspot.second < spot.yHi() + height / 2) {
             badspots++;
         }
-    }
+		}*/
     // for now, if there are several bad spots then it is too dangerous
-    if (badspots > 1) {
+    //if (badspots > 1) {
         //return false;
-    }
+    //}
     return true;
 }
 
@@ -1205,7 +1205,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
 	// run blobber on parts of the image where spot detector won't work
-	int bottomThird = max(field->horizonAt(width / 2), 60); //height * 1 /2;
+	int bottomThird = max(field->horizonAt(width / 2), height * 3 / 4); //height * 1 /2;
 	if (topCamera) {
 		ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
 								height - bottomThird);
@@ -1224,7 +1224,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 #else
         return true;
 #endif
-    }
+}
 
     SpotDetector whiteSpotDetector;
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
