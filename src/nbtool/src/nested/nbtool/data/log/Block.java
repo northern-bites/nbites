@@ -36,7 +36,7 @@ public class Block {
 		this.data = data == null ? new byte[0] : data;
 		this.dict = dict == null ? new JsonObject() : dict;
 		this.type = type == null ? "" : type;
-		this.whereFrom = type == null ? "" : where;
+		this.whereFrom = where == null ? "" : where;
 		this.imageIndex = index;
 		this.createdWhen = when;
 	}

@@ -164,6 +164,17 @@ strikerTop = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
 strikerTriangle = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
                                 NogginConstants.MIDFIELD_Y - 200,
                                 135)
+
+# Facing opponent's goal box
+# Made for when striker alternates between two home positions
+strikerLeftHome = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
+                                NogginConstants.MIDFIELD_Y + 200,
+                                -45)
+strikerRightHome = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X - 100,
+                                NogginConstants.MIDFIELD_Y - 200,
+                                135)
+
+
 ## SUMMER 2016 CHANGES ##
 
 if NogginConstants.LEFT_FORWARD_DEFENSE:
@@ -194,7 +205,7 @@ else:
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y - 70,
                                 35)
     oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 70,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 20,
                                 0)
 
 ## END SUMMER 2016 CHANGES ##
@@ -204,7 +215,7 @@ oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                               90)
 
 oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 60,
-                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 120,
+                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 70,
                                  10)
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS,
                                NogginConstants.CENTER_FIELD_Y,
@@ -260,14 +271,16 @@ oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginCon
 evenDefenderBoxCautious = ((0, NogginConstants.CENTER_FIELD_Y), NogginConstants.CENTER_FIELD_X - 70, \
                            NogginConstants.CENTER_FIELD_Y)
 
-oddDefenderBox = defenderBox
-evenDefenderBox = defenderBox
+# oddDefenderBox = defenderBox
+# evenDefenderBox = defenderBox
+
+#Whole Field
+oddDefenderBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
+evenDefenderBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
 chaserBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
-strikerBox = ((NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS, 0), 
-    (NogginConstants.FIELD_GREEN_WIDTH - (NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS)), 
-    NogginConstants.FIELD_HEIGHT)
+strikerBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
 cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstants.FIELD_WHITE_WIDTH), 0),
                     0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 

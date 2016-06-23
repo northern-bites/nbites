@@ -17,6 +17,11 @@ def walkInPlace(nav):
     """
     Makes the motion engine walk in place. 
     """
+    status = nav.brain.interface.motionStatus.calibrated
+    if not status:
+        createAndSendWalkVector(nav, 0, 0, 0)
+        return
+
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.WALK_IN_PLACE #Destination Walk
 
@@ -97,11 +102,22 @@ def setDestination(nav, dest, gain = 1.0, kick = None):
         command.dest.rel_x = 0.0
         command.dest.rel_y = 0.0
         command.dest.rel_h = dest.relH
+    elif MyMath.fabs(dest.relX) > 120.0:
+        command.dest.rel_x = dest.relX
+        command.dest.rel_y = 0.0
+        command.dest.rel_h = dest.relH
     else:
         # print("NavDebug - heading was not too great I won't turn")
+        if (MyMath.sign(setDestination.last_rel_y) != MyMath.sign(dest.relY) 
+            and setDestination.last_rel_y != 0.0):
+            command.dest.rel_y = 0.0
+        else:
+            command.dest.rel_y = dest.relY
+
         command.dest.rel_x = dest.relX
-        command.dest.rel_y = dest.relY
         command.dest.rel_h = dest.relH
+        setDestination.last_rel_y = dest.relY
+
 
     command.dest.gain = gain
 
@@ -125,6 +141,8 @@ def setDestination(nav, dest, gain = 1.0, kick = None):
 
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
+
+setDestination.last_rel_y = 0.0
 
 def setOdometryDestination(nav, dest, gain = 1.0):
     """
