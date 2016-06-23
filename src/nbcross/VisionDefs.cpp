@@ -13,6 +13,7 @@
 #include "vision/VisionModule.h"
 #include "vision/FrontEnd.h"
 #include "vision/Homography.h"
+#include "vision/Spots.h"
 #include "ParamReader.h"
 #include "NBMath.h"
 
@@ -25,168 +26,7 @@
 #include <fstream>
 #include <map>
 
-using namespace nbl;
-
-/* HELPER FUNCTIONS */
-
-void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
-    std::cout << "Saving params!" << std::endl;
-    std::ifstream textFile;
-    textFile.open(sexpPath);
-
-    // Get size of file
-    textFile.seekg (0, textFile.end);
-    long size = textFile.tellg();
-    textFile.seekg(0);
-
-    // Read file into buffer and convert to string
-    char* buff = new char[size];
-    textFile.read(buff, size);
-    std::string sexpText(buff);
-
-    // Get SExpr from string
-    SExpr* savedParams, * savedSExpr = SExpr::read((const std::string)sexpText);
-
-    if (top) {
-        savedParams = savedSExpr->get(1)->find("Top");
-    } else {
-        savedParams = savedSExpr->get(1)->find("Bottom");
-    }
-
-    const std::vector<SExpr>& newParams = *params->get(1)->getList();
-    savedParams->get(1)->setList(newParams);
-
-    // Write out
-    size = savedSExpr->print().length();
-    char* buffer = new char[size + 1];
-    std::strcpy(buffer, savedSExpr->print().c_str());
-    std::ofstream out;
-    out.open(sexpPath);
-    out.write(buffer, savedSExpr->print().length());
-
-    delete[] buff;
-    delete[] buffer;
-    textFile.close();
-    out.close();
-}
-
-enum VisionColor {
-    VISION_WHITE,
-    VISION_GREEN,
-    VISION_ORANGE
-};
-
-SExpr getSExprFromSavedParams(VisionColor color, std::string sexpPath, bool top) {
-    std::ifstream textFile;
-    textFile.open(sexpPath);
-
-    // Get size of file
-    textFile.seekg (0, textFile.end);
-    long size = textFile.tellg();
-    textFile.seekg(0);
-
-    // Read file into buffer and convert to string
-    char* buff = new char[size];
-    textFile.read(buff, size);
-    std::string sexpText(buff);
-
-    // Get SExpr from string
-    SExpr* savedSExpr = SExpr::read((const std::string)sexpText);
-
-    // Point to required set of 6 params
-    if (top)
-        savedSExpr = savedSExpr->get(1)->find("Top");
-    else
-        savedSExpr = savedSExpr->get(1)->find("Bottom");
-
-    if (color == VISION_WHITE)                              // White
-        savedSExpr = savedSExpr->get(1)->find("White");
-    else if (color == VISION_GREEN)                         // Green
-        savedSExpr = savedSExpr->get(1)->find("Green");
-    else                                                    // Orange
-        savedSExpr = savedSExpr->get(1)->find("Orange");
-
-
-    // Build SExpr from params
-    std::vector<SExpr> atoms;
-    for (SExpr s : *(savedSExpr->getList()))
-        atoms.push_back(s);
-
-    return SExpr(atoms);
-}
-
-SExpr treeFromBlob(man::vision::Blob& b)
-{
-    SExpr x(b.centerX());
-    SExpr y(b.centerY());
-    SExpr p = SExpr::list({x, y});
-
-    SExpr center = SExpr::keyValue("center", p);
-    SExpr area = SExpr::keyValue("area", b.area());
-    SExpr count = SExpr::keyValue("count", b.count());
-    SExpr len1 = SExpr::keyValue("len1", b.firstPrincipalLength());
-    SExpr len2 = SExpr::keyValue("len2", b.secondPrincipalLength());
-    SExpr ang1 = SExpr::keyValue("ang1", b.firstPrincipalAngle());
-    SExpr ang2 = SExpr::keyValue("ang2", b.secondPrincipalAngle());
-    SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
-
-    return toRet;
-}
-
-SExpr treeFromBall(man::vision::Ball& b)
-{
-    SExpr x(b.x_rel);
-    SExpr y(b.y_rel);
-    SExpr p = SExpr::list({x, y});
-    SExpr bl = treeFromBlob(b.getBlob());
-
-    SExpr rel = SExpr::keyValue("rel", p);
-    SExpr blob = SExpr::keyValue("blob", bl);
-    SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
-    SExpr toRet = SExpr::list({rel, blob, exDiam});
-
-    return toRet;
-}
-
-void imageSizeCheck(bool top, int width, int height) {
-    if (top) {
-        if (width != 2 * man::vision::DEFAULT_TOP_IMAGE_WIDTH ||
-            height != man::vision::DEFAULT_TOP_IMAGE_HEIGHT ) {
-            printf("WARNING! topCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
-                   width, height);
-        }
-    } else {
-        //bot
-        if ( // 2 / 2 == 1
-            width != man::vision::DEFAULT_TOP_IMAGE_WIDTH ||
-            height != ( man::vision::DEFAULT_TOP_IMAGE_HEIGHT / 2 ) ) {
-            printf("WARNING! botCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
-                   width, height);
-        }
-    }
-}
-
-//robotName may be empty ("").
-std::map<const std::string, man::vision::VisionModule *> vmRefMap;
-
-man::vision::VisionModule& getModuleRef(const std::string robotName) {
-    if (vmRefMap.find(robotName) != vmRefMap.end()) {
-        printf("nbcross-getModuleRef REUSING MODULE [%s]\n",
-               robotName.c_str() );
-        man::vision::VisionModule* module = vmRefMap[robotName];
-        module->reset();
-        return *module;
-
-    } else {
-        printf("nbcross-getModuleRef CREATING NEW MODULE [%s]\n",
-               robotName.c_str() );
-        man::vision::VisionModule * newInst =
-        new man::vision::VisionModule(man::vision::DEFAULT_TOP_IMAGE_WIDTH,
-                                      man::vision::DEFAULT_TOP_IMAGE_HEIGHT, robotName);
-        vmRefMap[robotName] = newInst;
-        return *newInst;
-    }
-}
+#include "Helpers.hpp"
 
 messages::YUVImage emptyTop(
                             man::vision::DEFAULT_TOP_IMAGE_WIDTH * 2,
@@ -197,10 +37,6 @@ messages::YUVImage emptyBot(
                             man::vision::DEFAULT_TOP_IMAGE_WIDTH,
                             man::vision::DEFAULT_TOP_IMAGE_HEIGHT / 2
                             );
-
-void bumpLineFitThreshold(double newVal = 0.70) {
-    man::vision::FIT_THRESH_START = newVal;
-}
 
 /* NBCROSS FUNCTIONS */
 
@@ -231,6 +67,9 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
 
     imageSizeCheck(topCamera, width, height);
 
+    printf("ARGUMENT WAS: camera:%d width:%d height:%d",
+           !topCamera, width, height);
+
 //    messages::YUVImage realImage = imageBlock.copyAsYUVImage();
 //    messages::YUVImage realImage = imageBlock.parseAsYUVImage();
 
@@ -238,10 +77,6 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     messages::YUVImage realImage = imageBlock.copyAsYUVImage(lbuf);
 
     printf("parsed image width=%d, height=%d\n", realImage.width(), realImage.height() );
-
-    // Location of lisp text file with color params
-    std::string sexpPath = std::string(getenv("NBITES_DIR"));
-    sexpPath += "/src/man/config/colorParams.txt";
 
     // Read number of bytes of image, inertials, and joints if exist
     messages::JointAngles joints;
@@ -269,26 +104,41 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
 
     module.jointsIn.setMessage(jointsMessage);
 
-    if (theLog->topLevelDictionary.find("ColorCalibrationParams") !=
-        theLog->topLevelDictionary.end()) {
-        std::string ser = theLog->topLevelDictionary["ColorCalibrationParams"].asString();
+    module.blackStar(false);
 
-        SExpr * deser = SExpr::read(ser);
-        // Set new parameters as frontEnd colorParams
-        man::vision::Colors* c = module.getColorsFromLisp(deser, 2);
-        module.setColorParams(c, topCamera);
-
-        // Look for atom value "SaveParams", i.e. "save" button press
-        if (theLog->topLevelDictionary.find("SaveColorCalibration") !=
-            theLog->topLevelDictionary.end()) {
-            // Save attached parameters to txt file
-            updateSavedColorParams(sexpPath, deser, topCamera);
-        }
-
-        delete deser;
+    if (theLog->topLevelDictionary.find("OriginalCameraOffsets") !=
+        theLog->topLevelDictionary.end() ) {
+        NBL_INFO("using OriginalCameraOffsets");
+        json::Object& offsets = theLog->topLevelDictionary["OriginalCameraOffsets"].asObject();
+        module.setCalibrationParams(man::vision::calibration::parseOffsetsFromJSON(offsets), topCamera);
     }
 
-    if (theLog->blocks.size() > 3) {
+    if (theLog->topLevelDictionary.find("ModifiedCameraOffsets") !=
+        theLog->topLevelDictionary.end()) {
+        NBL_INFO("using ModifiedCameraOffsets");
+        json::Object& offsets = theLog->topLevelDictionary["ModifiedCameraOffsets"].asObject();
+        module.setCalibrationParams(man::vision::calibration::parseOffsetsFromJSON(offsets), topCamera);
+    }
+
+    if (theLog->topLevelDictionary.find("OriginalColorParams") !=
+        theLog->topLevelDictionary.end()) {
+        NBL_INFO("using OriginalColorParams");
+        json::Object& offsets = theLog->topLevelDictionary["OriginalColorParams"].asObject();
+        module.setColorParams(man::vision::calibration::parseColorsFromJSON(offsets), topCamera);
+    }
+
+    if (theLog->topLevelDictionary.find("ModifiedColorParams") !=
+        theLog->topLevelDictionary.end()) {
+        NBL_INFO("using ModifiedColorParams");
+        json::Object& offsets = theLog->topLevelDictionary["ModifiedColorParams"].asObject();
+//        NBL_INFO("ModifiedColorParams object retrieved");
+        module.latestUsedColorParams[!topCamera] = offsets;
+        module.setColorParams(man::vision::calibration::parseColorsFromJSON(offsets), topCamera);
+        NBL_INFO("ModifiedColorParams object parsed");
+    }
+
+    if (theLog->blocks.size() > 3 && theLog->blocks[2].type == SharedConstants::SexprType_DEFAULT()) {
+        NBL_WARN("using camera offsets parameters in LISP FORM (v8.0)");
         SExpr _calParams = theLog->blocks[3].parseAsSexpr();
 
         SExpr* calParams = &_calParams;
@@ -297,14 +147,11 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
             std::cout << "Found and using calibration params in log description: "
             << "Roll: " << calParams->get(1)->valueAsDouble() << " Tilt: " <<  calParams->get(2)->valueAsDouble()<< std::endl;
             man::vision::CalibrationParams* ncp =
-            new man::vision::CalibrationParams(calParams->get(1)->valueAsDouble(),
+                new man::vision::CalibrationParams(calParams->get(1)->valueAsDouble(),
                                                calParams->get(2)->valueAsDouble());
 
             module.setCalibrationParams(ncp, topCamera);
         }
-
-        if (_calParams.recursiveFind("BlackStar").size() > 0)
-            module.blackStar(true);
     }
 
     if (theLog->topLevelDictionary.find("DebugDrawing") !=
@@ -320,7 +167,6 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     module.run();
 
     std::vector<Block> retVec;
-    json::Object retKeys;
     // -----------
     //   Y IMAGE
     // -----------
@@ -341,7 +187,8 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     // ---------------
     int whiteLength = (width / 4) * (height / 2);
     json::Object whiteDictionary;
-    whiteDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_WHITE, sexpPath, topCamera).serialize());
+    //    whiteDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_WHITE, sexpPath, topCamera).serialize());
+    whiteDictionary["ColorParams"] = module.latestUsedColorParams[!topCamera]["white"];
     retVec.push_back(Block{std::string{ (const char *) frontEnd->whiteImage().pixelAddr(), whiteLength}, whiteDictionary, "whiteRet", "nbcross", 0, 0});
 
     // ---------------
@@ -350,7 +197,8 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
 
     int greenLength = (width / 4) * (height / 2);
     json::Object greenDictionary;
-    greenDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_GREEN, sexpPath, topCamera).serialize());
+    //    greenDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_GREEN, sexpPath, topCamera).serialize());
+    greenDictionary["ColorParams"] = module.latestUsedColorParams[!topCamera]["green"];
     retVec.push_back(Block{std::string{ (const char *)  (const char *)frontEnd->greenImage().pixelAddr(), greenLength}, greenDictionary, "greenRet", "nbcross", 0, 0});
 
     // ----------------
@@ -358,7 +206,8 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     // ----------------
     int orangeLength = (width / 4) * (height / 2);
     json::Object orangeDictionary;
-    orangeDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_ORANGE, sexpPath, topCamera).serialize());
+    //    orangeDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_ORANGE, sexpPath, topCamera).serialize());
+    orangeDictionary["ColorParams"] = module.latestUsedColorParams[!topCamera]["orange"];
     retVec.push_back(Block{std::string{ (const char *) frontEnd->orangeImage().pixelAddr(), orangeLength}, orangeDictionary, "orangeRet", "nbcross", 0, 0});
 
     //-------------------
@@ -493,29 +342,64 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     //-----------
     //  BALL
     //-----------
+//    man::vision::BallDetector* detector = module.getBallDetector(topCamera);
+//    std::vector<man::vision::Ball> balls = detector->getBalls();
+//
+//    SExpr allBalls;
+//    int count = 0;
+//    for (auto i=balls.begin(); i!=balls.end(); i++) {
+//        SExpr ballTree = treeFromBall(*i, width, height);
+//        SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
+//        allBalls.append(next);
+//        count++;
+//    }
+//    count = 0;
+//    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
+//        if ((*i).firstPrincipalLength() < 8) {
+//            SExpr blobTree = treeFromBlob(*i);
+//            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
+//            allBalls.append(next);
+//            count++;
+//        }
+//    }
+
     man::vision::BallDetector* detector = module.getBallDetector(topCamera);
+
     std::vector<man::vision::Ball> balls = detector->getBalls();
-    std::list<man::vision::Blob> blobs = detector->getBlobber()->blobs;
+	std::vector<man::vision::Spot> whiteSpots = detector->getWhiteSpots();
+	std::vector<man::vision::Spot> blackSpots = detector->getBlackSpots();
 
     SExpr allBalls;
+	SExpr allWhite;
+	SExpr allBlack;
     int count = 0;
     for (auto i=balls.begin(); i!=balls.end(); i++) {
-        SExpr ballTree = treeFromBall(*i);
+        SExpr ballTree = treeFromBall(*i, width, height);
         SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
         allBalls.append(next);
         count++;
     }
-    count = 0;
-    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
-        if ((*i).firstPrincipalLength() < 8) {
-            SExpr blobTree = treeFromBlob(*i);
-            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
-            allBalls.append(next);
-            count++;
-        }
+	count = 0;
+    for (auto i=whiteSpots.begin(); i!=whiteSpots.end(); i++) {
+        SExpr spotTree = treeFromSpot(*i, width, height);
+        SExpr next = SExpr::keyValue("whiteSpot" + std::to_string(count), spotTree);
+        allWhite.append(next);
+        count++;
+    }
+	count = 0;
+    for (auto i=blackSpots.begin(); i!=blackSpots.end(); i++) {
+        SExpr spotTree = treeFromSpot(*i, width, height);
+        SExpr next = SExpr::keyValue("darkSpot" + std::to_string(count), spotTree);
+        allBlack.append(next);
+        count++;
     }
 
-    retVec.push_back(Block{allBalls.serialize(), json::Object{}, SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-ball", 0, 0});
+    retVec.push_back(Block{allBalls.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-ball", 0, 0});
+    retVec.push_back(Block{allWhite.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-spot-white", 0, 0});
+    retVec.push_back(Block{allBlack.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-spot-black", 0, 0});
 
     //---------------
     // Center Circle
@@ -547,12 +431,7 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     int debugImageLength = (width / 2) * (height / 2);
     retVec.push_back(Block{ std::string{ (const char *) module.getDebugImage(topCamera)->pixArray(), debugImageLength}, json::Object{}, "debugImage", "nbcross", 0, 0});
 
-    if (theLog->topLevelDictionary.find("BallTest_Balls") !=
-                theLog->topLevelDictionary.end()) {
-        retKeys["BallTest_Balls"] = theLog->topLevelDictionary["BallTest_Balls"];
-    }
-
-    RETURN(Log::explicitLog(retVec, retKeys, "VisionReturn"));
+    RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));
 }
 
 NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tripoint())
@@ -565,7 +444,7 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
     double totalR = 0;
     double totalT = 0;
 
-    man::vision::VisionModule& module = getModuleRef("");
+    man::vision::VisionModule& module = getModuleRef("none");
 
     for (logptr tripointLog : arguments) {
         module.reset();
@@ -590,17 +469,8 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
 
         imageSizeCheck(topCamera, width, height);
 
-        //    messages::YUVImage realImage = imageBlock.copyAsYUVImage();
-        //    messages::YUVImage realImage = imageBlock.parseAsYUVImage();
-
         std::string lbuf;
         messages::YUVImage realImage = imageBlock.copyAsYUVImage(lbuf);
-
-//        printf("parsed image width=%d, height=%d\n", realImage.width(), realImage.height() );
-
-        // Location of lisp text file with color params
-        std::string sexpPath = std::string(getenv("NBITES_DIR"));
-        sexpPath += "/src/man/config/colorParams.txt";
 
         // Read number of bytes of image, inertials, and joints if exist
         messages::JointAngles joints;
@@ -629,6 +499,11 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
         
         // Run it!
         module.run();
+
+        NBL_ASSERT_EQ(module.calibrationParams[0]->getRoll(), 0.0);
+        NBL_ASSERT_EQ(module.calibrationParams[1]->getRoll(), 0.0);
+        NBL_ASSERT_EQ(module.calibrationParams[0]->getTilt(), 0.0);
+        NBL_ASSERT_EQ(module.calibrationParams[1]->getTilt(), 0.0);
 
         man::vision::FieldHomography* fh = module.getFieldHomography(topCamera);
         man::vision::HoughLineList* lineList = module.getHoughLines(topCamera);
@@ -677,7 +552,7 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
 }
 
 NBCROSS_FUNCTION(CheckCameraOffsets, false, nbl::SharedConstants::LogClass_Tripoint())
-(const std::vector<nbl::logptr> &arguments)
+            (const std::vector<nbl::logptr> &arguments)
 {
     printf("CheckCameraOffsets()\n");
     NBL_ASSERT(arguments.size() == 1);
@@ -712,10 +587,6 @@ NBCROSS_FUNCTION(CheckCameraOffsets, false, nbl::SharedConstants::LogClass_Tripo
 
     printf("parsed image width=%d, height=%d\n", realImage.width(), realImage.height() );
 
-    // Location of lisp text file with color params
-    std::string sexpPath = std::string(getenv("NBITES_DIR"));
-    sexpPath += "/src/man/config/colorParams.txt";
-
     // Read number of bytes of image, inertials, and joints if exist
     messages::JointAngles joints;
     jointsBlock.parseAsProtobuf(joints);
@@ -741,44 +612,6 @@ NBCROSS_FUNCTION(CheckCameraOffsets, false, nbl::SharedConstants::LogClass_Tripo
     }
 
     module.jointsIn.setMessage(jointsMessage);
-
-//    if (theLog->topLevelDictionary.find("ColorCalibrationParams") !=
-//        theLog->topLevelDictionary.end()) {
-//        std::string ser = theLog->topLevelDictionary["ColorCalibrationParams"].asString();
-//
-//        SExpr * deser = SExpr::read(ser);
-//        // Set new parameters as frontEnd colorParams
-//        man::vision::Colors* c = module.getColorsFromLisp(deser, 2);
-//        module.setColorParams(c, topCamera);
-//
-//        // Look for atom value "SaveParams", i.e. "save" button press
-//        if (theLog->topLevelDictionary.find("SaveColorCalibration") !=
-//            theLog->topLevelDictionary.end()) {
-//            // Save attached parameters to txt file
-//            updateSavedColorParams(sexpPath, deser, topCamera);
-//        }
-//
-//        delete deser;
-//    }
-//
-//    if (theLog->blocks.size() > 3) {
-//        SExpr _calParams = theLog->blocks[3].parseAsSexpr();
-//
-//        SExpr* calParams = &_calParams;
-//        calParams = topCamera ? calParams->find("camera_TOP") : calParams->find("camera_BOT");
-//        if (calParams != NULL) {
-//            std::cout << "Found and using calibration params in log description: "
-//            << "Roll: " << calParams->get(1)->valueAsDouble() << " Tilt: " <<  calParams->get(2)->valueAsDouble()<< std::endl;
-//            man::vision::CalibrationParams* ncp =
-//            new man::vision::CalibrationParams(calParams->get(1)->valueAsDouble(),
-//                                               calParams->get(2)->valueAsDouble());
-//
-//            module.setCalibrationParams(ncp, topCamera);
-//        }
-//
-//        if (_calParams.recursiveFind("BlackStar").size() > 0)
-//        module.blackStar(true);
-//    }
 
     module.blackStar(true);
 
@@ -809,7 +642,8 @@ NBCROSS_FUNCTION(CheckCameraOffsets, false, nbl::SharedConstants::LogClass_Tripo
     // ---------------
     int whiteLength = (width / 4) * (height / 2);
     json::Object whiteDictionary;
-    whiteDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_WHITE, sexpPath, topCamera).serialize());
+//    whiteDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_WHITE, sexpPath, topCamera).serialize());
+    whiteDictionary["ColorParams"] = module.latestUsedColorParams[!topCamera]["white"];
     retVec.push_back(Block{std::string{ (const char *) frontEnd->whiteImage().pixelAddr(), whiteLength}, whiteDictionary, "whiteRet", "nbcross", 0, 0});
 
     // ---------------
@@ -818,7 +652,8 @@ NBCROSS_FUNCTION(CheckCameraOffsets, false, nbl::SharedConstants::LogClass_Tripo
 
     int greenLength = (width / 4) * (height / 2);
     json::Object greenDictionary;
-    greenDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_GREEN, sexpPath, topCamera).serialize());
+//    greenDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_GREEN, sexpPath, topCamera).serialize());
+    greenDictionary["ColorParams"] = module.latestUsedColorParams[!topCamera]["green"];
     retVec.push_back(Block{std::string{ (const char *)  (const char *)frontEnd->greenImage().pixelAddr(), greenLength}, greenDictionary, "greenRet", "nbcross", 0, 0});
 
     // ----------------
@@ -826,7 +661,8 @@ NBCROSS_FUNCTION(CheckCameraOffsets, false, nbl::SharedConstants::LogClass_Tripo
     // ----------------
     int orangeLength = (width / 4) * (height / 2);
     json::Object orangeDictionary;
-    orangeDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_ORANGE, sexpPath, topCamera).serialize());
+//    orangeDictionary["ColorParams"] = json::String(getSExprFromSavedParams(VISION_ORANGE, sexpPath, topCamera).serialize());
+    orangeDictionary["ColorParams"] = module.latestUsedColorParams[!topCamera]["orange"];
     retVec.push_back(Block{std::string{ (const char *) frontEnd->orangeImage().pixelAddr(), orangeLength}, orangeDictionary, "orangeRet", "nbcross", 0, 0});
 
     //-------------------

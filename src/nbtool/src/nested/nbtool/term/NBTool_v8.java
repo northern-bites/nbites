@@ -44,14 +44,6 @@ public class NBTool_v8 {
 				ToolSettings.VERSION, ToolSettings.MINOR_VERSION);
 		
 		parse_args(args);
-		Debug.lbreak();
-		
-		if (run_tests) {
-			Tests.findAllTests();
-			if (!Tests.runAll()) {
-				System.exit(-1);
-			}
-		}
 		
 		//Very likely other portions of the code will register listeners, so
 		//manually start the center first.
@@ -79,7 +71,14 @@ public class NBTool_v8 {
 		ClassFinder.callAllInstancesOfStaticMethod(ToolSettings.staticRequiredStartMethodName);
 		Debug.print("Static init done.");
 		
+		Debug.lbreak();
 		
+		if (run_tests) {
+			Tests.findAllTests();
+			if (!Tests.runAll()) {
+				System.exit(-1);
+			}
+		}
 		
 		GlobalKeyBind.setupKeyBinds();
 		

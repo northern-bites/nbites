@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisualDetectionOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.VisualDetection)
-    com.google.protobuf.MessageOrBuilder {
+public interface VisualDetectionOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float distance = 1;
   /**
    * <code>optional float distance = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface VisualDetectionOrBuilder extends
    */
   float getDistance();
 
+  // optional float bearing = 2;
   /**
    * <code>optional float bearing = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface VisualDetectionOrBuilder extends
    */
   float getBearing();
 
+  // optional float bearing_deg = 3;
   /**
    * <code>optional float bearing_deg = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface VisualDetectionOrBuilder extends
    */
   float getBearingDeg();
 
+  // optional float distance_sd = 4;
   /**
    * <code>optional float distance_sd = 4;</code>
    */
@@ -43,6 +46,7 @@ public interface VisualDetectionOrBuilder extends
    */
   float getDistanceSd();
 
+  // optional float bearing_sd = 5;
   /**
    * <code>optional float bearing_sd = 5;</code>
    */
@@ -52,6 +56,7 @@ public interface VisualDetectionOrBuilder extends
    */
   float getBearingSd();
 
+  // optional int32 certainty = 6;
   /**
    * <code>optional int32 certainty = 6;</code>
    */
@@ -61,6 +66,7 @@ public interface VisualDetectionOrBuilder extends
    */
   int getCertainty();
 
+  // optional bool on = 7;
   /**
    * <code>optional bool on = 7;</code>
    */
@@ -70,6 +76,7 @@ public interface VisualDetectionOrBuilder extends
    */
   boolean getOn();
 
+  // optional int32 frames_on = 8;
   /**
    * <code>optional int32 frames_on = 8;</code>
    */
@@ -79,6 +86,7 @@ public interface VisualDetectionOrBuilder extends
    */
   int getFramesOn();
 
+  // optional int32 frames_off = 9;
   /**
    * <code>optional int32 frames_off = 9;</code>
    */
@@ -88,6 +96,7 @@ public interface VisualDetectionOrBuilder extends
    */
   int getFramesOff();
 
+  // repeated .messages.Point concrete_coords = 10;
   /**
    * <code>repeated .messages.Point concrete_coords = 10;</code>
    */
@@ -112,6 +121,7 @@ public interface VisualDetectionOrBuilder extends
   messages.PointOrBuilder getConcreteCoordsOrBuilder(
       int index);
 
+  // optional float angle_x_deg = 11;
   /**
    * <code>optional float angle_x_deg = 11;</code>
    */
@@ -121,6 +131,7 @@ public interface VisualDetectionOrBuilder extends
    */
   float getAngleXDeg();
 
+  // optional float angle_y_deg = 12;
   /**
    * <code>optional float angle_y_deg = 12;</code>
    */
@@ -130,6 +141,7 @@ public interface VisualDetectionOrBuilder extends
    */
   float getAngleYDeg();
 
+  // optional bool red_goalie = 13;
   /**
    * <code>optional bool red_goalie = 13;</code>
    *
@@ -147,6 +159,7 @@ public interface VisualDetectionOrBuilder extends
    */
   boolean getRedGoalie();
 
+  // optional bool navy_goalie = 14;
   /**
    * <code>optional bool navy_goalie = 14;</code>
    */
@@ -156,6 +169,7 @@ public interface VisualDetectionOrBuilder extends
    */
   boolean getNavyGoalie();
 
+  // optional bool intopcam = 15;
   /**
    * <code>optional bool intopcam = 15;</code>
    */
@@ -165,6 +179,7 @@ public interface VisualDetectionOrBuilder extends
    */
   boolean getIntopcam();
 
+  // optional int32 x = 17;
   /**
    * <code>optional int32 x = 17;</code>
    */
@@ -174,6 +189,7 @@ public interface VisualDetectionOrBuilder extends
    */
   int getX();
 
+  // optional int32 y = 18;
   /**
    * <code>optional int32 y = 18;</code>
    */

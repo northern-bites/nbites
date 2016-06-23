@@ -17,7 +17,7 @@ public class ToolSettings {
 	public static final String staticRequiredStartMethodName = "_NBL_REQUIRED_START_";
 	
 	public static final int VERSION = 8;
-	public static final int MINOR_VERSION = 0;
+	public static final int MINOR_VERSION = 1;
 	
 	public static final int NBITES_TEAM_NUM = 14;
 		

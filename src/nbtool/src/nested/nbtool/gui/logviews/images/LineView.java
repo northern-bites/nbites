@@ -1,39 +1,36 @@
 package nbtool.gui.logviews.images;
 
-import java.awt.Graphics;
 import java.awt.Color;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseListener;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
-import nbtool.data.SExpr;
+import nbtool.data.calibration.ColorParam;
+import nbtool.data.calibration.ColorParam.Set;
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
-import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.misc.VisionView;
+import nbtool.gui.utilitypanes.ColorCalibrationListener;
+import nbtool.gui.utilitypanes.UtilityManager;
+import nbtool.gui.utilitypanes.UtilityProvider;
 import nbtool.images.EdgeImage;
-import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
-import nbtool.nio.CrossServer;
-import nbtool.nio.CrossServer.CrossInstance;
 import nbtool.util.Debug;
-import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
 
-public class LineView extends VisionView {
-	
+public class LineView extends VisionView implements ColorCalibrationListener {
+
 	private static final Debug.DebugSettings debug = Debug.createSettings(true, true, true, null, null);
-    
+
     int width;
     int height;
-    
+
     int displayw;
     int displayh;
 
@@ -43,13 +40,13 @@ public class LineView extends VisionView {
     final int buffer = 5;
 
     double resize = 1;
-    
+
     // Starting size. The larger the number, the smaller the field ratio
     final int startSize = 1;
 
     boolean click = false;
     boolean drag = false;
-    
+
     // Click and release values
     int clickX1 = 0;
     int clickY1 = 0;
@@ -61,14 +58,14 @@ public class LineView extends VisionView {
     int fy0;
 
     // Center of field cordinate system
-    int fxc = displayw + buffer + fieldw/2; 
+    int fxc = displayw + buffer + fieldw/2;
     int fyc = fieldh;
-    
+
     BufferedImage originalImage;
     BufferedImage edgeImage;
     Vector<Double> lines;
     Vector<Double> ccPoints;
-    
+
     @Override
 	protected void setupVisionDisplay() {
     	width = this.originalWidth();
@@ -80,17 +77,35 @@ public class LineView extends VisionView {
         fx0 = displayw + buffer;
         fy0 = 0;
 
-        fxc = displayw + buffer + fieldw/2; 
+        fxc = displayw + buffer + fieldw/2;
         fyc = fieldh;
 
         originalImage = this.getOriginal().toBufferedImage();
+
+        /* add this line to constructor or setup*() */
+        UtilityManager.ColorCalibrationUtility.listen(this);
 	}
 
-    public void paintComponent(Graphics g) {
-        if (edgeImage != null) { 
+    /* this is called when stuff is changed */
+    @Override
+	public void utilityChanged(UtilityProvider<Set, ?> who, Set what) {
+    	displayedLog = displayedLog.deepCopy();
+		ColorParam.applyTo(displayedLog, what.get(Utility.camera(displayedLog)));
+		callVision();
+	}
+
+    /* this line removes the listener when the view goes away */
+    @Override
+    public void disappearing() {
+    	UtilityManager.ColorCalibrationUtility.stopListening(this);
+    }
+
+    @Override
+	public void paintComponent(Graphics g) {
+        if (edgeImage != null) {
             g.drawImage(originalImage, 0, 0, displayw, displayh, null);
             g.drawImage(edgeImage, 0, displayh + buffer, displayw, displayh, null);
-            
+
 
             g.setColor(new Color(90, 130, 90));
             g.fillRect(displayw + buffer, 0, fieldw, fieldh);
@@ -135,7 +150,7 @@ public class LineView extends VisionView {
 
                 g.drawLine(x1, y1, x2, y2);
 
-                // Image view line labels 
+                // Image view line labels
                 double xstring = (x1 + x2) / 2;
                 double ystring = (y1 + y2) / 2;
 
@@ -147,8 +162,8 @@ public class LineView extends VisionView {
                 xstring += scale*Math.cos(icT);
                 ystring += scale*Math.sin(icT);
 
-                g.drawString(Integer.toString((int) houghIndex) + "/" + Integer.toString((int) fieldIndex), 
-                             (int) xstring, 
+                g.drawString(Integer.toString((int) houghIndex) + "/" + Integer.toString((int) fieldIndex),
+                             (int) xstring,
                              (int) ystring);
 
 
@@ -176,7 +191,7 @@ public class LineView extends VisionView {
                 //     lines.set(i+4, -1.0);
                 // }
             }
-            
+
             List<Double> drawn = new ArrayList<Double>();
 
             // Loop through again to draw lines in field space with calucluated resize value
@@ -221,7 +236,7 @@ public class LineView extends VisionView {
             if (click && clickX1 > fx0 && clickX1 < fx0+fieldw && clickY1 < fieldh) {
                 g.drawLine(fxc, fyc, clickX1, clickY1);
                 double distanceCM = Math.sqrt((clickX1-fxc)*(clickX1-fxc) + (clickY1-fyc)*(clickY1-fyc));
-                distanceCM *= (1.0/(double)startSize)*(1/resize);
+                distanceCM *= (1.0/startSize)*(1/resize);
                 g.drawString(Double.toString((double)Math.round(distanceCM* 1000)/1000) + "cm",
                     (fxc+clickX1)/2 + 5, (fyc+clickY1)/2);
                 click = false;
@@ -242,7 +257,7 @@ public class LineView extends VisionView {
 
 
             /*
-                Uncomment to show center circle potentials and estimation. The last point is the 
+                Uncomment to show center circle potentials and estimation. The last point is the
                 CenterCircleDetectors guess. Also comment out resizing and set startSize to 1 for
                 proper scale.
             */
@@ -252,7 +267,7 @@ public class LineView extends VisionView {
             g.setColor(Color.black);
             for (int i = 0; i < ccPoints.size() - 2; i += 2)
                 g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
-            
+
             // Last point is predicted center circle center!
             if (ccPoints.size() > 1) {
                 if (ccPoints.get(ccPoints.size()-2) != 0 || ccPoints.get(ccPoints.size() - 1) != 0) {
@@ -262,7 +277,7 @@ public class LineView extends VisionView {
             }
         }
     }
-    
+
     public LineView() {
         super();
         setLayout(null);
@@ -273,19 +288,22 @@ public class LineView extends VisionView {
 
     class DistanceGetter implements MouseListener {
 
-      public void mouseClicked(MouseEvent e) {
+      @Override
+	public void mouseClicked(MouseEvent e) {
         clickX1 = e.getX();
         clickY1 = e.getY();
         click = true;
         repaint();
       }
 
-      public void mousePressed(MouseEvent e) {
+      @Override
+	public void mousePressed(MouseEvent e) {
         clickX1 = e.getX();
         clickY1 = e.getY();
       }
 
-      public void mouseReleased(MouseEvent e) {
+      @Override
+	public void mouseReleased(MouseEvent e) {
         clickX2 = e.getX();
         clickY2 = e.getY();
         if (clickX1 != clickX2 || clickY1 != clickY2) {
@@ -294,9 +312,11 @@ public class LineView extends VisionView {
         }
       }
 
-      public void mouseEntered(MouseEvent e) {}
+      @Override
+	public void mouseEntered(MouseEvent e) {}
 
-      public void mouseExited(MouseEvent e) {}
+      @Override
+	public void mouseExited(MouseEvent e) {}
     }
 
     @Override
@@ -305,7 +325,7 @@ public class LineView extends VisionView {
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
     	assert(out[0] == latestVisionLog);
-    	
+
     	Block edgeBlock, lineBlock, ccdBlock;
     	edgeBlock = this.getEdgeBlock();
     	if (edgeBlock != null) {
@@ -316,7 +336,7 @@ public class LineView extends VisionView {
 
         // TODO refactor. Protobuf?
         lines = new Vector<Double>();
-        
+
         lineBlock = this.getLineBlock();
         if (lineBlock != null) {
     		debug.info("found lineBlock");
@@ -343,8 +363,8 @@ public class LineView extends VisionView {
                 e.printStackTrace();
             }
         }
-        
-        
+
+
 
         ccPoints = new Vector<Double>();
         ccdBlock = this.getCCDBlock();
@@ -362,7 +382,7 @@ public class LineView extends VisionView {
                 e.printStackTrace();
             }
         }
-                
+
         repaint();
     }
 }

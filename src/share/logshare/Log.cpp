@@ -94,6 +94,11 @@ namespace nbl {
 
         NBL_CREATE_CONSTANT_METHOD(ROBOT_LOG_PATH_PREFIX)
 
+        NBL_CREATE_CONSTANT_METHOD(ONLINE_CAMERA_OFFSET_PATH)
+        NBL_CREATE_CONSTANT_METHOD(ONLINE_COLOR_PARAMS_PATH)
+        NBL_CREATE_CONSTANT_METHOD(OFFLINE_CAMERA_OFFSET_SUFFIX)
+        NBL_CREATE_CONSTANT_METHOD(OFFLINE_COLOR_PARAMS_SUFFIX)
+
         NBL_CREATE_CONSTANT_METHOD(LOG_TOPLEVEL_MAGIC_KEY)
 
         NBL_CREATE_CONSTANT_METHOD(LOG_TOPLEVEL_BLOCKS)
@@ -202,11 +207,22 @@ namespace nbl {
     };
 #undef NBL_HOST_TYPE_SET_M
 
-    void configTopLevelLogAttrs(host_type_e ht, std::string hn) {
+    void configTopLevelLogAttrs(host_type_e ht, std::string hn_uncropped) {
+
+        std::string hn_cropped;
+        size_t dot_local_pos = hn_uncropped.find(".local");
+
+        if (dot_local_pos != std::string::npos) {
+            hn_cropped = hn_uncropped.substr(0, dot_local_pos);
+        } else {
+            hn_cropped = hn_uncropped;
+        }
+
         NBL_PRINT("HOST_TYPE=%s HOST_NAME=%s",
-                  HOST_TYPE_S[ht], hn.c_str() );
+                  HOST_TYPE_S[ht], hn_cropped.c_str() );
+
         HOST_TYPE = ht;
-        HOST_NAME = hn;
+        HOST_NAME = hn_cropped;
     }
 
 #define ADD_BLOCK_FAIL_IF(cond, msg, ...)    \

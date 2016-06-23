@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.MotionCommand}
  */
-public final class MotionCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.MotionCommand)
-    MotionCommandOrBuilder {
+public  final class MotionCommand extends
+    com.google.protobuf.GeneratedMessage
+    implements MotionCommandOrBuilder {
   // Use MotionCommand.newBuilder() to construct.
   private MotionCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -118,8 +117,21 @@ public final class MotionCommand extends
             bitField0_ |= 0x00000010;
             break;
           }
-          case 48: {
+          case 50: {
+            messages.Kick.Builder subBuilder = null;
+            if (((bitField0_ & 0x00000020) == 0x00000020)) {
+              subBuilder = kick_.toBuilder();
+            }
+            kick_ = input.readMessage(messages.Kick.PARSER, extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(kick_);
+              kick_ = subBuilder.buildPartial();
+            }
             bitField0_ |= 0x00000020;
+            break;
+          }
+          case 56: {
+            bitField0_ |= 0x00000040;
             timestamp_ = input.readInt64();
             break;
           }
@@ -183,6 +195,10 @@ public final class MotionCommand extends
      * <code>ODOMETRY_WALK = 3;</code>
      */
     ODOMETRY_WALK(3, 3),
+    /**
+     * <code>KICK = 4;</code>
+     */
+    KICK(4, 4),
     ;
 
     /**
@@ -201,6 +217,10 @@ public final class MotionCommand extends
      * <code>ODOMETRY_WALK = 3;</code>
      */
     public static final int ODOMETRY_WALK_VALUE = 3;
+    /**
+     * <code>KICK = 4;</code>
+     */
+    public static final int KICK_VALUE = 4;
 
 
     public final int getNumber() { return value; }
@@ -211,6 +231,7 @@ public final class MotionCommand extends
         case 1: return WALK_COMMAND;
         case 2: return SCRIPTED_MOVE;
         case 3: return ODOMETRY_WALK;
+        case 4: return KICK;
         default: return null;
       }
     }
@@ -263,6 +284,7 @@ public final class MotionCommand extends
   }
 
   private int bitField0_;
+  // optional .messages.MotionCommand.CommandType type = 1;
   public static final int TYPE_FIELD_NUMBER = 1;
   private messages.MotionCommand.CommandType type_;
   /**
@@ -278,6 +300,7 @@ public final class MotionCommand extends
     return type_;
   }
 
+  // optional .messages.ScriptedMove script = 2;
   public static final int SCRIPT_FIELD_NUMBER = 2;
   private messages.ScriptedMove script_;
   /**
@@ -299,6 +322,7 @@ public final class MotionCommand extends
     return script_;
   }
 
+  // optional .messages.DestinationWalk dest = 3;
   public static final int DEST_FIELD_NUMBER = 3;
   private messages.DestinationWalk dest_;
   /**
@@ -320,6 +344,7 @@ public final class MotionCommand extends
     return dest_;
   }
 
+  // optional .messages.WalkCommand speed = 4;
   public static final int SPEED_FIELD_NUMBER = 4;
   private messages.WalkCommand speed_;
   /**
@@ -341,6 +366,7 @@ public final class MotionCommand extends
     return speed_;
   }
 
+  // optional .messages.OdometryWalk odometry_dest = 5;
   public static final int ODOMETRY_DEST_FIELD_NUMBER = 5;
   private messages.OdometryWalk odometryDest_;
   /**
@@ -362,16 +388,39 @@ public final class MotionCommand extends
     return odometryDest_;
   }
 
-  public static final int TIMESTAMP_FIELD_NUMBER = 6;
-  private long timestamp_;
+  // optional .messages.Kick kick = 6;
+  public static final int KICK_FIELD_NUMBER = 6;
+  private messages.Kick kick_;
   /**
-   * <code>optional int64 timestamp = 6;</code>
+   * <code>optional .messages.Kick kick = 6;</code>
    */
-  public boolean hasTimestamp() {
+  public boolean hasKick() {
     return ((bitField0_ & 0x00000020) == 0x00000020);
   }
   /**
-   * <code>optional int64 timestamp = 6;</code>
+   * <code>optional .messages.Kick kick = 6;</code>
+   */
+  public messages.Kick getKick() {
+    return kick_;
+  }
+  /**
+   * <code>optional .messages.Kick kick = 6;</code>
+   */
+  public messages.KickOrBuilder getKickOrBuilder() {
+    return kick_;
+  }
+
+  // optional int64 timestamp = 7;
+  public static final int TIMESTAMP_FIELD_NUMBER = 7;
+  private long timestamp_;
+  /**
+   * <code>optional int64 timestamp = 7;</code>
+   */
+  public boolean hasTimestamp() {
+    return ((bitField0_ & 0x00000040) == 0x00000040);
+  }
+  /**
+   * <code>optional int64 timestamp = 7;</code>
    */
   public long getTimestamp() {
     return timestamp_;
@@ -383,13 +432,13 @@ public final class MotionCommand extends
     dest_ = messages.DestinationWalk.getDefaultInstance();
     speed_ = messages.WalkCommand.getDefaultInstance();
     odometryDest_ = messages.OdometryWalk.getDefaultInstance();
+    kick_ = messages.Kick.getDefaultInstance();
     timestamp_ = 0L;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -414,7 +463,10 @@ public final class MotionCommand extends
       output.writeMessage(5, odometryDest_);
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      output.writeInt64(6, timestamp_);
+      output.writeMessage(6, kick_);
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      output.writeInt64(7, timestamp_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -447,7 +499,11 @@ public final class MotionCommand extends
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(6, timestamp_);
+        .computeMessageSize(6, kick_);
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(7, timestamp_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -531,9 +587,8 @@ public final class MotionCommand extends
    * Protobuf type {@code messages.MotionCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.MotionCommand)
-      messages.MotionCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.MotionCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_MotionCommand_descriptor;
@@ -562,6 +617,7 @@ public final class MotionCommand extends
         getDestFieldBuilder();
         getSpeedFieldBuilder();
         getOdometryDestFieldBuilder();
+        getKickFieldBuilder();
       }
     }
     private static Builder create() {
@@ -596,8 +652,14 @@ public final class MotionCommand extends
         odometryDestBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000010);
-      timestamp_ = 0L;
+      if (kickBuilder_ == null) {
+        kick_ = messages.Kick.getDefaultInstance();
+      } else {
+        kickBuilder_.clear();
+      }
       bitField0_ = (bitField0_ & ~0x00000020);
+      timestamp_ = 0L;
+      bitField0_ = (bitField0_ & ~0x00000040);
       return this;
     }
 
@@ -665,6 +727,14 @@ public final class MotionCommand extends
       if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
         to_bitField0_ |= 0x00000020;
       }
+      if (kickBuilder_ == null) {
+        result.kick_ = kick_;
+      } else {
+        result.kick_ = kickBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+        to_bitField0_ |= 0x00000040;
+      }
       result.timestamp_ = timestamp_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
@@ -697,6 +767,9 @@ public final class MotionCommand extends
       if (other.hasOdometryDest()) {
         mergeOdometryDest(other.getOdometryDest());
       }
+      if (other.hasKick()) {
+        mergeKick(other.getKick());
+      }
       if (other.hasTimestamp()) {
         setTimestamp(other.getTimestamp());
       }
@@ -727,6 +800,7 @@ public final class MotionCommand extends
     }
     private int bitField0_;
 
+    // optional .messages.MotionCommand.CommandType type = 1;
     private messages.MotionCommand.CommandType type_ = messages.MotionCommand.CommandType.DESTINATION_WALK;
     /**
      * <code>optional .messages.MotionCommand.CommandType type = 1;</code>
@@ -762,6 +836,7 @@ public final class MotionCommand extends
       return this;
     }
 
+    // optional .messages.ScriptedMove script = 2;
     private messages.ScriptedMove script_ = messages.ScriptedMove.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ScriptedMove, messages.ScriptedMove.Builder, messages.ScriptedMoveOrBuilder> scriptBuilder_;
@@ -870,7 +945,7 @@ public final class MotionCommand extends
       if (scriptBuilder_ == null) {
         scriptBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ScriptedMove, messages.ScriptedMove.Builder, messages.ScriptedMoveOrBuilder>(
-                getScript(),
+                script_,
                 getParentForChildren(),
                 isClean());
         script_ = null;
@@ -878,6 +953,7 @@ public final class MotionCommand extends
       return scriptBuilder_;
     }
 
+    // optional .messages.DestinationWalk dest = 3;
     private messages.DestinationWalk dest_ = messages.DestinationWalk.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.DestinationWalk, messages.DestinationWalk.Builder, messages.DestinationWalkOrBuilder> destBuilder_;
@@ -986,7 +1062,7 @@ public final class MotionCommand extends
       if (destBuilder_ == null) {
         destBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.DestinationWalk, messages.DestinationWalk.Builder, messages.DestinationWalkOrBuilder>(
-                getDest(),
+                dest_,
                 getParentForChildren(),
                 isClean());
         dest_ = null;
@@ -994,6 +1070,7 @@ public final class MotionCommand extends
       return destBuilder_;
     }
 
+    // optional .messages.WalkCommand speed = 4;
     private messages.WalkCommand speed_ = messages.WalkCommand.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.WalkCommand, messages.WalkCommand.Builder, messages.WalkCommandOrBuilder> speedBuilder_;
@@ -1102,7 +1179,7 @@ public final class MotionCommand extends
       if (speedBuilder_ == null) {
         speedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.WalkCommand, messages.WalkCommand.Builder, messages.WalkCommandOrBuilder>(
-                getSpeed(),
+                speed_,
                 getParentForChildren(),
                 isClean());
         speed_ = null;
@@ -1110,6 +1187,7 @@ public final class MotionCommand extends
       return speedBuilder_;
     }
 
+    // optional .messages.OdometryWalk odometry_dest = 5;
     private messages.OdometryWalk odometryDest_ = messages.OdometryWalk.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.OdometryWalk, messages.OdometryWalk.Builder, messages.OdometryWalkOrBuilder> odometryDestBuilder_;
@@ -1218,7 +1296,7 @@ public final class MotionCommand extends
       if (odometryDestBuilder_ == null) {
         odometryDestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.OdometryWalk, messages.OdometryWalk.Builder, messages.OdometryWalkOrBuilder>(
-                getOdometryDest(),
+                odometryDest_,
                 getParentForChildren(),
                 isClean());
         odometryDest_ = null;
@@ -1226,33 +1304,151 @@ public final class MotionCommand extends
       return odometryDestBuilder_;
     }
 
-    private long timestamp_ ;
+    // optional .messages.Kick kick = 6;
+    private messages.Kick kick_ = messages.Kick.getDefaultInstance();
+    private com.google.protobuf.SingleFieldBuilder<
+        messages.Kick, messages.Kick.Builder, messages.KickOrBuilder> kickBuilder_;
     /**
-     * <code>optional int64 timestamp = 6;</code>
+     * <code>optional .messages.Kick kick = 6;</code>
      */
-    public boolean hasTimestamp() {
+    public boolean hasKick() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional int64 timestamp = 6;</code>
+     * <code>optional .messages.Kick kick = 6;</code>
+     */
+    public messages.Kick getKick() {
+      if (kickBuilder_ == null) {
+        return kick_;
+      } else {
+        return kickBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>optional .messages.Kick kick = 6;</code>
+     */
+    public Builder setKick(messages.Kick value) {
+      if (kickBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        kick_ = value;
+        onChanged();
+      } else {
+        kickBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000020;
+      return this;
+    }
+    /**
+     * <code>optional .messages.Kick kick = 6;</code>
+     */
+    public Builder setKick(
+        messages.Kick.Builder builderForValue) {
+      if (kickBuilder_ == null) {
+        kick_ = builderForValue.build();
+        onChanged();
+      } else {
+        kickBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000020;
+      return this;
+    }
+    /**
+     * <code>optional .messages.Kick kick = 6;</code>
+     */
+    public Builder mergeKick(messages.Kick value) {
+      if (kickBuilder_ == null) {
+        if (((bitField0_ & 0x00000020) == 0x00000020) &&
+            kick_ != messages.Kick.getDefaultInstance()) {
+          kick_ =
+            messages.Kick.newBuilder(kick_).mergeFrom(value).buildPartial();
+        } else {
+          kick_ = value;
+        }
+        onChanged();
+      } else {
+        kickBuilder_.mergeFrom(value);
+      }
+      bitField0_ |= 0x00000020;
+      return this;
+    }
+    /**
+     * <code>optional .messages.Kick kick = 6;</code>
+     */
+    public Builder clearKick() {
+      if (kickBuilder_ == null) {
+        kick_ = messages.Kick.getDefaultInstance();
+        onChanged();
+      } else {
+        kickBuilder_.clear();
+      }
+      bitField0_ = (bitField0_ & ~0x00000020);
+      return this;
+    }
+    /**
+     * <code>optional .messages.Kick kick = 6;</code>
+     */
+    public messages.Kick.Builder getKickBuilder() {
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return getKickFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>optional .messages.Kick kick = 6;</code>
+     */
+    public messages.KickOrBuilder getKickOrBuilder() {
+      if (kickBuilder_ != null) {
+        return kickBuilder_.getMessageOrBuilder();
+      } else {
+        return kick_;
+      }
+    }
+    /**
+     * <code>optional .messages.Kick kick = 6;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        messages.Kick, messages.Kick.Builder, messages.KickOrBuilder> 
+        getKickFieldBuilder() {
+      if (kickBuilder_ == null) {
+        kickBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            messages.Kick, messages.Kick.Builder, messages.KickOrBuilder>(
+                kick_,
+                getParentForChildren(),
+                isClean());
+        kick_ = null;
+      }
+      return kickBuilder_;
+    }
+
+    // optional int64 timestamp = 7;
+    private long timestamp_ ;
+    /**
+     * <code>optional int64 timestamp = 7;</code>
+     */
+    public boolean hasTimestamp() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional int64 timestamp = 7;</code>
      */
     public long getTimestamp() {
       return timestamp_;
     }
     /**
-     * <code>optional int64 timestamp = 6;</code>
+     * <code>optional int64 timestamp = 7;</code>
      */
     public Builder setTimestamp(long value) {
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000040;
       timestamp_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>optional int64 timestamp = 6;</code>
+     * <code>optional int64 timestamp = 7;</code>
      */
     public Builder clearTimestamp() {
-      bitField0_ = (bitField0_ & ~0x00000020);
+      bitField0_ = (bitField0_ & ~0x00000040);
       timestamp_ = 0L;
       onChanged();
       return this;

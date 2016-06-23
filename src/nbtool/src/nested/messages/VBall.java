@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.VBall}
  */
-public final class VBall extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.VBall)
-    VBallOrBuilder {
+public  final class VBall extends
+    com.google.protobuf.GeneratedMessage
+    implements VBallOrBuilder {
   // Use VBall.newBuilder() to construct.
   private VBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -180,6 +179,7 @@ public final class VBall extends
   }
 
   private int bitField0_;
+  // optional double distance = 1;
   public static final int DISTANCE_FIELD_NUMBER = 1;
   private double distance_;
   /**
@@ -195,6 +195,7 @@ public final class VBall extends
     return distance_;
   }
 
+  // optional double bearing = 2;
   public static final int BEARING_FIELD_NUMBER = 2;
   private double bearing_;
   /**
@@ -210,6 +211,7 @@ public final class VBall extends
     return bearing_;
   }
 
+  // optional double angle_x_deg = 3;
   public static final int ANGLE_X_DEG_FIELD_NUMBER = 3;
   private double angleXDeg_;
   /**
@@ -225,6 +227,7 @@ public final class VBall extends
     return angleXDeg_;
   }
 
+  // optional double angle_y_deg = 4;
   public static final int ANGLE_Y_DEG_FIELD_NUMBER = 4;
   private double angleYDeg_;
   /**
@@ -240,6 +243,7 @@ public final class VBall extends
     return angleYDeg_;
   }
 
+  // optional double bearing_sd = 5;
   public static final int BEARING_SD_FIELD_NUMBER = 5;
   private double bearingSd_;
   /**
@@ -255,21 +259,23 @@ public final class VBall extends
     return bearingSd_;
   }
 
-  public static final int INTOPCAM_FIELD_NUMBER = 6;
+  // optional bool in_top_cam = 6;
+  public static final int IN_TOP_CAM_FIELD_NUMBER = 6;
   private boolean inTopCam_;
   /**
-   * <code>optional bool inTopCam = 6;</code>
+   * <code>optional bool in_top_cam = 6;</code>
    */
   public boolean hasInTopCam() {
     return ((bitField0_ & 0x00000020) == 0x00000020);
   }
   /**
-   * <code>optional bool inTopCam = 6;</code>
+   * <code>optional bool in_top_cam = 6;</code>
    */
   public boolean getInTopCam() {
     return inTopCam_;
   }
 
+  // optional double radius = 7;
   public static final int RADIUS_FIELD_NUMBER = 7;
   private double radius_;
   /**
@@ -285,6 +291,7 @@ public final class VBall extends
     return radius_;
   }
 
+  // optional double confidence = 8;
   public static final int CONFIDENCE_FIELD_NUMBER = 8;
   private double confidence_;
   /**
@@ -300,6 +307,7 @@ public final class VBall extends
     return confidence_;
   }
 
+  // optional bool on = 9;
   public static final int ON_FIELD_NUMBER = 9;
   private boolean on_;
   /**
@@ -315,6 +323,7 @@ public final class VBall extends
     return on_;
   }
 
+  // optional sint32 frames_on = 10;
   public static final int FRAMES_ON_FIELD_NUMBER = 10;
   private int framesOn_;
   /**
@@ -330,6 +339,7 @@ public final class VBall extends
     return framesOn_;
   }
 
+  // optional sint32 frames_off = 11;
   public static final int FRAMES_OFF_FIELD_NUMBER = 11;
   private int framesOff_;
   /**
@@ -345,6 +355,7 @@ public final class VBall extends
     return framesOff_;
   }
 
+  // optional double rel_x_variance = 12;
   public static final int REL_X_VARIANCE_FIELD_NUMBER = 12;
   private double relXVariance_;
   /**
@@ -360,6 +371,7 @@ public final class VBall extends
     return relXVariance_;
   }
 
+  // optional double rel_y_variance = 13;
   public static final int REL_Y_VARIANCE_FIELD_NUMBER = 13;
   private double relYVariance_;
   /**
@@ -375,6 +387,7 @@ public final class VBall extends
     return relYVariance_;
   }
 
+  // optional double bearing_deg = 14;
   public static final int BEARING_DEG_FIELD_NUMBER = 14;
   private double bearingDeg_;
   /**
@@ -390,6 +403,7 @@ public final class VBall extends
     return bearingDeg_;
   }
 
+  // optional sint32 x = 15;
   public static final int X_FIELD_NUMBER = 15;
   private int x_;
   /**
@@ -405,6 +419,7 @@ public final class VBall extends
     return x_;
   }
 
+  // optional sint32 y = 16;
   public static final int Y_FIELD_NUMBER = 16;
   private int y_;
   /**
@@ -420,6 +435,7 @@ public final class VBall extends
     return y_;
   }
 
+  // optional float wz0 = 17;
   public static final int WZ0_FIELD_NUMBER = 17;
   private float wz0_;
   /**
@@ -457,8 +473,7 @@ public final class VBall extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -677,9 +692,8 @@ public final class VBall extends
    * Protobuf type {@code messages.VBall}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.VBall)
-      messages.VBallOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.VBallOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Vision.internal_static_messages_VBall_descriptor;
@@ -936,6 +950,7 @@ public final class VBall extends
     }
     private int bitField0_;
 
+    // optional double distance = 1;
     private double distance_ ;
     /**
      * <code>optional double distance = 1;</code>
@@ -968,6 +983,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double bearing = 2;
     private double bearing_ ;
     /**
      * <code>optional double bearing = 2;</code>
@@ -1000,6 +1016,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double angle_x_deg = 3;
     private double angleXDeg_ ;
     /**
      * <code>optional double angle_x_deg = 3;</code>
@@ -1032,6 +1049,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double angle_y_deg = 4;
     private double angleYDeg_ ;
     /**
      * <code>optional double angle_y_deg = 4;</code>
@@ -1064,6 +1082,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double bearing_sd = 5;
     private double bearingSd_ ;
     /**
      * <code>optional double bearing_sd = 5;</code>
@@ -1096,21 +1115,22 @@ public final class VBall extends
       return this;
     }
 
+    // optional bool in_top_cam = 6;
     private boolean inTopCam_ ;
     /**
-     * <code>optional bool inTopCam = 6;</code>
+     * <code>optional bool in_top_cam = 6;</code>
      */
     public boolean hasInTopCam() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional bool inTopCam = 6;</code>
+     * <code>optional bool in_top_cam = 6;</code>
      */
     public boolean getInTopCam() {
       return inTopCam_;
     }
     /**
-     * <code>optional bool inTopCam = 6;</code>
+     * <code>optional bool in_top_cam = 6;</code>
      */
     public Builder setInTopCam(boolean value) {
       bitField0_ |= 0x00000020;
@@ -1119,7 +1139,7 @@ public final class VBall extends
       return this;
     }
     /**
-     * <code>optional bool inTopCam = 6;</code>
+     * <code>optional bool in_top_cam = 6;</code>
      */
     public Builder clearInTopCam() {
       bitField0_ = (bitField0_ & ~0x00000020);
@@ -1128,6 +1148,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double radius = 7;
     private double radius_ ;
     /**
      * <code>optional double radius = 7;</code>
@@ -1160,6 +1181,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double confidence = 8;
     private double confidence_ ;
     /**
      * <code>optional double confidence = 8;</code>
@@ -1192,6 +1214,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional bool on = 9;
     private boolean on_ ;
     /**
      * <code>optional bool on = 9;</code>
@@ -1224,6 +1247,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional sint32 frames_on = 10;
     private int framesOn_ ;
     /**
      * <code>optional sint32 frames_on = 10;</code>
@@ -1256,6 +1280,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional sint32 frames_off = 11;
     private int framesOff_ ;
     /**
      * <code>optional sint32 frames_off = 11;</code>
@@ -1288,6 +1313,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double rel_x_variance = 12;
     private double relXVariance_ ;
     /**
      * <code>optional double rel_x_variance = 12;</code>
@@ -1320,6 +1346,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double rel_y_variance = 13;
     private double relYVariance_ ;
     /**
      * <code>optional double rel_y_variance = 13;</code>
@@ -1352,6 +1379,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional double bearing_deg = 14;
     private double bearingDeg_ ;
     /**
      * <code>optional double bearing_deg = 14;</code>
@@ -1384,6 +1412,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional sint32 x = 15;
     private int x_ ;
     /**
      * <code>optional sint32 x = 15;</code>
@@ -1416,6 +1445,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional sint32 y = 16;
     private int y_ ;
     /**
      * <code>optional sint32 y = 16;</code>
@@ -1448,6 +1478,7 @@ public final class VBall extends
       return this;
     }
 
+    // optional float wz0 = 17;
     private float wz0_ ;
     /**
      * <code>optional float wz0 = 17;</code>

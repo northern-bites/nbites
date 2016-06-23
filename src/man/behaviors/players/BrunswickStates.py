@@ -2,12 +2,17 @@
 Game controller states for pBrunswick, our soccer player.
 """
 
+from ..Say import *
+
 import noggin_constants as nogginConstants
 from math import fabs
 from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
+from math import fabs, degrees
+
+DEBUG_MANUAL_PLACEMENT = False
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -28,6 +33,7 @@ def gameInitial(player):
         player.role = player.brain.playerNumber
         roleConstants.setRoleConstants(player, player.role)
 
+    # print "Current Angle: " + str(degrees(player.brain.interface.joints.head_yaw))
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
         player.stand()
@@ -45,7 +51,7 @@ def gameReady(player):
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.repeatWideSnapPan()
 
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
@@ -53,17 +59,16 @@ def gameReady(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
-            # US OPEN 16 Turns of going into after penalty in ready
-            # return player.goNow('afterPenalty')
+            player.goNow('manualPlacement')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
 
-    # CHINA HACK player 5 walking off field so start by walking forward
-    if player.brain.playerNumber == 5 and player.stateTime <= 4:
-        player.setWalk(0.6, 0, 0)
-        return player.stay()
+    # # CHINA HACK player 5 walking off field so start by walking forward
+    # if player.brain.playerNumber == 5 and player.stateTime <= 4:
+    #     player.setWalk(0.6, 0, 0)
+    #     return player.stay()
 
     return player.goNow('positionReady')
 
@@ -72,20 +77,33 @@ def gameSet(player):
     """
     Fixate on the ball, or scan to look for it
     """
+
     if player.firstFrame():
+        #The player's currentState = gameSet
+
+        # print "GAME SET FIRST FRAME"
+
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.gainsOn()
         player.stand()
         player.brain.nav.stand()
-        player.brain.tracker.performWidePan()
+
+        # player.brain.tracker.helper.boundsSnapPan(-90, 90, False)
+        player.brain.tracker.performGameSetInitialWideSnapPan()
+        # player.brain.tracker.helper.startingPan(Head)
+        # player.brain.tracker.helper.executeHeadMove(player.brain.tracker.helper.boundsSnapPan(-90, 90, False))
 
         if player.wasPenalized:
             player.wasPenalized = False
+            player.goNow('manualPlacement')
 
     elif player.brain.tracker.isStopped():
-        player.brain.tracker.trackBall()
 
+        # print "TRUE"
+
+        player.brain.tracker.trackBall(True)
+        # print "Current Angle: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
@@ -104,7 +122,6 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
-
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
     #     player.brain.play.isChaser()):
@@ -115,6 +132,8 @@ def gamePlaying(player):
     if player.wasPenalized:
         player.wasPenalized = False
         if player.lastDiffState != 'gameSet': 
+            if DEBUG_MANUAL_PLACEMENT:
+                return player.goNow('manualPlacement')
             return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
@@ -166,11 +185,11 @@ def gamePenalized(player):
         player.wasPenalized = True
         player.brain.penalizedEdgeClose = 0
         player.brain.penalizedCount = 0
-        player.executeMove(SweetMoves.STRETCHED_KNEE_STAND)
+        player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
             player.brain.resetLocToCross()
-            print "BRUNSWICK PENALIZED"
+            # print "BRUNSWICK PENALIZED"
 
     if player.brain.vision.horizon_dist < 200.0:
         player.brain.penalizedEdgeClose += 1

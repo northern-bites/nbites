@@ -53,10 +53,10 @@ import nbtool.util.Utility;
 public class PathChooser {
 		
 	public static String suggestion(String robot) {
-		
 		Calendar cal = Calendar.getInstance();
+		
 		int day = cal.get(Calendar.DAY_OF_MONTH);
-		int month = cal.get(Calendar.MONTH);
+		int month = cal.get(Calendar.MONTH) + 1;
 		
 		return ToolSettings.NBITES_DIR + 
 				"data/logs/" +
@@ -125,6 +125,8 @@ public class PathChooser {
 	private static final PathChooserHandler handler = new PathChooserHandler();
 
 	private static final Color DARK_GREEN = new Color(0,100,0);
+	
+	private static final int DISPLAYED_CONTENTS_LIMIT = 500;
 	
 	private static class PathChooserHandler implements KeyListener, ActionListener, TreeModel, TreeSelectionListener {
 
@@ -228,7 +230,7 @@ public class PathChooser {
 				return null;
 			}
 			
-			Path[] parts = FileIO.getContentsOf(enclosing);
+			Path[] parts = FileIO.getContentsOf(enclosing, DISPLAYED_CONTENTS_LIMIT);
 			assert(parts != null);
 			if (parts.length == 1) {
 				return parts[0];
@@ -364,7 +366,7 @@ public class PathChooser {
 		private Path[] workingContents() {
 			Path dir = enclosing();
 			if (dir == null) return new Path[0];
-			Path[] found = FileIO.getContentsOf(dir);
+			Path[] found = FileIO.getContentsOf(dir, DISPLAYED_CONTENTS_LIMIT);
 			return (found == null) ? new Path[0] : found;
 		}
 

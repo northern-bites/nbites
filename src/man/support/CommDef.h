@@ -42,17 +42,17 @@ static const robot_ip_pair vera    = {"vera"   , "139.140.192.15"};
 static const robot_ip_pair mal     = {"mal"    , "139.140.192.16"};
 static const robot_ip_pair zoe     = {"zoe"    , "139.140.192.17"};
 
-static const robot_ip_pair ringo   = {"ringo"  , "139.140.192.18"};
-static const robot_ip_pair beyonce = {"beyonce", "139.140.192.19"};
-static const robot_ip_pair ozzy    = {"ozzy"   , "139.140.192.20"};
-static const robot_ip_pair avril   = {"avril"  , "139.140.192.21"};
+static const robot_ip_pair blt     = {"blt"    , "139.140.192.18"};
+static const robot_ip_pair elektra = {"elektra", "139.140.192.19"};
+static const robot_ip_pair wasp    = {"wasp"   , "139.140.192.20"};
+static const robot_ip_pair buzz    = {"buzz"   , "139.140.192.21"};
 static const robot_ip_pair batman  = {"batman" , "139.140.192.22"};
 static const robot_ip_pair shehulk = {"shehulk" , "139.140.192.23"};
 
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
                                                    simon, inara, kaylee,
-                                                   vera, mal, zoe, ringo, beyonce,
-                                                   ozzy, avril, batman, shehulk};
+                                                   vera, mal, zoe, blt, elektra,
+                                                   wasp, buzz, batman, shehulk};
 
 //
 // Comm constants and MACRO definitions

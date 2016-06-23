@@ -3,6 +3,8 @@ package nbtool.gui.logviews.misc;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,6 +16,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.text.DefaultCaret;
 
 import nbtool.data.SExpr;
 import nbtool.data.log.Block;
@@ -48,9 +51,10 @@ public class DefaultView extends ViewParent implements ActionListener {
 			ToolMessage.displayError("write failed for: %s", displayedLog);
 		}
 	}
-
-	@Override
-	public void setupDisplay() {
+	
+	int jsonAreaLoc = 0;
+	
+	private void reDisplay() {
 		this.classAndHostLabel.setText(
 				String.format("logClass= %s from %s@%s (type=%s)"
 				, displayedLog.logClass, displayedLog.host_name, displayedLog.host_addr, displayedLog.host_type));
@@ -75,13 +79,47 @@ public class DefaultView extends ViewParent implements ActionListener {
 				));
 		
 		this.blockList.setListData(blockList.toArray(new String[0]));
-		this.jsonStringTextArea.setText(displayedLog.getFullDictionary().print());
 		
+		//TODO save loc position?
+//		int loc = this.jScrollPaneForJsonArea.getVerticalScrollBar().getValue();
+		this.jsonStringTextArea.setText(displayedLog.getFullDictionary().print());
+		this.jScrollPaneForJsonArea.getVerticalScrollBar().setValue(jsonAreaLoc);
+	}
+
+	@Override
+	public void setupDisplay() {
+		reDisplay();
 		this.saveFile.addActionListener(this);
+	}
+	
+	private int getJsonLoc() {
+		return this.jScrollPaneForJsonArea.getVerticalScrollBar().getValue();
 	}
 		
 	public DefaultView() {
-		initComponents();	
+		initComponents();
+		DefaultCaret caret = (DefaultCaret) this.jsonStringTextArea.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		
+		this.addComponentListener(new ComponentListener(){
+
+			@Override
+			public void componentResized(ComponentEvent e) { }
+
+			@Override
+			public void componentMoved(ComponentEvent e) { }
+
+			@Override
+			public void componentShown(ComponentEvent e) {
+				reDisplay();
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				jsonAreaLoc = getJsonLoc();
+			}
+			
+		});
 	}
 	
 	/**
@@ -99,7 +137,7 @@ public class DefaultView extends ViewParent implements ActionListener {
         referenceLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         blockList = new javax.swing.JList<>();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        jScrollPaneForJsonArea = new javax.swing.JScrollPane();
         jsonStringTextArea = new javax.swing.JTextArea();
         saveFile = new javax.swing.JButton();
 
@@ -122,7 +160,7 @@ public class DefaultView extends ViewParent implements ActionListener {
         jsonStringTextArea.setRows(5);
         jsonStringTextArea.setWrapStyleWord(true);
         jsonStringTextArea.setBorder(javax.swing.BorderFactory.createTitledBorder("full json serialization"));
-        jScrollPane2.setViewportView(jsonStringTextArea);
+        jScrollPaneForJsonArea.setViewportView(jsonStringTextArea);
 
         saveFile.setText("save to file");
 
@@ -133,7 +171,7 @@ public class DefaultView extends ViewParent implements ActionListener {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPaneForJsonArea, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
                     .addComponent(classAndHostLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(whenBlocksAndBytesLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -158,7 +196,7 @@ public class DefaultView extends ViewParent implements ActionListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                .addComponent(jScrollPaneForJsonArea, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(saveFile)
                 .addContainerGap())
@@ -170,7 +208,7 @@ public class DefaultView extends ViewParent implements ActionListener {
     private javax.swing.JList<String> blockList;
     private javax.swing.JLabel classAndHostLabel;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPaneForJsonArea;
     private javax.swing.JTextArea jsonStringTextArea;
     private javax.swing.JLabel referenceLabel;
     private javax.swing.JButton saveFile;

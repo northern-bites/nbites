@@ -8,9 +8,10 @@ import CommMonitorTransitions as transitions
 import RoleConstants
 from ..util import *
 
-# TODO CHINA HACK 2015
-# TURN ROLE SWITCHING BACK ON AFTER CHINA
 
+# TODO stop defaulting to player number everywhere
+# This is where we can switch our strategies based on comm quality
+# Should add time stamps for how we switch strategies but also how we determine comm quality
 
 @defaultState('gameControllerResponder')
 @superState('roleSwitcher')
@@ -18,41 +19,4 @@ def commMonitor(player):
 
     # role switching off for drop in player
     if player.dropIn:
-        # RoleConstants.setRoleConstants(player, player.role)
         return
-    
-    # if player.commMode == -1:
-    #     pass
-    # elif player.commMode != 2 and transitions.awfulComm(player):
-    #     print "Switched to awful comm mode!"
-    #     print "Setting player role to player number in CommMonitorStates."
-    #     player.role = player.brain.playerNumber
-    #     player.prevRoleConfig = RoleConstants.roleConfiguration
-    #     RoleConstants.roleConfiguration = RoleConstants.spread
-    #     RoleConstants.oddDefenderBox = RoleConstants.defenderBox
-    #     RoleConstants.evenDefenderBox = RoleConstants.defenderBox
-    #     RoleConstants.setRoleConstants(player, player.role)
-    #     player.roleSwitching = False
-    #     player.commMode = 2
-    # elif player.commMode != 1 and transitions.mediocreComm(player):
-    #     print "Switched to mediocre comm mode!"
-    #     player.role = player.brain.playerNumber
-    #     if player.commMode == 2: 
-    #         RoleConstants.roleConfiguration = player.prevRoleConfig
-    #     RoleConstants.oddDefenderBox = RoleConstants.defenderBox
-    #     RoleConstants.evenDefenderBox = RoleConstants.defenderBox
-    #     RoleConstants.setRoleConstants(player, player.role)
-    #     player.roleSwitching = False
-    #     player.commMode = 1
-    # elif player.commMode != 0 and transitions.goodComm(player):
-    #     print "Switched to good comm mode!"
-    #     player.role = player.brain.playerNumber
-    #     if player.commMode == 2: 
-    #         RoleConstants.roleConfiguration = player.prevRoleConfig
-    #     RoleConstants.oddDefenderBox = RoleConstants.defenderBox
-    #     RoleConstants.evenDefenderBox = RoleConstants.defenderBox
-    #     RoleConstants.setRoleConstants(player, player.role)
-    #     player.roleSwitching = True
-    #     player.commMode = 0
-
-

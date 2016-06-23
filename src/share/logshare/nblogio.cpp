@@ -9,6 +9,7 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
+#include <stdexcept>
 
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -39,6 +40,50 @@ namespace nbl {
     namespace io {
 
         const char LOCAL_HOST_ADDR[] = "127.0.0.1";
+
+        FileMonitor::FileMonitor(const char * file, bool trueOnFirst) :
+            fd(0), last(0)
+        {
+            fd = open(file, O_RDONLY);
+            if (!fd) {
+                int err = errno;
+                throw std::runtime_error{utilities::format("could not open file: %s: %s",
+                                                           file,
+                                                           utilities::get_error(err).c_str()
+                                                           )};
+            }
+
+            if (!trueOnFirst) {
+                update();
+            }
+        }
+
+        FileMonitor::~FileMonitor() {
+            close();
+        }
+
+        bool FileMonitor::update() {
+            if (fd) {
+                struct stat buf;
+                fstat(fd, &buf);
+                double diff = difftime(buf.st_mtime, last);
+                if (diff > 0) {
+                    last = buf.st_mtime;
+                    return true;
+                } else return false;
+            } else {
+                throw std::runtime_error("FileMonitor: cannot call update() after close()");
+            }
+
+
+        }
+
+        void FileMonitor::close() {
+            if (fd) {
+                ::close(fd);
+                fd = 0;
+            }
+        }
 
         const iotime_t IO_EXPECTING_ST  = 1000;
         const iotime_t IO_NOT_EXPECTING_ST = 500000;
@@ -205,6 +250,15 @@ return ERROR; }
             serv_addr.sin_family = AF_INET;
             serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
             serv_addr.sin_port = htons(port);
+
+            /* we need the socket to use these two options so that we may re-establish dead servers quickly */
+            int enable = 1;
+
+            int ru_addr_ret = setsockopt(ss, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+            PERROR_AND_FAIL_IF(ru_addr_ret, "could not set SO_REUSEADDR !");
+
+//            int ru_port_ret = setsockopt(ss, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int));
+//            PERROR_AND_FAIL_IF(ru_port_ret, "could not set SO_REUSEPORT !");
 
             int bret = bind(ss, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
             PERROR_AND_FAIL_IF(bret, "could not bind server socket!");

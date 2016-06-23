@@ -3,6 +3,7 @@ package nbtool.data.group;
 import java.util.ArrayList;
 
 import nbtool.data.log.Log;
+import nbtool.data.log.LogReference;
 import nbtool.util.Center;
 import nbtool.util.Events;
 
@@ -49,13 +50,19 @@ public class AllGroups {
 		}
 	}
 	
-	private static class Counter implements Events.LogsFound {
+	private static class Counter implements Events.LogsFound, Events.LogRefsFound {
 		protected Counter() {
 			Center.listen(Events.LogsFound.class, this, false);
+			Center.listen(Events.LogRefsFound.class, this, true);
 		}
 
 		@Override
 		public void logsFound(Object source, Log... found) {
+			log_count += found.length;
+		}
+
+		@Override
+		public void logRefsFound(Object source, LogReference... found) {
 			log_count += found.length;
 		}
 	}
