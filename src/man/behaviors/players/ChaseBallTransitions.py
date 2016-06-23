@@ -90,7 +90,7 @@ def shouldRedecideKick(player):
     """
     We've been in position for kick too long
     """
-    return player.counter > 200
+    return player.counter > 400
 
 def ballInPosition(player, kickPose):
     """
@@ -204,6 +204,9 @@ def spunOnce(player):
     Did we spin once?
     """
     return player.stateTime > constants.SPUN_ONCE_TIME_THRESH
+
+def didOnePan(player):
+    return player.stateTime > 8 # Should use constant for one snap pan
 
 def shouldWalkFindBall(player):
     """
