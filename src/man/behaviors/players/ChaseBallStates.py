@@ -151,7 +151,7 @@ def prepareForKick(player):
     if not player.inKickOffPlay:
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
             print "DIAGONAL Overriding kick decider for kickoff!"
-            # player.shouldKickOff = False
+            player.shouldKickOff = False
             player.kick = player.decider.new2016KickStrategy()
             print("Decided kick: ", str(player.kick))
         else:
@@ -228,8 +228,8 @@ def orbitBall(player):
         player.kick.destinationX = destinationX
         player.kick.destinationY = destinationY
 
-        # if transitions.shouldNotDribble(player):
-        #     return player.goNow('positionForKick')
+        if transitions.shouldNotDribble(player):
+            return player.goNow('positionForKick')
         return player.goNow('dribble')
         
 
@@ -341,11 +341,11 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
-        print "It's no longer dribble time"
-        return player.goNow('approachBall')
+        print "It's no longer poo dribble time"
+        return player.goNow('positionForKick')
     print "Dribble time"
     ball = player.brain.ball
-    player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_THREE)
+    player.brain.nav.goTo(Location(ball.x - 10, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_TWO)
     # player.brain.nav.walk(10, 0, 0)
     return player.stay()
 

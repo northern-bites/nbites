@@ -222,4 +222,4 @@ def shouldChangeKickingStrategy(player):
 def shouldNotDribble(player):
     return (player.brain.game.secs_remaining <= 30 or
             # player.brain.game.secs_remaining > (NogginConstants.LENGTH_OF_HALF - 20) or # don't dribble for the first 20 seconds
-            player.brain.nav.x > NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X) 
+            player.brain.loc.x > NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X) 
