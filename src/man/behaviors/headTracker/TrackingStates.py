@@ -293,6 +293,7 @@ def gamePlayingSnapPan(tracker):
 
     if (isinstance(tracker.target, Vision.messages.FilteredBall) and
         tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+        print("HEADTRACKER SAW BALL!!")
         return tracker.goLater('tracking')
 
     return tracker.stay()
