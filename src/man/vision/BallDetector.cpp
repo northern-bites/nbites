@@ -169,6 +169,9 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
     }
     int midY = *(yImage.pixelAddr(currentSpot.ix() + width / 2,
                                   -currentSpot.iy() + height / 2)) / 4;
+	if (topCamera && topY < height / 3) {
+		return false;
+	}
     // spots in robots are often actually bright, just surrounded by brighter
     if (midY > MIN_CENTER_Y) {
 		if (debugBall) {
@@ -194,6 +197,10 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
 	}
     int currentY = 0;
     int whites = 0;
+	int NEEDED = 2;
+	if (!topCamera) {
+		NEEDED = 3;
+	}
 	// scan out from each edge to see if there is a significant
     // jump in Y in at least two directions
 	for (int i = leftX; i > leftX - scan; i--) {
@@ -210,21 +217,21 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
 			i = i + scan;
 		}
 	}
-	for (int i = topY; i > topY - scan; i--) {
+	for (int i = topY; i > topY - scan && whites < NEEDED; i--) {
         currentY = *(yImage.pixelAddr(currentSpot.ix() + width / 2, i)) / 4;
         if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i - scan;
 		}
 	}
-	for (int i = bottomY; i < bottomY + scan; i++) {
+	for (int i = bottomY; i < bottomY + scan && whites < NEEDED; i++) {
         currentY = *(yImage.pixelAddr(currentSpot.ix() + width / 2, i)) / 4;
         if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i + scan;
 		}
 	}
-    if (whites > 1) {
+    if (whites >= NEEDED) {
         if (debugBall) {
             debugDraw.drawPoint(currentSpot.ix() + width / 2, -currentSpot.iy() + height / 2, BLUE);
             std::cout << "Black blob " << (currentSpot.ix() + width / 2) << " " <<
@@ -1184,6 +1191,11 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 		return false;
 	}
 
+	imagePoint p = imagePoint(midX, midY);
+	if (!greenAroundBallFromCentroid(p)) {
+		return false;
+	}
+
 	// The biggest thing is there should be no white and at least
 	// some green above the ball
 	int total = 0;
@@ -1283,6 +1295,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
         }
     }
     // for now, if there are no black spots then it is too dangerous
+	int THRESHOLD = 110;
     if (spots < 1) {
 		if (!whiteNoBlack(spot)) {
 			return false;
@@ -1290,8 +1303,10 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
     } else if (spots == 1) {
 		// circle detection can be hard if the ball is on a line or in front of a robot
 		// check whiteness?
-		//std::cout << "Checking one spot " << spot.green << " " << std::endl;
-		if (!checkGradientInSpot(spot) || spot.green > 3) {
+		if (!checkGradientInSpot(spot) || spot.green > 10) {
+			if (debugBall) {
+				std::cout << "Checking one spot " << spot.green << " " << std::endl;
+			}
 			return false;
 		}
 	}
@@ -1407,7 +1422,11 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
 
-    if(darkSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
+	//std::cout << "Tilt: " << homography->tilt() << std::endl;
+	//std::cout << "Height " << cameraHeight << std::endl;
+	//std::cout << "FLen: " << homography->flen() << std::endl;
+
+    if(darkSpotDetector.spotDetect(yImage, *homography, &greenImage)) {
         SpotList darkSpots = darkSpotDetector.spots();
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
 		if (debugSpots) {
@@ -1420,6 +1439,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			for (int i = max; i < height && box != 0; i+= box) {
 				uint8_t* row = filteredImage.pixelAddr(0, i);
 				box = row[1];
+				std::cout << "SPot size " << box << std::endl;
 				debugDraw.drawBox(1, box + 1, i+box, i, BLUE);
 			}
 		}
@@ -1459,7 +1479,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
-    if(whiteSpotDetector.spotDetect(smallerY, homography, &smallerGreen)) {
+    if(whiteSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
 		if (debugSpots) {
 			int max = field->horizonAt(0);
 			if (!topCamera) {
