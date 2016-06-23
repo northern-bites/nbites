@@ -61,6 +61,7 @@ def spinSearch(player):
 
 @superState('gameControllerResponder')
 @stay
+@ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def fastPan(player):
 
     if player.firstFrame():
