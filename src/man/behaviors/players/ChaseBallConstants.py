@@ -45,7 +45,7 @@ LINE_UP_HD = 0.0
 # # Orbit
 DEBUG_ORBIT = False
 SHOULD_ORBIT_BEARING = 25
-ORBIT_GOOD_BEARING = 10
+ORBIT_GOOD_BEARING = 7
 SHOULD_CANCEL_ORBIT_BALL_DIST = APPROACH_BALL_AGAIN_DIST
 ORBIT_TOO_LONG_THR = 8
 ORBIT_Y_SPEED = speeds.SPEED_THREE
@@ -79,9 +79,9 @@ SHOULD_KICK_AGAIN_Y = 15
 # Ball in position
 ## NOTE: important that these values slightly overestimate the values in
 ##        navigator's PFK. Otherwise there can be bad looping.
-BALL_X_OFFSET = 3.5
+BALL_X_OFFSET = 2
 BALL_Y_OFFSET = 3.5
-GOOD_ENOUGH_H = 6
+GOOD_ENOUGH_H = 4
 
 # States' constants
 
@@ -94,6 +94,9 @@ FACING_KICK_ACCEPTABLE_BEARING = 4
 # find ball
 SPUN_ONCE_TIME_THRESH = 8
 WALK_FIND_BALL_TIME_THRESH = SPUN_ONCE_TIME_THRESH * 3 # Roughly 3 spins
+SPEED_FOUR_SPUN_ONCE_TIME = 14
+SPEED_SIX_SPUN_ONCE_TIME = 9
+
 
 SPIN_SEARCH_BEARING = 20
 
