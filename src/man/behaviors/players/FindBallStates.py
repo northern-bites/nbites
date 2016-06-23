@@ -35,10 +35,7 @@ def searchInFront(player):
     if player.firstFrame():
         player.brain.tracker.performCenterSnapPan()
 
-    # playerTracker = player.brain.tracker
-
     if not player.brain.tracker.brain.motion.head_is_active and player.brain.tracker.isStopped():
-        # print "-------HEAD IS NOT ACTIVE, GOING TO SPINNING--------------\n"
         return player.goNow('spinSearch')
 
 @superState('gameControllerResponder')
