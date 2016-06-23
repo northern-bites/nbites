@@ -93,6 +93,10 @@ def gameSet(player):
         player.brain.tracker.performGameSetInitialWideSnapPan()
         # player.brain.tracker.helper.startingPan(Head)
         # player.brain.tracker.helper.executeHeadMove(player.brain.tracker.helper.boundsSnapPan(-90, 90, False))
+        
+        if player.brain.interface.fallStatus.pickup == 1:
+            print "We done been picked up"
+            player.brain.pickedUpInSet = True
 
         if player.wasPenalized:
             player.wasPenalized = False
@@ -122,6 +126,11 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
+
+        if player.brain.pickedUpInSet == True:
+            player.brain.pickedUpInSet = False
+            player.brain.player.brain.resetLocTo(999, 999, 999)
+            
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
     #     player.brain.play.isChaser()):

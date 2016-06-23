@@ -36,6 +36,10 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
+        if player.lastCounter < 300:
+            print "We were in penalty for less than 10 seconds, it probably doesn't count"
+            return player.goNow("gamePlaying")
+
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
 
