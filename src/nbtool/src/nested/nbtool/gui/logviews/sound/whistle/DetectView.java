@@ -36,6 +36,13 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 		Debug.info("view!");
 		this.setLayout(new BorderLayout());
 
+//		if (alsoSelected.size() > 0) {
+//			LogSorting.sort(LogSorting.Sort.BY_FILENAME, alsoSelected);;
+//		}
+
+		if (this.displayedLog.getReference() != null && this.displayedLog.getReference().loadPath() != null)
+			Debug.print("load: %d from %s", this.displayedLog.getReference().thisID, this.displayedLog.getReference().loadPath().getFileName());
+
 		final JCheckBox playBox = new JCheckBox();
 		playBox.setText("play sound on selection");
 		playBox.setSelected(play);
