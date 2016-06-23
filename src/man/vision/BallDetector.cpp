@@ -897,49 +897,47 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
 
 bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
     int THRESHOLD = 110;
-    int checkedPixels = 0;
+    int topCheckedPixels = 0, bottomCheckedPixels = 0;
+    int topGreenSum = 0, bottomGreenSum = 0;
 
     double bx = 0, by = 0;
     imageToBillCoordinates(p.first, p.second, bx, by);
     int r = projectedBallRadius(std::make_pair(bx, by));
 
-    bool bottomHalf = false;
-    if(p.second > height/2) {
-        bottomHalf = true;
+    int topY = std::round(p.second - r - 1);
+    int bottomY = std::round(p.second + r + 1);
+
+    getColor(p.first, topY);
+    for(int i = 0; i < 1.5*r && (topY - i) >= 0; i++) {
+        topGreenSum += getGreen();
+        topCheckedPixels++;
+        getColor(p.first, topY - i);
     }
 
-    int greenMagnitudeSums = 0;
-
-    if(bottomHalf) {
-        int topY = std::round(p.second - r - 1.5);
-        if(debugBall) {
-            debugDraw.drawDot(p.first, topY, BLUE);
-            debugDraw.drawDot(p.first, topY-r, BLUE);
-        }
-
-        getColor(p.first, topY);
-        for(int i = 0; i < r && (topY - i >= 0); i++) {
-            greenMagnitudeSums += getGreen();
-            checkedPixels++;
-            getColor(p.first, topY-i);
-        }
-    } else {
-        int bottomY = std::round(p.second + r + 1.5);
-        if(debugBall) {
-            debugDraw.drawDot(p.first, bottomY, RED);
-            debugDraw.drawDot(p.first, bottomY+r, RED);
-        }
-
-        getColor(p.first, bottomY);
-        for(int i = 0; i < r && (bottomY + i <= width); i++) {
-            greenMagnitudeSums += getGreen();
-            checkedPixels++;
-            getColor(p.first, bottomY+i);
-        }
+    getColor(p.first, bottomY);
+    for(int i = 0; i < 1.5*r && (bottomY + i <= width); i++) {
+        bottomGreenSum += getGreen();
+        bottomCheckedPixels++;
+        getColor(p.first, bottomY + i);
     }
 
-    if((greenMagnitudeSums / checkedPixels) >= THRESHOLD) {
-        if(debugBall) { std::cout<<"[BALL INFO] Green Test Passed\n"; }
+    if(debugBall) {
+        debugDraw.drawDot(p.first, bottomY, RED);
+        debugDraw.drawDot(p.first, bottomY + bottomCheckedPixels, RED);
+        debugDraw.drawDot(p.first, topY, BLUE);
+        debugDraw.drawDot(p.first, topY - topCheckedPixels, BLUE); //wont draw if too close to top
+    }
+
+    if((topGreenSum / topCheckedPixels >= THRESHOLD) || (bottomGreenSum / bottomCheckedPixels >= THRESHOLD)) {
+        if(debugBall) { 
+            std::cout<<"[BALL INFO] Green Test Passed\n"; 
+            for(int i = 0; i < topCheckedPixels; i++) {
+                debugDraw.drawDot(p.first, topY - i, GREEN);
+            }
+            for(int i = 0; i < bottomCheckedPixels; i++) {
+                debugDraw.drawDot(p.first, bottomY + i, GREEN);
+            }
+        }
         return true;
     } else {
         if(debugBall) { std::cout<<"[BALL INFO] Green Test Failed\n"; }
