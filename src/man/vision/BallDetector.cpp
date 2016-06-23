@@ -571,7 +571,7 @@ bool BallDetector::findCorrelatedBlackSpots
     					ballSpot.rawX = ix;
     					ballSpot.rawY = iy;
     					ballSpot.innerDiam = 5;
-    				    
+
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
 #ifdef OFFLINE
                         foundBall = true;
@@ -1183,7 +1183,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			for (int i = max; i < height && box != 0; i+= box) {
 				uint8_t* row = filteredImage.pixelAddr(0, i);
 				box = row[1];
-				std::cout << "SPot size " << box << std::endl;
 				debugDraw.drawBox(1, box + 1, i+box, i, BLUE);
 			}
 		}
@@ -1220,7 +1219,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 }
 
     SpotDetector whiteSpotDetector;
-    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
+    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
     if(whiteSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
