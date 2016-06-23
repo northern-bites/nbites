@@ -83,11 +83,14 @@ def watchForBall(player):
     while player.stateTime < 8:
         return player.stay()
 
-    if role.isStriker(player.role):
+    if role.isChaser(player.role):
         while player.stateTime < 12:
             return player.stay()
 
-    return player.goNow('spinAtHome')
+    if role.isFirstChaser(player.role):
+        return player.goNow('playerFourSearchBehavior')
+    else:
+        return player.goNow('spinAtHome')
 
 @defaultState('doFirstHalfSpin')
 @superState('playOffBall')
@@ -108,9 +111,9 @@ def doFirstHalfSpin(player):
         player.brain.tracker.repeatFixedPitchLookAhead()
         
         if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_EIGHT)
+            player.setWalk(0, 0, speeds.SPEED_FOUR)
         else:
-            player.setWalk(0, 0, -speeds.SPEED_EIGHT)
+            player.setWalk(0, 0, -speeds.SPEED_FOUR)
 
     while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME / 2:
         return player.stay()
@@ -133,7 +136,12 @@ def doPan(player):
         while player.stateTime < 12:
             return player.stay()
 
-    return player.goNow('doSecondHalfSpin')
+    # if role.isFirstChaser(player.role):
+    #     return player.goNow('playerFourSearchBehavior')
+    if role.isStriker(player.role):
+        return player.goNow('playerFiveSearchBehavior')
+    else:
+        return player.goNow('doSecondHalfSpin')
 
 @superState('spinAtHome')
 def doSecondHalfSpin(player):
@@ -144,17 +152,17 @@ def doSecondHalfSpin(player):
         player.brain.tracker.repeatFixedPitchLookAhead()
 
         if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_EIGHT)
+            player.setWalk(0, 0, speeds.SPEED_FOUR)
         else:
-            player.setWalk(0, 0, -speeds.SPEED_EIGHT)
+            player.setWalk(0, 0, -speeds.SPEED_FOUR)
 
     while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME / 2:
         return player.stay()
 
-    if role.isFirstChaser(player.role):
-        return player.goNow('playerFourSearchBehavior')
-    elif role.isStriker(player.role):
-        return player.goNow('playerFiveSearchBehavior')
+    # if role.isFirstChaser(player.role):
+    #     return player.goNow('playerFourSearchBehavior')
+    # elif role.isStriker(player.role):
+    #     return player.goNow('playerFiveSearchBehavior')
     return player.goNow('playOffBall')
 
 @superState('playOffBall')
@@ -268,11 +276,11 @@ def playerFourSearchBehavior(player):
         if playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 0:
             adjustHeading.desiredHeading = 180
             return player.goNow("adjustHeading")
-        else if playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 1:
-            adjustHeading.desiredHeading = 90
+        elif playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 1:
+            adjustHeading.desiredHeading = -90
             return player.goNow("adjustHeading")
         else:
-            adjustHeading.desiredHeading = -90
+            adjustHeading.desiredHeading = 90
             return player.goNow("adjustHeading")
 
     player.brain.nav.updateDest(playerFourSearchBehavior.dest)
@@ -345,7 +353,6 @@ def adjustHeading(player):
 def panAtWayPoint(player):
 
     if player.firstFrame():
-
         player.stand()
         player.brain.tracker.trackBall()
 

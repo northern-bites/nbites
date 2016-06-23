@@ -33,6 +33,7 @@ def findBall(player):
 def searchInFront(player):
 
     if player.firstFrame():
+        player.stand()
         player.brain.tracker.performCenterSnapPan()
 
     # playerTracker = player.brain.tracker
@@ -54,7 +55,7 @@ def spinSearch(player):
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
-        player.setWalk(0, 0, spinDir*speeds.SPEED_FIVE)
+        player.setWalk(0, 0, spinDir*speeds.SPEED_FOUR)
         player.brain.tracker.repeatFixedPitchLookAhead()
 
 @superState('gameControllerResponder')
