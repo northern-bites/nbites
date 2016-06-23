@@ -31,7 +31,6 @@ def findBall(player):
 @stay
 @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def searchInFront(player):
-
     if player.firstFrame():
         player.stand()
         player.brain.tracker.performCenterSnapPan()
@@ -54,10 +53,8 @@ def spinSearch(player):
         player.setWalk(0, 0, spinDir*speeds.SPEED_SIX)
         player.brain.tracker.repeatFixedPitchLookAhead()
 
-    while player.stateTime < constants.SPEED_SIX_SPUN_ONCE_TIME / 2:
-        return player.stay()
-
-    return player.goNow("fastPan")
+    while player.stateTime > constants.SPEED_SIX_SPUN_ONCE_TIME / 2:
+        return player.goNow("fastPan")
 
 @superState('gameControllerResponder')
 @stay
@@ -68,10 +65,8 @@ def fastPan(player):
         player.stand()
         player.brain.tracker.repeatWideSnapPan()
 
-    while player.stateTime < 8:
-        return player.stay()
-
-    return player.goNow("playOffBall")
+    while player.stateTime > 8:
+        return player.goNow("playOffBall")
 
 @superState('gameControllerResponder')
 @stay
