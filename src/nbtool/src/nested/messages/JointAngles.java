@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.JointAngles}
  */
-public final class JointAngles extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.JointAngles)
-    JointAnglesOrBuilder {
+public  final class JointAngles extends
+    com.google.protobuf.GeneratedMessage
+    implements JointAnglesOrBuilder {
   // Use JointAngles.newBuilder() to construct.
   private JointAngles(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -225,6 +224,7 @@ public final class JointAngles extends
   }
 
   private int bitField0_;
+  // optional float head_yaw = 1;
   public static final int HEAD_YAW_FIELD_NUMBER = 1;
   private float headYaw_;
   /**
@@ -248,6 +248,7 @@ public final class JointAngles extends
     return headYaw_;
   }
 
+  // optional float head_pitch = 2;
   public static final int HEAD_PITCH_FIELD_NUMBER = 2;
   private float headPitch_;
   /**
@@ -263,6 +264,7 @@ public final class JointAngles extends
     return headPitch_;
   }
 
+  // optional float l_shoulder_pitch = 3;
   public static final int L_SHOULDER_PITCH_FIELD_NUMBER = 3;
   private float lShoulderPitch_;
   /**
@@ -286,6 +288,7 @@ public final class JointAngles extends
     return lShoulderPitch_;
   }
 
+  // optional float l_shoulder_roll = 4;
   public static final int L_SHOULDER_ROLL_FIELD_NUMBER = 4;
   private float lShoulderRoll_;
   /**
@@ -301,6 +304,7 @@ public final class JointAngles extends
     return lShoulderRoll_;
   }
 
+  // optional float l_elbow_yaw = 5;
   public static final int L_ELBOW_YAW_FIELD_NUMBER = 5;
   private float lElbowYaw_;
   /**
@@ -316,6 +320,7 @@ public final class JointAngles extends
     return lElbowYaw_;
   }
 
+  // optional float l_elbow_roll = 6;
   public static final int L_ELBOW_ROLL_FIELD_NUMBER = 6;
   private float lElbowRoll_;
   /**
@@ -331,6 +336,7 @@ public final class JointAngles extends
     return lElbowRoll_;
   }
 
+  // optional float l_wrist_yaw = 7;
   public static final int L_WRIST_YAW_FIELD_NUMBER = 7;
   private float lWristYaw_;
   /**
@@ -346,6 +352,7 @@ public final class JointAngles extends
     return lWristYaw_;
   }
 
+  // optional float l_hand = 8;
   public static final int L_HAND_FIELD_NUMBER = 8;
   private float lHand_;
   /**
@@ -361,6 +368,7 @@ public final class JointAngles extends
     return lHand_;
   }
 
+  // optional float r_shoulder_pitch = 9;
   public static final int R_SHOULDER_PITCH_FIELD_NUMBER = 9;
   private float rShoulderPitch_;
   /**
@@ -384,6 +392,7 @@ public final class JointAngles extends
     return rShoulderPitch_;
   }
 
+  // optional float r_shoulder_roll = 10;
   public static final int R_SHOULDER_ROLL_FIELD_NUMBER = 10;
   private float rShoulderRoll_;
   /**
@@ -399,6 +408,7 @@ public final class JointAngles extends
     return rShoulderRoll_;
   }
 
+  // optional float r_elbow_yaw = 11;
   public static final int R_ELBOW_YAW_FIELD_NUMBER = 11;
   private float rElbowYaw_;
   /**
@@ -414,6 +424,7 @@ public final class JointAngles extends
     return rElbowYaw_;
   }
 
+  // optional float r_elbow_roll = 12;
   public static final int R_ELBOW_ROLL_FIELD_NUMBER = 12;
   private float rElbowRoll_;
   /**
@@ -429,6 +440,7 @@ public final class JointAngles extends
     return rElbowRoll_;
   }
 
+  // optional float r_wrist_yaw = 13;
   public static final int R_WRIST_YAW_FIELD_NUMBER = 13;
   private float rWristYaw_;
   /**
@@ -444,6 +456,7 @@ public final class JointAngles extends
     return rWristYaw_;
   }
 
+  // optional float r_hand = 14;
   public static final int R_HAND_FIELD_NUMBER = 14;
   private float rHand_;
   /**
@@ -459,6 +472,7 @@ public final class JointAngles extends
     return rHand_;
   }
 
+  // optional float l_hip_yaw_pitch = 15;
   public static final int L_HIP_YAW_PITCH_FIELD_NUMBER = 15;
   private float lHipYawPitch_;
   /**
@@ -482,6 +496,7 @@ public final class JointAngles extends
     return lHipYawPitch_;
   }
 
+  // optional float r_hip_yaw_pitch = 16;
   public static final int R_HIP_YAW_PITCH_FIELD_NUMBER = 16;
   private float rHipYawPitch_;
   /**
@@ -497,6 +512,7 @@ public final class JointAngles extends
     return rHipYawPitch_;
   }
 
+  // optional float l_hip_roll = 17;
   public static final int L_HIP_ROLL_FIELD_NUMBER = 17;
   private float lHipRoll_;
   /**
@@ -520,6 +536,7 @@ public final class JointAngles extends
     return lHipRoll_;
   }
 
+  // optional float l_hip_pitch = 18;
   public static final int L_HIP_PITCH_FIELD_NUMBER = 18;
   private float lHipPitch_;
   /**
@@ -535,6 +552,7 @@ public final class JointAngles extends
     return lHipPitch_;
   }
 
+  // optional float l_knee_pitch = 19;
   public static final int L_KNEE_PITCH_FIELD_NUMBER = 19;
   private float lKneePitch_;
   /**
@@ -550,6 +568,7 @@ public final class JointAngles extends
     return lKneePitch_;
   }
 
+  // optional float l_ankle_pitch = 20;
   public static final int L_ANKLE_PITCH_FIELD_NUMBER = 20;
   private float lAnklePitch_;
   /**
@@ -565,6 +584,7 @@ public final class JointAngles extends
     return lAnklePitch_;
   }
 
+  // optional float l_ankle_roll = 21;
   public static final int L_ANKLE_ROLL_FIELD_NUMBER = 21;
   private float lAnkleRoll_;
   /**
@@ -580,6 +600,7 @@ public final class JointAngles extends
     return lAnkleRoll_;
   }
 
+  // optional float r_hip_roll = 22;
   public static final int R_HIP_ROLL_FIELD_NUMBER = 22;
   private float rHipRoll_;
   /**
@@ -603,6 +624,7 @@ public final class JointAngles extends
     return rHipRoll_;
   }
 
+  // optional float r_hip_pitch = 23;
   public static final int R_HIP_PITCH_FIELD_NUMBER = 23;
   private float rHipPitch_;
   /**
@@ -618,6 +640,7 @@ public final class JointAngles extends
     return rHipPitch_;
   }
 
+  // optional float r_knee_pitch = 24;
   public static final int R_KNEE_PITCH_FIELD_NUMBER = 24;
   private float rKneePitch_;
   /**
@@ -633,6 +656,7 @@ public final class JointAngles extends
     return rKneePitch_;
   }
 
+  // optional float r_ankle_pitch = 25;
   public static final int R_ANKLE_PITCH_FIELD_NUMBER = 25;
   private float rAnklePitch_;
   /**
@@ -648,6 +672,7 @@ public final class JointAngles extends
     return rAnklePitch_;
   }
 
+  // optional float r_ankle_roll = 26;
   public static final int R_ANKLE_ROLL_FIELD_NUMBER = 26;
   private float rAnkleRoll_;
   /**
@@ -694,8 +719,7 @@ public final class JointAngles extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -977,9 +1001,8 @@ public final class JointAngles extends
    * Protobuf type {@code messages.JointAngles}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.JointAngles)
-      messages.JointAnglesOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.JointAnglesOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_JointAngles_descriptor;
@@ -1317,6 +1340,7 @@ public final class JointAngles extends
     }
     private int bitField0_;
 
+    // optional float head_yaw = 1;
     private float headYaw_ ;
     /**
      * <code>optional float head_yaw = 1;</code>
@@ -1365,6 +1389,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float head_pitch = 2;
     private float headPitch_ ;
     /**
      * <code>optional float head_pitch = 2;</code>
@@ -1397,6 +1422,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_shoulder_pitch = 3;
     private float lShoulderPitch_ ;
     /**
      * <code>optional float l_shoulder_pitch = 3;</code>
@@ -1445,6 +1471,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_shoulder_roll = 4;
     private float lShoulderRoll_ ;
     /**
      * <code>optional float l_shoulder_roll = 4;</code>
@@ -1477,6 +1504,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_elbow_yaw = 5;
     private float lElbowYaw_ ;
     /**
      * <code>optional float l_elbow_yaw = 5;</code>
@@ -1509,6 +1537,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_elbow_roll = 6;
     private float lElbowRoll_ ;
     /**
      * <code>optional float l_elbow_roll = 6;</code>
@@ -1541,6 +1570,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_wrist_yaw = 7;
     private float lWristYaw_ ;
     /**
      * <code>optional float l_wrist_yaw = 7;</code>
@@ -1573,6 +1603,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_hand = 8;
     private float lHand_ ;
     /**
      * <code>optional float l_hand = 8;</code>
@@ -1605,6 +1636,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_shoulder_pitch = 9;
     private float rShoulderPitch_ ;
     /**
      * <code>optional float r_shoulder_pitch = 9;</code>
@@ -1653,6 +1685,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_shoulder_roll = 10;
     private float rShoulderRoll_ ;
     /**
      * <code>optional float r_shoulder_roll = 10;</code>
@@ -1685,6 +1718,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_elbow_yaw = 11;
     private float rElbowYaw_ ;
     /**
      * <code>optional float r_elbow_yaw = 11;</code>
@@ -1717,6 +1751,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_elbow_roll = 12;
     private float rElbowRoll_ ;
     /**
      * <code>optional float r_elbow_roll = 12;</code>
@@ -1749,6 +1784,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_wrist_yaw = 13;
     private float rWristYaw_ ;
     /**
      * <code>optional float r_wrist_yaw = 13;</code>
@@ -1781,6 +1817,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_hand = 14;
     private float rHand_ ;
     /**
      * <code>optional float r_hand = 14;</code>
@@ -1813,6 +1850,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_hip_yaw_pitch = 15;
     private float lHipYawPitch_ ;
     /**
      * <code>optional float l_hip_yaw_pitch = 15;</code>
@@ -1861,6 +1899,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_hip_yaw_pitch = 16;
     private float rHipYawPitch_ ;
     /**
      * <code>optional float r_hip_yaw_pitch = 16;</code>
@@ -1893,6 +1932,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_hip_roll = 17;
     private float lHipRoll_ ;
     /**
      * <code>optional float l_hip_roll = 17;</code>
@@ -1941,6 +1981,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_hip_pitch = 18;
     private float lHipPitch_ ;
     /**
      * <code>optional float l_hip_pitch = 18;</code>
@@ -1973,6 +2014,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_knee_pitch = 19;
     private float lKneePitch_ ;
     /**
      * <code>optional float l_knee_pitch = 19;</code>
@@ -2005,6 +2047,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_ankle_pitch = 20;
     private float lAnklePitch_ ;
     /**
      * <code>optional float l_ankle_pitch = 20;</code>
@@ -2037,6 +2080,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float l_ankle_roll = 21;
     private float lAnkleRoll_ ;
     /**
      * <code>optional float l_ankle_roll = 21;</code>
@@ -2069,6 +2113,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_hip_roll = 22;
     private float rHipRoll_ ;
     /**
      * <code>optional float r_hip_roll = 22;</code>
@@ -2117,6 +2162,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_hip_pitch = 23;
     private float rHipPitch_ ;
     /**
      * <code>optional float r_hip_pitch = 23;</code>
@@ -2149,6 +2195,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_knee_pitch = 24;
     private float rKneePitch_ ;
     /**
      * <code>optional float r_knee_pitch = 24;</code>
@@ -2181,6 +2228,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_ankle_pitch = 25;
     private float rAnklePitch_ ;
     /**
      * <code>optional float r_ankle_pitch = 25;</code>
@@ -2213,6 +2261,7 @@ public final class JointAngles extends
       return this;
     }
 
+    // optional float r_ankle_roll = 26;
     private float rAnkleRoll_ ;
     /**
      * <code>optional float r_ankle_roll = 26;</code>

@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.HeadMotionCommand}
  */
-public final class HeadMotionCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.HeadMotionCommand)
-    HeadMotionCommandOrBuilder {
+public  final class HeadMotionCommand extends
+    com.google.protobuf.GeneratedMessage
+    implements HeadMotionCommandOrBuilder {
   // Use HeadMotionCommand.newBuilder() to construct.
   private HeadMotionCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -227,6 +226,7 @@ public final class HeadMotionCommand extends
   }
 
   private int bitField0_;
+  // optional .messages.HeadMotionCommand.CommandType type = 1;
   public static final int TYPE_FIELD_NUMBER = 1;
   private messages.HeadMotionCommand.CommandType type_;
   /**
@@ -242,6 +242,7 @@ public final class HeadMotionCommand extends
     return type_;
   }
 
+  // optional .messages.PositionHeadCommand pos_command = 2;
   public static final int POS_COMMAND_FIELD_NUMBER = 2;
   private messages.PositionHeadCommand posCommand_;
   /**
@@ -263,6 +264,7 @@ public final class HeadMotionCommand extends
     return posCommand_;
   }
 
+  // optional .messages.ScriptedHeadCommand scripted_command = 3;
   public static final int SCRIPTED_COMMAND_FIELD_NUMBER = 3;
   private messages.ScriptedHeadCommand scriptedCommand_;
   /**
@@ -284,6 +286,7 @@ public final class HeadMotionCommand extends
     return scriptedCommand_;
   }
 
+  // optional int64 timestamp = 4;
   public static final int TIMESTAMP_FIELD_NUMBER = 4;
   private long timestamp_;
   /**
@@ -308,8 +311,7 @@ public final class HeadMotionCommand extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -437,9 +439,8 @@ public final class HeadMotionCommand extends
    * Protobuf type {@code messages.HeadMotionCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.HeadMotionCommand)
-      messages.HeadMotionCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.HeadMotionCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_HeadMotionCommand_descriptor;
@@ -597,6 +598,7 @@ public final class HeadMotionCommand extends
     }
     private int bitField0_;
 
+    // optional .messages.HeadMotionCommand.CommandType type = 1;
     private messages.HeadMotionCommand.CommandType type_ = messages.HeadMotionCommand.CommandType.POS_HEAD_COMMAND;
     /**
      * <code>optional .messages.HeadMotionCommand.CommandType type = 1;</code>
@@ -632,6 +634,7 @@ public final class HeadMotionCommand extends
       return this;
     }
 
+    // optional .messages.PositionHeadCommand pos_command = 2;
     private messages.PositionHeadCommand posCommand_ = messages.PositionHeadCommand.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.PositionHeadCommand, messages.PositionHeadCommand.Builder, messages.PositionHeadCommandOrBuilder> posCommandBuilder_;
@@ -740,7 +743,7 @@ public final class HeadMotionCommand extends
       if (posCommandBuilder_ == null) {
         posCommandBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.PositionHeadCommand, messages.PositionHeadCommand.Builder, messages.PositionHeadCommandOrBuilder>(
-                getPosCommand(),
+                posCommand_,
                 getParentForChildren(),
                 isClean());
         posCommand_ = null;
@@ -748,6 +751,7 @@ public final class HeadMotionCommand extends
       return posCommandBuilder_;
     }
 
+    // optional .messages.ScriptedHeadCommand scripted_command = 3;
     private messages.ScriptedHeadCommand scriptedCommand_ = messages.ScriptedHeadCommand.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.ScriptedHeadCommand, messages.ScriptedHeadCommand.Builder, messages.ScriptedHeadCommandOrBuilder> scriptedCommandBuilder_;
@@ -856,7 +860,7 @@ public final class HeadMotionCommand extends
       if (scriptedCommandBuilder_ == null) {
         scriptedCommandBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.ScriptedHeadCommand, messages.ScriptedHeadCommand.Builder, messages.ScriptedHeadCommandOrBuilder>(
-                getScriptedCommand(),
+                scriptedCommand_,
                 getParentForChildren(),
                 isClean());
         scriptedCommand_ = null;
@@ -864,6 +868,7 @@ public final class HeadMotionCommand extends
       return scriptedCommandBuilder_;
     }
 
+    // optional int64 timestamp = 4;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 4;</code>

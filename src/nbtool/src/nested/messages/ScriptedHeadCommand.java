@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.ScriptedHeadCommand}
  */
-public final class ScriptedHeadCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.ScriptedHeadCommand)
-    ScriptedHeadCommandOrBuilder {
+public  final class ScriptedHeadCommand extends
+    com.google.protobuf.GeneratedMessage
+    implements ScriptedHeadCommandOrBuilder {
   // Use ScriptedHeadCommand.newBuilder() to construct.
   private ScriptedHeadCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -105,6 +104,7 @@ public final class ScriptedHeadCommand extends
     return PARSER;
   }
 
+  // repeated .messages.HeadJointCommand command = 1;
   public static final int COMMAND_FIELD_NUMBER = 1;
   private java.util.List<messages.HeadJointCommand> command_;
   /**
@@ -146,8 +146,7 @@ public final class ScriptedHeadCommand extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -254,9 +253,8 @@ public final class ScriptedHeadCommand extends
    * Protobuf type {@code messages.ScriptedHeadCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.ScriptedHeadCommand)
-      messages.ScriptedHeadCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.ScriptedHeadCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_ScriptedHeadCommand_descriptor;
@@ -400,6 +398,7 @@ public final class ScriptedHeadCommand extends
     }
     private int bitField0_;
 
+    // repeated .messages.HeadJointCommand command = 1;
     private java.util.List<messages.HeadJointCommand> command_ =
       java.util.Collections.emptyList();
     private void ensureCommandIsMutable() {
@@ -541,8 +540,7 @@ public final class ScriptedHeadCommand extends
         java.lang.Iterable<? extends messages.HeadJointCommand> values) {
       if (commandBuilder_ == null) {
         ensureCommandIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, command_);
+        super.addAll(values, command_);
         onChanged();
       } else {
         commandBuilder_.addAllMessages(values);

@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.WalkProvider}
  */
-public final class WalkProvider extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.WalkProvider)
-    WalkProviderOrBuilder {
+public  final class WalkProvider extends
+    com.google.protobuf.GeneratedMessage
+    implements WalkProviderOrBuilder {
   // Use WalkProvider.newBuilder() to construct.
   private WalkProvider(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -142,10 +141,10 @@ public final class WalkProvider extends
     return PARSER;
   }
 
-  public interface BHDebugOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:messages.WalkProvider.BHDebug)
-      com.google.protobuf.MessageOrBuilder {
+  public interface BHDebugOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // optional uint32 motion_type = 1;
     /**
      * <code>optional uint32 motion_type = 1;</code>
      */
@@ -155,6 +154,7 @@ public final class WalkProvider extends
      */
     int getMotionType();
 
+    // optional string motion_name = 2;
     /**
      * <code>optional string motion_name = 2;</code>
      */
@@ -169,6 +169,7 @@ public final class WalkProvider extends
     com.google.protobuf.ByteString
         getMotionNameBytes();
 
+    // optional uint32 selected_motion_type = 3;
     /**
      * <code>optional uint32 selected_motion_type = 3;</code>
      */
@@ -178,6 +179,7 @@ public final class WalkProvider extends
      */
     int getSelectedMotionType();
 
+    // optional string selected_motion_name = 4;
     /**
      * <code>optional string selected_motion_name = 4;</code>
      */
@@ -192,6 +194,7 @@ public final class WalkProvider extends
     com.google.protobuf.ByteString
         getSelectedMotionNameBytes();
 
+    // optional .messages.RobotLocation target = 5;
     /**
      * <code>optional .messages.RobotLocation target = 5;</code>
      */
@@ -205,6 +208,7 @@ public final class WalkProvider extends
      */
     messages.RobotLocationOrBuilder getTargetOrBuilder();
 
+    // optional .messages.RobotLocation speeds = 6;
     /**
      * <code>optional .messages.RobotLocation speeds = 6;</code>
      */
@@ -218,6 +222,7 @@ public final class WalkProvider extends
      */
     messages.RobotLocationOrBuilder getSpeedsOrBuilder();
 
+    // repeated float select_ratios = 7;
     /**
      * <code>repeated float select_ratios = 7;</code>
      */
@@ -231,6 +236,7 @@ public final class WalkProvider extends
      */
     float getSelectRatios(int index);
 
+    // optional bool ground_contact_safe = 8;
     /**
      * <code>optional bool ground_contact_safe = 8;</code>
      */
@@ -240,6 +246,7 @@ public final class WalkProvider extends
      */
     boolean getGroundContactSafe();
 
+    // optional bool instable = 9;
     /**
      * <code>optional bool instable = 9;</code>
      */
@@ -253,9 +260,8 @@ public final class WalkProvider extends
    * Protobuf type {@code messages.WalkProvider.BHDebug}
    */
   public static final class BHDebug extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:messages.WalkProvider.BHDebug)
-      BHDebugOrBuilder {
+      com.google.protobuf.GeneratedMessage
+      implements BHDebugOrBuilder {
     // Use BHDebug.newBuilder() to construct.
     private BHDebug(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -307,9 +313,8 @@ public final class WalkProvider extends
               break;
             }
             case 18: {
-              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              motionName_ = bs;
+              motionName_ = input.readBytes();
               break;
             }
             case 24: {
@@ -318,9 +323,8 @@ public final class WalkProvider extends
               break;
             }
             case 34: {
-              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000008;
-              selectedMotionName_ = bs;
+              selectedMotionName_ = input.readBytes();
               break;
             }
             case 42: {
@@ -423,6 +427,7 @@ public final class WalkProvider extends
     }
 
     private int bitField0_;
+    // optional uint32 motion_type = 1;
     public static final int MOTION_TYPE_FIELD_NUMBER = 1;
     private int motionType_;
     /**
@@ -438,6 +443,7 @@ public final class WalkProvider extends
       return motionType_;
     }
 
+    // optional string motion_name = 2;
     public static final int MOTION_NAME_FIELD_NUMBER = 2;
     private java.lang.Object motionName_;
     /**
@@ -480,6 +486,7 @@ public final class WalkProvider extends
       }
     }
 
+    // optional uint32 selected_motion_type = 3;
     public static final int SELECTED_MOTION_TYPE_FIELD_NUMBER = 3;
     private int selectedMotionType_;
     /**
@@ -495,6 +502,7 @@ public final class WalkProvider extends
       return selectedMotionType_;
     }
 
+    // optional string selected_motion_name = 4;
     public static final int SELECTED_MOTION_NAME_FIELD_NUMBER = 4;
     private java.lang.Object selectedMotionName_;
     /**
@@ -537,6 +545,7 @@ public final class WalkProvider extends
       }
     }
 
+    // optional .messages.RobotLocation target = 5;
     public static final int TARGET_FIELD_NUMBER = 5;
     private messages.RobotLocation target_;
     /**
@@ -558,6 +567,7 @@ public final class WalkProvider extends
       return target_;
     }
 
+    // optional .messages.RobotLocation speeds = 6;
     public static final int SPEEDS_FIELD_NUMBER = 6;
     private messages.RobotLocation speeds_;
     /**
@@ -579,6 +589,7 @@ public final class WalkProvider extends
       return speeds_;
     }
 
+    // repeated float select_ratios = 7;
     public static final int SELECT_RATIOS_FIELD_NUMBER = 7;
     private java.util.List<java.lang.Float> selectRatios_;
     /**
@@ -601,6 +612,7 @@ public final class WalkProvider extends
       return selectRatios_.get(index);
     }
 
+    // optional bool ground_contact_safe = 8;
     public static final int GROUND_CONTACT_SAFE_FIELD_NUMBER = 8;
     private boolean groundContactSafe_;
     /**
@@ -616,6 +628,7 @@ public final class WalkProvider extends
       return groundContactSafe_;
     }
 
+    // optional bool instable = 9;
     public static final int INSTABLE_FIELD_NUMBER = 9;
     private boolean instable_;
     /**
@@ -645,8 +658,7 @@ public final class WalkProvider extends
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       memoizedIsInitialized = 1;
       return true;
@@ -811,9 +823,8 @@ public final class WalkProvider extends
      * Protobuf type {@code messages.WalkProvider.BHDebug}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:messages.WalkProvider.BHDebug)
-        messages.WalkProvider.BHDebugOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements messages.WalkProvider.BHDebugOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages._File_Motion.internal_static_messages_WalkProvider_BHDebug_descriptor;
@@ -1028,6 +1039,7 @@ public final class WalkProvider extends
       }
       private int bitField0_;
 
+      // optional uint32 motion_type = 1;
       private int motionType_ ;
       /**
        * <code>optional uint32 motion_type = 1;</code>
@@ -1060,6 +1072,7 @@ public final class WalkProvider extends
         return this;
       }
 
+      // optional string motion_name = 2;
       private java.lang.Object motionName_ = "";
       /**
        * <code>optional string motion_name = 2;</code>
@@ -1073,12 +1086,9 @@ public final class WalkProvider extends
       public java.lang.String getMotionName() {
         java.lang.Object ref = motionName_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            motionName_ = s;
-          }
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          motionName_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1136,6 +1146,7 @@ public final class WalkProvider extends
         return this;
       }
 
+      // optional uint32 selected_motion_type = 3;
       private int selectedMotionType_ ;
       /**
        * <code>optional uint32 selected_motion_type = 3;</code>
@@ -1168,6 +1179,7 @@ public final class WalkProvider extends
         return this;
       }
 
+      // optional string selected_motion_name = 4;
       private java.lang.Object selectedMotionName_ = "";
       /**
        * <code>optional string selected_motion_name = 4;</code>
@@ -1181,12 +1193,9 @@ public final class WalkProvider extends
       public java.lang.String getSelectedMotionName() {
         java.lang.Object ref = selectedMotionName_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            selectedMotionName_ = s;
-          }
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          selectedMotionName_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1244,6 +1253,7 @@ public final class WalkProvider extends
         return this;
       }
 
+      // optional .messages.RobotLocation target = 5;
       private messages.RobotLocation target_ = messages.RobotLocation.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder> targetBuilder_;
@@ -1352,7 +1362,7 @@ public final class WalkProvider extends
         if (targetBuilder_ == null) {
           targetBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder>(
-                  getTarget(),
+                  target_,
                   getParentForChildren(),
                   isClean());
           target_ = null;
@@ -1360,6 +1370,7 @@ public final class WalkProvider extends
         return targetBuilder_;
       }
 
+      // optional .messages.RobotLocation speeds = 6;
       private messages.RobotLocation speeds_ = messages.RobotLocation.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder> speedsBuilder_;
@@ -1468,7 +1479,7 @@ public final class WalkProvider extends
         if (speedsBuilder_ == null) {
           speedsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder>(
-                  getSpeeds(),
+                  speeds_,
                   getParentForChildren(),
                   isClean());
           speeds_ = null;
@@ -1476,6 +1487,7 @@ public final class WalkProvider extends
         return speedsBuilder_;
       }
 
+      // repeated float select_ratios = 7;
       private java.util.List<java.lang.Float> selectRatios_ = java.util.Collections.emptyList();
       private void ensureSelectRatiosIsMutable() {
         if (!((bitField0_ & 0x00000040) == 0x00000040)) {
@@ -1527,8 +1539,7 @@ public final class WalkProvider extends
       public Builder addAllSelectRatios(
           java.lang.Iterable<? extends java.lang.Float> values) {
         ensureSelectRatiosIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, selectRatios_);
+        super.addAll(values, selectRatios_);
         onChanged();
         return this;
       }
@@ -1542,6 +1553,7 @@ public final class WalkProvider extends
         return this;
       }
 
+      // optional bool ground_contact_safe = 8;
       private boolean groundContactSafe_ ;
       /**
        * <code>optional bool ground_contact_safe = 8;</code>
@@ -1574,6 +1586,7 @@ public final class WalkProvider extends
         return this;
       }
 
+      // optional bool instable = 9;
       private boolean instable_ ;
       /**
        * <code>optional bool instable = 9;</code>
@@ -1618,6 +1631,7 @@ public final class WalkProvider extends
   }
 
   private int bitField0_;
+  // optional bool active = 1;
   public static final int ACTIVE_FIELD_NUMBER = 1;
   private boolean active_;
   /**
@@ -1633,6 +1647,7 @@ public final class WalkProvider extends
     return active_;
   }
 
+  // optional bool is_walking = 2;
   public static final int IS_WALKING_FIELD_NUMBER = 2;
   private boolean isWalking_;
   /**
@@ -1648,6 +1663,7 @@ public final class WalkProvider extends
     return isWalking_;
   }
 
+  // optional bool stopping = 3;
   public static final int STOPPING_FIELD_NUMBER = 3;
   private boolean stopping_;
   /**
@@ -1663,6 +1679,7 @@ public final class WalkProvider extends
     return stopping_;
   }
 
+  // optional bool requested_to_stop = 4;
   public static final int REQUESTED_TO_STOP_FIELD_NUMBER = 4;
   private boolean requestedToStop_;
   /**
@@ -1678,6 +1695,7 @@ public final class WalkProvider extends
     return requestedToStop_;
   }
 
+  // optional bool is_standing = 5;
   public static final int IS_STANDING_FIELD_NUMBER = 5;
   private boolean isStanding_;
   /**
@@ -1693,6 +1711,7 @@ public final class WalkProvider extends
     return isStanding_;
   }
 
+  // optional bool calibrated = 6;
   public static final int CALIBRATED_FIELD_NUMBER = 6;
   private boolean calibrated_;
   /**
@@ -1708,6 +1727,7 @@ public final class WalkProvider extends
     return calibrated_;
   }
 
+  // optional int32 command_type = 8;
   public static final int COMMAND_TYPE_FIELD_NUMBER = 8;
   private int commandType_;
   /**
@@ -1723,6 +1743,7 @@ public final class WalkProvider extends
     return commandType_;
   }
 
+  // optional .messages.WalkProvider.BHDebug bhdebug = 7;
   public static final int BHDEBUG_FIELD_NUMBER = 7;
   private messages.WalkProvider.BHDebug bhdebug_;
   /**
@@ -1757,8 +1778,7 @@ public final class WalkProvider extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -1914,9 +1934,8 @@ public final class WalkProvider extends
    * Protobuf type {@code messages.WalkProvider}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.WalkProvider)
-      messages.WalkProviderOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.WalkProviderOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Motion.internal_static_messages_WalkProvider_descriptor;
@@ -2101,6 +2120,7 @@ public final class WalkProvider extends
     }
     private int bitField0_;
 
+    // optional bool active = 1;
     private boolean active_ ;
     /**
      * <code>optional bool active = 1;</code>
@@ -2133,6 +2153,7 @@ public final class WalkProvider extends
       return this;
     }
 
+    // optional bool is_walking = 2;
     private boolean isWalking_ ;
     /**
      * <code>optional bool is_walking = 2;</code>
@@ -2165,6 +2186,7 @@ public final class WalkProvider extends
       return this;
     }
 
+    // optional bool stopping = 3;
     private boolean stopping_ ;
     /**
      * <code>optional bool stopping = 3;</code>
@@ -2197,6 +2219,7 @@ public final class WalkProvider extends
       return this;
     }
 
+    // optional bool requested_to_stop = 4;
     private boolean requestedToStop_ ;
     /**
      * <code>optional bool requested_to_stop = 4;</code>
@@ -2229,6 +2252,7 @@ public final class WalkProvider extends
       return this;
     }
 
+    // optional bool is_standing = 5;
     private boolean isStanding_ ;
     /**
      * <code>optional bool is_standing = 5;</code>
@@ -2261,6 +2285,7 @@ public final class WalkProvider extends
       return this;
     }
 
+    // optional bool calibrated = 6;
     private boolean calibrated_ ;
     /**
      * <code>optional bool calibrated = 6;</code>
@@ -2293,6 +2318,7 @@ public final class WalkProvider extends
       return this;
     }
 
+    // optional int32 command_type = 8;
     private int commandType_ ;
     /**
      * <code>optional int32 command_type = 8;</code>
@@ -2325,6 +2351,7 @@ public final class WalkProvider extends
       return this;
     }
 
+    // optional .messages.WalkProvider.BHDebug bhdebug = 7;
     private messages.WalkProvider.BHDebug bhdebug_ = messages.WalkProvider.BHDebug.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.WalkProvider.BHDebug, messages.WalkProvider.BHDebug.Builder, messages.WalkProvider.BHDebugOrBuilder> bhdebugBuilder_;
@@ -2433,7 +2460,7 @@ public final class WalkProvider extends
       if (bhdebugBuilder_ == null) {
         bhdebugBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.WalkProvider.BHDebug, messages.WalkProvider.BHDebug.Builder, messages.WalkProvider.BHDebugOrBuilder>(
-                getBhdebug(),
+                bhdebug_,
                 getParentForChildren(),
                 isClean());
         bhdebug_ = null;

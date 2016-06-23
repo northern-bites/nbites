@@ -189,7 +189,6 @@ class HeadTrackingHelper(object):
         # If we haven't seen the target, look towards loc model.
         if target.vis.frames_off > 3:
 
-
 # TODO: use a constant above
             self.lookToPoint(target)
 # TODO: safeguard above call from errors due to calling every frame
@@ -198,34 +197,35 @@ class HeadTrackingHelper(object):
 
         # Assert: target is visible.
 
-        #Marcus - LOOK AT TARGET HERE. ROTATE BODY TO FACE BALL HERE.
+        self.lookAtBallAngle()
+        # return
 
-        # Find the target's angular distance from yaw center.
-        changeX = target.vis.angle_x_deg
-        # ignore changeY: pitch is fixed
+        # # Find the target's angular distance from yaw center.
+        # changeX = target.vis.angle_x_deg
+        # # ignore changeY: pitch is fixed
 
-        curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
-        maxChange = 13.0
+        # curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
+        # maxChange = 13.0
 
-        # Warning- no gain is applied currently!
-        safeChangeX = MyMath.clip(changeX, -maxChange, maxChange)
-        # ignore safeChangeY: pitch is fixed
+        # # Warning- no gain is applied currently!
+        # safeChangeX = MyMath.clip(changeX, -maxChange, maxChange)
+        # # ignore safeChangeY: pitch is fixed
 
-        newYaw = curYaw + safeChangeX
-        # ignore newPitch: pitch is fixed
+        # newYaw = curYaw + safeChangeX
+        # # ignore newPitch: pitch is fixed
 
-        maxSpeed = 2.0 # TODO: use a constant
+        # maxSpeed = 2.0 # TODO: use a constant
 
-        # Set motion message fields
-        command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.POS_HEAD_COMMAND
+        # # Set motion message fields
+        # command = self.tracker.brain.interface.headMotionCommand
+        # command.type = command.CommandType.POS_HEAD_COMMAND
 
-        command.pos_command.head_yaw = newYaw
-        command.pos_command.head_pitch = constants.FIXED_PITCH_VALUE
-        command.pos_command.max_speed_yaw = maxSpeed
-        command.pos_command.max_speed_pitch = maxSpeed
+        # command.pos_command.head_yaw = newYaw
+        # command.pos_command.head_pitch = constants.FIXED_PITCH_VALUE
+        # command.pos_command.max_speed_yaw = maxSpeed
+        # command.pos_command.max_speed_pitch = maxSpeed
 
-        command.timestamp = int(self.tracker.brain.time * 1000)
+        # command.timestamp = int(self.tracker.brain.time * 1000)
 
     def trackStationaryObject(self):
         # Note: safe to call every frame.
@@ -292,6 +292,7 @@ class HeadTrackingHelper(object):
         """
         If the relative y is positive, look left. Otherwise, look right.
         """
+        
         if hasattr(target, "height"):
             height = target.height
         else:
@@ -327,7 +328,30 @@ class HeadTrackingHelper(object):
         return (((yaw, pitch),
                  .5, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
 
-        # TODO: use constants above
+        # TODO: use constants above 
+
+    def lookAtBallAngle(self):
+
+        curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
+        ballYaw = self.tracker.brain.ball.bearing_deg
+
+        maxSpeed = 2.0 # TODO: use a constant
+
+        # Set motion message fields
+        command = self.tracker.brain.interface.headMotionCommand
+        command.type = command.CommandType.POS_HEAD_COMMAND
+
+        if MyMath.fabs(curYaw - ballYaw) < 5:
+            command.pos_command.head_yaw = curYaw
+
+        else:
+            command.pos_command.head_yaw = ballYaw
+
+        command.pos_command.head_pitch = constants.FIXED_PITCH_VALUE
+        command.pos_command.max_speed_yaw = maxSpeed
+        command.pos_command.max_speed_pitch = maxSpeed
+
+        command.timestamp = int(self.tracker.brain.time * 1000)
 
     def lookToXY(self, x, y):
         self.tracker.target.x = x
