@@ -2,6 +2,8 @@ package nbtool.gui.logviews.images;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
@@ -12,6 +14,8 @@ public class ImageDisplay extends JPanel {
 
 	private BufferedImage image = null;
 	public ImageDisplayAnnotator ida = null;
+
+	private Dimension prefSizeOverride = null;
 
 	public void setImage(BufferedImage bi) {
 		Debug.info("new image!");
@@ -31,6 +35,37 @@ public class ImageDisplay extends JPanel {
 
 	public ImageDisplay() {
 		this(null, null);
+	}
+
+	public ImageDisplay(final Dimension pref) {
+		this(null, null);
+		this.prefSizeOverride = pref;
+
+		this.addComponentListener(new ComponentAdapter(){
+			final double heightPerWidth = pref.height / (double) pref.width;
+			final double widthPerHeight = pref.width / (double) pref.height;
+
+			@Override
+			public void componentResized(ComponentEvent e) {
+				int width = e.getComponent().getWidth();
+				int height = e.getComponent().getHeight();
+
+				Dimension takeWidth = new Dimension(width, (int) (width * heightPerWidth) );
+				Dimension takeHeight = new Dimension((int) (height * widthPerHeight), height);
+
+				Dimension use = null;
+				if (takeWidth.height <= height && takeWidth.width <= width) {
+					use = takeWidth;
+				} else if (takeHeight.height <= height && takeHeight.width <= width) {
+					use = takeHeight;
+				} else {
+					Debug.error("logic for dimensions wrong in ImageDisplay!");
+					assert(false);
+				}
+
+				e.getComponent().setSize(use);
+			}
+		});
 	}
 
 	@Override
@@ -71,6 +106,9 @@ public class ImageDisplay extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
+		if (this.prefSizeOverride != null)
+			return prefSizeOverride;
+
 		if (image != null) {
 			return new Dimension(image.getWidth(), image.getHeight());
 		} else {

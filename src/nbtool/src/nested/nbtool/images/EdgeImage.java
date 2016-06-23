@@ -13,11 +13,10 @@ public class EdgeImage extends ImageParent {
 		super(w, h, d);
 	}
 
-	
 	private static final Color[] angleMap = initColorMap();
-	
+
 	private static Color[] initColorMap(){
-		
+
 		Color[] ret = new Color[256];
 		Color[] top = {Color.RED,
 				Color.ORANGE,
@@ -28,20 +27,20 @@ public class EdgeImage extends ImageParent {
 				Color.GRAY,
 				Color.PINK};
 		assert(top.length == 8);
-		
+
 		for (int i = 0; i < 256; ++i) {
 			int bi = i / 32;
 			int ni = (bi + 1) % 8;
-			
+
 			int dist = i % 32;
-			
+
 			Color bc = top[bi];
 			Color nc = top[ni];
-			
+
 			int dr = nc.getRed() - bc.getRed();
 			int dg = nc.getGreen() - bc.getGreen();
 			int db = nc.getBlue() - bc.getBlue();
-			
+
 			Color tc = new Color(
 					bc.getRed() + (dist * dr) / 32,
 					bc.getGreen() + (dist * dg) / 32,
@@ -49,7 +48,7 @@ public class EdgeImage extends ImageParent {
 					);
 			ret[i] = tc;
 		}
-		
+
 		return ret;
 	};
 
@@ -57,7 +56,7 @@ public class EdgeImage extends ImageParent {
 	public BufferedImage toBufferedImage() {
 
 		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		
+
 		for (int x = 0; x < width; ++x) {
 			for (int y = 0; y < height; ++y) {
 				ret.setRGB(x, y, Color.BLACK.getRGB());
@@ -68,13 +67,13 @@ public class EdgeImage extends ImageParent {
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
 			int n_edges = data.length / (4 * 4);
 			Debug.info( "%d edges expected.", n_edges);
-			
+
 			for (int i = 0; i < n_edges; ++i) {
 				int x = dis.readInt();
 				int y = dis.readInt();
 				int mag = dis.readInt();
 				int ang = dis.readInt();
-				
+
 				Color base = angleMap[ang];
 				ret.setRGB(x, y, base.getRGB());
 			}

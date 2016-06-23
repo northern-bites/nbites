@@ -121,6 +121,8 @@ namespace man {
                                 	spotVector & actualWhiteSpots, double cameraHeight,
                                 	int bottomQuarer);
 
+			bool whiteBelowSpot(Spot spot);
+			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
 			bool checkDiagonalCircle(Spot spot);
@@ -167,6 +169,7 @@ namespace man {
 			const std::vector<Spot>& getWhiteSpots() { return debugWhiteSpots; }
 			const std::vector<Spot>& getBlackSpots() { return debugBlackSpots; }
 			void setDebugBall(bool debug) {debugBall = debug;}
+			void setDebugSpots(bool debug) {debugSpots = debug; }
 			void setDebugFilterDark(int fd) { filterThresholdDark = fd; }
 			void setDebugGreenDark(int gd) { greenThresholdDark = gd; }
 			void setDebugFilterBrite(int fb) { filterThresholdBrite = fb; }
@@ -204,12 +207,14 @@ namespace man {
 			std::vector<Ball> candidates;
 #ifdef OFFLINE
 			bool debugBall;
+			bool debugSpots;
 			int filterThresholdDark;
 			int greenThresholdDark;
 			int filterThresholdBrite;
 			int greenThresholdBrite;
 #else
 			static const bool debugBall = false;
+			static const bool debugSpots = false;
 			static const int filterThresholdDark = 144;
 			static const int greenThresholdDark = 60;
 			static const int filterThresholdBrite = 144;

@@ -77,8 +77,12 @@ def watchForBall(player):
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
-    if transitions.tooFarFromHome(player, 50, 20):
-        return player.goLater('positionAtHome')
+
+    # I commented this out because we were getting strange oscillations 
+    # between this and positonAtHome, and honestly we never go here unless
+    # we are already at home... dumb...
+    # if transitions.tooFarFromHome(player, 50, 20):
+    #     return player.goLater('positionAtHome')
 
     while player.stateTime < 8:
         return player.stay()
