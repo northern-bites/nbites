@@ -1163,6 +1163,9 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         smallerY = ImageLiteU16(yImage, 0, 0, yImage.width(), yImage.height());
         smallerGreen = ImageLiteU8(greenImage, 0, 0, greenImage.width(),greenImage.height());
 	} else {
+        ((startCol - 3 > 0) ? startCol = startCol-3 : startCol = 0);
+        ((endCol + 3 < width) ? endCol = endCol+3 : endCol = width);
+        ((endRow + 3 < height) ? endRow = endRow+3 : endRow = height);
         smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
         smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
     }
@@ -1224,7 +1227,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
     SpotDetector whiteSpotDetector;
-    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
+    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
     if(whiteSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
