@@ -409,6 +409,11 @@ bool BallDetector::blobsAreClose(std::pair<int,int> p, std::pair<int,int> q)
     double cx = (p.first + q.first) / 2;
     double cy = (p.second + q.second) / 2;
 
+    int midY = *(yImage.pixelAddr(cx, cy)) / 4;
+	if (midY < 100) {
+		return false;
+	}
+
     double bcx = 0, bcy = 0;
     imageToBillCoordinates(cx, cy, bcx, bcy);
 
@@ -491,7 +496,7 @@ bool BallDetector::findCorrelatedBlackSpots
 
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
-                    
+
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
 
