@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.BodyJointCommand}
  */
-public final class BodyJointCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.BodyJointCommand)
-    BodyJointCommandOrBuilder {
+public  final class BodyJointCommand extends
+    com.google.protobuf.GeneratedMessage
+    implements BodyJointCommandOrBuilder {
   // Use BodyJointCommand.newBuilder() to construct.
   private BodyJointCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -219,6 +218,7 @@ public final class BodyJointCommand extends
   }
 
   private int bitField0_;
+  // optional float time = 1;
   public static final int TIME_FIELD_NUMBER = 1;
   private float time_;
   /**
@@ -234,6 +234,7 @@ public final class BodyJointCommand extends
     return time_;
   }
 
+  // optional .messages.JointAngles angles = 2;
   public static final int ANGLES_FIELD_NUMBER = 2;
   private messages.JointAngles angles_;
   /**
@@ -255,6 +256,7 @@ public final class BodyJointCommand extends
     return angles_;
   }
 
+  // optional .messages.JointAngles stiffness = 3;
   public static final int STIFFNESS_FIELD_NUMBER = 3;
   private messages.JointAngles stiffness_;
   /**
@@ -276,6 +278,7 @@ public final class BodyJointCommand extends
     return stiffness_;
   }
 
+  // optional .messages.BodyJointCommand.InterpolationType interpolation = 4;
   public static final int INTERPOLATION_FIELD_NUMBER = 4;
   private messages.BodyJointCommand.InterpolationType interpolation_;
   /**
@@ -300,8 +303,7 @@ public final class BodyJointCommand extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -429,9 +431,8 @@ public final class BodyJointCommand extends
    * Protobuf type {@code messages.BodyJointCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.BodyJointCommand)
-      messages.BodyJointCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.BodyJointCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_BodyJointCommand_descriptor;
@@ -589,6 +590,7 @@ public final class BodyJointCommand extends
     }
     private int bitField0_;
 
+    // optional float time = 1;
     private float time_ ;
     /**
      * <code>optional float time = 1;</code>
@@ -621,6 +623,7 @@ public final class BodyJointCommand extends
       return this;
     }
 
+    // optional .messages.JointAngles angles = 2;
     private messages.JointAngles angles_ = messages.JointAngles.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.JointAngles, messages.JointAngles.Builder, messages.JointAnglesOrBuilder> anglesBuilder_;
@@ -729,7 +732,7 @@ public final class BodyJointCommand extends
       if (anglesBuilder_ == null) {
         anglesBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.JointAngles, messages.JointAngles.Builder, messages.JointAnglesOrBuilder>(
-                getAngles(),
+                angles_,
                 getParentForChildren(),
                 isClean());
         angles_ = null;
@@ -737,6 +740,7 @@ public final class BodyJointCommand extends
       return anglesBuilder_;
     }
 
+    // optional .messages.JointAngles stiffness = 3;
     private messages.JointAngles stiffness_ = messages.JointAngles.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         messages.JointAngles, messages.JointAngles.Builder, messages.JointAnglesOrBuilder> stiffnessBuilder_;
@@ -845,7 +849,7 @@ public final class BodyJointCommand extends
       if (stiffnessBuilder_ == null) {
         stiffnessBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             messages.JointAngles, messages.JointAngles.Builder, messages.JointAnglesOrBuilder>(
-                getStiffness(),
+                stiffness_,
                 getParentForChildren(),
                 isClean());
         stiffness_ = null;
@@ -853,6 +857,7 @@ public final class BodyJointCommand extends
       return stiffnessBuilder_;
     }
 
+    // optional .messages.BodyJointCommand.InterpolationType interpolation = 4;
     private messages.BodyJointCommand.InterpolationType interpolation_ = messages.BodyJointCommand.InterpolationType.SMOOTH;
     /**
      * <code>optional .messages.BodyJointCommand.InterpolationType interpolation = 4;</code>

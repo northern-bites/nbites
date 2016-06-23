@@ -73,7 +73,7 @@ void FieldHomography::panAzimuth(double iy, double x, double y, double& xp, doub
   yp = x * sp + y * cp;
 }
 
-bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) const
+bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy, double wz) const
 {
   compute();
 
@@ -82,7 +82,7 @@ bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) 
   iy -= iy0();
 
   // Camera coordinates
-  double cz = -h34 / (ix * h31 + iy * h32 + flen() * h33);
+  double cz = -(h34 + wz) / (ix * h31 + iy * h32 + flen() * h33);
   double cx = ix * cz;
   double cy = iy * cz;
   cz *= flen();
@@ -92,18 +92,11 @@ bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) 
   wx += h14;
   wy += h24;
 
-  double wz = h31 * cx + h32 * cy + h33 * cz + h34;
-  if (fabs(wz) > 1.0e-6) {
-    // TODO call exception "Internal error in FieldHomography"
-    std::cout<<"[HOMOGRAPHY ] BIG ERROR but not calling stupid exception."<<std::endl;
-    // throw exception();
-  }
-
   return cz > 0;
 }
 
 void FieldHomography::fieldVector(double ix, double iy, double dix, double diy,
-                                  double& dwx, double& dwy) const
+                                  double& dwx, double& dwy, double wz) const
 {
   compute();
 
@@ -118,7 +111,7 @@ void FieldHomography::fieldVector(double ix, double iy, double dix, double diy,
   double j21 =  -sp * st * iy + ( cp * sr + sp * cr * ct) * flen();
   double j22 =   sp * st * ix + (-cp * cr + sp * sr * ct) * flen();
   double js = h31 * ix + h32 * iy + h33 * flen();
-  js = h34 / (js * js);
+  js = (h34 + wz) / (js * js);
 
   dwx = js * (dix * j11 + diy * j12);
   dwy = js * (dix * j21 + diy * j22);

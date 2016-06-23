@@ -125,10 +125,24 @@ private:
 
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
 
+    /*  */
+    void doPickupDetection();
+
     static const int PICKUP_FRAMES = 50;
+    static float PICKUP_NOT_SET;
+
     float pickupFrames[PICKUP_FRAMES];
     bool pickupCalibrated;
     float pickupZCalibration;
+    int pickupIndex;
+
+    enum PickupStatus {
+        PICKED_UP = 0,
+        NONE = 1,
+        PUT_DOWN = 2
+    };
+
+    PickupStatus latestPickupStatus;
 };
 
 }

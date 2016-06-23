@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface NaiveBallOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.NaiveBall)
-    com.google.protobuf.MessageOrBuilder {
+public interface NaiveBallOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float velocity = 1;
   /**
    * <code>optional float velocity = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getVelocity();
 
+  // optional bool stationary = 2;
   /**
    * <code>optional bool stationary = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface NaiveBallOrBuilder extends
    */
   boolean getStationary();
 
+  // optional float yintercept = 3;
   /**
    * <code>optional float yintercept = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getYintercept();
 
+  // repeated .messages.NaiveBall.Position position = 4;
   /**
    * <code>repeated .messages.NaiveBall.Position position = 4;</code>
    */
@@ -58,6 +61,7 @@ public interface NaiveBallOrBuilder extends
   messages.NaiveBall.PositionOrBuilder getPositionOrBuilder(
       int index);
 
+  // repeated .messages.NaiveBall.Position dest_buffer = 5;
   /**
    * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
    */
@@ -82,6 +86,7 @@ public interface NaiveBallOrBuilder extends
   messages.NaiveBall.PositionOrBuilder getDestBufferOrBuilder(
       int index);
 
+  // optional float x_vel = 6;
   /**
    * <code>optional float x_vel = 6;</code>
    */
@@ -91,6 +96,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getXVel();
 
+  // optional float y_vel = 7;
   /**
    * <code>optional float y_vel = 7;</code>
    */
@@ -100,6 +106,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getYVel();
 
+  // optional float start_avg_x = 8;
   /**
    * <code>optional float start_avg_x = 8;</code>
    */
@@ -109,6 +116,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getStartAvgX();
 
+  // optional float start_avg_y = 9;
   /**
    * <code>optional float start_avg_y = 9;</code>
    */
@@ -118,6 +126,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getStartAvgY();
 
+  // optional float end_avg_x = 10;
   /**
    * <code>optional float end_avg_x = 10;</code>
    */
@@ -127,6 +136,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getEndAvgX();
 
+  // optional float end_avg_y = 11;
   /**
    * <code>optional float end_avg_y = 11;</code>
    */
@@ -136,6 +146,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getEndAvgY();
 
+  // optional float avg_start_index = 12;
   /**
    * <code>optional float avg_start_index = 12;</code>
    */
@@ -145,6 +156,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getAvgStartIndex();
 
+  // optional float avg_end_index = 13;
   /**
    * <code>optional float avg_end_index = 13;</code>
    */
@@ -154,6 +166,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getAvgEndIndex();
 
+  // optional float alt_x_vel = 14;
   /**
    * <code>optional float alt_x_vel = 14;</code>
    */
@@ -163,6 +176,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getAltXVel();
 
+  // optional float x_v_1 = 15;
   /**
    * <code>optional float x_v_1 = 15;</code>
    */
@@ -172,6 +186,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getXV1();
 
+  // optional float x_v_2 = 16;
   /**
    * <code>optional float x_v_2 = 16;</code>
    */
@@ -181,6 +196,7 @@ public interface NaiveBallOrBuilder extends
    */
   float getXV2();
 
+  // optional float x_v_3 = 17;
   /**
    * <code>optional float x_v_3 = 17;</code>
    */

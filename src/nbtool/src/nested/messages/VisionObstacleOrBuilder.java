@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisionObstacleOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.VisionObstacle)
-    com.google.protobuf.MessageOrBuilder {
+public interface VisionObstacleOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional bool on_left = 1;
   /**
    * <code>optional bool on_left = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface VisionObstacleOrBuilder extends
    */
   boolean getOnLeft();
 
+  // optional bool on_right = 2;
   /**
    * <code>optional bool on_right = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface VisionObstacleOrBuilder extends
    */
   boolean getOnRight();
 
+  // optional bool off_field = 3;
   /**
    * <code>optional bool off_field = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface VisionObstacleOrBuilder extends
    */
   boolean getOffField();
 
+  // optional sint32 block_left = 4;
   /**
    * <code>optional sint32 block_left = 4;</code>
    */
@@ -43,6 +46,7 @@ public interface VisionObstacleOrBuilder extends
    */
   int getBlockLeft();
 
+  // optional sint32 block_mid = 5;
   /**
    * <code>optional sint32 block_mid = 5;</code>
    */
@@ -52,6 +56,7 @@ public interface VisionObstacleOrBuilder extends
    */
   int getBlockMid();
 
+  // optional sint32 block_right = 6;
   /**
    * <code>optional sint32 block_right = 6;</code>
    */
@@ -61,6 +66,7 @@ public interface VisionObstacleOrBuilder extends
    */
   int getBlockRight();
 
+  // optional float left_dist = 7;
   /**
    * <code>optional float left_dist = 7;</code>
    */
@@ -70,6 +76,7 @@ public interface VisionObstacleOrBuilder extends
    */
   float getLeftDist();
 
+  // optional float mid_dist = 8;
   /**
    * <code>optional float mid_dist = 8;</code>
    */
@@ -79,6 +86,7 @@ public interface VisionObstacleOrBuilder extends
    */
   float getMidDist();
 
+  // optional float right_dist = 9;
   /**
    * <code>optional float right_dist = 9;</code>
    */
@@ -88,6 +96,7 @@ public interface VisionObstacleOrBuilder extends
    */
   float getRightDist();
 
+  // optional float left_bearing = 10;
   /**
    * <code>optional float left_bearing = 10;</code>
    */
@@ -97,6 +106,7 @@ public interface VisionObstacleOrBuilder extends
    */
   float getLeftBearing();
 
+  // optional float mid_bearing = 11;
   /**
    * <code>optional float mid_bearing = 11;</code>
    */
@@ -106,6 +116,7 @@ public interface VisionObstacleOrBuilder extends
    */
   float getMidBearing();
 
+  // optional float right_bearing = 12;
   /**
    * <code>optional float right_bearing = 12;</code>
    */
