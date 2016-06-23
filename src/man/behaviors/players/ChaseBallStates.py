@@ -338,7 +338,7 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchNow(transitions.shouldSpinToKickHeading, 'orbitBall')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
-@ifSwitchLater(transitions.shouldFindBall, 'findBall')
+@ifSwitchLater(transitions.shouldFindBall, 'playOffBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
         print "It's no longer poo dribble time"
