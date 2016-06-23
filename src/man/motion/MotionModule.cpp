@@ -88,6 +88,7 @@ void MotionModule::run_()
     //         std::cout << "Curprovider is scriptedProvider!\n";
     //     }
     // }
+    if (curProvider )
 
     // (2) If motion is enabled, perform a single iteration
     //     of the main motion loop.
@@ -125,7 +126,10 @@ void MotionModule::run_()
         newInputJoints = false;
         frameCount++;
 
-        if (!walkProvider.calibrated()) { adjustIMU(); }
+        if (!walkProvider.calibrated()) {
+            // TODO bella hack fix this, love nikki :) 
+            // std::cout << "NOT CALIBRATED DONt move\n";
+            adjustIMU(); }
     }
 
     PROF_EXIT(P_MOTION);
@@ -249,6 +253,10 @@ void MotionModule::processBodyJoints()
             curProvider->calculateNextJointsAndStiffnesses(
                 sensorAngles, sensorCurrents,
                 inertialsInput_.message(), fsrInput_.message());
+
+            // std::cout << "Resetting calibration inertials\n";
+            walkProvider.resetIMU();
+
         }
         else
         {
@@ -481,6 +489,7 @@ void MotionModule::preProcessBody()
 
         if (!curProvider->isActive())
         {
+            std::cout << "[MOTION MODULE] Swapping body providers \n";
             swapBodyProvider();
         }
     }
@@ -636,6 +645,10 @@ void MotionModule::swapBodyProvider()
         // ONCE (Maybe twice?), instead of doing this forever.
         //The potential symptoms of such a bug would be jittering when standing
         //We need to ensure we are in the correct gait before walking
+
+        // std::cout << "Resetting calibration inertials\n";
+        // walkProvider.resetIMU();
+
         if(noWalkTransitionCommand){//only enqueue one
             noWalkTransitionCommand = false;
             transitions = generateNextBodyProviderTransitions();
@@ -1038,7 +1051,7 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
         gain = command.gain();
     else
         gain = DEFAULT_SPEED;
-    std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
+    // std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
 
     nextProvider = &walkProvider;
     StepCommand::ptr newCommand(
@@ -1053,7 +1066,7 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 
 void MotionModule::sendMotionCommand(const KickCommand::ptr command)
 {
-    std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
+    // std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
 
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
@@ -1061,7 +1074,7 @@ void MotionModule::sendMotionCommand(const KickCommand::ptr command)
 
 void MotionModule::sendMotionCommand(messages::Kick command, int time)
 {
-    std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
+    // std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
 
     nextProvider = &walkProvider;
     KickCommand::ptr newCommand(new KickCommand(command.type(), time));

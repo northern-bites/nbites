@@ -251,6 +251,15 @@ return ERROR; }
             serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
             serv_addr.sin_port = htons(port);
 
+            /* we need the socket to use these two options so that we may re-establish dead servers quickly */
+            int enable = 1;
+
+            int ru_addr_ret = setsockopt(ss, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+            PERROR_AND_FAIL_IF(ru_addr_ret, "could not set SO_REUSEADDR !");
+
+//            int ru_port_ret = setsockopt(ss, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int));
+//            PERROR_AND_FAIL_IF(ru_port_ret, "could not set SO_REUSEPORT !");
+
             int bret = bind(ss, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
             PERROR_AND_FAIL_IF(bret, "could not bind server socket!");
 

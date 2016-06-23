@@ -124,7 +124,7 @@ public class YUVColorUtility extends UtilityParent {
 	    @SuppressWarnings("unchecked")
 	    // <editor-fold defaultstate="collapsed" desc="Generated Code">
 	    private void initComponents() {
-	        imageDisplay = new ImageDisplay(null);
+	        imageDisplay = new ImageDisplay();
 
 	        ySlider = new javax.swing.JSlider();
 	        jLabel1 = new javax.swing.JLabel();

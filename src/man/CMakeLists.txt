@@ -177,6 +177,11 @@ file ( GLOB loggingFiles "../share/logshare/LOGGING_CONSTANTS.json" )
 
 install ( FILES ${loggingFiles} DESTINATION ${CMAKE_INSTALL_PREFIX}/Config )
 
+file ( GLOB unswPositionFiles "motion/unswalk/pos/*" )
+
+install ( FILES ${unswPositionFiles} DESTINATION ${CMAKE_INSTALL_PREFIX}/Config/pos )
+
+
 
 
 

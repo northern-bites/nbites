@@ -35,8 +35,13 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       colorParamsMonitor( calibration::colorParamsPath().c_str(), false),
       camOffsetsMonitor( calibration::cameraOffsetsPath().c_str(), false)
 {
-    NBL_ASSERT_EQ( robotName.find(".local"), std::string::npos )
-    name = robotName;
+    size_t dot_local_pos = robotName.find(".local");
+
+    if (dot_local_pos != std::string::npos) {
+        name = robotName.substr(0, dot_local_pos);
+    } else {
+        name = robotName;
+    }
 
     for (int i = 0; i < 2; ++i) {
         colorParams[i] = NULL;
@@ -60,7 +65,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edges[i] = new EdgeList(32000);
         rejectedEdges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
-        calibrationParams[i] = new CalibrationParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
@@ -231,7 +235,7 @@ void VisionModule::run_()
 
         // Offset to hackily adjust tilt for high-azimuth error
         double azOffset = 0;
-        if (name != "ringo")
+        if (name != "blt")
             azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
 
         // Calculate kinematics and adjust homography
