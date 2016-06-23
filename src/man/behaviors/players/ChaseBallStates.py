@@ -345,8 +345,16 @@ def dribble(player):
         return player.goNow('positionForKick')
     print "Dribble time"
     ball = player.brain.ball
-    player.brain.nav.goTo(Location(ball.x - 10, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_TWO)
-    # player.brain.nav.walk(10, 0, 0)
+    relH = player.decider.normalizeAngle(player.brain.loc.h)
+    if ball.distance < constants.LINE_UP_X and not (relH > -constants.ORBIT_GOOD_BEARING and
+        relH < constants.ORBIT_GOOD_BEARING):
+        player.setWalk(0, 0, 0)
+        return player.goLater('orbitBall')
+
+    if player.brain.ball.vis == True:
+        player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_TWO)
+    else:
+        player.brain.nav.walk(10, 0, 0)
     return player.stay()
 
 @superState('positionAndKickBall')
