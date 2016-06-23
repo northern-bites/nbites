@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.LedCommand}
  */
-public final class LedCommand extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.LedCommand)
-    LedCommandOrBuilder {
+public  final class LedCommand extends
+    com.google.protobuf.GeneratedMessage
+    implements LedCommandOrBuilder {
   // Use LedCommand.newBuilder() to construct.
   private LedCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -142,6 +141,7 @@ public final class LedCommand extends
     return PARSER;
   }
 
+  // repeated int32 led_id = 1;
   public static final int LED_ID_FIELD_NUMBER = 1;
   private java.util.List<java.lang.Integer> ledId_;
   /**
@@ -179,6 +179,7 @@ public final class LedCommand extends
     return ledId_.get(index);
   }
 
+  // repeated int32 rgb_hex = 2;
   public static final int RGB_HEX_FIELD_NUMBER = 2;
   private java.util.List<java.lang.Integer> rgbHex_;
   /**
@@ -208,8 +209,7 @@ public final class LedCommand extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -333,9 +333,8 @@ public final class LedCommand extends
    * Protobuf type {@code messages.LedCommand}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.LedCommand)
-      messages.LedCommandOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.LedCommandOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_LedCommand.internal_static_messages_LedCommand_descriptor;
@@ -471,6 +470,7 @@ public final class LedCommand extends
     }
     private int bitField0_;
 
+    // repeated int32 led_id = 1;
     private java.util.List<java.lang.Integer> ledId_ = java.util.Collections.emptyList();
     private void ensureLedIdIsMutable() {
       if (!((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -552,8 +552,7 @@ public final class LedCommand extends
     public Builder addAllLedId(
         java.lang.Iterable<? extends java.lang.Integer> values) {
       ensureLedIdIsMutable();
-      com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, ledId_);
+      super.addAll(values, ledId_);
       onChanged();
       return this;
     }
@@ -572,6 +571,7 @@ public final class LedCommand extends
       return this;
     }
 
+    // repeated int32 rgb_hex = 2;
     private java.util.List<java.lang.Integer> rgbHex_ = java.util.Collections.emptyList();
     private void ensureRgbHexIsMutable() {
       if (!((bitField0_ & 0x00000002) == 0x00000002)) {
@@ -623,8 +623,7 @@ public final class LedCommand extends
     public Builder addAllRgbHex(
         java.lang.Iterable<? extends java.lang.Integer> values) {
       ensureRgbHexIsMutable();
-      com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, rgbHex_);
+      super.addAll(values, rgbHex_);
       onChanged();
       return this;
     }

@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface DestinationWalkOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.DestinationWalk)
-    com.google.protobuf.MessageOrBuilder {
+public interface DestinationWalkOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float rel_x = 1;
   /**
    * <code>optional float rel_x = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface DestinationWalkOrBuilder extends
    */
   float getRelX();
 
+  // optional float rel_y = 2;
   /**
    * <code>optional float rel_y = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface DestinationWalkOrBuilder extends
    */
   float getRelY();
 
+  // optional float rel_h = 3;
   /**
    * <code>optional float rel_h = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface DestinationWalkOrBuilder extends
    */
   float getRelH();
 
+  // optional float gain = 4;
   /**
    * <code>optional float gain = 4;</code>
    */
@@ -43,6 +46,7 @@ public interface DestinationWalkOrBuilder extends
    */
   float getGain();
 
+  // optional .messages.MotionKick kick = 5;
   /**
    * <code>optional .messages.MotionKick kick = 5;</code>
    */

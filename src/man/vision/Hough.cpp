@@ -585,9 +585,9 @@ bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0,
   }
 
   if (count < minPotentials) {
-#ifdef OFFLINE
-    std::cerr << std::endl << "Not enough potentials for center circle: " << (double)count << " potentials" << std::endl;
-#endif   
+// #ifdef OFFLINE
+//     std::cerr << std::endl << "Not enough potentials for center circle: " << (double)count << " potentials" << std::endl;
+// #endif   
     return false;
   }
 
