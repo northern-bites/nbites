@@ -105,13 +105,19 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 		int fudge = radius / 4;
 		bool goodSize = radius <= diam && diam < 2 * radius + fudge;
 		if (!topCamera && !goodSize) {
-			goodSize = diam > 8 && diam < 2 * radius + fudge;
+			goodSize = diam > 8 && diam < 2 * radius + fudge && diam < 30;
+		}
+		if (!topCamera && goodSize && diam > 25) {
+			goodSize = false;
 		}
 		if (!goodSize && debugBall) {
 			std::cout << "Bad size on blob " << radius << " " <<
 				diam << " " << diam2 << " " << cx << " " <<
 				(cy+bottomQuarter) << std::endl;
 		}
+		std::cout << "Good size on blob " << radius << " " <<
+				diam << " " << diam2 << " " << cx << " " <<
+				(cy+bottomQuarter) << std::endl;
 
         if (goodSize && diam2 >= radius / 2 && cy - diam > 0 &&
 			cx - diam > 0 && cx + diam < width &&
@@ -685,7 +691,7 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
     }
     // for now, if there are no black spots then it is too dangerous
     if (spots < 1) {
-		if (!whiteNoBlack(spot)) {
+		if (!topCamera || !whiteNoBlack(spot)) {
 			return false;
 		}
     }
@@ -1049,7 +1055,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
     // for now, if there are no black spots then it is too dangerous
 	int THRESHOLD = 110;
     if (spots < 1) {
-		if (!whiteNoBlack(spot)) {
+		if (!topCamera || !whiteNoBlack(spot)) {
 			return false;
 		}
     } else if (spots == 1) {
