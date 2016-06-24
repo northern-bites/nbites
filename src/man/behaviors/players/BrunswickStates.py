@@ -164,11 +164,11 @@ def gameFinished(player):
         player.brain.fallController.enabled = False
         player.stopWalking()
         player.zeroHeads()
-        if nogginConstants.V5_ROBOT:
-            player.executeMove(SweetMoves.SIT_POS_V5)
-        else:
-            player.executeMove(SweetMoves.SIT_POS)
-
+        # if nogginConstants.V5_ROBOT:
+        #     player.executeMove(SweetMoves.SIT_POS_V5)
+        # else:
+        #     player.executeMove(SweetMoves.SIT_POS)
+        player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
     if player.brain.nav.isStopped():
         player.gainsOff()
 
