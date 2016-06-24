@@ -42,6 +42,4 @@ message WorldModel
     optional int32 intention = 22;
 
     optional bool  alive = 23;
-
-    optional bool even_defender_forward = 24;
 }

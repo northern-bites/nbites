@@ -11,7 +11,7 @@ def setRoleConstants(player, role):
         player.box = evenDefenderBox
         player.isKickingOff = False
     elif isRightDefender(role):
-        player.homePosition = oddDefenderHome
+        player.homePosition = oddDefenderBack
         player.kickoffPosition = oddDefenderKickoff
         #player.kickoffPosition = oddDefenderKickoff
         player.box = oddDefenderBox
@@ -142,13 +142,13 @@ oddDefenderForward = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 330,
                                    35)
 evenDefenderForward = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 330,
                                     NogginConstants.MY_GOALBOX_TOP_Y + 120,
-                                    -35)
-oddDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 60,
-                                35)
-evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
-                                 NogginConstants.MY_GOALBOX_TOP_Y + 60,
-                                 -35)
+                                    -25)
+oddDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 30,
+                                10)
+evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 80,
+                                 NogginConstants.MY_GOALBOX_TOP_Y,
+                                 -20)
 
 # Tomultuous triangle (odd chaser positioning)
 strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 175,

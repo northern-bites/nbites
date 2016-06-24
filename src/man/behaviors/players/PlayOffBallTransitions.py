@@ -112,11 +112,21 @@ def shouldChangeDefenderPosition(player):
     if player.brain.defendingStateTime >= 750: #Number of frames. #Should change to constant.
         player.brain.defendingStateTime = 0
         return True
+    else:
+        return False
+
+self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition,
+                                                                  Transition.MOST_OF_THE_TIME,
+                                                                  Transition.HIGH_PRECISION)
 
 def ballInOurHalf(player):
-    return player.brain.sharedBall.ball_on and player.brain.sharedBall.x < NogginConstants.MIDFIELD_X
+    if role.isDefender(player.role):
+        return player.brain.sharedBall.ball_on and (player.brain.sharedBall.x < (nogginC.MIDFIELD_X - nogginC.CENTER_CIRCLE_RADIUS))
+    return False
 
 def ballInTheirHalf(player):
-    return player.brain.sharedBall.ball_on and player.brain.sharedBall.x > NogginConstants.MIDFIELD_X
+    if role.isDefender(player.role):
+        return player.brain.sharedBall.ball_on and (player.brain.sharedBall.x > (nogginC.MIDFIELD_X + nogginC.CENTER_CIRCLE_RADIUS))
+    return False
 
 
