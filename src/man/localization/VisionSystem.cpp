@@ -220,9 +220,9 @@ bool VisionSystem::update(ParticleSet& particles,
                         }
 
                         // Inject if reconstucted location is on field
-                        // ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
-                        // if (reconstructed.onField())
-                        //     injections.push_back(reconstructed);
+                        ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
+                        if (reconstructed.onField())
+                            injections.push_back(reconstructed);
                     }
                 }
 
@@ -300,41 +300,41 @@ bool VisionSystem::update(ParticleSet& particles,
         // }
 
         // (4) Reconstruct pose from center circle and midline
-        // if (vision.circle().on()) {
-        //     bool midlineFound = false;
-        //     messages::FieldLine midline;
+        if (vision.circle().on()) {
+            bool midlineFound = false;
+            messages::FieldLine midline;
 
-        //     // Find line that loc system classified as midline
-        //     for (int i = 0; i < vision.line_size(); i++) {
-        //         const messages::FieldLine& field = vision.line(i);
+            // Find line that loc system classified as midline
+            for (int i = 0; i < vision.line_size(); i++) {
+                const messages::FieldLine& field = vision.line(i);
 
-        //         // Check for midline
-        //         if (field.id() == static_cast<int>(vision::LineID::Midline)) {
-        //             midlineFound = true;
-        //             midline = field;
-        //         }
-        //     }
+                // Check for midline
+                if (field.id() == static_cast<int>(vision::LineID::Midline)) {
+                    midlineFound = true;
+                    midline = field;
+                }
+            }
 
-        //     // If found the midline, reconstruct location
-        //     if (midlineFound) {
-        //         // Get appropriate line id
-        //         LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirMidline : LocLineID::OurMidline);
+            // If found the midline, reconstruct location
+            if (midlineFound) {
+                // Get appropriate line id
+                LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirMidline : LocLineID::OurMidline);
 
-        //         // Recontruct x and h from midline and y from center circle
-        //         messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(id, midline);
-        //         messages::RobotLocation fromLineAndCircle = fromLine;
+                // Recontruct x and h from midline and y from center circle
+                messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(id, midline);
+                messages::RobotLocation fromLineAndCircle = fromLine;
 
-        //         // Rotate to absolute coordinate system
-        //         double circleAbsX, circleAbsY;
-        //         vision::translateRotate(vision.circle().x(), vision.circle().y(), 0, 0, fromLine.h(), circleAbsX, circleAbsY);
-        //         fromLineAndCircle.set_y(CENTER_FIELD_Y - circleAbsY);
+                // Rotate to absolute coordinate system
+                double circleAbsX, circleAbsY;
+                vision::translateRotate(vision.circle().x(), vision.circle().y(), 0, 0, fromLine.h(), circleAbsX, circleAbsY);
+                fromLineAndCircle.set_y(CENTER_FIELD_Y - circleAbsY);
 
-        //         // Add injection and return
-        //         ReconstructedLocation reconstructed(fromLineAndCircle.x(), fromLineAndCircle.y(), fromLineAndCircle.h(), 1, 1, 0.01);
-        //         if (reconstructed.onField())
-        //             injections.push_back(reconstructed);
-        //     }
-        // }
+                // Add injection and return
+                ReconstructedLocation reconstructed(fromLineAndCircle.x(), fromLineAndCircle.y(), fromLineAndCircle.h(), 1, 1, 0.01);
+                if (reconstructed.onField())
+                    injections.push_back(reconstructed);
+            }
+        }
     }
 
     PROF_EXIT(P_LOCV_INJECTION)
