@@ -58,7 +58,7 @@ def goToPosition(nav):
     #                                             nav.brain.ball.loc.bearing)
 
     
-    if nav.counter < 2:
+    if nav.counter < 5:
         print("In go to position, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
@@ -151,14 +151,14 @@ def goToPosition(nav):
 
 
         # TODO nikki walk unsw hack
-        if relDest.relY < DISTANCE_ADAPT_CUTOFF:
-            velY = 0.0
+        # if relDest.relY < DISTANCE_ADAPT_CUTOFF:
+        #     velY = 0.0
 
         if (fabs(relDest.relH) > 20.0):
             goToPosition.speeds = (0, 0, velH)
         else:
             goToPosition.speeds = (velX, velY, velH)
-        # print("My speeds:", velX, velY, velH)
+        # print("     NAV: My speeds:", velX, velY, velH)
 
         helper.setSpeed(nav, goToPosition.speeds)
 
@@ -173,6 +173,7 @@ def goToPosition(nav):
             speed = goToPosition.speed
 
         helper.setDestination(nav, relDest, speed)
+        # print("     NAV Setting dest: ", str(relDest))
 
     # if navTrans.shouldDodge(nav):
     #     return nav.goNow('dodge')
@@ -294,9 +295,11 @@ def walkingTo(nav):
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         print ("MY dest: ", nav.destination.relX, nav.destination.relY, nav.destination.relH)
-        # helper.stand(nav)
+        helper.walkInPlace(nav)
         return nav.stay()
 
+    if nav.counter < 5:
+        return nav.stay()
 
     walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
                          nav.brain.interface.odometry.y,
@@ -368,6 +371,12 @@ def atPosition(nav):
 
     return Transition.getNextState(nav, atPosition)
 
+def walkInPlace(nav):
+    if nav.firstFrame():
+        helper.walkInPlace(nav)
+
+    return nav.stay()
+
 def stand(nav):
     """
     Transitional state between walking and standing
@@ -375,7 +384,8 @@ def stand(nav):
     the stand if desired
     """
     if (nav.brain.player.gameState == 'gameInitial'
-     or nav.brain.player.gameState == 'gameSet'):
+     or nav.brain.player.gameState == 'gameSet'
+     or nav.lastState == 'stand'):
         helper.stand(nav)
         return nav.stay()
 

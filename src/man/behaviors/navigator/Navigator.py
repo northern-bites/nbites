@@ -267,6 +267,9 @@ class Navigator(FSA.FSA):
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
+    def walkInPlace(self):
+        self.switchTo('walkInPlace')
+
     def stand(self):
         """
         Make the robot stand. Standing should be the default action when we're not
