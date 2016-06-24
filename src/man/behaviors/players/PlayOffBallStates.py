@@ -43,7 +43,29 @@ def branchOnRole(player):
         return player.goNow('playerFourSearchBehavior')
     elif role.isStriker(player.role):
         return player.goNow('playerFiveSearchBehavior')
-    return player.goNow('positionAtHome')
+    return player.goNow('positionAtDefenderHome')
+
+@superState('playOffBall')
+@stay
+@ifSwitchNow(shared.navAtPosition, 'watchForBall')
+def positionAtDefenderHome(player):
+    """
+    Go to the player's home position.
+    """
+
+    home = calculateHomePosition(player)
+
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        fastWalk = role.isChaser(player.role)
+        player.brain.nav.goTo(home, precision = nav.GRAINY,
+                              speed = speeds.SPEED_EIGHT, avoidObstacles = True,
+                              fast = fastWalk, pb = False)
+
+    if home.distTo(player.brain.loc) > 90:
+        player.brain.nav.updateDest(home)
+
+    print home.x, home.y, home.h
 
 @superState('playOffBall')
 @stay
@@ -305,7 +327,7 @@ def playerFiveSearchBehavior(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if playerFiveSearchBehavior.pointIndex == -1:[I] 7694 qi.eventloop: Creating event loop while no qi::Application() is running
+        if playerFiveSearchBehavior.pointIndex == -1:
 
             playerFiveSearchBehavior.dest = min(playerFivePoints, key = lambda x:fabs(player.brain.loc.distTo(x)))
             playerFiveSearchBehavior.pointIndex = playerFivePoints.index(playerFiveSearchBehavior.dest)
