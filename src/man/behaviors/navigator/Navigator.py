@@ -342,10 +342,3 @@ class Navigator(FSA.FSA):
 
     def setHSpeed(self, h):
         NavStates.walking.speeds = (self.getXSpeed(), self.getYSpeed(), h)
-    def walkInPlaceForXSeconds(self,x):
-    	self.switchTo("walkInPlace")
-    	int counter = 0
-    	if(counter == x):
-    		self.switchTo('stand')
-    	else:
-    		counter = counter + 1

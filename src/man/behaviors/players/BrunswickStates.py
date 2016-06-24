@@ -168,6 +168,8 @@ def gameFinished(player):
         #     player.executeMove(SweetMoves.SIT_POS_V5)
         # else:
         #     player.executeMove(SweetMoves.SIT_POS)
+        if player.stateTime < 20:
+            player.walkInPlace()
         player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
     if player.brain.nav.isStopped():
         player.gainsOff()
