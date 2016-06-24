@@ -15,6 +15,6 @@ namespace nowifi {
             return;
         }
 
-        pthread_mutex_lock(<#pthread_mutex_t *#>)
+        pthread_mutex_lock(&mutex);
     }
 }

@@ -35,9 +35,10 @@ const int peak_radius = 15;
 
 const float min_sdev_start_ratio = 3.0;
 const float min_integral_start_ratio = 6.0;
+//const float min_integral_start_ratio = 10.0;
 
 const float min_sdev_cont_ratio = .6;
-const float min_integral_cont_ratio = 0.8;
+const float min_integral_cont_ratio = 0.5;
 
 Range range_around(int i, int r) { return {i - r, i + r}; }
 

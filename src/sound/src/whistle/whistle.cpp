@@ -20,7 +20,7 @@
 
 #include "Logging.hpp"
 
-const char * LAST_MODIFIED = "6/22 16:00";
+const char * LAST_MODIFIED = "6/23 22:28";
 const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
 using namespace nbl;
@@ -49,6 +49,8 @@ logptr logFromRingBuffer(SampleRingBuffer& buffer) {
 }
 
 void simple_write_log(logptr log, size_t inter_heard) {
+    NBL_INFO("writing whistle log in frame %zd...", inter_heard)
+
     std::string fileName = utilities::format("%s/whistle_log_%zd.nblog",
                                              SharedConstants::ROBOT_LOG_PATH_PREFIX().c_str(), inter_heard);
     std::string fileContents;
@@ -100,6 +102,7 @@ void do_heard() {
         shared.whistle_listening() = false;
     }
 }
+
 const int WINDOW_SIZE = 16384;
 Config used_config{ 48000, WINDOW_SIZE };
 
@@ -108,6 +111,7 @@ SampleRingBuffer ringBuffer(4, used_config.num_channels, used_config.window_size
 #endif
 
 size_t iteration = 0;
+size_t listening = 0;
 
 void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
 
@@ -124,11 +128,23 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
     }
 
     if ( !shared.isOpen() || shared.whistle_listening() ) {
+        ++listening;
+
+        bool ignore_for_start = false;
+        double buffer_fraction = config.window_size / (double) config.sample_rate;
+
+        if ( (listening * buffer_fraction) < 1.5) {
+            ignore_for_start = true;
+        }
 
         bool heard = detect::detect(buffer);
 
         if (heard) {
-            do_heard();
+            if (ignore_for_start) {
+                NBL_WARN("WHISTLE HEARD but ignoring for first 1.5 seconds");
+            } else {
+                do_heard();
+            }
 
 #ifdef SAVE_HEARD_WHISTLES
             simple_write_log(logFromRingBuffer(ringBuffer), iteration);
@@ -136,6 +152,7 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
         }
 
     } else {
+        listening = 0;
         std::cout << "." << std::endl;
     }
 
