@@ -137,9 +137,9 @@ private:
     int pickupIndex;
 
     enum PickupStatus {
-        PICKED_UP = 0,
-        NONE = 1,
-        PUT_DOWN = 2
+        PICKED_UP = 1,
+        NONE = 0,
+        PUT_DOWN = -1
     };
 
     PickupStatus latestPickupStatus;
