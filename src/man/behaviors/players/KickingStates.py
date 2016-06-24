@@ -95,8 +95,15 @@ def afterKick(player):
     """
     if player.firstFrame():
         # player.stand()        # stand up right, ready to walk
+        afterKick.numTimes += 1
         player.brain.tracker.afterKickScan(player.kick.name)
         return player.stay()
+
+    print "afterKick.numTimes = " + str(afterKick.numTimes)
+
+    if afterKick.numTimes >= 5:
+        afterKick.numTimes = 0
+        return player.goNow('spinSearch')    
 
     if player.penaltyKicking:
         return player.stay()
@@ -130,6 +137,8 @@ def afterKick(player):
         print "going to chaseAfterBall"
         return player.goNow('chaseAfterBall')
 
+
+
     # while not transitions.shouldChaseBall(player) and player.counter < 300:
     #     print "Walking forward"
     #     player.brain.nav.destinationWalkTo(RelRobotLocation(10, 0, 0))
@@ -153,6 +162,8 @@ def afterKick(player):
 
     return player.stay()
 
+afterKick.numTimes = 0
+
 @superState('gameControllerResponder')
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 @ifSwitchNow(shared.walkingOffField, 'spinSearch')
@@ -173,7 +184,7 @@ def chaseAfterBall(player):
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 def lookAroundForBall(player):
     if player.firstFrame():
-        player.brain.nav.walk(0.1, 0, 0)
+        player.brain.nav.walk(0.1, 0, 0.05)
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         return player.stay()
     if transitions.shouldChaseBall(player):
