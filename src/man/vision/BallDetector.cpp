@@ -851,6 +851,9 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			getColor(x, y);
 		}
 		int elength5 = y - bottomY;
+		if (elength5 > 10) {
+			return false;
+		}
 		// left
 		getColor(leftX, midY);
 		for (x = leftX, y = midY; x > 0 && getGreen() < THRESHOLD; x--) {
@@ -1026,7 +1029,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
         return false;
     }
     // when it is too small it is very dangerous
-	if (spot.innerDiam < 4) {
+	if (spot.innerDiam < 6) {
 		return false;
 	}
     if (spot.innerDiam <= 8) {
