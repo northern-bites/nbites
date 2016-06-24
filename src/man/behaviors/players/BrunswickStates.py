@@ -160,6 +160,7 @@ def gameFinished(player):
     In the future, we may wish to make the head move a bit slower here
     """
     if player.firstFrame():
+        player.brain.nav.walkInPlace()
         player.inKickingState = False
         player.brain.fallController.enabled = False
         player.stopWalking()
@@ -168,8 +169,6 @@ def gameFinished(player):
         #     player.executeMove(SweetMoves.SIT_POS_V5)
         # else:
         #     player.executeMove(SweetMoves.SIT_POS)
-        if player.stateTime < 20:
-            player.walkInPlace()
         player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
     if player.brain.nav.isStopped():
         player.gainsOff()
@@ -255,3 +254,4 @@ def penaltyShotsGamePlaying(player):
 def fallen(player):
     player.inKickingState = False
     return player.stay()
+
