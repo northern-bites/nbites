@@ -4,6 +4,7 @@
 #include "SensorTypes.h"
 #include "JointNames.h"
 
+#define NB_BOSS_COMPILATION
 #include "TextToSpeech.h"
 
 #include <stdlib.h>
