@@ -35,6 +35,7 @@ class TeamMember(RobotLocation):
         self.active = True
         self.alive = True
         self.claimedBall = False
+        self.evenDefenderIsForward = True
 
         self.frameSinceActive = 0
         self.lastTimestamp = 0
@@ -68,6 +69,7 @@ class TeamMember(RobotLocation):
         self.alive = info.alive
         self.fallen = info.fallen
         self.claimedBall = info.claimed_ball
+        self.evenDefenderIsForward = info.even_defender_forward
 
         if self.active:
             self.frameSinceActive = 0
@@ -143,6 +145,7 @@ class TeamMember(RobotLocation):
         self.fallen = self.brain.fallController.falling or self.brain.fallController.fell
 
         self.claimedBall = self.brain.player.claimedBall
+        self.evenDefenderIsForward = self.brain.evenDefenderIsForward
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -171,6 +174,7 @@ class TeamMember(RobotLocation):
         self.frameSinceActive = 0
         self.lastTimestamp = 0
         self.framesWithoutPacket = 0
+        self.evenDefenderIsForward = True
 
     def getBearingToGoal(self):
         """returns bearing to goal"""

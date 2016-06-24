@@ -143,11 +143,11 @@ oddDefenderForward = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 330,
 evenDefenderForward = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 330,
                                     NogginConstants.MY_GOALBOX_TOP_Y + 120,
                                     -35)
-oddDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 70,
+oddDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 60,
                                 35)
-evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
-                                 NogginConstants.MY_GOALBOX_TOP_Y + 70,
+evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
+                                 NogginConstants.MY_GOALBOX_TOP_Y + 60,
                                  -35)
 
 # Tomultuous triangle (odd chaser positioning)

@@ -123,6 +123,7 @@ class Brain(object):
             self.ballMem.append(0)
 
         # New defender positioning
+        self.evenDefenderIsForward = True
         self.defendingStateTime = 0 #Number of frames.
         self.staggeredPositioning = False
         self.defenderPositioning = 0
@@ -249,6 +250,7 @@ class Brain(object):
         output.fallen = me.fallen
         output.active = me.active
         output.claimed_ball = me.claimedBall
+        output.even_defender_forward = me.evenDefenderIsForward
 
     def getCommUpdate(self):
         self.teamMembers[self.playerNumber - 1].updateMe()

@@ -15,7 +15,7 @@ from math import hypot, fabs, atan2, degrees
 from ..headTracker import HeadMoves
 import random
 
-evenDefenderToGoForward = True
+lastEvenDefenderForwardVal = True
 
 # IMPORTANT China 2015 bug found
 # TODO fix oscillation between positionAtHome and positionAsSupporter
@@ -38,6 +38,13 @@ def branchOnRole(player):
     Chasers are going to have a different behavior again.
     We will branch on behavior based on role here
     """
+    print "Entered Branch on Role"
+    print "----- evenDefenderIsForward, lastEvenDefenderForwardVal ----"
+    print player.brain.evenDefenderIsForward, lastEvenDefenderForwardVal
+
+    global lastEvenDefenderForwardVal
+    player.brain.evenDefenderIsForward = not lastEvenDefenderForwardVal
+    newEvenDefenderForwardVal = True
     # print("TIME SINCE PLAYING:", player.brain.gameController.timeSincePlaying)
     if role.isFirstChaser(player.role):
         if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
@@ -47,16 +54,26 @@ def branchOnRole(player):
         return player.goNow('playerFiveSearchBehavior')
 
     elif player.brain.sharedBall.ball_on and player.brain.sharedBall.x < NogginConstants.MIDFIELD_X:
+        print "----- evenDefenderIsForward, lastEvenDefenderForwardVal ----"
+        print player.brain.evenDefenderIsForward, lastEvenDefenderForwardVal
         return player.goNow('bothDefendersBack')
 
+    elif role.isLeftDefender(player.role):
+        newEvenDefenderForwardVal = player.brain.teamMembers[3-1].evenDefenderIsForward
     else:
-        global evenDefenderToGoForward
-        if evenDefenderToGoForward:
-            evenDefenderToGoForward = False
-            return player.goNow('evenDefenderForward')
-        else:
-            evenDefenderToGoForward = True
-            return player.goNow('oddDefenderForward')
+        newEvenDefenderForwardVal = player.brain.teamMembers[2-1].evenDefenderIsForward
+
+    if lastEvenDefenderForwardVal is not newEvenDefenderForwardVal:
+        lastEvenDefenderForwardVal = newEvenDefenderForwardVal
+        player.brain.evenDefenderIsForward = lastEvenDefenderForwardVal
+
+    print "----- evenDefenderIsForward, lastEvenDefenderForwardVal ----"
+    print player.brain.evenDefenderIsForward, lastEvenDefenderForwardVal
+
+    if lastEvenDefenderForwardVal:
+        return player.goNow('evenDefenderForward')
+    else:
+        return player.goNow('oddDefenderForward')
 
 # @superState('playOffBall')
 # @stay
@@ -319,15 +336,15 @@ def searchFieldForFlippedSharedBall(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.ballInOurHalf, 'playOffBall') 
+@ifSwitchNow(transitions.ballInOurHalf, 'playOffBall')
 def evenDefenderForward(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if role.isRightDefender(player.role):
-            player.brain.home = role.oddDefenderForward
+            player.brain.home = role.oddDefenderBack
         else:
-            player.brain.home = role.evenDefenderBack
+            player.brain.home = role.evenDefenderForward
 
         if player.brain.home.distTo(player.brain.loc) < 45:
             return player.goNow('watchForBall')
@@ -341,15 +358,15 @@ def evenDefenderForward(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.ballInOurHalf, 'playOffBall') # 
+@ifSwitchNow(transitions.ballInOurHalf, 'playOffBall')
 def oddDefenderForward(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if role.isRightDefender(player.role):
-            player.brain.home = role.oddDefenderBack
+            player.brain.home = role.oddDefenderForward
         else:
-            player.brain.home = role.evenDefenderForward
+            player.brain.home = role.evenDefenderBack
 
         if player.brain.home.distTo(player.brain.loc) < 45:
             return player.goNow('watchForBall')
