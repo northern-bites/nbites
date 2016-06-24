@@ -151,14 +151,14 @@ def goToPosition(nav):
 
 
         # TODO nikki walk unsw hack
-        if relDest.relY < DISTANCE_ADAPT_CUTOFF:
-            velY = 0.0
+        # if relDest.relY < DISTANCE_ADAPT_CUTOFF:
+        #     velY = 0.0
 
         if (fabs(relDest.relH) > 20.0):
             goToPosition.speeds = (0, 0, velH)
         else:
             goToPosition.speeds = (velX, velY, velH)
-        # print("My speeds:", velX, velY, velH)
+        # print("     NAV: My speeds:", velX, velY, velH)
 
         helper.setSpeed(nav, goToPosition.speeds)
 
@@ -173,6 +173,7 @@ def goToPosition(nav):
             speed = goToPosition.speed
 
         helper.setDestination(nav, relDest, speed)
+        # print("     NAV Setting dest: ", str(relDest))
 
     # if navTrans.shouldDodge(nav):
     #     return nav.goNow('dodge')
