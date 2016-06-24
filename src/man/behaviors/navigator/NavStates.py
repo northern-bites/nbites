@@ -376,7 +376,8 @@ def stand(nav):
     the stand if desired
     """
     if (nav.brain.player.gameState == 'gameInitial'
-     or nav.brain.player.gameState == 'gameSet'):
+     or nav.brain.player.gameState == 'gameSet'
+     or nav.lastState == 'stand'):
         helper.stand(nav)
         return nav.stay()
 
