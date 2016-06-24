@@ -50,6 +50,7 @@ def executeSweetKick(player):
     Kick the ball using sweet move. But don't do it. They suck!
     """
     if player.firstFrame():
+        print("Using kick: ", str(player.kick))
         player.brain.tracker.trackBall()
         executeSweetKick.sweetMove = player.kick.sweetMove
         return player.stay()
@@ -154,6 +155,7 @@ def afterKick(player):
 
 @superState('gameControllerResponder')
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
+@ifSwitchNow(shared.walkingOffField, 'spinSearch')
 def chaseAfterBall(player):
     if player.firstFrame():
         print "in chaseAfterBall"
@@ -170,7 +172,7 @@ def chaseAfterBall(player):
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 def lookAroundForBall(player):
     if player.firstFrame():
-        player.brain.nav.stand()
+        player.brain.nav.walk(0.1, 0, 0)
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         return player.stay()
     if transitions.shouldChaseBall(player):

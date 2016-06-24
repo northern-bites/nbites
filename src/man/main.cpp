@@ -6,6 +6,9 @@
 #include "SharedData.h"
 
 #include <sys/file.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <errno.h>
 #include <unistd.h>
 
@@ -14,7 +17,6 @@ man::Man* instance;
 
 pid_t whistlePID = 0;
 const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-//const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
 
@@ -61,8 +63,7 @@ void error_signal_handler(int signal) {
 
     // cleanup();
 
-    printf("error_signal_handler() done.\n");
-    exit(-1);
+    abort();
 }
 
 // Deal with lock file. To ensure that we only have ONE instance of man
@@ -124,6 +125,11 @@ int main() {
         // (Diagram threads are daemon threads, and man will exit if they're the
         // only ones left)
         sleep(10);
+
+        int status;
+        // clear zombie mans
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
+
     return 1;
 }

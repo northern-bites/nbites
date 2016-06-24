@@ -9,6 +9,15 @@ namespace motion
 	static const float OLD_SCALE = 0.8;
 
 	IMUAdjuster::IMUAdjuster() {
+		init();
+
+	}
+
+	void IMUAdjuster::reset() {
+		init();
+	}
+
+	void IMUAdjuster::init() {
 		initted = false;
 		falling = false;
 
@@ -17,7 +26,6 @@ namespace motion
 		adj_gyr_x = 0.0f;
 		adj_gyr_y = 0.0f;
 		counter = 0;
-
 	}
 
 	IMUAdjuster::~IMUAdjuster() { }
@@ -39,6 +47,9 @@ namespace motion
 
 		gyr_y = gyr_y - gyr_zero_y;
 		adj_gyr_y = adj_gyr_y * OLD_SCALE + gyr_y * (1.0 - OLD_SCALE);
+
+		// std::cout << "Angle_Y degrees: " << angle_y * 180 / M_PI;
+		// std::cout << "          Angle_X degrees: " << angle_x * 180 / M_PI << std::endl;
 
 		if (angle_x >= fallDownAngleX || angle_y >= fallDownAngleY) {
 			// std::cout << "FALLING IS TRUUUUE\n";

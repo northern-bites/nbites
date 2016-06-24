@@ -36,10 +36,10 @@ namespace motion
 // };
 
 const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] {
-	1.57f, 0.17f, -1.57f, -0.05f,
-	0.0f, 0.0f, -0.44f, 0.98f, -0.55f, 0.0f,
-	0.0f, 0.0f, -0.44f, 0.98f, -0.55f, 0.0f,
-	1.57f, -0.17f, 1.57f, 0.05f,
+	1.57f, 0.17f, 0.0f, 0.0f,
+	0.0f, 0.0017f, -0.488f, 0.87f, -0.436f, 0.0f,
+	0.0f, 0.0017f, -0.488f, 0.87f, -0.436f, 0.0f,
+	1.57f, -0.17f, 0.0f, 0.0f,
 	0.f,0.f,
 };
 
@@ -99,6 +99,7 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
     angleChanged = 0.0;
 
     counter = 0;
+    //generator->readOptions("/home/nao/nbites/Config");
 	
 	resetAll();
 }
@@ -289,7 +290,6 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
             // }
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK_IN_PLACE) {
-			std::cout << "Walking in place! " << std::endl;
 			request->body.forward = 00.0; //command->x_percent ;
 			request->body.left = 00.0; //command->y_percent ;
 			request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
@@ -496,7 +496,6 @@ void UNSWalkProvider::resetOdometry() {
 
 void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
 	if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
-		std::cout << "Stand command!\n";
 		this->stand();
 		return;
 	}

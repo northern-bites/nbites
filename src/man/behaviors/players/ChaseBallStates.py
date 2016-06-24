@@ -6,6 +6,7 @@ import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import RoleConstants as roleConstants
 import PlayOffBallTransitions as playOffTransitions
+import PlayOffBallStates as playOffStates
 from ..navigator import Navigator
 from ..navigator import PID
 from ..navigator import BrunswickSpeeds as speeds
@@ -23,10 +24,11 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 @ifSwitchNow(claimTransitions.shouldCedeClaim, 'playOffBall')
 def approachBall(player):
-    print "approachBall"
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
+        playOffStates.playerFourSearchBehavior.pointIndex = -1
+        playOffStates.playerFiveSearchBehavior.pointIndex = -1
 
     if player.brain.nav.dodging:
         return player.stay()
@@ -149,9 +151,10 @@ def prepareForKick(player):
 
     if not player.inKickOffPlay:
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
-            # print "Overriding kick decider for kickoff!"
-            player.shouldKickOff = False
+            print "DIAGONAL Overriding kick decider for kickoff!"
+            # player.shouldKickOff = False
             player.kick = player.decider.new2016KickStrategy()
+            print("Decided kick: ", str(player.kick))
         else:
             player.shouldKickOff = False
             # print("PREPAREFOREKICK THIS CASE")
@@ -295,7 +298,6 @@ def orbitBall(player):
     # Are we within the acceptable heading range?
     if (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
-        print "STOPPED! Because relH is: ", relH
         #player.stopWalking()
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
@@ -318,33 +320,25 @@ def orbitBall(player):
     if relH < 0:
         if relH < -20:
             xSpeed = 0.0
-            ySpeed = 0.8
-            hSpeed = -0.25
+            ySpeed = 0.85
+            hSpeed = -0.45
             # player.setWalk(0, 0.7, -0.25)
         else:
             xSpeed = 0.0
-            ySpeed = 0.5
-            hSpeed = -0.15
+            ySpeed = 0.6
+            hSpeed = -0.2
             # player.setWalk(0, 0.5, -0.15)
     elif relH > 0:
         if relH > 20:
             xSpeed = 0.0
-            ySpeed = -0.8
-            hSpeed = 0.25
+            ySpeed = -0.85
+            hSpeed = 0.45
             # player.setWalk(0, -0.7, 0.25)
         else:
             xSpeed = 0.0
-            ySpeed = -0.5
-            hSpeed = 0.15
+            ySpeed = -0.6
+            hSpeed = 0.2
             # player.setWalk(0, -0.5, 0.15)
-
-    # DEBUGGING PRINT OUTS
-    if constants.DEBUG_ORBIT and player.counter%20 == 0:
-        print "desiredHeading is:  | ", player.kick.setupH
-        print "player heading:     | ", player.brain.loc.h
-        print "orbit heading:      | ", relH
-        print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
-        print "==============================="
 
     # X correction
     if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR <
@@ -400,14 +394,18 @@ def orbitBall(player):
                 # player.brain.nav.setHSpeed(0.15)
 
     player.setWalk(xSpeed, ySpeed, hSpeed)
-    # print("Orbit speedx: ", xSpeed, "speedY:", ySpeed, "hSpeed:", hSpeed)
+    # DEBUGGING PRINT OUTS
+    if constants.DEBUG_ORBIT and player.counter%10 == 0:
+        print "desiredHeading is:  | ", player.kick.setupH
+        print "player heading:     | ", player.brain.loc.h
+        print "orbit heading:      | ", relH
+        print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
+        print "==============================="
+        
     return player.stay()
 
 orbitBall.X_SPEED = .35
 orbitBall.X_BACKUP_SPEED = .2
-
-# <<<<<
-
 
 
 @superState('positionAndKickBall')
@@ -437,12 +435,14 @@ def spinToBall(player):
 
     return player.stay()
 
+
 @superState('positionAndKickBall')
 def positionForKick(player):
     """
     Get the ball in the sweet spot
     """
     if transitions.shouldRedecideKick(player):
+        print("I think I should redecide my kick!!")
         return player.goLater('approachBall')
 
     ball = player.brain.ball
@@ -450,20 +450,36 @@ def positionForKick(player):
                                                 ball.rel_y - player.kick.setupY,
                                                 0)
 
+    # print("Ball is: ", ball.rel_x, ball.rel_y)
+    # print("My setup is: ", player.kick.setupX)
+
+    # print("Ball.rel_x:", ball.rel_x, "rel_y:", ball.rel_y)
+
     if player.firstFrame():
+        # print("IN position for kick, should kick off: ", player.shouldKickOff)
         player.brain.tracker.lookStraightThenTrack()
 
         # if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
         #     positionForKick.speed = Navigator.GRADUAL_SPEED
         # else:
         positionForKick.speed = speeds.SPEED_TWO
+        # print("In position for kick! Setting walk speed")
+        # print("My location:", str(positionForKick.kickPose))
+        player.brain.nav.goTo(positionForKick.kickPose, Navigator.CLOSE_ENOUGH,
+                              speeds.SPEED_FIVE, True, fast = True, useLoc = False)
+        # player.brain.nav.walkTo(positionForKick.kickPose, speeds.SPEED_THREE)
 
-        player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
-                                            positionForKick.speed)
+        # player.setWalk()
+
+        # player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
+        #                                     positionForKick.speed)
 
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         # print "positionForKick -- we don't see it"
-        player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
+        player.brain.nav.updateDest(positionForKick.kickPose)
+        # player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
+
+    # print "positionForKick"
 
     # print "positionForKick"
 
@@ -473,6 +489,7 @@ def positionForKick(player):
     if transitions.ballInPosition(player, positionForKick.kickPose):
         # print("The ball is in position! CHASEBALL")
         # print player.kick
+        player.shouldKickOff = False
         return player.goLater('executeSweetKick')
         # if player.motionKick or True:
         #    return player.goNow('executeMotionKick')

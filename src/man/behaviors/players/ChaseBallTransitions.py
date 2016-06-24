@@ -83,22 +83,25 @@ def shouldApproachBallAgain(player):
     The ball got really far away somehow
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST and not player.inKickOffPlay
+    return (ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST 
+        and not player.inKickOffPlay and not player.shouldKickOff)
 
 def shouldRedecideKick(player):
     """
     We've been in position for kick too long
     """
-    return player.counter > 200
+    return player.counter > 400
 
 def ballInPosition(player, kickPose):
     """
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
     """
+
     if not player.brain.ball.vis.on:
         return False
-
+    # print("Checking ball in position")
+    # print("Relx: ", kickPose.relX, " RelY:", kickPose.relY)
     # NOTE don't take the absolute value of kickPose.relX because being too
     # close to the ball is not a problem for kicking
     return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and
