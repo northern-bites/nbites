@@ -39,6 +39,13 @@ def branchOnRole(player):
     if role.isFirstChaser(player.role):
         # if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
             # return player.goNow('searchFieldForSharedBall')
+        if player.shouldKickOff:
+            print("I think I'm in kickoff!")
+            dest = RelRobotLocation(20.0, 0, 0)
+            player.brain.nav.goTo(dest, precision = nav.HOME,
+                              speed = speeds.SPEED_FIVE, avoidObstacles = True,
+                              fast = fastWalk, pb = False)
+            return player.stay()
         return player.goNow('playerFourSearchBehavior')
     elif role.isStriker(player.role):
         return player.goNow('playerFiveSearchBehavior')
