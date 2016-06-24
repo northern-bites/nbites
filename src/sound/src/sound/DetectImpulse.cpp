@@ -110,6 +110,38 @@ double efraction_at_peak(float * spectrum, Peak& peak, int radius = peak_radius)
     return sum_inside / (sum_outside + sum_inside);
 }
 
+double sdev_fraction_at_peak(float * spectrum, Peak& peak, float cur_sdev, int radius = peak_radius) {
+    double sum_outside = 0;
+    int used = 0;
+    Range pr = range_around(peak.first, radius);
+
+    for (int i = 0; i < pr.first; ++i) {
+        sum_outside += spectrum[i];
+        ++used;
+    }
+
+    for (int i = pr.second; i < frequency_output_length; ++i) {
+        sum_outside += spectrum[i];
+        ++used;
+    }
+
+    double mean = sum_outside / used;
+
+    double sum_sdev = 0;
+
+    for (int i = 0; i < pr.first; ++i) {
+        double val = spectrum[i] - mean;
+        sum_sdev += (val*val);
+    }
+
+    for (int i = pr.second; i < frequency_output_length; ++i) {
+        double val = spectrum[i] - mean;
+        sum_sdev += (val*val);
+    }
+
+    return std::sqrt(sum_sdev) / cur_sdev;
+}
+
 class NullOut {
 public:
     template<typename T>
@@ -216,6 +248,14 @@ struct Channel {
 
             double efrac = efraction_at_peak(spectrum, this_peak);
             START(1) << "efrac " << efrac END
+
+            double sdratio = sdev_fraction_at_peak(spectrum, this_peak, this_sdev);
+            START(1) << "sdratio " << sdratio END
+
+            if (sdratio < .2) {
+                on = true;
+                goto failed;
+            }
 
             if (!hearing()) {
                 START(1) << "looking for new peak..." END;
