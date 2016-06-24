@@ -654,7 +654,9 @@ void BallDetector::makeBall(Spot spot, double cameraHeight, double conf,
                             bool foundBall, bool isBlack)
 {
     double x_rel, y_rel;
-    bool belowHoriz = homography->fieldCoords(spot.ix(), spot.iy(), x_rel, y_rel);
+    int r = projectedBallRadius(std::make_pair(spot.ix(), spot.iy()));
+    bool belowHoriz = homography->fieldCoords(spot.ix(), spot.iy()-r, x_rel, y_rel);
+
     Ball b(spot, x_rel, -1 * y_rel, cameraHeight, height,
            width, topCamera, spot.ix() + width / 2, -spot.iy() + height / 2, conf);
     _best = b;
