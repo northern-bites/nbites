@@ -57,6 +57,15 @@ INITIAL_POS = (((90.4, 9.6, 0.2, -2.4),
                 (90.3, -9.3, -0.3, 2.7),
                   3.0,0,stiff.NORMAL_STIFFNESSES),)
 
+## OLD STAND POSITION FROM BH ENGINE, USING IT TO HACK SWEEPS FOR NOW ##
+
+# INITIAL_POS = (((90., 10., -90., -3.),
+#                 (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+#                 (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+#                 (90., -10., 90., 3.),
+#                 3.0,0,stiff.NORMAL_STIFFNESSES),)
+
+
 #Keyframe that moves can called from an unbalanced position to slowly return the joints to a stable, standing position.
 INITIAL_POS_KEYFRAME = ((90.4, 9.6, 0.2, -2.4),
                         (0.0, 0.1, -27.9, 50.1, -25.0, 0.0),
@@ -796,6 +805,13 @@ LEFT_SHORT_STRAIGHT_KICK = (
      (-0.2,0.0,-22.3,43.5,-21.2, 0.0),
      (90.,-10.,82.,13.2),
      0.3,0,stiff.NORMAL_STIFFNESSES),
+
+    # HACK for scrimmage, TODO tune walk
+    ((90., 10., -90., -3.),
+    (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+    (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+    (90., -10., 90., 3.),
+    .30,0,stiff.NORMAL_STIFFNESSES),
 
     #lean right/lift leg
     ((20.,30.,0.,0.),

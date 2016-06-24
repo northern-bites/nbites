@@ -32,6 +32,16 @@ namespace nbl {
                 throw std::runtime_error("SocketMaster could not create server socket");
             }
 
+//            int enable = 1;
+//            if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+//                std::string err = utilities::get_error(errno);
+//                NBL_ERROR("SocketMaster(port=%d) got ERROR: %s",
+//                          port,
+//                          err.c_str());
+//
+//                throw std::runtime_error("SocketMaster could not setsockopt(SO_REUSEADDR)");
+//            }
+
             pthread_mutex_init(&connectionMutex, NULL);
             pthread_cond_init(&connectionAvailableCond, NULL);
             pthread_cond_init(&connectionDiedCond, NULL);

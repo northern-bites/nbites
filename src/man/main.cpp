@@ -6,6 +6,9 @@
 #include "SharedData.h"
 
 #include <sys/file.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <errno.h>
 #include <unistd.h>
 
@@ -52,8 +55,14 @@ void error_signal_handler(int signal) {
     fflush(stdout);
     fflush(stderr);
 
-    printf("error_signal_handler() done.\n");
-    exit(-1);
+    // while(1) {
+    // 	//man::tts::say(IN_GAME, "g d b me");
+    // 	sleep(10);
+    // }
+
+    // cleanup();
+
+    abort();
 }
 
 // Deal with lock file. To ensure that we only have ONE instance of man
@@ -100,7 +109,11 @@ int main() {
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
     freopen(MAN_LOG_PATH, "w", stdout);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> a9ac2bd652dae978c00e14da18be7390ff1245ef
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     
@@ -115,6 +128,11 @@ int main() {
         // (Diagram threads are daemon threads, and man will exit if they're the
         // only ones left)
         sleep(10);
+
+        int status;
+        // clear zombie mans
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
+
     return 1;
 }

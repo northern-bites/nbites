@@ -155,6 +155,7 @@ def afterKick(player):
 
 @superState('gameControllerResponder')
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
+@ifSwitchNow(shared.walkingOffField, 'spinSearch')
 def chaseAfterBall(player):
     if player.firstFrame():
         print "in chaseAfterBall"
@@ -171,7 +172,7 @@ def chaseAfterBall(player):
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 def lookAroundForBall(player):
     if player.firstFrame():
-        player.brain.nav.stand()
+        player.brain.nav.walk(0.1, 0, 0)
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         return player.stay()
     if transitions.shouldChaseBall(player):
