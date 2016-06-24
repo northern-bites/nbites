@@ -126,6 +126,11 @@ class Brain(object):
         for i in range(self.BALL_MEM_SIZE):
             self.ballMem.append(0)
 
+        # New defender positioning
+        self.defendingStateTime = 0 #Number of frames.
+        self.staggeredPositioning = False
+        self.defenderPositioning = 0
+
     def initTeamMembers(self):
         self.teamMembers = []
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
