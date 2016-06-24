@@ -31,13 +31,14 @@ const Range whistle_peak_range = {70,160};
 const int min_frames_on = 4;
 const int max_frames_off = 2;
 
-const int peak_radius = 15;
+const int peak_radius = 20;
 
 const float min_sdev_start_ratio = 3.0;
 const float min_integral_start_ratio = 6.0;
 //const float min_integral_start_ratio = 10.0;
 
-const double min_efrac_start_ratio = 0.3;
+//const double min_efrac_start_ratio = 0.3;
+const double min_efrac_start_ratio = 0.2;
 
 const float min_sdev_cont_ratio = .6;
 const float min_integral_cont_ratio = 0.5;
