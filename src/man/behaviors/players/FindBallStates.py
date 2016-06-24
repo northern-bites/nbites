@@ -1,5 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from ..headTracker import TrackingConstants as tracking
 from ..navigator import Navigator
 from ..navigator import BrunswickSpeeds as speeds
 from ..util import *
@@ -31,19 +32,15 @@ def findBall(player):
 @stay
 @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def searchInFront(player):
-
     if player.firstFrame():
+        player.stand()
         player.brain.tracker.performCenterSnapPan()
 
-    # playerTracker = player.brain.tracker
-
     if not player.brain.tracker.brain.motion.head_is_active and player.brain.tracker.isStopped():
-        # print "-------HEAD IS NOT ACTIVE, GOING TO SPINNING--------------\n"
         return player.goNow('spinSearch')
 
 @superState('gameControllerResponder')
 @stay
-@ifSwitchLater(transitions.spunOnce, 'playOffBall')
 @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def spinSearch(player):
     """
@@ -55,7 +52,22 @@ def spinSearch(player):
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
         player.setWalk(0, 0, spinDir*speeds.SPEED_FIVE)
-        player.brain.tracker.lookToSpinDirection(spinDir)
+        player.brain.tracker.repeatFixedPitchLookAhead()
+
+    if player.stateTime >= constants.SPEED_FIVE_SPUN_ONCE_TIME / 2:
+        return player.goNow("fastPan")
+
+@superState('gameControllerResponder')
+@stay
+@ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
+def fastPan(player):
+
+    if player.firstFrame():
+        player.stand()
+        player.brain.tracker.repeatWideSnapPan()
+
+    if player.stateTime >= tracking.FULL_WIDE_PAN_TIME:
+        return player.goNow("playOffBall")
 
 @superState('gameControllerResponder')
 @stay

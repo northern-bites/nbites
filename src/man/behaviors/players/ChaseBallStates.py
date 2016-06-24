@@ -448,8 +448,10 @@ def positionForKick(player):
                                                 ball.rel_y - player.kick.setupY,
                                                 0)
 
+    # print("")
     # print("Ball is: ", ball.rel_x, ball.rel_y)
-    # print("My setup is: ", player.kick.setupX)
+    # print("Ball dist:", ball.distance)
+    # print("My kick setup is: ", player.kick.setupX, player.kick.setupY)
 
     # print("Ball.rel_x:", ball.rel_x, "rel_y:", ball.rel_y)
 
@@ -475,6 +477,7 @@ def positionForKick(player):
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         # print "positionForKick -- we don't see it"
         player.brain.nav.updateDest(positionForKick.kickPose)
+        print("MY kickpose:", str(positionForKick.kickPose))
         # player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
     # print "positionForKick"

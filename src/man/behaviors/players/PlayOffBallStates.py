@@ -7,6 +7,7 @@ import ClaimTransitions as claims
 import RoleSwitchingTransitions as roleTransitions
 from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findStrikerHome, findDefenderHome, calculateHomePosition
 import noggin_constants as NogginConstants
+from ..headTracker import TrackingConstants as tracking
 from ..navigator import Navigator as nav
 from ..navigator import BrunswickSpeeds as speeds
 from objects import Location, RobotLocation, RelRobotLocation
@@ -20,7 +21,7 @@ import random
 
 @defaultState('branchOnRole')
 @superState('gameControllerResponder')
-# @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
+@ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
 @ifSwitchNow(transitions.shouldBeSupporter, 'positionAsSupporter')
 @ifSwitchNow(transitions.shouldApproachBall, 'approachBall')
 def playOffBall(player):
@@ -38,8 +39,8 @@ def branchOnRole(player):
     """
     # print("TIME SINCE PLAYING:", player.brain.gameController.timeSincePlaying)
     if role.isFirstChaser(player.role):
-        # if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
-            # return player.goNow('searchFieldForSharedBall')
+        if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
+            return player.goNow('searchFieldForSharedBall')
         return player.goNow('playerFourSearchBehavior')
     elif role.isStriker(player.role):
         return player.goNow('playerFiveSearchBehavior')
@@ -75,10 +76,8 @@ def watchForBall(player):
     """
 
     if player.firstFrame():
-        print "-----------Player at home-----------"
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
-
 
     # I commented this out because we were getting strange oscillations 
     # between this and positonAtHome, and honestly we never go here unless
@@ -86,10 +85,11 @@ def watchForBall(player):
     # if transitions.tooFarFromHome(player, 50, 20):
     #     return player.goLater('positionAtHome')
 
-    while player.stateTime < 8:
-        return player.stay()
+    if player.stateTime >= tracking.FULL_WIDE_PAN_TIME and not role.isStriker(player.role):
+        return player.goNow('spinAtHome')
 
-    return player.goNow('spinAtHome')
+    elif player.stateTime >= tracking.FULL_WIDE_PAN_TIME * 2:
+        return player.goNow('spinAtHome')
 
 @defaultState('doFirstHalfSpin')
 @superState('playOffBall')
@@ -101,73 +101,60 @@ def spinAtHome(player):
     pass
 
 @superState('spinAtHome')
+@stay
 def doFirstHalfSpin(player):
     """
     Spin to where we think the ball is.
     """
 
     if player.firstFrame():
-        print "------------First half spin-------------"
+        player.brain.tracker.repeatFixedPitchLookAhead()
 
-        player.setWalk(0, 0, speeds.SPEED_FIVE)
-        player.brain.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
-        # player.brain.tracker.lookToSpinDirection(1)
+        if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, speeds.SPEED_FIVE)
+        else:
+            player.setWalk(0, 0, -speeds.SPEED_FIVE)
 
-        # if player.brain.playerNumber == 3:
-        #     player.setWalk(0, 0, speeds.SPEED_EIGHT)
-        #     player.brain.tracker.lookToSpinDirection(1) #Clockwise
-        # else:
-        #     player.setWalk(0, 0, -speeds.SPEED_EIGHT)
-        #     player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
-
-    while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME / 2:
-        return player.stay()
-
-    return player.goNow('doPan')
+    if player.stateTime >= chaseConstants.SPEED_FIVE_SPUN_ONCE_TIME / 2:
+        return player.goNow('doPan')
 
 @superState('spinAtHome')
+@stay
 def doPan(player):
     """
     Wide pan for 5 seconds.
     """
     if player.firstFrame():
-        print "------------Doing Pan-------------"
-
         player.stand()
         player.brain.tracker.trackBall()
 
-    while player.stateTime < 8: #Should use constant here.
-        return player.stay()
+    if not role.isStriker(player.role):
+        if player.stateTime >= tracking.FULL_WIDE_PAN_TIME:
+            if role.isFirstChaser(player.role):
+                return player.goNow('playerFourSearchBehavior')
+            else:
+                return player.goNow('doSecondHalfSpin')
 
-    return player.goNow('doSecondHalfSpin')
+    else:
+        if player.stateTime >= tracking.FULL_WIDE_PAN_TIME * 2:
+            return player.goNow('playerFiveSearchBehavior')
 
 @superState('spinAtHome')
+@stay
 def doSecondHalfSpin(player):
     """
     Keep spinning in the same direction.
     """
     if player.firstFrame():
-        print "--------------Second Half Spin---------------"
+        player.brain.tracker.repeatFixedPitchLookAhead()
 
-        player.setWalk(0, 0, speeds.SPEED_FIVE)
-        player.brain.tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
-        # player.brain.tracker.lookToSpinDirection(1)
+        if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, speeds.SPEED_FIVE)
+        else:
+            player.setWalk(0, 0, -speeds.SPEED_FIVE)
 
-        # if player.brain.playerNumber == 3:
-        #     player.setWalk(0, 0, speeds.SPEED_EIGHT)
-        #     player.brain.tracker.lookToSpinDirection(1) #Clockwise
-        # else:
-        #     player.setWalk(0, 0, -speeds.SPEED_EIGHT)
-        #     player.brain.tracker.lookToSpinDirection(-1) #AntiClockwise
-
-    while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME / 2:
-        return player.stay()
-
-    if role.isFirstChaser(player.role):
-        return player.goNow('playerFourSearchBehavior')
-    elif role.isStriker(player.role):
-        return player.goNow('playerFiveSearchBehavior')
-    return player.goNow('playOffBall')
+    if player.stateTime > chaseConstants.SPEED_FIVE_SPUN_ONCE_TIME / 2:
+        return player.goNow('playOffBall')
 
 @superState('playOffBall')
 @stay
@@ -280,8 +267,11 @@ def playerFourSearchBehavior(player):
         if playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 0:
             adjustHeading.desiredHeading = 180
             return player.goNow("adjustHeading")
+        elif playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 1:
+            adjustHeading.desiredHeading = -90
+            return player.goNow("adjustHeading")
         else:
-            adjustHeading.desiredHeading = 0
+            adjustHeading.desiredHeading = 90
             return player.goNow("adjustHeading")
 
     player.brain.nav.updateDest(playerFourSearchBehavior.dest)
@@ -300,7 +290,8 @@ def playerFiveSearchBehavior(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if playerFiveSearchBehavior.pointIndex == -1:
+        if playerFiveSearchBehavior.pointIndex == -1:[I] 7694 qi.eventloop: Creating event loop while no qi::Application() is running
+
             playerFiveSearchBehavior.dest = min(playerFivePoints, key = lambda x:fabs(player.brain.loc.distTo(x)))
             playerFiveSearchBehavior.pointIndex = playerFivePoints.index(playerFiveSearchBehavior.dest)
             playerFiveSearchBehavior.pointsWalked = 0
@@ -336,6 +327,7 @@ playerFiveSearchBehavior.pointsWalked = 0
 playerFiveSearchBehavior.dest = playerFiveWayPoint1
 
 @superState('playOffBall')
+@stay
 def adjustHeading(player):
 
     if player.firstFrame():
@@ -348,39 +340,37 @@ def adjustHeading(player):
         # player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
 
         # or math.fabs()
-    while fabs(player.brain.loc.h - adjustHeading.desiredHeading) > 25:
-        return player.stay()
-
-    player.stand()
-    return player.goNow("panAtWayPoint")
+    if fabs(player.brain.loc.h - adjustHeading.desiredHeading) < 25:
+        player.stand()
+        return player.goNow("panAtWayPoint")
 
 @superState('playOffBall')
+@stay
 def panAtWayPoint(player):
 
     if player.firstFrame():
-        print "------------Doing Pan-------------"
-
         player.stand()
         player.brain.tracker.trackBall()
 
-    while player.stateTime < 8: #Should use constant for 1 pan here.
-        return player.stay()
-
-    return player.goNow("spinAtHome")
+    if player.stateTime >= tracking.FULL_WIDE_PAN_TIME:
+        if role.isFirstChaser(player.role) and not playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 0:
+            return player.goNow("playerFourSearchBehavior")
+        else:
+            return player.goNow("spinAtHome")
 
 @superState('playOffBall')
+@stay
 def spinAtWayPoint(player):
     """
     Keep spinning in the same direction.
     """
     if player.firstFrame():
         player.stand()
-        player.setWalk(0, 0, speeds.SPEED_FOUR)
+        player.brain.tracker.repeatFixedPitchLookAhead()
+        player.setWalk(0, 0, speeds.SPEED_FIVE)
 
-    while player.stateTime < chaseConstants.SPEED_FOUR_SPUN_ONCE_TIME:
-        return player.stay()
-
-    return player.goNow('playerFiveSearchBehavior')
+    if player.stateTime > chaseConstants.SPEED_FIVE_SPUN_ONCE_TIME:
+        return player.goNow('playerFiveSearchBehavior')
 
 # @superState('playOffBall')
 # @stay
