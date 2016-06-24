@@ -5,6 +5,7 @@ hard reset to one of the two possible post-penalty positions.
 
 import ChaseBallTransitions as transitions
 import RoleConstants as roleConstants
+import GoalieConstants as GoalieConstants
 from noggin_constants import LineID
 from math import copysign, fabs, pi
 from objects import RelRobotLocation

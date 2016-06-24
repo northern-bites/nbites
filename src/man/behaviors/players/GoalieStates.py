@@ -97,7 +97,7 @@ def gamePlaying(player):
         player.penalized = False
         return player.goLater('afterPenalty')
 
-    if player.lastDiffState == 'afterPenalty':
+    if player.lastDiffState == 'determineRole':
         return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
