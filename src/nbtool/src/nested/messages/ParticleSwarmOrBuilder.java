@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface ParticleSwarmOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.ParticleSwarm)
-    com.google.protobuf.MessageOrBuilder {
+public interface ParticleSwarmOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // repeated .messages.Particle particle = 1;
   /**
    * <code>repeated .messages.Particle particle = 1;</code>
    */

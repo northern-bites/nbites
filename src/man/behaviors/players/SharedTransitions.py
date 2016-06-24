@@ -119,6 +119,13 @@ def betweenCrosses(player):
     return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
             player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
 
+def walkingOffField(player):
+    edge_offset = 20;
+    return (player.brain.loc.x < (0 + edge_offset) or
+            player.brain.loc.x > (nogginConstants.FIELD_WHITE_WIDTH - edge_offset) or
+            player.brain.loc.y > (0 + edge_offset) or
+            player.brain.loc.y < (nogginConstants.FIELD_WHITE_HEIGHT - edge_offset))
+
 def middleThird(player):
     """
     We are in the middle third of the field.

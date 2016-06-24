@@ -70,15 +70,27 @@ kicks available, but some of them are pretty questionable, so it would be
 good to thoroughly test each kick you want to put back in.
                                                     - James Little
                                                     June 13, 2016
+                                                    <3
 """
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", 
-                                 x = 23, y = 3,
+                                 x = 18.5, y = 5,
                                  dist = 270,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
-                                 x = 23, y = -3,
+                                 x = 18.5, y = -5,
                                  dist = 270,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
+
+LEFT_DIAGONAL_KICK = Kick("Left_Diagonal", 
+                                 x = 23.5, y = 5,
+                                 dist = 270,
+                                 move=SweetMoves.MEGKOTE_DIAGONAL_FAST_KICK_LEFT)
+
+RIGHT_DIAGONAL_KICK = Kick("Right_Diagonal", 
+                                 x = 23.5, y = 5,
+                                 dist = 270,
+                                 move=SweetMoves.MEGKOTE_DIAGONAL_FAST_KICK_RIGHT)
+
 
 # LEFT_BIG_KICK =  Kick("L_Big_Straight", 
 #                       x = 14.8, y =  4.5,
@@ -144,6 +156,12 @@ def chooseAlignedKickFromKick(player, kick):
             return LEFT_SHORT_STRAIGHT_KICK
         else:
             return RIGHT_SHORT_STRAIGHT_KICK
+    if (kick == LEFT_DIAGONAL_KICK or
+          kick == RIGHT_DIAGONAL_KICK):
+        if ballRelY > 0:
+            return LEFT_DIAGONAL_KICK
+        else:
+            return RIGHT_DIAGONAL_KICK
 
     # if (kick == LEFT_STRAIGHT_KICK or
     #     kick == RIGHT_STRAIGHT_KICK):
