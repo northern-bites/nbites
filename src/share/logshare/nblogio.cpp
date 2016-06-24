@@ -322,6 +322,50 @@ return ERROR; }
             
             return SUCCESS;
         }
+
+        ioret connect_pipe( client_socket_t& sock, int port)
+        {
+            struct sockaddr_in server;
+            bzero(&server, sizeof(server));
+
+            sock = socket(AF_INET, SOCK_STREAM, 0);
+            PERROR_AND_FAIL_IF(sock < 0, "could not create client socket!")
+
+            server.sin_family = AF_INET ;
+            server.sin_port = htons(port);
+
+            struct hostent * hent = gethostbyname("127.0.0.1");
+            PERROR_AND_FAIL_IF(!hent, utilities::format("could not get localhost!").c_str() )
+
+            bcopy(hent->h_addr, &server.sin_addr.s_addr, hent->h_length);
+
+            int ret = connect(sock, (struct sockaddr *) &server, (socklen_t) sizeof(struct sockaddr_in) );
+
+            PERROR_AND_FAIL_IF(ret, "could not connect client socket!")
+
+            return SUCCESS;
+        }
+
+        extern ioret create_pipe(server_socket_t& server, int port) {
+            struct sockaddr_in serv_addr;
+            memset(&serv_addr, 0, sizeof(serv_addr));
+
+            server = socket(AF_INET, SOCK_STREAM, 0);
+            PERROR_AND_FAIL_IF(server < 0, "could not create server socket")
+
+            serv_addr.sin_family = AF_INET;
+            serv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+            serv_addr.sin_port = htons(port);
+
+            int bret = bind(server, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+            PERROR_AND_FAIL_IF(bret, "could not bind server socket!");
+
+            int lret = listen(server, 0);
+            PERROR_AND_FAIL_IF(lret, "could not listen() server socket!");
+            
+            return SUCCESS;
+        }
+
         
     }
 }

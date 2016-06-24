@@ -74,6 +74,12 @@ option(
 option(
   USE_ROBOT_TTS
   "Enable text to speech on the robot."
+  ON
+)
+
+option(
+  USE_SPL_BUTTONS
+  "Use SPL button presses to change state."
   OFF
 )
 

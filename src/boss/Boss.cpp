@@ -4,11 +4,17 @@
 #include "SensorTypes.h"
 #include "JointNames.h"
 
+#include "TextToSpeech.h"
+
+#include <stdlib.h>
 #include <iostream>
 #include <string.h>
 #include <cstdlib>
 #include <chrono>
+#include <sys/wait.h>
 #include <errno.h>
+#include <signal.h>
+#include <assert.h>
 
 #define MAN_RESTART 'r'
 #define MAN_KILL    'k'
@@ -72,8 +78,11 @@ bool DCM_TIMING_DEBUG_END() {
 #define DCM_TIMING_DEBUG_END() false
 
 #endif
+//original
 
-#define MAN_DEAD_THRESHOLD 2000
+//#define MAN_DEAD_THRESHOLD 2000
+#define MAN_DEAD_THRESHOLD 1000
+
 #define BOSS_MAIN_LOOP_US 500000
 
 namespace boss {
@@ -94,7 +103,10 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     fifo_fd(-1)
 {
     printf("\t\tBOSS VERSION == %d\n", BOSS_VERSION);
-    
+
+    //for when man dies
+    manDiedOverride = false;
+
     std::cout << "Boss Constructor" << std::endl;
     bool success = true;
     
@@ -162,20 +174,31 @@ Boss::~Boss()
 
 void Boss::listener()
 {
-    while(true)
-    {
-        if (manRunning) {
-            
+    int status; //currently unused.
+
+    while(true) {
+        if (manRunning && !manDiedOverride) {
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
                 std::cout << "Boss::listener() killing man due to inactivity" << std::endl;
+                man::tts::say(IN_SCRIMMAGE, "man down!");
+
                 print_info();
-                killMan();
+                manDiedOverride = true;
+
+                if (manPID > 0) {
+                    std::cout << "Boss::listener() sending SIGKILL for good measure." << std::endl;
+                    kill(manPID, SIGKILL);
+                }
+
                 continue;
             }
         }
         
         checkFIFO();
-        
+
+        //clear zombie mans
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
+
         usleep(BOSS_MAIN_LOOP_US);
     }
 }
@@ -183,8 +206,14 @@ void Boss::listener()
 int Boss::startMan() {
     // TODO make extra sure man isn't running yet?
     // Man uses a lock file so it shouldn't be necessary..
+
     if (manRunning) {
         std::cout << "Man is already running. Will not start." << std::endl;
+        return -1;
+    }
+
+    if (manDiedOverride) {
+        std::cout << "Cannot start while executing sit." << std::endl;
         return -1;
     }
 
@@ -193,13 +222,18 @@ int Boss::startMan() {
     if (child > 0) {
         manPID = child;
         manRunning = true;
+        shared->latestSensorRead = shared->latestSensorWritten;
         std::cout << "\n\n\n=================================================\n\n\n" << std::endl;
     }
     else if (child == 0) {
         //replace this child process with an instance of man.
         execl("/home/nao/nbites/lib/man", "", NULL);
         printf("CHILD PROCESS FAILED TO EXECL MAN!\n");
-        ::exit(1);
+
+        for (;;) {
+            ::exit(1);
+            kill(getpid(), SIGKILL);
+        }
     }
     else {
         std::cout << "COULD NOT DETACH MAN" << std::endl;
@@ -284,7 +318,7 @@ int Boss::constructSharedMem()
     return 0;
 }
 
-
+//DO NOT PUT PRINT OUTS/BLOCKING CODE HERES! WILL CRASH ROBOT!
 bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
     //We know there exists new data in >sd<,
     //now we just need to safely read it out.
@@ -301,9 +335,22 @@ bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
     return true;
 }
 
+//DO NOT PUT PRINT OUTS/BLOCKING CODE HERES! WILL CRASH ROBOT!
 void Boss::DCMPreProcessCallback()
 {
     DCM_TIMING_DEBUG_PRE1();
+
+    if (manDiedOverride) {
+        bool sit_finished = enactor.manDied();
+
+        if (sit_finished) {
+            manRunning = false;
+            manDiedOverride = false;
+        }
+        
+        return;
+    }
+            
     // Make sure that we ONLY enact legitimate commands from Man
     if (!manRunning || shared->latestCommandWritten == 0) {
         enactor.noStiff();
@@ -318,6 +365,7 @@ void Boss::DCMPreProcessCallback()
     std::string leds;
 
     if (shared->latestCommandWritten > shared->latestCommandRead) {
+
         if (bossSyncRead(shared, cmndStaging)) {
             Deserialize des(cmndStaging);
 
@@ -344,7 +392,6 @@ void Boss::DCMPreProcessCallback()
             // Now pass mans commands to the DCM
             enactor.command(results.jointsCommand, results.stiffnessCommand);
             led.setLeds(ledResults);
-
         } else {
             ++cmndLockMiss;
         }
@@ -355,6 +402,7 @@ void Boss::DCMPreProcessCallback()
     DCM_TIMING_DEBUG_PRE2();
 }
 
+//DO NOT PUT PRINT OUTS/BLOCKING CODE HERES! WILL CRASH ROBOT!
 bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, int64_t index)
 {
     // trylock because we're in the DCMs cycle right now. We don't want to block!
@@ -371,6 +419,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, int64_t index)
     return true;
 }
 
+//DO NOT PUT PRINT OUTS/BLOCKING CODE HERES! WILL CRASH ROBOT!
 void Boss::DCMPostProcessCallback()
 {
     if (!manRunning) return;
@@ -463,4 +512,5 @@ void Boss::print_info() {
     
     fflush(stdout);
 }
+
 }

@@ -1,5 +1,5 @@
 /**
- * Specified in http://www.aldebaran-robotics.com/documentation/dev/cpp/tutos/create_module.html#how-to-create-a-local-module
+ * Specified in http://doc.aldebaran.com/1-14/dev/cpp/tutos/create_module.html
  **/
 
 #include <alcommon/almodule.h>
