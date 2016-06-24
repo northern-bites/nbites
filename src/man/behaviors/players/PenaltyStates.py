@@ -5,6 +5,7 @@ hard reset to one of the two possible post-penalty positions.
 
 import ChaseBallTransitions as transitions
 import RoleConstants as roleConstants
+import GoalieConstants as GoalieConstants
 from noggin_constants import LineID
 from math import copysign, fabs, pi
 from objects import RelRobotLocation
@@ -151,7 +152,7 @@ def afterPenalty(player):
                 afterPenalty.averageLeftHorizon = afterPenalty.leftHorizSum / (afterPenalty.numOfPans / 2.0)
                 afterPenalty.averageRightHorizon = afterPenalty.rightHorizSum / (afterPenalty.numOfPans / 2.0)
                 print("computed avg left horizon", afterPenalty.averageLeftHorizon, "avg right horizon", afterPenalty.averageRightHorizon)
-            player.brain.resetLocalizationFromPenalty(afterPenalty.averageLeftHorizon > afterPenalty.averageRightHorizon)
+            player.brain.resetLocalizationFromPenalty(afterPenalty.leftHorizSum > afterPenalty.rightHorizSum)
 
         if DEBUG_PENALTY_STATES:
             print ("\n-------------------------------------------------------------")

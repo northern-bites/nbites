@@ -29,8 +29,10 @@ def walkToGoal(player):
     if player.firstFrame():
         player.brain.tracker.repeatWideSnapPan()
         player.returningFromPenalty = False
-        player.brain.nav.goTo(RobotLocation(FIELD_WHITE_LEFT_SIDELINE_X,
-                                       CENTER_FIELD_Y, 0.0))
+        dest = constants.HOME_POSITION
+        player.brain.nav.goTo(dest, speed = speeds.SPEED_SEVEN,
+                                    precision = nav.GENERAL_AREA,
+                                    fast = True)
 
     return Transition.getNextState(player, walkToGoal)
 
