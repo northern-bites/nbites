@@ -261,8 +261,10 @@ void GuardianModule::checkFallen()
 
 void GuardianModule::doPickupDetection() {
     static const float MAX_DIFF_FOR_CALIB = 2.0;
-    static const float PICKUP_INTEGRAL_THRESH = -800.0f;
+    static const float PICKUP_INTEGRAL_THRESH = -400.0f;
     static const float PUTDOWN_INTEGRAL_THRESH = 1000.0f;
+
+    static time_t lastReport = 0;
 
     static float zCalibIntegral = 0;
 
@@ -300,13 +302,19 @@ void GuardianModule::doPickupDetection() {
     } else {
         float integral = sum - (zCalibIntegral);
 
-        if (integral < PICKUP_INTEGRAL_THRESH) {
+        if (integral < PICKUP_INTEGRAL_THRESH && !feetOnGround) {
             printf("\t%f counts as pickup.\n", integral);
+
+            if (difftime(time(NULL), lastReport) > 10) {
+                lastReport = time(NULL);
+                man::tts::say(IN_SCRIMMAGE, "weeeeeeeeee");
+            }
+
             latestPickupStatus = PICKED_UP;
         }
 
         if (integral > PUTDOWN_INTEGRAL_THRESH ) {
-            printf("\t%f counts as put down.\n", integral);
+//            printf("\t%f counts as put down.\n", integral);
             latestPickupStatus = PUT_DOWN;
         }
     }
