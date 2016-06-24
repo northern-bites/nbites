@@ -38,7 +38,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         ### DROP IN PLAYER ###
         # FROM CHINA HACK 2015; we change this instead of defaulting to player number
-        self.role = 1
+        self.role = 4
         self.dropIn = True
         print "role in init soccer player", self.role
         roleConstants.setRoleConstants(self, self.role)
