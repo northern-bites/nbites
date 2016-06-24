@@ -1,22 +1,22 @@
 {
-  "wasp" :
+  "wash" :
     {
       "camera_TOP" :
         {
           "d_roll" :
-            -0.097998,
+            -0.013589,
           "d_tilt" :
-            0.002212
+            -0.052398
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.032963,
+            -0.013021,
           "d_tilt" :
-            -0.013954
+            -0.042207
         }
     },
-  "inara" :
+  "vera" :
     {
       "camera_TOP" :
         {
@@ -50,57 +50,6 @@
             0.022088
         }
     },
-  "vera" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            0,
-          "d_tilt" :
-            0
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            0,
-          "d_tilt" :
-            0
-        }
-    },
-  "buzz" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.161938,
-          "d_tilt" :
-            -0.020126
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            -0.108061,
-          "d_tilt" :
-            0.012168
-        }
-    },
-  "wash" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.013589,
-          "d_tilt" :
-            -0.052398
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            -0.013021,
-          "d_tilt" :
-            -0.042207
-        }
-    },
   "none" :
     {
       "camera_TOP" :
@@ -123,33 +72,84 @@
       "camera_TOP" :
         {
           "d_roll" :
-            -0.055326,
+            -0.028668,
           "d_tilt" :
-            -0.052547
+            -0.035212
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.031641,
+            -0.019414,
           "d_tilt" :
-            -0.024406
+            0.002756
         }
     },
-  "mal" :
+  "kaylee" :
     {
       "camera_TOP" :
         {
           "d_roll" :
-            -0.113934,
+            0.003291,
           "d_tilt" :
-            -0.055559
+            0.340564
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.043646,
+            -0.016782,
           "d_tilt" :
-            -0.024966
+            0.001572
+        }
+    },
+  "wasp" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            -0.0671,
+          "d_tilt" :
+            -0.012289
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0.002811,
+          "d_tilt" :
+            -0.014835
+        }
+    },
+  "inara" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            0,
+          "d_tilt" :
+            0
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0,
+          "d_tilt" :
+            0
+        }
+    },
+  "zoe" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            -0.04876,
+          "d_tilt" :
+            -0.029965
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            -0.000237,
+          "d_tilt" :
+            -0.025905
         }
     },
   "simon" :
@@ -157,50 +157,16 @@
       "camera_TOP" :
         {
           "d_roll" :
-            -0.07293,
+            -0.019676,
           "d_tilt" :
-            -0.028727
+            -0.039569
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.070554,
+            0.016359,
           "d_tilt" :
-            -0.002615
-        }
-    },
-  "jayne" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.113372,
-          "d_tilt" :
-            -0.022066
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            -0.054771,
-          "d_tilt" :
-            0.006992
-        }
-    },
-  "elektra" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.019501,
-          "d_tilt" :
-            -0.039135
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            0.018001,
-          "d_tilt" :
-            0.016866
+            -0.068056
         }
     },
   "elektra" :
@@ -225,50 +191,50 @@
       "camera_TOP" :
         {
           "d_roll" :
-            -0.114095,
+            -0.088202,
           "d_tilt" :
-            -0.002495
+            -0.003025
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.070439,
+            -0.051534,
           "d_tilt" :
-            0.042918
+            0.018336
         }
     },
-  "kaylee" :
+  "mal" :
     {
       "camera_TOP" :
         {
           "d_roll" :
-            0.003291,
+            -0.113934,
           "d_tilt" :
-            0.340564
+            -0.055559
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.016782,
+            -0.043646,
           "d_tilt" :
-            0.001572
+            -0.024966
         }
     },
-  "zoe" :
+  "jayne" :
     {
       "camera_TOP" :
         {
           "d_roll" :
-            -0.030961,
+            0,
           "d_tilt" :
-            -0.043171
+            0
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.000237,
+            0,
           "d_tilt" :
-            -0.025905
+            0
         }
     },
   "river" :
@@ -286,6 +252,23 @@
             0,
           "d_tilt" :
             0
+        }
+    },
+  "buzz" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            -0.019392,
+          "d_tilt" :
+            -0.052269
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0.016876,
+          "d_tilt" :
+            0.089381
         }
     }
 }
