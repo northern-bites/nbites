@@ -4,6 +4,9 @@
 #include "whistle.hpp"
 
 #include <sys/file.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <errno.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -52,10 +55,15 @@ void error_signal_handler(int signal) {
     fflush(stdout);
     fflush(stderr);
 
-    cleanup();
+    // while(1) {
+    // 	//man::tts::say(IN_GAME, "g d b me");
+    // 	sleep(10);
+    // }
 
-    printf("error_signal_handler() done.\n");
-    exit(-1);
+    // cleanup();
+
+
+    abort();
 }
 
 // Deal with lock file. To ensure that we only have ONE instance of man
@@ -112,7 +120,9 @@ int main() {
         // only ones left)
         sleep(10);
         int status;
+
         while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
+
     return 1;
 }

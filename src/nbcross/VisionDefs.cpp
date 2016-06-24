@@ -449,6 +449,11 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
     for (logptr tripointLog : arguments) {
         module.reset();
 
+        for (int i = 0; i < 2; ++i) {
+            NBL_ASSERT( module.calibrationParams[i]->getRoll() == 0.0 )
+            NBL_ASSERT( module.calibrationParams[i]->getTilt() == 0.0 )
+        }
+
         logptr theLog = tripointLog;
 
         Block& imageBlock = theLog->blocks[0];
@@ -514,6 +519,8 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
         rollBefore = fh->roll();
         tiltBefore = fh->tilt();
 
+        printf("========\n\tbefore: roll %lf tilt %lf\n", rollBefore, tiltBefore);
+
         bool success = fh->calibrateFromStar(*module.getFieldLines(topCamera));
 
 //        printf("... %s\n", success ? "SUCCESS" : "FAILURE");
@@ -523,6 +530,9 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
         } else {
             rollAfter = fh->roll();
             tiltAfter = fh->tilt();
+            printf("\tafter: roll %lf tilt %lf\n", rollAfter, tiltAfter);
+            printf("\tdelta: roll %lf tilt %lf\n", rollAfter - rollBefore, tiltAfter - tiltBefore );
+
             totalR += rollAfter - rollBefore;
             totalT += tiltAfter - tiltBefore;
         }
@@ -536,6 +546,8 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
     if (successes) {
         totalR /= (successes);
         totalT /= (successes);
+
+        printf("averaged: %lf %lf\n", totalR, totalT);
     } else {
         totalR = -999;
         totalT = -999;

@@ -1,5 +1,6 @@
 from ..headTracker import HeadMoves
 from ..navigator import Navigator
+from ..navigator import BrunswickSpeeds as speeds
 from objects import RobotLocation, RelRobotLocation
 from ..util import *
 
@@ -25,7 +26,7 @@ def gamePlaying(player):
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
     elif player.counter == 1:
         player.brain.nav.walkTo(RelRobotLocation(100,0,0),
-                                Navigator.QUICK_SPEED)
+                                speeds.SPEED_SEVEN)
     elif player.counter > 30 and player.brain.interface.motionStatus.standing:
         player.brain.nav.stand()
 
@@ -38,7 +39,7 @@ def gamePenalized(player):
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
     elif player.counter == 1:
         player.brain.nav.walkTo(RelRobotLocation(0,0,90),
-                                Navigator.QUICK_SPEED)
+                                speeds.SPEED_SEVEN)
     elif player.counter > 30 and player.brain.interface.motionStatus.standing:
         player.brain.nav.stand()
 

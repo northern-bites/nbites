@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface WalkProviderOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.WalkProvider)
-    com.google.protobuf.MessageOrBuilder {
+public interface WalkProviderOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional bool active = 1;
   /**
    * <code>optional bool active = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface WalkProviderOrBuilder extends
    */
   boolean getActive();
 
+  // optional bool is_walking = 2;
   /**
    * <code>optional bool is_walking = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface WalkProviderOrBuilder extends
    */
   boolean getIsWalking();
 
+  // optional bool stopping = 3;
   /**
    * <code>optional bool stopping = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface WalkProviderOrBuilder extends
    */
   boolean getStopping();
 
+  // optional bool requested_to_stop = 4;
   /**
    * <code>optional bool requested_to_stop = 4;</code>
    */
@@ -43,6 +46,7 @@ public interface WalkProviderOrBuilder extends
    */
   boolean getRequestedToStop();
 
+  // optional bool is_standing = 5;
   /**
    * <code>optional bool is_standing = 5;</code>
    */
@@ -52,6 +56,7 @@ public interface WalkProviderOrBuilder extends
    */
   boolean getIsStanding();
 
+  // optional bool calibrated = 6;
   /**
    * <code>optional bool calibrated = 6;</code>
    */
@@ -61,6 +66,7 @@ public interface WalkProviderOrBuilder extends
    */
   boolean getCalibrated();
 
+  // optional int32 command_type = 8;
   /**
    * <code>optional int32 command_type = 8;</code>
    */
@@ -70,6 +76,7 @@ public interface WalkProviderOrBuilder extends
    */
   int getCommandType();
 
+  // optional .messages.WalkProvider.BHDebug bhdebug = 7;
   /**
    * <code>optional .messages.WalkProvider.BHDebug bhdebug = 7;</code>
    */

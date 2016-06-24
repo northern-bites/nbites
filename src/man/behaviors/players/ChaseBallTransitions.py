@@ -61,10 +61,19 @@ def shouldSpinToBall(player):
     return fabs(degrees(player.brain.ball.bearing)) > constants.SHOULD_SPIN_TO_BALL_BEARING and not player.inKickOffPlay
 
 def shouldSpinToKickHeading(player):
+    """
+    We should spin to kick heading (does this mean orbit?) if: 
+    1) we're close enough to the ball and 
+    2) if we're in a 6-degree range of the direction we're trying to kick the 
+       ball -- in other words, if we don't have to orbit around the ball to
+       kick it in the right direction.
+    """
     ball = player.brain.ball
     xDiff = ball.x - player.brain.loc.x
     yDiff = ball.y - player.brain.loc.y
 
+    # atan2(y, x) is the angle in radians between the positive x-axis of a 
+    # plane and the point given by the coordinates (x, y) on it.
     headingToBall = degrees(atan2(yDiff, xDiff))
 
     return fabs(headingToBall - player.kick.setupH) < 6 and ball.distance <= constants.PREPARE_FOR_KICK_DIST
@@ -74,25 +83,28 @@ def shouldApproachBallAgain(player):
     The ball got really far away somehow
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST and not player.inKickOffPlay
+    return (ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST 
+        and not player.inKickOffPlay and not player.shouldKickOff)
 
 def shouldRedecideKick(player):
     """
     We've been in position for kick too long
     """
-    return player.counter > 200
+    return player.counter > 400
 
 def ballInPosition(player, kickPose):
     """
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
     """
+
     if not player.brain.ball.vis.on:
         return False
-
+    # print("Checking ball in position")
+    # print("Relx: ", kickPose.relX, " RelY:", kickPose.relY)
     # NOTE don't take the absolute value of kickPose.relX because being too
     # close to the ball is not a problem for kicking
-    return (kickPose.relX < constants.BALL_X_OFFSET and
+    return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and
             fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
             fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 
@@ -192,6 +204,9 @@ def spunOnce(player):
     Did we spin once?
     """
     return player.stateTime > constants.SPUN_ONCE_TIME_THRESH
+
+def didOnePan(player):
+    return player.stateTime > 8 # Should use constant for one snap pan
 
 def shouldWalkFindBall(player):
     """

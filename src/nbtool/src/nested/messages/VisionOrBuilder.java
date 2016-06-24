@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface VisionOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.Vision)
-    com.google.protobuf.MessageOrBuilder {
+public interface VisionOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // repeated .messages.FieldLine line = 1;
   /**
    * <code>repeated .messages.FieldLine line = 1;</code>
    */
@@ -31,6 +31,7 @@ public interface VisionOrBuilder extends
   messages.FieldLineOrBuilder getLineOrBuilder(
       int index);
 
+  // repeated .messages.Corner corner = 2;
   /**
    * <code>repeated .messages.Corner corner = 2;</code>
    */
@@ -55,6 +56,7 @@ public interface VisionOrBuilder extends
   messages.CornerOrBuilder getCornerOrBuilder(
       int index);
 
+  // optional .messages.CenterCircle circle = 3;
   /**
    * <code>optional .messages.CenterCircle circle = 3;</code>
    */
@@ -68,6 +70,7 @@ public interface VisionOrBuilder extends
    */
   messages.CenterCircleOrBuilder getCircleOrBuilder();
 
+  // optional .messages.VBall ball = 4;
   /**
    * <code>optional .messages.VBall ball = 4;</code>
    */
@@ -81,6 +84,7 @@ public interface VisionOrBuilder extends
    */
   messages.VBallOrBuilder getBallOrBuilder();
 
+  // optional int32 horizon_dist = 5;
   /**
    * <code>optional int32 horizon_dist = 5;</code>
    */

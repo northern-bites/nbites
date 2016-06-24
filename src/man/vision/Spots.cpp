@@ -40,9 +40,14 @@ SpotDetector::~SpotDetector()
   delete[] filteredImageMemory;
 }
 
-void SpotDetector::alloc(const ImageLiteBase& src)
+bool SpotDetector::alloc(const ImageLiteBase& src)
 {
-  if (src.width() > _filteredImage.width())
+  if(!src.hasProperDimensions()) {
+    _spots.clear();
+    return false;
+  }
+
+  if (src.width() >= _filteredImage.width())
   {
     delete[] innerColumns;
     delete[] outerColumns;
@@ -58,19 +63,37 @@ void SpotDetector::alloc(const ImageLiteBase& src)
   };
   int pitchNeeded = (src.width() + rowAlignMask) & ~rowAlignMask;
   int maxHeightNeeded = src.height() - initialOuterDiam() + 2;  // one extra for peak detect
-  size_t sizeNeeded = pitchNeeded * maxHeightNeeded;
-  if (sizeNeeded > filteredSize)
+
+  if(maxHeightNeeded <= 0) {
+    _spots.clear();
+    return false;
+  }
+
+  size_t sizeNeeded = pitchNeeded * maxHeightNeeded; //is sizeNeeded good?
+  if (sizeNeeded >= filteredSize)
   {
     delete[] filteredImageMemory;
     filteredPixels = (uint8_t*)alignedAlloc(sizeNeeded, 4, filteredImageMemory);
     filteredSize = sizeNeeded;
   }
-  _filteredImage = ImageLiteU8(src.x0() + ((initialOuterDiam() + 1) & 1), src.y0() - initialOuterDiam() + 1,
-                               src.width(), maxHeightNeeded, pitchNeeded, filteredPixels);
+  
+  int width = src.width();
+  int height = maxHeightNeeded;
+  if(width > 0 && height > 0) {
+    _filteredImage = ImageLiteU8(src.x0() + ((initialOuterDiam() + 1) & 1), src.y0() - initialOuterDiam() + 1,
+                               width, height, pitchNeeded, filteredPixels);
+    return true;
+  } else {
+    return false;
+  }
 }
 
-void SpotDetector::spotDetect(const ImageLiteU8* green)
+bool SpotDetector::spotDetect(const ImageLiteU8* green)
 {
+  if(!green->hasProperDimensions()) {
+    _spots.clear();
+    return false;
+  }
   _spots.clear();
   int p = filteredImage().pitch();
   int spotThreshold = (int)(filterThreshold() * filterGain()) - 1;
@@ -153,6 +176,7 @@ void SpotDetector::spotDetect(const ImageLiteU8* green)
       else
         ++i;
   }
+  return true;
 }
 
 }
