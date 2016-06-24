@@ -221,5 +221,11 @@ def shouldChangeKickingStrategy(player):
 
 def shouldNotDribble(player):
     return (player.brain.game.secs_remaining <= 30 or
-            # player.brain.game.secs_remaining > (NogginConstants.LENGTH_OF_HALF - 20) or # don't dribble for the first 20 seconds
-            player.brain.loc.x > NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X) 
+            # If we're in our own half, kick
+            player.brain.loc.x < NogginConstants.CENTER_FIELD_X or
+
+            # If we're between their cross and halfway between their cross and the half, kick.
+            (player.brain.loc.x > ((NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X + NogginConstants.CENTER_FIELD_X) / 2) and
+             player.brain.loc.x < NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)) 
+
+            # Basically we only dribble if we're really close to their goal or close to the half on their side
