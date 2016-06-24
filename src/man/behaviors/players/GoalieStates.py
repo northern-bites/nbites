@@ -187,8 +187,6 @@ def watchWithLineChecks(player):
         player.goodRightCornerObservation = False
         player.goodLeftCornerObservation = False
         watchWithLineChecks.counter = 0
-        print ("My num turns:", watchWithLineChecks.numTurns)
-        print ("My num fix:", watchWithLineChecks.numFixes)
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
         watchWithLineChecks.hasPanned = False
