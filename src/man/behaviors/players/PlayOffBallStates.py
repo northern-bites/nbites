@@ -20,7 +20,7 @@ import random
 
 @defaultState('branchOnRole')
 @superState('gameControllerResponder')
-# @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
+@ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
 @ifSwitchNow(transitions.shouldBeSupporter, 'positionAsSupporter')
 @ifSwitchNow(transitions.shouldApproachBall, 'approachBall')
 def playOffBall(player):
@@ -38,8 +38,8 @@ def branchOnRole(player):
     """
     # print("TIME SINCE PLAYING:", player.brain.gameController.timeSincePlaying)
     if role.isFirstChaser(player.role):
-        # if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
-            # return player.goNow('searchFieldForSharedBall')
+        if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
+            return player.goNow('searchFieldForSharedBall')
         return player.goNow('playerFourSearchBehavior')
     elif role.isStriker(player.role):
         return player.goNow('playerFiveSearchBehavior')

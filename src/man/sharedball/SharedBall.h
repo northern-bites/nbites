@@ -71,7 +71,7 @@ public:
 
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
     portals::InPortal<messages::RobotLocation> locIn;
-    portals::InPortal<messages::FilteredBall> ballIn;
+    portals::InPortal<messages::Vision> visionIn;
 
 
     portals::OutPortal<messages::SharedBall> sharedBallOutput;
@@ -90,7 +90,7 @@ private:
     bool inGoalieBox(float x, float y);
 
     messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
-    messages::FilteredBall myBall;
+    messages::VBall myBall;
 
     float x;            //ball x location for a given robot
     float y;            //ball y location for a given robot
