@@ -61,6 +61,8 @@ class SoccerFSA(FSA.FSA):
         if x == 0 and y == 0 and theta == 0:
             self.stand()
         else:
+            if theta > 180:
+                theta -= 360
             self.brain.nav.walk(x, y, theta)
 
     def stand(self):

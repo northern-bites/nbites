@@ -50,4 +50,6 @@ TARGET_LINK_LIBRARIES(
   portals
   support
   messages
+  logshare
+  logging
   )

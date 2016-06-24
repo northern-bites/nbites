@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface InertialStateOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.InertialState)
-    com.google.protobuf.MessageOrBuilder {
+public interface InertialStateOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional float acc_x = 1;
   /**
    * <code>optional float acc_x = 1;</code>
    *
@@ -24,6 +24,7 @@ public interface InertialStateOrBuilder extends
    */
   float getAccX();
 
+  // optional float acc_y = 2;
   /**
    * <code>optional float acc_y = 2;</code>
    */
@@ -33,6 +34,7 @@ public interface InertialStateOrBuilder extends
    */
   float getAccY();
 
+  // optional float acc_z = 3;
   /**
    * <code>optional float acc_z = 3;</code>
    */
@@ -42,6 +44,7 @@ public interface InertialStateOrBuilder extends
    */
   float getAccZ();
 
+  // optional float gyr_x = 4;
   /**
    * <code>optional float gyr_x = 4;</code>
    *
@@ -59,6 +62,7 @@ public interface InertialStateOrBuilder extends
    */
   float getGyrX();
 
+  // optional float gyr_y = 5;
   /**
    * <code>optional float gyr_y = 5;</code>
    */
@@ -68,6 +72,7 @@ public interface InertialStateOrBuilder extends
    */
   float getGyrY();
 
+  // optional float gyr_z = 6;
   /**
    * <code>optional float gyr_z = 6;</code>
    */
@@ -77,6 +82,7 @@ public interface InertialStateOrBuilder extends
    */
   float getGyrZ();
 
+  // optional float angle_x = 7;
   /**
    * <code>optional float angle_x = 7;</code>
    *
@@ -94,6 +100,7 @@ public interface InertialStateOrBuilder extends
    */
   float getAngleX();
 
+  // optional float angle_y = 8;
   /**
    * <code>optional float angle_y = 8;</code>
    */
@@ -103,6 +110,7 @@ public interface InertialStateOrBuilder extends
    */
   float getAngleY();
 
+  // optional float angle_z = 9;
   /**
    * <code>optional float angle_z = 9;</code>
    */

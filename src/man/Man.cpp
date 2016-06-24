@@ -141,7 +141,7 @@ Man::Man() :
             sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
         }
         sharedBall.locIn.wireTo(&localization.output);
-        sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
+        sharedBall.visionIn.wireTo(&vision.visionOut);
         naiveBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
 
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
@@ -195,74 +195,10 @@ Man::Man() :
         printf("nbl::initiateLogging()\n");
         nbl::initiateLogging();
 
-#ifdef START_WITH_FILEIO
-#ifndef USE_LOGGING
-#error "option START_WITH_FILEIO defined WITHOUT option USE_LOGGING"
-#endif
-            printf("CONTROL: Starting with logToFilesystem flag set!\n");
-            control::set(control::flags::logToFilesystem, true);
-#endif
+        cognitionThread.log<messages::ParticleSwarm>((control::flags::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
 
-#ifdef START_WITH_THUMBNAIL
-#ifndef USE_LOGGING
-#error "option START_WITH_THUMBNAIL defined WITHOUT option USE_LOGGING"
-#endif
-            printf("CONTROL: Starting with thumbnail flag set!\n");
-            control::set(control::flags::thumbnail, true);
-#endif
-
-//        /*
-//         SPECIFIC MODULE LOGGING
-//         
-//         CALLING NBLOG IN A SPECIFIC LOCATION, as in TRIPOINT, IS ALWAYS MORE EFFICIENT THAN THIS
-//         */
-//        sensorsThread.log<messages::JointAngles>((control::flags::SENSORS), &sensors.jointsOutput_,
-//                                                 "proto-JointAngles", "sensorsThread");
-//        sensorsThread.log<messages::JointAngles>((control::flags::SENSORS), &sensors.temperatureOutput_,
-//                                                 "proto-JointAngles", "sensorsThread");
-//        sensorsThread.log<messages::ButtonState>((control::flags::SENSORS), &sensors.chestboardButtonOutput_,
-//                                                 "proto-ButtonState", "sensorsThread");
-//        sensorsThread.log<messages::FootBumperState>((control::flags::SENSORS), &sensors.footbumperOutput_,
-//                                                     "proto-FootBumperState", "sensorsThread");
-//        sensorsThread.log<messages::InertialState>((control::flags::SENSORS), &sensors.inertialsOutput_,
-//                                                   "proto-InertialState", "sensorsThread");
-//        sensorsThread.log<messages::SonarState>((control::flags::SENSORS), &sensors.sonarsOutput_,
-//                                                "proto-SonarState", "sensorsThread");
-//        sensorsThread.log<messages::FSR>((control::flags::SENSORS), &sensors.fsrOutput_,
-//                                         "proto-FSR", "sensorsThread");
-//        sensorsThread.log<messages::BatteryState>((control::flags::SENSORS), &sensors.batteryOutput_,
-//                                                  "proto-BatteryState", "sensorsThread");
-//
-//        guardianThread.log<messages::StiffnessControl>((control::flags::GUARDIAN), &guardian.stiffnessControlOutput,
-//                                                       "proto-StiffnessControl", "guardianThread");
-//        guardianThread.log<messages::FeetOnGround>((control::flags::GUARDIAN), &guardian.feetOnGroundOutput,
-//                                                   "proto-FeetOnGround", "guardianThread");
-//        guardianThread.log<messages::FallStatus>((control::flags::GUARDIAN), &guardian.fallStatusOutput,
-//                                                 "proto-FallStatus", "guardianThread");
-//        guardianThread.log<messages::AudioCommand>((control::flags::GUARDIAN), &guardian.audioOutput,
-//                                                   "proto-AudioCommand", "guardianThread");
-////         cognitionThread.log<messages::RobotLocation>((control::flags::LOCATION), &localization.output, "proto-RobotLocation", "location");
-////         cognitionThread.log<messages::RobotLocation>((control::flags::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometry");
-////         cognitionThread.log<messages::VisionField>((control::flags::OBSERVATIONS), &vision.vision_field, "proto-VisionField", "observations");
-            cognitionThread.log<messages::ParticleSwarm>((control::flags::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
-////         cognitionThread.log<messages::FilteredBall>((control::flags::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
-//        // cognitionThread.log<messages::VisionBall>((control::flags::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
-//        cognitionThread.log<messages::Vision>((control::flags::VISION), &vision.visionOut,
-//                                                   "proto-Vision", "vision");
-//        // cognitionThread.log<messages::VisionField>((control::flags::VISION), &vision.vision_field,
-//        //                                            "proto-VisionField", "vision");
-//        // cognitionThread.log<messages::VisionBall>((control::flags::VISION), &vision.vision_ball,
-//        //                                           "proto-VisionBall", "vision");
-//        // cognitionThread.log<messages::VisionRobot>((control::flags::VISION), &vision.vision_robot,
-//        //                                            "proto-VisionRobot", "vision");
-//        // cognitionThread.log<messages::VisionObstacle>((control::flags::VISION), &vision.vision_obstacle,
-//        //                                               "proto-VisionObstacle", "vision");
-//        // cognitionThread.log<messages::JointAngles>((control::flags::VISION), &vision.joint_angles_out,
-//        //                                            "proto-JointAngles", "vision");
-//        // cognitionThread.log<messages::InertialState>((control::flags::VISION), &vision.inertial_state_out,
-//                                                     // "proto-InertialState", "vision");
-//
         }   //end USE_LOGGING bracket
+
 #endif //USE_LOGGING
 
 #ifdef USE_TIME_PROFILING

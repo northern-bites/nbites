@@ -90,6 +90,8 @@ public class LogRPC {
 
 		toSend.blocks.add(payload);
 		toSend.topLevelDictionary.put("TextFilePath", path);
+		
+		conn.addControlCall(ifr, "SetTextFileContents", toSend);
 	}
 
 	public static void setFileContents(IOFirstResponder ifr, RobotConnection conn, String path, String contents) {

@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.Kick}
  */
-public final class Kick extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.Kick)
-    KickOrBuilder {
+public  final class Kick extends
+    com.google.protobuf.GeneratedMessage
+    implements KickOrBuilder {
   // Use Kick.newBuilder() to construct.
   private Kick(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -188,6 +187,7 @@ public final class Kick extends
   }
 
   private int bitField0_;
+  // optional .messages.Kick.KickType type = 2;
   public static final int TYPE_FIELD_NUMBER = 2;
   private messages.Kick.KickType type_;
   /**
@@ -209,8 +209,7 @@ public final class Kick extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -317,9 +316,8 @@ public final class Kick extends
    * Protobuf type {@code messages.Kick}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.Kick)
-      messages.KickOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.KickOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_PMotion.internal_static_messages_Kick_descriptor;
@@ -432,6 +430,7 @@ public final class Kick extends
     }
     private int bitField0_;
 
+    // optional .messages.Kick.KickType type = 2;
     private messages.Kick.KickType type_ = messages.Kick.KickType.kickForwardLeft;
     /**
      * <code>optional .messages.Kick.KickType type = 2;</code>
