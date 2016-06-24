@@ -66,6 +66,12 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots,
         int midY = -(*i).iy() + height / 2;
         (*i).rawX = midX;
         (*i).rawY = midY;
+		/*imagePoint p = imagePoint(midX - width /2, -midY + height / 2);
+		std::cout << "Spots " << (*i).innerDiam << " " << (2 * projectedBallRadius(p)) << std::endl;
+		debugDraw.drawBox(midX, midX + 2 * projectedBallRadius(p), midY + 2 * projectedBallRadius(p), midY, RED);
+		p = imagePoint( - width /2, -midY + height / 2);
+		debugDraw.drawBox(midX, midX + 2 * projectedBallRadius(p),
+		midY + 2 * projectedBallRadius(p), midY, RED);*/
         if (filterWhiteSpot((*i), blackSpots, badBlackSpots)) {
             actualWhiteSpots.push_back((*i));
                 if(debugBall) {
@@ -105,7 +111,7 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 		imagePoint p = imagePoint(bx, by);
 		int radius = projectedBallRadius(p);
 		int fudge = radius / 4;
-		bool goodSize = radius <= diam && diam < 2 * radius + fudge;
+		bool goodSize = radius <= diam + fudge && diam < 2 * radius + fudge;
 		if (!topCamera && !goodSize) {
 			goodSize = diam > 8 && diam < 2 * radius + fudge && diam < 30;
 		}
@@ -1069,7 +1075,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 		// circle detection can be hard if the ball is on a line or in front of a robot
 		// check whiteness?
 		imagePoint p = imagePoint(midX, midY);
-		if (!checkGradientInSpot(spot) || spot.green > 40 || !greenAroundBallFromCentroid(p)) {
+		if (!checkGradientInSpot(spot) || !greenAroundBallFromCentroid(p)) {
 			if (debugBall) {
 				std::cout << "Checking one spot " << spot.green << " " << std::endl;
 			}
