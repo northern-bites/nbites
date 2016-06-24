@@ -111,6 +111,8 @@ class Brain(object):
 
         self.pickedUpInSet = False
 
+        self.penaltyCount = 0
+
         # CHINA HACK(s)
         self.penalizedHack = False
         self.penalizedEdgeClose = 0

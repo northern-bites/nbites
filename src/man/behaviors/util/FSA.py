@@ -51,7 +51,6 @@ class FSA:
         self.lastCounter = 0
         self.startTime = 0
         self.stateTime = 0
-        self.lastStateTime = 0
         self.states = dict()
 
         self.getTime = time.time
@@ -212,7 +211,6 @@ class FSA:
                             " frames in state \'"+self.lastState+"\'",
                             self.stateChangeColor)
             self.lastDiffState = self.lastState
-            self.lastCounter = self.counter
             self.counter = 0
             self.lastStateTime = self.stateTime
             self.startTime = self.getTime()

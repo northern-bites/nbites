@@ -193,7 +193,7 @@ def gamePenalized(player):
         player.penalizeHeads()
         player.wasPenalized = True
         player.brain.penalizedEdgeClose = 0
-        player.brain.penalizedCount = 0
+        player.brain.penaltyCount = 0
         player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
@@ -203,7 +203,7 @@ def gamePenalized(player):
     if player.brain.vision.horizon_dist < 200.0:
         player.brain.penalizedEdgeClose += 1
 
-    player.brain.penalizedCount += 1
+    player.brain.penaltyCount += 1
     return player.stay()
 
 @superState('gameControllerResponder')
