@@ -32,24 +32,26 @@ void BallDetector::processDarkSpots(SpotList & darkSpots, intPairVector & blackS
         // convert back to raw coordinates
         int midX = (*i).ix() + width / 2;
         int midY = -(*i).iy() + height / 2;
-        (*i).rawX = midX;
-        (*i).rawY = midY;
-        getColor(midX, midY);
-        // if the middle of the spot is white or green, ignore it
-        if (!(isWhite() || isGreen()) &&
-            (!topCamera || midY > field->horizonAt(midX))) {
-            if (filterBlackSpots((*i))) {
-                blackSpots.push_back(std::make_pair(midX, midY));
-                actualBlackSpots.push_back((*i));
-                (*i).spotType = SpotType::DARK_CANDIDATE;
-            } else {
-                (*i).spotType = SpotType::DARK_REJECT;
-                badBlackSpots.push_back(std::make_pair(midX, midY));
-            }
-            if (debugBall) {
-                debugBlackSpots.push_back((*i));
-            }
-        }
+		if (midX < width - 5 && midX > 5 && midY > 5 && midY < height - 5) {
+			(*i).rawX = midX;
+			(*i).rawY = midY;
+			getColor(midX, midY);
+			// if the middle of the spot is white or green, ignore it
+			if (!(isWhite() || isGreen()) &&
+				(!topCamera || midY > field->horizonAt(midX))) {
+				if (filterBlackSpots((*i))) {
+					blackSpots.push_back(std::make_pair(midX, midY));
+					actualBlackSpots.push_back((*i));
+					(*i).spotType = SpotType::DARK_CANDIDATE;
+				} else {
+					(*i).spotType = SpotType::DARK_REJECT;
+					badBlackSpots.push_back(std::make_pair(midX, midY));
+				}
+				if (debugBall) {
+					debugBlackSpots.push_back((*i));
+				}
+			}
+		}
     }
 }
 
@@ -115,10 +117,6 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 				diam << " " << diam2 << " " << cx << " " <<
 				(cy+bottomQuarter) << std::endl;
 		}
-		std::cout << "Good size on blob " << radius << " " <<
-				diam << " " << diam2 << " " << cx << " " <<
-				(cy+bottomQuarter) << std::endl;
-
         if (goodSize && diam2 >= radius / 2 && cy - diam > 0 &&
 			cx - diam > 0 && cx + diam < width &&
 			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
@@ -851,7 +849,11 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			getColor(x, y);
 		}
 		int elength5 = y - bottomY;
-		if (elength5 > 10) {
+		if (elength5 > 2 * diam) {
+			if (debugBall) {
+				debugDraw.drawPoint(x, y, RED);
+				std::cout << "Problem finding green below " << elength5 << std::endl;
+			}
 			return false;
 		}
 		// left
@@ -1066,7 +1068,8 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
     } else if (spots == 1) {
 		// circle detection can be hard if the ball is on a line or in front of a robot
 		// check whiteness?
-		if (!checkGradientInSpot(spot) || spot.green > 40) {
+		imagePoint p = imagePoint(midX, midY);
+		if (!checkGradientInSpot(spot) || spot.green > 40 || !greenAroundBallFromCentroid(p)) {
 			if (debugBall) {
 				std::cout << "Checking one spot " << spot.green << " " << std::endl;
 			}
