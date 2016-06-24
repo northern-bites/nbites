@@ -187,8 +187,7 @@ class HeadTrackingHelper(object):
             return
 
         # If we haven't seen the target, look towards loc model.
-        if target.vis.frames_off > 3:
-
+        if target.vis.frames_off > 30:
 # TODO: use a constant above
             self.lookToPoint(target)
 # TODO: safeguard above call from errors due to calling every frame
