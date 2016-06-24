@@ -30,7 +30,7 @@ def walkToGoal(player):
         player.brain.tracker.repeatWideSnapPan()
         player.returningFromPenalty = False
         dest = constants.HOME_POSITION
-        player.brain.nav.goTo(dest, speed = speeds.SPEED_FIVE,
+        player.brain.nav.goTo(dest, speed = speeds.SPEED_SEVEN,
                                     precision = nav.GENERAL_AREA,
                                     fast = True)
 

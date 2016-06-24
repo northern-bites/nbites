@@ -146,7 +146,7 @@ def afterPenalty(player):
                 afterPenalty.averageLeftHorizon = afterPenalty.leftHorizSum / (afterPenalty.numOfPans / 2.0)
                 afterPenalty.averageRightHorizon = afterPenalty.rightHorizSum / (afterPenalty.numOfPans / 2.0)
                 print("computed avg left horizon", afterPenalty.averageLeftHorizon, "avg right horizon", afterPenalty.averageRightHorizon)
-            player.brain.resetLocalizationFromPenalty(afterPenalty.averageLeftHorizon > afterPenalty.averageRightHorizon)
+            player.brain.resetLocalizationFromPenalty(afterPenalty.leftHorizSum > afterPenalty.rightHorizSum)
 
         if DEBUG_PENALTY_STATES:
             print ("\n-------------------------------------------------------------")
