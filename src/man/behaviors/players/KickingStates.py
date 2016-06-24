@@ -168,9 +168,10 @@ afterKick.numTimes = 0
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 @ifSwitchNow(shared.walkingOffField, 'spinSearch')
 def chaseAfterBall(player):
+
     if player.firstFrame():
-        print "in chaseAfterBall"
-        player.brain.nav.destinationWalkTo(RelRobotLocation(200, 0, 0))
+        player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
+        player.brain.nav.destinationWalkTo(RelRobotLocation(player.brain.ball.x, player.brain.ball.y, 0))
         return player.stay()
     if transitions.shouldChaseBall(player):
         print "I can see the ball!"
@@ -190,7 +191,6 @@ def lookAroundForBall(player):
         print "I can see the ball!"
         return player.goNow('approachBall')
     if player.counter > 50:
-        print "going back to afterKick"
         return player.goNow('afterKick')
     return player.stay()
 
