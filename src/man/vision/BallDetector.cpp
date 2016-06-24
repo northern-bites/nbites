@@ -702,7 +702,7 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
 		}
     }
 	if (spots == 1) {
-		if (!checkGradientInSpot(spot)) {
+		if ((spot.innerDiam < 25 || !topCamera) &&!checkGradientInSpot(spot)) {
 			return false;
 		}
 	}
@@ -768,8 +768,10 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	int y = topY;
 	getColor(x, y);
 	int THRESHOLD = 110;
-	if (!checkGradientInSpot(spot)) {
-        // std::cout<<"returning false 1\n";
+	// normally check the gradient to get rid of crosses, but if ball is really large
+	// it could be blurry and low gradient
+	if ((diam < 15 || !topCamera) && !checkGradientInSpot(spot)) {
+        std::cout<<"returning false " << diam << "\n";
 		return false;
 	}
 	int length1, length2, length3, length4;
@@ -1075,7 +1077,8 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 		// circle detection can be hard if the ball is on a line or in front of a robot
 		// check whiteness?
 		imagePoint p = imagePoint(midX, midY);
-		if (!checkGradientInSpot(spot) || !greenAroundBallFromCentroid(p)) {
+		if (((!topCamera || spot.innerDiam < 25) && !checkGradientInSpot(spot)) ||
+			!greenAroundBallFromCentroid(p)) {
 			if (debugBall) {
 				std::cout << "Checking one spot " << spot.green << " " << std::endl;
 			}
