@@ -115,6 +115,7 @@ def afterKick(player):
         destinationOfKick = Location(player.kick.destinationX,
                                      player.kick.destinationY)
         if player.kick.destinationX == 0 and player.kick.destinationY == 0:
+            afterKick.numTimes = 0
             player.goNow('spinSearch')
 
         if not player.brain.ball.vis.frames_on > 5:
@@ -127,6 +128,8 @@ def afterKick(player):
         #     player.motionKick = False
         #     return player.goNow('spinToBall')
         # else:
+        
+        afterKick.numTimes = 0
         return player.goNow('positionForKick')
 
     elif player.kickedOut:
@@ -135,6 +138,7 @@ def afterKick(player):
 
     if player.counter < 300:
         print "going to chaseAfterBall"
+        afterKick.numTimes = 0
         return player.goNow('chaseAfterBall')
 
 
@@ -165,8 +169,8 @@ def afterKick(player):
 afterKick.numTimes = 0
 
 @superState('gameControllerResponder')
-@ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
-@ifSwitchNow(shared.walkingOffField, 'spinSearch')
+# @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
+# @ifSwitchNow(shared.walkingOffField, 'spinSearch')
 def chaseAfterBall(player):
 
     if player.firstFrame():
@@ -176,6 +180,9 @@ def chaseAfterBall(player):
     if transitions.shouldChaseBall(player):
         print "I can see the ball!"
         return player.goNow('approachBall')
+    if shared.walkingOffField(player):
+        print "I'm walking off the field!"
+        return player.goNow('spinSearch')
     if shared.navAtPosition(player) or player.counter > 100:
         return player.goNow('lookAroundForBall')
     return player.stay()
