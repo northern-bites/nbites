@@ -125,6 +125,7 @@ class Brain(object):
         # New defender positioning
         self.defendingStateTime = 0 #Number of frames.
         self.staggeredPositioning = False
+        self.defenderPositioning = 0
 
     def initTeamMembers(self):
         self.teamMembers = []

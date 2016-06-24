@@ -124,36 +124,39 @@ def findDefenderHomeWithBall(player, left, ball, hh):
 
     print "Find Defender Home WITH ball"
 
-    if ball.x < NogginConstants.MIDFIELD_X:
-        player.brain.staggeredPositioning = True
-        if left:
-            home = closePointOnSeg(role.evenDefenderBack.x, role.evenDefenderBack.y,
-                                    role.evenDefenderForward.x, role.evenDefenderForward.y,
-                                    ball.x, ball.y)
-            print "left defender ball in half"
-            return RobotLocation(home[0], home[1], hh)
+    # if ball.x < NogginConstants.MIDFIELD_X:
+    #     player.brain.staggeredPositioning = True
+    #     if left:
+    #         # home = closePointOnSeg(role.evenDefenderBack.x, role.evenDefenderBack.y,
+    #         #                         role.evenDefenderForward.x, role.evenDefenderForward.y,
+    #         #                         ball.x, ball.y)
+    #         # print "left defender ball in half"
+    #         # return RobotLocation(home[0], home[1], hh)
+
+    #         return role.evenDefenderForward
+
+    #     else:
+    #         home = closePointOnSeg(role.oddDefenderBack.x, role.oddDefenderBack.y,
+    #                                 role.oddDefenderForward.x, role.oddDefenderForward.y,
+    #                                 ball.x, ball.y)
+    #         print "right defender ball in half"
+    #         return RobotLocation(home[0], home[1], hh)
+    # else:
+    player.brain.staggeredPositioning = False
+    if left:
+        if ball.y  >= (NogginConstants.MIDFIELD_Y + NogginConstants.CENTER_CIRCLE_RADIUS):
+            print "ball even defender forward"
+            return role.evenDefenderForward
         else:
-            home = closePointOnSeg(role.oddDefenderBack.x, role.oddDefenderBack.y,
-                                    role.oddDefenderForward.x, role.oddDefenderForward.y,
-                                    ball.x, ball.y)
-            print "right defender ball in half"
-            return RobotLocation(home[0], home[1], hh)
+            print "ball even back"
+            return role.evenDefenderBack
     else:
-        player.brain.staggeredPositioning = False
-        if left:
-            if ball.y  >= (NogginConstants.MIDFIELD_Y + NogginConstants.CENTER_CIRCLE_RADIUS):
-                print "ball even defender forward"
-                return role.evenDefenderForward
-            else:
-                print "ball even back"
-                return role.evenDefenderBack
+        if ball.y <= (NogginConstants.MIDFIELD_Y - NogginConstants.CENTER_CIRCLE_RADIUS):
+            print "ball odd forward"
+            return role.oddDefenderForward
         else:
-            if ball.y <= (NogginConstants.MIDFIELD_Y - NogginConstants.CENTER_CIRCLE_RADIUS):
-                print "ball odd forward"
-                return role.oddDefenderForward
-            else:
-                print "ball odd back"
-                return role.oddDefenderBack
+            print "ball odd back"
+            return role.oddDefenderBack
 
 #ballPrev = previous position of ball
 def findDefenderHomeNoBall(player, left):

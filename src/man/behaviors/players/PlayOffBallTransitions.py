@@ -112,3 +112,11 @@ def shouldChangeDefenderPosition(player):
     if player.brain.defendingStateTime >= 750: #Number of frames. #Should change to constant.
         player.brain.defendingStateTime = 0
         return True
+
+def ballInOurHalf(player):
+    return player.brain.sharedBall.ball_on and player.brain.sharedBall.x < NogginConstants.MIDFIELD_X
+
+def ballInTheirHalf(player):
+    return player.brain.sharedBall.ball_on and player.brain.sharedBall.x > NogginConstants.MIDFIELD_X
+
+
