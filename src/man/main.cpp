@@ -109,11 +109,7 @@ int main() {
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
     freopen(MAN_LOG_PATH, "w", stdout);
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> a9ac2bd652dae978c00e14da18be7390ff1245ef
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     
