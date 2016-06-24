@@ -127,8 +127,9 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 			if (row != null) {
 				int successes = out[0].topLevelDictionary.get("CalibrationNumSuccess").asNumber().asInt();
-				double droll = out[0].topLevelDictionary.get("CalibrationDeltaTilt").asNumber().asDouble();
-				double dtilt = out[0].topLevelDictionary.get("CalibrationDeltaRoll").asNumber().asDouble();
+
+				double droll = out[0].topLevelDictionary.get("CalibrationDeltaRoll").asNumber().asDouble();
+				double dtilt = out[0].topLevelDictionary.get("CalibrationDeltaTilt").asNumber().asDouble();
 
 				row.used = successes;
 
