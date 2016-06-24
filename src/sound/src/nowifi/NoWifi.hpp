@@ -56,7 +56,7 @@ namespace nowifi {
     };
 
     SendrBase * getSender();
-    RecvrBase * getRecvr();
+    RecvrBase * getRecvr(Callback callback);
 }
 
 #include "SimpleFSK.hpp"
