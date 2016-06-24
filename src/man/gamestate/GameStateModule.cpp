@@ -168,7 +168,7 @@ namespace man{
             }
 
             next = (game_state_t) latest_data.state();
-            whistleHandler(last, next);
+//            whistleHandler(last, next);
             latest_data.set_state( (int) next);
         }
 
