@@ -127,9 +127,10 @@ def gamePlaying(player):
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
 
-        if player.brain.pickedUpInSet == True:
-            player.brain.pickedUpInSet = False
-            player.brain.player.brain.resetLocTo(999, 999, 999)
+        # Overzealous
+        # if player.brain.pickedUpInSet == True:
+        #     player.brain.pickedUpInSet = False
+        #     player.brain.player.brain.resetLocTo(999, 999, 999)
             
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
