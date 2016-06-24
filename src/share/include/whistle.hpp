@@ -79,11 +79,11 @@ namespace whistle {
 
             double dt = difftime(time(NULL), whistle_heartbeat() );
             if (dt > 5) {
-                NBL_WARN("gamestate hasn't heard from whistle for %lf seconds!", dt);
+//                NBL_WARN("gamestate hasn't heard from whistle for %lf seconds!", dt);
 
                 if (difftime(time(NULL), last_complain) > 10) {
                     last_complain = time(NULL);
-                    man::tts::say(IN_SCRIMMAGE, "whistle is not running!");
+//                    man::tts::say(IN_SCRIMMAGE, "whistle is not running!");
                 }
 
                 return false;
