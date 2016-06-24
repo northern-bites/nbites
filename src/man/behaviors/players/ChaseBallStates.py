@@ -225,7 +225,9 @@ def orbitBall(player):
         #player.stopWalking()
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
+        print("     ORBIT I'm in orbit and deciding my chooseAlignedKickFromKick")
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+        print("     ORBIT chosen kick:", str(player.kick))
         player.kick.destinationX = destinationX
         player.kick.destinationY = destinationY
 
@@ -343,7 +345,7 @@ orbitBall.X_BACKUP_SPEED = .2
 def dribble(player):
     if transitions.shouldNotDribble(player):
         print "It's no longer dribble time"
-        return player.goNow('positionForKick')
+        return player.goNow('orbitBall')
     print "Dribble time"
     ball = player.brain.ball
     relH = player.decider.normalizeAngle(player.brain.loc.h)
@@ -429,7 +431,7 @@ def positionForKick(player):
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         # print "positionForKick -- we don't see it"
         player.brain.nav.updateDest(positionForKick.kickPose)
-        print("MY kickpose:", str(positionForKick.kickPose))
+        # print("MY kickpose:", str(positionForKick.kickPose))
         # player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
     # print "positionForKick"

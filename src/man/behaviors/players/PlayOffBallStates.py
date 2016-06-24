@@ -289,7 +289,7 @@ def playerFiveSearchBehavior(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if playerFiveSearchBehavior.pointIndex == -1:[I] 7694 qi.eventloop: Creating event loop while no qi::Application() is running
+        if playerFiveSearchBehavior.pointIndex == -1:
 
             playerFiveSearchBehavior.dest = min(playerFivePoints, key = lambda x:fabs(player.brain.loc.distTo(x)))
             playerFiveSearchBehavior.pointIndex = playerFivePoints.index(playerFiveSearchBehavior.dest)
