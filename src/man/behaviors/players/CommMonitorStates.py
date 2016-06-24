@@ -21,7 +21,9 @@ def commMonitor(player):
 
     elif player.commMode != 0 and player.brain.game.have_remote_gc:
         
-        print "Switched to good comm mode because we are on the GC BABAY!"
+        if player.firstFrame():
+            print "Switched to good comm mode because we are on the GC BABAY!"
+            print "Player role switch is", str(player.roleSwitching)
         
         player.role = player.brain.playerNumber
     
@@ -31,13 +33,15 @@ def commMonitor(player):
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = False # HACK switched this off for testing; TODO back on for Germany!
+        player.roleSwitching = True # HACK switched this off for testing; TODO back on for Germany!
         player.commMode = 0
 
     elif not player.brain.game.have_remote_gc and player.commMode != 2 and transitions.awfulComm(player):
         
-        print "Switched to awful comm mode!"
-        
+        if player.firstFrame():
+            print "Switched to awful comm mode!"
+            print "Player role switch is", str(player.roleSwitching)
+
         player.role = player.brain.playerNumber
         player.prevRoleConfig = RoleConstants.roleConfiguration
         RoleConstants.roleConfiguration = RoleConstants.spread
@@ -49,8 +53,9 @@ def commMonitor(player):
     
     elif not player.brain.game.have_remote_gc and player.commMode != 1 and transitions.mediocreComm(player):
 
-        print "Switched to mediocre comm mode!"
-    
+        if player.firstFrame():
+            print "Switched to mediocre comm mode!"
+            print "Player role switch is", str(player.roleSwitching)
         player.role = player.brain.playerNumber
     
         if player.commMode == 2: 
@@ -64,7 +69,9 @@ def commMonitor(player):
 
     elif player.commMode != 0 and transitions.goodComm(player):
         
-        print "Switched to good comm mode! ROLE SWITCHING SHOULD BE TURNED ON."
+        if player.firstFrame():
+            print "Switched to good comm mode! ROLE SWITCHING SHOULD BE TURNED ON."
+            print "Player role switch is", str(player.roleSwitching)   
         
         player.role = player.brain.playerNumber
         
@@ -74,5 +81,5 @@ def commMonitor(player):
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = False # HACK TODO turn this back on for Germany
+        player.roleSwitching = True # HACK TODO turn this back on for Germany
         player.commMode = 0
