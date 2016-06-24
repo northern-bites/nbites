@@ -15,7 +15,8 @@
 
 #include <fftw3.h>
 
-#define SPECTRUM_LENGTH( nsamp ) ((int) ((nsamp / 2) + 1))
+//#define SPECTRUM_LENGTH( nsamp ) ((int) ((nsamp / 2) + 1))
+#define SPECTRUM_LENGTH( nsamp ) ((int) ((nsamp / 2)))
 
 namespace nbsound {
     class Transform {

@@ -48,9 +48,18 @@ public class LogSorting {
 			public int compare(LogReference o1, LogReference o2) {
 				Path p1 = o1.loadPath();
 				Path p2 = o2.loadPath();
+
 				if (p1 == null && p2 == null) return 0;
 				if (p1 == null && p2 != null) return 1;
-				if (p1 != null && p2 != null) return -1;
+				if (p1 != null && p2 == null) return -1;
+
+				String fn1 = p1.getFileName().toString();
+				String fn2 = p2.getFileName().toString();
+
+				if (fn1.length() != fn2.length()) {
+					if (fn1.length() > fn2.length()) return 1;
+					else return -1;
+				}
 
 				return p1.getFileName().toString().compareTo(p2.getFileName().toString());
 			}

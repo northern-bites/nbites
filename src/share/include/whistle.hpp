@@ -20,6 +20,8 @@
 namespace whistle {
 
     static inline pid_t start_whistle_process() {
+        system("killall whistle");
+
         pid_t wpid = fork();
 
         if (!wpid) {
