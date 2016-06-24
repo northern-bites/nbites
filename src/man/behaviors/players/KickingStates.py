@@ -47,7 +47,7 @@ from objects import Location, RelRobotLocation
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 def executeSweetKick(player):
     """
-    Kick the ball using sweet move. But don't do it. They suck!
+    Kick the ball using sweet move.
     """
     if player.firstFrame():
         print("Using kick: ", str(player.kick))
