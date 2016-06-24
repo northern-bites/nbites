@@ -1,5 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from ..headTracker import TrackingConstants as tracking
 from ..navigator import Navigator
 from ..navigator import BrunswickSpeeds as speeds
 from ..util import *
@@ -65,7 +66,7 @@ def fastPan(player):
         player.stand()
         player.brain.tracker.repeatWideSnapPan()
 
-    if player.stateTime >= 8:
+    if player.stateTime >= tracking.FULL_WIDE_PAN_TIME:
         return player.goNow("playOffBall")
 
 @superState('gameControllerResponder')

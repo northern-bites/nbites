@@ -6,6 +6,7 @@ import ChaseBallConstants as chaseConstants
 import ClaimTransitions as claims
 from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findStrikerHome, findDefenderHome, calculateHomePosition
 import noggin_constants as NogginConstants
+from ..headTracker import TrackingConstants as tracking
 from ..navigator import Navigator as nav
 from ..navigator import BrunswickSpeeds as speeds
 from objects import Location, RobotLocation, RelRobotLocation
@@ -83,10 +84,10 @@ def watchForBall(player):
     # if transitions.tooFarFromHome(player, 50, 20):
     #     return player.goLater('positionAtHome')
 
-    if player.stateTime >= 8 and not role.isStriker(player.role):
+    if player.stateTime >= tracking.FULL_WIDE_PAN_TIME and not role.isStriker(player.role):
         return player.goNow('spinAtHome')
 
-    elif player.stateTime >= 12:
+    elif player.stateTime >= tracking.FULL_WIDE_PAN_TIME * 2:
         return player.goNow('spinAtHome')
 
 @defaultState('doFirstHalfSpin')
@@ -127,14 +128,14 @@ def doPan(player):
         player.brain.tracker.trackBall()
 
     if not role.isStriker(player.role):
-        if player.stateTime >= 4:
+        if player.stateTime >= tracking.FULL_WIDE_PAN_TIME:
             if role.isFirstChaser(player.role):
                 return player.goNow('playerFourSearchBehavior')
             else:
                 return player.goNow('doSecondHalfSpin')
 
     else:
-        if player.stateTime >= 8:
+        if player.stateTime >= tracking.FULL_WIDE_PAN_TIME * 2:
             return player.goNow('playerFiveSearchBehavior')
 
 @superState('spinAtHome')
@@ -349,7 +350,7 @@ def panAtWayPoint(player):
         player.stand()
         player.brain.tracker.trackBall()
 
-    if player.stateTime >= 8: #Should use constant for 1 pan here.
+    if player.stateTime >= tracking.FULL_WIDE_PAN_TIME:
         if role.isFirstChaser(player.role) and not playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 0:
             return player.goNow("playerFourSearchBehavior")
         else:
