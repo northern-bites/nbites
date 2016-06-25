@@ -86,6 +86,19 @@ STAND_STRAIGHT_POS = (((98.95, 9.74, -89.95, -2.86),
                        (98.95, -9.74, 89.95, 2.86),
                        3.0,0,stiff.NORMAL_STIFFNESSES),)
 
+
+STAND_STRAIGHT_POS_FINAL = ((0.,90.,0.,0.),
+               (0.,0.,-55.,125.7,-75.7,0.),
+               (0.,0.,-55.,125.7,-75.7,0.),
+               (0.,-90.,0.,0.),
+               3.0,0,stiff.LOW_HEAD_STIFFNESSES),
+
+               ((98.95, 9.74, -89.95, -2.86),
+                (0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                (0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                (98.95, -9.74, 89.95, 2.86),
+                3.0,0,stiff.NORMAL_STIFFNESSES),)
+
 #Angles measured pretty exactly from the robot w/gains off.
 #might want to make them even different if we suspect the
 #motors are weakening
