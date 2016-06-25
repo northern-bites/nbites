@@ -112,6 +112,7 @@ def getDirection(h):
         return states.dodge.DDirects[6]
 
 def notAtLocPosition(nav):
+    return False # Honestly this is so bad
     if not states.goToPosition.useLoc: 
         return False
     return not atDestination(nav)

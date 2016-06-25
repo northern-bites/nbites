@@ -62,6 +62,7 @@ def checkSafePlacement(player):
     elif checkSafePlacement.turnCount >= 2:
         player.brain.tracker.lookToAngle(0)
     if player.brain.tracker.isStopped():
+        print("setting is looking to false")
         checkSafePlacement.looking = False
 
     # if player.counter > 50:
@@ -89,6 +90,7 @@ def clearBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
+        # Moved kick transition to transitions
     if player.brain.ball.distance < constants.POSITION_FOR_KICK_DIST:
         # print "Now positioning for kick"
         return player.goNow('positionForGoalieKick')
@@ -97,7 +99,7 @@ def clearBall(player):
         player.brain.nav.chaseBall(speeds.SPEED_FIVE, fast = True)
     else:
         # print "approaching ball"
-        player.brain.nav.chaseBall(speeds.SPEED_EIGHT, fast = True)
+        player.brain.nav.chaseBall(speeds.SPEED_SEVEN, fast = True)
 
     # if player.counter % 2 == 0:
     #     nball = player.brain.naiveBall
