@@ -1,0 +1,2 @@
+#!/bin/bash
+$NBITES_DIR/src/nbtool/scripts/nbtool-class nbtool.term.whistle_anno "$@"

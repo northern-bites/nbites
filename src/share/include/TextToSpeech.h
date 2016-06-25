@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <signal.h>
 
-#ifndef NBL_STANDALONE
+#if !defined(NBL_STANDALONE) && !defined(NB_BOSS_COMPILATION)
 #include "DebugConfig.h"
 #endif
 
@@ -24,6 +24,7 @@ namespace man {
         static inline void internal_say(const char * line) {
             if (!fork()) {
                 execl("/usr/bin/say", "", line, NULL);
+
                 exit(0);
                 kill(getpid(), SIGKILL);
             }
