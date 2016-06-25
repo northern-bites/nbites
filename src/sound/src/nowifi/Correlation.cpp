@@ -6,3 +6,7 @@
 //
 
 #include "Correlation.hpp"
+
+namespace nowifi {
+    
+}
