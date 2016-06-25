@@ -248,7 +248,6 @@ def penaltyShotsGamePlaying(player):
         player.brain.fallController.enabled = True
         player.inKickingState = False
         player.shouldKickOff = False
-        shrek
         player.penaltyKicking = True
         player.brain.resetPenaltyKickLocalization()
 

@@ -115,10 +115,6 @@ def shouldChangeDefenderPosition(player):
     else:
         return False
 
-self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition,
-                                                                  Transition.MOST_OF_THE_TIME,
-                                                                  Transition.HIGH_PRECISION)
-
 def ballInOurHalf(player):
     if role.isDefender(player.role):
         return player.brain.sharedBall.ball_on and (player.brain.sharedBall.x < (nogginC.MIDFIELD_X - nogginC.CENTER_CIRCLE_RADIUS))
