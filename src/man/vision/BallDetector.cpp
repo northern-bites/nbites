@@ -759,7 +759,6 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	getColor(x, y);
 	int THRESHOLD = 110;
 	if (!checkGradientInSpot(spot)) {
-        // std::cout<<"returning false 1\n";
 		return false;
 	}
 	int length1, length2, length3, length4;
