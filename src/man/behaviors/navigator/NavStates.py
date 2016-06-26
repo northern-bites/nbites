@@ -58,7 +58,7 @@ def goToPosition(nav):
     #                                             nav.brain.ball.loc.bearing)
 
     
-    if nav.counter < 2:
+    if nav.counter < 5:
         print("In go to position, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
@@ -299,9 +299,11 @@ def walkingTo(nav):
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         print ("MY dest: ", nav.destination.relX, nav.destination.relY, nav.destination.relH)
-        # helper.stand(nav)
+        helper.walkInPlace(nav)
         return nav.stay()
 
+    if nav.counter < 5:
+        return nav.stay()
 
     walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
                          nav.brain.interface.odometry.y,
@@ -372,6 +374,12 @@ def atPosition(nav):
         helper.stand(nav)
 
     return Transition.getNextState(nav, atPosition)
+
+def walkInPlace(nav):
+    if nav.firstFrame():
+        helper.walkInPlace(nav)
+
+    return nav.stay()
 
 def stand(nav):
     """

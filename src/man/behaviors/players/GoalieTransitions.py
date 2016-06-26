@@ -984,10 +984,12 @@ def shouldClearBall(player):
         player.aggressive = False
 
     # ball must be visible
-    if player.brain.ball.vis.frames_off > 10:
+    if player.brain.ball.vis.frames_off > 20:
         return False
 
     shouldGo = False
+
+    # print("Ball distance: ", player.brain.ball.distance)
 
     # if definitely within good chasing area
     if (player.brain.ball.distance < constants.CLEARIT_DIST_FRONT
@@ -1012,13 +1014,6 @@ def shouldClearBall(player):
         shouldGo = True
 
     if shouldGo:
-    #     if player.brain.ball.bearing_deg < -65.0:
-    #         VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
-    #     elif player.brain.ball.bearing_deg > 65.0:
-    #         VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
-    #     else:
-    #         VisualGoalieStates.clearIt.dangerousSide = -1
-
         if player.brain.ball.bearing_deg < 0.0:
             VisualGoalieStates.clearBall.ballSide = constants.RIGHT
         else:
@@ -1028,12 +1023,18 @@ def shouldClearBall(player):
 
     return shouldGo
 
+def shouldGoalieKick(player):
+    if player.brain.ball.distance < constants.POSITION_FOR_KICK_DIST:
+        # print "Now positioning for kick"
+        return True
+    return False
+
 def ballLostStopChasing(player):
     """
     If the robot does not see the ball while chasing, it is lost. Delay
     in case our shoulder pads are just hiding it.
     """
-    if player.brain.ball.vis.frames_off > 10:
+    if player.brain.ball.vis.frames_off > 35:
         return True
 
 #TODO fix this and make more sensitive
