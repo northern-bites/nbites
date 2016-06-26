@@ -989,7 +989,7 @@ def shouldClearBall(player):
 
     shouldGo = False
 
-    print("Ball distance: ", player.brain.ball.distance)
+    # print("Ball distance: ", player.brain.ball.distance)
 
     # if definitely within good chasing area
     if (player.brain.ball.distance < constants.CLEARIT_DIST_FRONT

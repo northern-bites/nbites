@@ -187,6 +187,8 @@ def watchWithLineChecks(player):
         player.goodRightCornerObservation = False
         player.goodLeftCornerObservation = False
         watchWithLineChecks.counter = 0
+        # print ("My num turns:", watchWithLineChecks.numTurns)
+        # print ("My num fix:", watchWithLineChecks.numFixes)
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
         watchWithLineChecks.hasPanned = False
@@ -236,6 +238,8 @@ def watchWithLineChecks(player):
 
 watchWithLineChecks.lines = []
 watchWithLineChecks.wentToClearIt = False
+watchWithLineChecks.numFixes = 0
+watchWithLineChecks.numTurns = 0
 
 @superState('gameControllerResponder')
 def lineCheckReposition(player):
