@@ -33,6 +33,9 @@ class SoccerFSA(FSA.FSA):
 
         self.timeReadyBegan = 0
 
+
+        self.lastNum = 0
+
     def run(self):
         # gamePenalized is a good time for a lot of i/o, since we
         # won't be moving

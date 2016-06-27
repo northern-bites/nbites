@@ -19,8 +19,6 @@ def gameInitial(player):
 
 @superState('gameControllerResponder')
 def gameReady(player):
-    if player.firstFrame():
-        player.brain.nav.stand()
     return player.stay()
 
 @superState('gameControllerResponder')
@@ -29,9 +27,7 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
-    if player.firstFrame():
-        player.goNow('pleaseTurn')
-    return player.stay()
+    return player.goNow('waitForNum')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -45,7 +41,22 @@ def fallen(player):
 @superState('gameControllerResponder')
 def pleaseTurn(player):
     if player.firstFrame():
-        print "turnnnnnnnninnngngngngngnngng"
-            # player.brain.nav.walkTo(RelRobotLocation(0.0, 0.0, 20.0), speed = nav.FAST_SPEED)
-        player.setWalk(0,0,15.0)
+        player.brain.interface.motionRequest.reset_odometry = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+    elif player.counter == 1:
+        player.setWalk(0,0,player.currNum)
+
+    elif player.counter == 2:
+        player.brain.nav.stand()
+        player.executeMove(SweetMoves.POINT)
+        player.lastNum = currNum
+        return player.goNow('waitForNum')
     return player.stay()
+@superState('gameControllerResponder')
+def waitForNum(player):
+    currNum = 15
+    if (player.lastNum != currNum):
+        return player.goNow('pleaseTurn')
+    return player.stay()
+
+#DONT FORGET TO MAKE SURE INITIALIZED PLAYER.LAST NUM IS FINE
