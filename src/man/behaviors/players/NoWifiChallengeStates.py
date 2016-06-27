@@ -30,7 +30,7 @@ def gameSet(player):
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
-        player.goNow('waitingForNum')
+        player.goNow('pleaseTurn')
     return player.stay()
 
 @superState('gameControllerResponder')
@@ -43,22 +43,9 @@ def fallen(player):
     return player.stay()
 
 @superState('gameControllerResponder')
-def waitingForNum(player):
+def pleaseTurn(player):
     if player.firstFrame():
         print "turnnnnnnnninnngngngngngnngng"
-        player.brain.nav.walkTo(RelRobotLocation(0,0,90), speed = speeds.SPEED_EIGHT)
+            # player.brain.nav.walkTo(RelRobotLocation(0.0, 0.0, 20.0), speed = nav.FAST_SPEED)
+        player.setWalk(0,0,15.0)
     return player.stay()
-
-#     if player.firstFrame():
-#          PHILNUMBER = 0.5 #the number phil gives me
-#          degAngle = math.degrees(PHILNUMBER)
-#     # #if player.brain.#THE NUMBER CHANGED AHHHH
-#     player.goNow('turnBody')
-
-
-# @superState('gameControllerResponder')
-# def turnBody(player):
-#     if player.firstFrame():
-#         #player.brain.walkTo(0,0,degAngle)
-#         player.brain.nav.walkTo(0,0,30)
-#     return player.goNow(waitingForNum)
