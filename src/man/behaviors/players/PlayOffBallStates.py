@@ -220,22 +220,18 @@ def doPan(player):
     Wide pan for 5 seconds.
     """
 
-    player.brain.defendingStateTime += 1
-
     if player.firstFrame():
         print "------------Doing Pan-------------"
 
         player.stand()
         player.brain.tracker.trackBall()
 
-    if role.isFirstChaser(player.role):
-        if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME:
-                return player.goNow('playerFourSearchBehavior')
-    elif role.isStriker(player.role):
-        if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME:
+    if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME:
+        if role.isFirstChaser(player.role):
+            return player.goNow('playerFourSearchBehavior')
+        elif role.isStriker(player.role):
             return player.goNow('playerFiveSearchBehavior')
-    else:
-        if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME:
+        else:
             return player.goNow('doSecondHalfSpin')
 
 @superState('spinAtHome')
@@ -245,7 +241,42 @@ def doSecondHalfSpin(player):
     Keep spinning in the same direction.
     """
 
-    player.brain.defendingStateTime += 1
+    if player.firstFrame():
+        player.brain.tracker.repeatFixedPitchLookAhead()
+
+        if player.brain.playerNumber == 3:
+            player.setWalk(0, 0, speeds.SPEED_SIX)
+        else:
+            player.setWalk(0, 0, -speeds.SPEED_SIX)
+
+    if player.stateTime > chaseConstants.SPEED_SIX_SPUN_ONCE_TIME / 2:
+        if role.isLeftDefender(player.role):
+            return player.goNow('defenderPan')
+        else:
+            return player.goNow('playOffBall')
+
+@superState('spinAtHome')
+# @ifSwitchNow(transitions.shouldChangeDefenderPosition, 'positionAtHome')
+# @ifSwitchNow(transitions.ballInOurHalf, 'playOffBall')
+@stay
+def defenderPan(player):
+
+    if player.firstFrame():
+        player.stand()
+        player.brain.tracker.trackBall()
+
+    if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME:
+
+        if role.isLeftDefender(player.role):
+            return player.goNow('adjustSpin')
+        else:
+            return player.goNow('playOffBall')
+
+@superState('spinAtHome')
+# @ifSwitchNow(transitions.shouldChangeDefenderPosition, 'positionAtHome')
+# @ifSwitchNow(transitions.ballInOurHalf, 'playOffBall')
+@stay
+def adjustSpin(player):
 
     if player.firstFrame():
         player.brain.tracker.repeatFixedPitchLookAhead()
@@ -379,7 +410,7 @@ def leftDefenderForward(player):
         player.brain.home = role.evenDefenderForward
 
         if player.brain.home.distTo(player.brain.loc) < 45:
-            adjustHeading.desiredHeading = -25
+            adjustHeading.desiredHeading = 0
             return player.goNow('adjustHeading')
 
         player.brain.nav.goTo(player.brain.home, precision = nav.GRAINY,
@@ -400,7 +431,7 @@ def leftDefenderBack(player):
         player.brain.home = role.evenDefenderBack
 
         if player.brain.home.distTo(player.brain.loc) < 45:
-            adjustHeading.desiredHeading = -25
+            adjustHeading.desiredHeading = 0
             return player.goNow('adjustHeading')
 
         player.brain.nav.goTo(player.brain.home, precision = nav.GRAINY,
@@ -520,14 +551,14 @@ def adjustHeading(player):
         # Spin to home heading
         player.stand()
         player.brain.tracker.repeatFixedPitchLookAhead()
-        dest = RelRobotLocation(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
+        dest = RelRobotLocation(0, 0, adjustHeading.desiredHeading - player.brain.loc.h)
         player.brain.nav.goTo(dest, precision = nav.HOME,
                           speed = speeds.SPEED_SIX, avoidObstacles = False,
                           fast = True, pb = False)
         # player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
 
         # or math.fabs()
-    if fabs(player.brain.loc.h - adjustHeading.desiredHeading) < 25:
+    if fabs(player.brain.loc.h - adjustHeading.desiredHeading) < 15:
         player.stand()
 
         if role.isDefender(player.role):
