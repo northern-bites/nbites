@@ -1,9 +1,7 @@
-/**
- * Specified in http://www.aldebaran-robotics.com/documentation/dev/cpp/tutos/create_module.html#how-to-create-a-local-module
- **/
 
 #include "Man.h"
 #include "SharedData.h"
+#include "whistle.hpp"
 
 #include <sys/file.h>
 #include <sys/types.h>
@@ -11,6 +9,7 @@
 
 #include <errno.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 int lockFD = 0;
 man::Man* instance;
@@ -20,7 +19,7 @@ const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
 
 void cleanup() {
 
-    printf(":::::::::::::::::::MAN cleanup code executing!\n:::::::::::::::::::");
+    printf("::::::::::::::::::: MAN cleanup code executing! :::::::::::::::::::\n");
 
     if (whistlePID > 0) {
         kill(whistlePID, SIGTERM);
@@ -37,7 +36,7 @@ void cleanup() {
     fclose(stdout);
 
     if (instance) delete instance;
-    printf(":::::::::::::::::::MAN cleanup code finished!\n:::::::::::::::::::");
+    printf("::::::::::::::::::: MAN cleanup code finished! :::::::::::::::::::\n");
 }
 
 void handler(int signal)
@@ -93,13 +92,7 @@ int main() {
     signal(SIGSEGV, error_signal_handler);
 
     printf("forking for whistle...\n");
-    whistlePID = fork();
-    if (whistlePID == 0) {
-        execl("/home/nao/whistle", "", NULL);
-
-        printf("WHISTLE FAILED TO LOAD!!\n");
-        exit(-1);
-    }
+    whistlePID = whistle::start_whistle_process();
 
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     

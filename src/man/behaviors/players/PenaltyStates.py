@@ -5,6 +5,7 @@ hard reset to one of the two possible post-penalty positions.
 
 import ChaseBallTransitions as transitions
 import RoleConstants as roleConstants
+import GoalieConstants as GoalieConstants
 from noggin_constants import LineID
 import noggin_constants as Constants
 from math import copysign, fabs, pi
@@ -37,11 +38,17 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
-        if player.brain.whistleCounter < 600:
-            print "You tried too hard"
-            player.brain.whistleCounter = 700
+        if player.brain.whistlePenalty == True:
+            print "Penalized because of false whistle"
+            player.brain.whistlePenalty = False
             return player.goNow('overeagerWhistle')
 
+        if player.brain.penaltyCount < 300:
+            print "We were in penalty for less than 10 seconds, it probably doesn't count"
+            player.brain.penaltyCount = 0
+            return player.goNow("gamePlaying")
+
+        player.brain.penaltyCount = 0
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
 
@@ -151,7 +158,7 @@ def afterPenalty(player):
                 afterPenalty.averageLeftHorizon = afterPenalty.leftHorizSum / (afterPenalty.numOfPans / 2.0)
                 afterPenalty.averageRightHorizon = afterPenalty.rightHorizSum / (afterPenalty.numOfPans / 2.0)
                 print("computed avg left horizon", afterPenalty.averageLeftHorizon, "avg right horizon", afterPenalty.averageRightHorizon)
-            player.brain.resetLocalizationFromPenalty(afterPenalty.averageLeftHorizon > afterPenalty.averageRightHorizon)
+            player.brain.resetLocalizationFromPenalty(afterPenalty.leftHorizSum > afterPenalty.rightHorizSum)
 
         if DEBUG_PENALTY_STATES:
             print ("\n-------------------------------------------------------------")

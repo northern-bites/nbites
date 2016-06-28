@@ -59,11 +59,11 @@ INITIAL_POS = (((90.4, 9.6, 0.2, -2.4),
 
 ## OLD STAND POSITION FROM BH ENGINE, USING IT TO HACK SWEEPS FOR NOW ##
 
-# INITIAL_POS = (((90., 10., -90., -3.),
-#                 (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-#                 (0.0, 0.0, -25., 56.3, -31.3, 0.0),
-#                 (90., -10., 90., 3.),
-#                 3.0,0,stiff.NORMAL_STIFFNESSES),)
+# ((90., 10., -90., -3.),
+#  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+#  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+#  (90., -10., 90., 3.),
+#  3.0,0,stiff.NORMAL_STIFFNESSES),
 
 
 #Keyframe that moves can called from an unbalanced position to slowly return the joints to a stable, standing position.
@@ -222,12 +222,18 @@ STAND_UP_FRONT = (#Initial
                   0.7, 1, stiff.STANDUP_STIFFNESSES),
                  # pulls both legs in, squat
 
+                 ((90., 10., -90., -3.),
+                  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                  (90., -10., 90., 3.),
+                  1.3,0,stiff.NORMAL_STIFFNESSES),
+
                  #stands up
                  (INITIAL_POS[0][0],
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  1.5,0, stiff.STANDUP_STIFFNESSES)
+                  0.3,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 
@@ -332,12 +338,18 @@ STAND_UP_FRONT_V4 = (#Initial
                   0.7, 1, stiff.STANDUP_STIFFNESSES),
                  # pulls both legs in, squat
 
+                 ((90., 10., -90., -3.),
+                  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                  (90., -10., 90., 3.),
+                  1.4,0,stiff.NORMAL_STIFFNESSES),
+
                  #stands up
                  (INITIAL_POS[0][0],
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  1.5,0, stiff.STANDUP_STIFFNESSES)
+                  0.3,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 #v5 robots
@@ -441,12 +453,18 @@ STAND_UP_BACK = (
                   0.7, 1, stiff.STANDUP_STIFFNESSES),
                  # pulls both legs in, squat
 
+                 ((90., 10., -90., -3.),
+                  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                  (90., -10., 90., 3.),
+                  1.4,0,stiff.NORMAL_STIFFNESSES),
+
                  #stands up
                  (INITIAL_POS[0][0],
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  1.5,0, stiff.STANDUP_STIFFNESSES)
+                  0.3,0, stiff.STANDUP_STIFFNESSES)
                  )
                  
 #v4 version
@@ -550,12 +568,18 @@ STAND_UP_BACK_V4 = (
                   0.7, 1, stiff.STANDUP_STIFFNESSES),
                  # pulls both legs in, squat
 
+                 ((90., 10., -90., -3.),
+                  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                  (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                  (90., -10., 90., 3.),
+                  1.5,0,stiff.NORMAL_STIFFNESSES),
+
                  #stands up
                  (INITIAL_POS[0][0],
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  1.5,0, stiff.STANDUP_STIFFNESSES)
+                  0.3,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 REVERSE_STAND_UP_BACK = mirrorMove(STAND_UP_BACK)
@@ -656,12 +680,18 @@ GOALIE_SQUAT_STAND_UP = (((-28.9, 17.5, 80.5, -1.7),
                          0.7, 1, stiff.STANDUP_STIFFNESSES),
                         # pulls both legs in, squat
 
+                        ((90., 10., -90., -3.),
+                         (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                         (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                         (90., -10., 90., 3.),
+                         1.5,0,stiff.NORMAL_STIFFNESSES),
+
                         #stands up
                         (INITIAL_POS[0][0],
                          INITIAL_POS[0][1],
                          INITIAL_POS[0][2],
                          INITIAL_POS[0][3],
-                         1.5,0, stiff.STANDUP_STIFFNESSES)
+                         0.3,0, stiff.STANDUP_STIFFNESSES)
                         )
 
 #Fast dive to the right
@@ -841,12 +871,19 @@ LEFT_SHORT_STRAIGHT_KICK = (
      (40, -9, 80, -9),
      .7,0,stiff.NORMAL_STIFFNESSES),
 
+    #HACK transition to BH stand first
+    ((90., 10., -90., -3.),
+     (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+     (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+     (90., -10., 90., 3.),
+     1.2,0,stiff.NORMAL_STIFFNESSES),
+
     #stand for a bit
     ((90.4, 9.6, 0.2, -2.4),
       (0.0, 0.1, -27.9, 50.1, -25.0, 0.0),
       (0.0, -0.1, -28.7, 49.9, -25.0, 0.2),
       (90.3, -9.3, -0.3, 2.7),
-      1.2,0,stiff.NORMAL_STIFFNESSES),
+      0.3,0,stiff.NORMAL_STIFFNESSES),
     )
 
 RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
@@ -1223,6 +1260,13 @@ CUTE_KICK_LEFT = (
      (90.,-10.,82.,13.2),
      0.2,0, stiff.NORMAL_STIFFNESSES),
 
+    #HACK transition to BH stand first
+    ((90., 10., -90., -3.),
+     (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+     (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+     (90., -10., 90., 3.),
+     1.2,0,stiff.NORMAL_STIFFNESSES),
+
     QUICK_INITIAL_POS_KEYFRAME,
     )
 
@@ -1257,6 +1301,13 @@ MEGKOTE_DIAGONAL_FAST_KICK_LEFT = (
      (0.6, 20.8, -30.4, 62.1, -34.7, -17.9),
      (90.,-10.,82.,13.2),
      0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    #HACK transition to BH stand first
+    ((90., 10., -90., -3.),
+     (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+     (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+     (90., -10., 90., 3.),
+     1.2,0,stiff.NORMAL_STIFFNESSES),
 
     QUICK_INITIAL_POS_KEYFRAME,
     )

@@ -14,9 +14,10 @@ NBCROSS_SRC= $(NBCROSS_DIR)/nbcross.cpp
 SOUND_SRC=src/sound/*.cpp
 
 NBC_SND_SRC= src/nbcross_sound/SoundDefs.cpp
-COR_SND_SRC= src/correlate/main.cpp
-REC_SND_SRC= src/record/record.cpp
 WHS_SND_SRC= src/whistle/whistle.cpp
+
+SENDR_SRC= src/sendr/*.cpp src/nowifi/*.cpp
+RECVR_SRC= src/recvr/*.cpp src/nowifi/*.cpp
 
 DBFLAGS= -ggdb
 
@@ -34,11 +35,7 @@ nowifi: sendr recvr
 cross:
 	@echo $(CYAN) compiling cross executable $(NORMAL)
 	$(BUILD) -ggdb -I $(NBCROSS_DIR) $(NBCROSS_SRC) -D DETECT_LOG_RESULTS $(SOUND_SRC) $(NBC_SND_SRC) -lasound -lrt lib/libfftw3f.a -o cross
-	./cross -s 10.211.55.2
-
-record:
-	@echo $(CYAN) compiling record executable $(NORMAL)
-	$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(REC_SND_SRC) -o record
+	./cross
 
 whistle:
 	@echo $(CYAN) compiling whistle executable $(NORMAL)
@@ -49,12 +46,15 @@ whistle:
 
 sendr:
 	@echo $(CYAN) compiling SENDR executable $(NORMAL)
-	$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(WHS_SND_SRC) -lasound -lrt lib/libfftw3f.a -o whistle
+	$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(SENDR_SRC) -lasound -lrt lib/libfftw3f.a -o sendr
 
 recvr:
 	@echo $(CYAN) compiling RECVR executable $(NORMAL)
-	$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(WHS_SND_SRC) -lasound -lrt lib/libfftw3f.a -o whistle
+	$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(RECVR_SRC) -lasound -lrt lib/libfftw3f.a -o recvr
 
 clean:
 	rm src/**.o
 	rm *.o
+	rm whistle cross sendr recvr
+
+

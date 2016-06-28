@@ -15,6 +15,7 @@ add_library(
 target_link_libraries(
   gamestate
   support
+  logshare
   portals
   messages
   )

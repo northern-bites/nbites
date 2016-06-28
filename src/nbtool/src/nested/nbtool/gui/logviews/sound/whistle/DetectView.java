@@ -1,25 +1,38 @@
 package nbtool.gui.logviews.sound.whistle;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.LinkedList;
 
+import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
+import nbtool.data.log.LogReference;
+import nbtool.data.log.LogSorting;
 import nbtool.gui.ToolMessage;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.nio.CrossServer;
 import nbtool.nio.CrossServer.CrossInstance;
+import nbtool.nio.FileIO;
 import nbtool.util.Debug;
 
 public class DetectView extends ViewParent implements IOFirstResponder {
+
+	static boolean play = false;
+	static final int SPECTRUM_OUTPUT_LENGTH = 2048;
 
 	FloatBuffer buff = null;
 	SoundPane pane = null;
@@ -27,14 +40,85 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 	JCheckBox containsBox = new JCheckBox("annotate:");
 	JLabel detection = new JLabel();
+	JLabel channel = new JLabel();
+
+	int channel_index = 0;
+	int max_index = 0;
 
 	@Override
 	public void setupDisplay() {
 		Debug.info("view!");
 		this.setLayout(new BorderLayout());
 
-		final byte[] dataToPlay = displayedLog.blocks.get(0).data;
-		PlaySound.play(dataToPlay);
+		if (alsoSelected.size() > 0) {
+			Debug.warn("starting merge of %d logs", alsoSelected.size() + 1);
+			LinkedList<LogReference> logRefs = new LinkedList<>();
+
+			if (this.displayedLog.getReference() != null)
+				logRefs.add(this.displayedLog.getReference());
+
+			for (Log lg : this.alsoSelected) {
+				if (lg.getReference() != null)
+					logRefs.add(lg.getReference());
+			}
+
+			LogSorting.sort(LogSorting.Sort.BY_FILENAME, logRefs);
+
+			int total = 0;
+			byte[][] all = new byte[logRefs.size()][];
+
+			for (int i = 0; i <logRefs.size(); ++i) {
+				LogReference ref = logRefs.get(i);
+
+				all[i] = ref.get().blocks.get(0).data;
+				total += all[i].length;
+
+				Debug.info("\t%d bytes from", all[i].length, ref.toString());
+			}
+
+			byte[] all_bytes = new byte[total];
+
+			int pos = 0;
+			for (int i = 0; i < all.length; ++i) {
+				System.arraycopy(all[i], 0, all_bytes, pos, all[i].length);
+				pos += all[i].length;
+			}
+
+			Log out = Log.emptyLog();
+			out.logClass = "DetectAmplitude";
+			out.blocks.add(Block.explicit(all_bytes, "SoundAmplitude"));
+
+			String name = String.format("merged_%dlogs_%d_%d.nblog",
+					logRefs.size(), logRefs.get(0).thisID, logRefs.getLast().thisID);
+
+
+			try {
+				FileIO.writeLogToPath(logRefs.get(0).loadPath().getParent().resolve(name), out);
+				ToolMessage.displayWarn("merged %d logs to %s", logRefs.size(), name);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+
+		if (this.displayedLog.getReference() != null && this.displayedLog.getReference().loadPath() != null)
+			Debug.print("load: %d from %s", this.displayedLog.getReference().thisID, this.displayedLog.getReference().loadPath().getFileName());
+
+		final JCheckBox playBox = new JCheckBox();
+		playBox.setText("play sound on selection");
+		playBox.setSelected(play);
+		playBox.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				play = playBox.isSelected();
+			}
+		});
+
+		this.add(playBox, BorderLayout.SOUTH);
+
+		if (play) {
+			final byte[] dataToPlay = displayedLog.blocks.get(0).data;
+			PlaySound.play(dataToPlay);
+		}
 
 		if (displayedLog.logClass.equals("DetectAmplitude")) {
 			CrossInstance ci = CrossServer.instanceByIndex(0);
@@ -47,11 +131,13 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 			JPanel container = new JPanel(new BorderLayout());
 			container.add(detection, BorderLayout.CENTER);
 			container.add(containsBox, BorderLayout.WEST);
+			container.add(channel, BorderLayout.EAST);
 
 			this.add(container, BorderLayout.NORTH);
-//			this.add(heardBox, BorderLayout.NORTH);
 
-			containsBox.setSelected(displayedLog.topLevelDictionary.get("WhistleHeard").asBoolean().bool());
+			if (displayedLog.topLevelDictionary.get("WhistleHeard") != null)
+				containsBox.setSelected(displayedLog.topLevelDictionary.get("WhistleHeard").asBoolean().bool());
+
 			containsBox.addChangeListener(new ChangeListener() {
 				@Override
 				public void stateChanged(ChangeEvent e) {
@@ -66,6 +152,34 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 					}
 				}
 			});
+
+			channel.setText(String.format(" (%d / %d)", channel_index, max_index ));
+			this.getActionMap().put("NextIndex", new AbstractAction(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					channel_index = Math.min(channel_index + 1, max_index);
+					Debug.print("channel index: %d", channel_index);
+					channel.setText(String.format(" (%d / %d)", channel_index, max_index ));
+					repaint();
+				}
+			});
+
+			this.getActionMap().put("PrevIndex", new AbstractAction(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					channel_index = Math.max(channel_index - 1, 0);
+					Debug.print("channel index: %d", channel_index);
+					channel.setText(String.format(" (%d / %d)", channel_index, max_index ));
+					repaint();
+				}
+			});
+
+			this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+					KeyStroke.getKeyStroke(KeyEvent.VK_CLOSE_BRACKET, 0)
+					, "NextIndex");
+			this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+					KeyStroke.getKeyStroke(KeyEvent.VK_OPEN_BRACKET, 0)
+					, "PrevIndex");
 		}
 	}
 
@@ -93,7 +207,9 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 			offset += b.data.length;
 		}
 
-		buff = new FloatBuffer(new Block(all, ""), out[0].blocks.size(), 2048);
+		max_index = out[0].blocks.size() - 1;
+		buff = new FloatBuffer(new Block(all, ""), out[0].blocks.size(),
+				SPECTRUM_OUTPUT_LENGTH);
 
 		if (pane != null) {
 			scroll.remove(pane);
@@ -101,11 +217,11 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 		detection.setText("detect: " + out[0].topLevelDictionary.get("WhistleHeard").asBoolean().bool());
 
-		pane = new SoundPane(out[0].blocks.size(), 1024) {
+		pane = new SoundPane(1, 2048) {
 
 			@Override
 			public int pixels(int c, int f, int radius) {
-				return (int) ((buff.get(f, c) / buff.max()) * radius * -1);
+				return (int) ((buff.get(f, channel_index) / buff.max()) * radius * -1);
 			}
 
 			@Override
@@ -115,7 +231,7 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 			@Override
 			public String selectionString(int c, int f) {
-				String fmat = String.format("c%df%d: %f", c, f, buff.get(f, c));
+				String fmat = String.format("c%df%d: %f", channel_index, f, buff.get(f, channel_index));
 				Debug.print("%s", fmat);
 				return fmat;
 			}
@@ -127,7 +243,6 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 	@Override
 	public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

@@ -14,10 +14,11 @@ namespace nbsound {
     Transform::Transform(int frames)
     {
         NBL_ASSERT(frames > 0)
+
         //Must be power of 2
         NBL_ASSERT( (frames & (frames - 1)) == 0)
 
-        frequency_length = frames / 2;
+        frequency_length = SPECTRUM_LENGTH(frames);
 
         outputmag = (float *) malloc(sizeof(float) * frequency_length);
 
@@ -51,7 +52,7 @@ namespace nbsound {
     
     void Transform::transform(SampleBuffer& buffer, int channel) {
 
-        NBL_ASSERT(buffer.frames == 2 * frequency_length);
+        NBL_ASSERT(SPECTRUM_LENGTH(buffer.frames) == frequency_length);
 
         SampleBuffer::BufferChannel chnl = buffer[channel];
         ssize_t sample_max = buffer.sample_max();

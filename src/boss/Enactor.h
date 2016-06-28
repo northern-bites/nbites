@@ -13,6 +13,8 @@ public:
 
     void command(messages::JointAngles angles, messages::JointAngles stiffness);
     void noStiff();
+    bool manDied();
+
 
 private:
     void initEnactor();
@@ -21,6 +23,10 @@ private:
 
     AL::ALValue jointCommand;
     AL::ALValue stiffnessCommand;
+
+    static const int numJoints = 21;
+    double lastSet[numJoints];
 };
+    
 }
 }

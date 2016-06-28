@@ -32,24 +32,26 @@ void BallDetector::processDarkSpots(SpotList & darkSpots, intPairVector & blackS
         // convert back to raw coordinates
         int midX = (*i).ix() + width / 2;
         int midY = -(*i).iy() + height / 2;
-        (*i).rawX = midX;
-        (*i).rawY = midY;
-        getColor(midX, midY);
-        // if the middle of the spot is white or green, ignore it
-        if (!(isWhite() || isGreen()) &&
-            (!topCamera || midY > field->horizonAt(midX))) {
-            if (filterBlackSpots((*i))) {
-                blackSpots.push_back(std::make_pair(midX, midY));
-                actualBlackSpots.push_back((*i));
-                (*i).spotType = SpotType::DARK_CANDIDATE;
-            } else {
-                (*i).spotType = SpotType::DARK_REJECT;
-                badBlackSpots.push_back(std::make_pair(midX, midY));
-            }
-            if (debugBall) {
-                debugBlackSpots.push_back((*i));
-            }
-        }
+		if (midX < width - 5 && midX > 5 && midY > 5 && midY < height - 5) {
+			(*i).rawX = midX;
+			(*i).rawY = midY;
+			getColor(midX, midY);
+			// if the middle of the spot is white or green, ignore it
+			if (!(isWhite() || isGreen()) &&
+				(!topCamera || midY > field->horizonAt(midX))) {
+				if (filterBlackSpots((*i))) {
+					blackSpots.push_back(std::make_pair(midX, midY));
+					actualBlackSpots.push_back((*i));
+					(*i).spotType = SpotType::DARK_CANDIDATE;
+				} else {
+					(*i).spotType = SpotType::DARK_REJECT;
+					badBlackSpots.push_back(std::make_pair(midX, midY));
+				}
+				if (debugBall) {
+					debugBlackSpots.push_back((*i));
+				}
+			}
+		}
     }
 }
 
@@ -64,6 +66,12 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots,
         int midY = -(*i).iy() + height / 2;
         (*i).rawX = midX;
         (*i).rawY = midY;
+		/*imagePoint p = imagePoint(midX - width /2, -midY + height / 2);
+		std::cout << "Spots " << (*i).innerDiam << " " << (2 * projectedBallRadius(p)) << std::endl;
+		debugDraw.drawBox(midX, midX + 2 * projectedBallRadius(p), midY + 2 * projectedBallRadius(p), midY, RED);
+		p = imagePoint( - width /2, -midY + height / 2);
+		debugDraw.drawBox(midX, midX + 2 * projectedBallRadius(p),
+		midY + 2 * projectedBallRadius(p), midY, RED);*/
         if (filterWhiteSpot((*i), blackSpots, badBlackSpots)) {
             actualWhiteSpots.push_back((*i));
                 if(debugBall) {
@@ -103,16 +111,18 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 		imagePoint p = imagePoint(bx, by);
 		int radius = projectedBallRadius(p);
 		int fudge = radius / 4;
-		bool goodSize = radius <= diam && diam < 2 * radius + fudge;
+		bool goodSize = radius <= diam + fudge && diam < 2 * radius + fudge;
 		if (!topCamera && !goodSize) {
-			goodSize = diam > 8 && diam < 2 * radius + fudge;
+			goodSize = diam > 8 && diam < 2 * radius + fudge && diam < 30;
+		}
+		if (!topCamera && goodSize && diam > 25) {
+			goodSize = false;
 		}
 		if (!goodSize && debugBall) {
 			std::cout << "Bad size on blob " << radius << " " <<
 				diam << " " << diam2 << " " << cx << " " <<
 				(cy+bottomQuarter) << std::endl;
 		}
-
         if (goodSize && diam2 >= radius / 2 && cy - diam > 0 &&
 			cx - diam > 0 && cx + diam < width &&
 			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
@@ -169,6 +179,9 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
     }
     int midY = *(yImage.pixelAddr(currentSpot.ix() + width / 2,
                                   -currentSpot.iy() + height / 2)) / 4;
+	if (topCamera && topY < height / 3) {
+		return false;
+	}
     // spots in robots are often actually bright, just surrounded by brighter
     if (midY > MIN_CENTER_Y) {
 		if (debugBall) {
@@ -194,6 +207,10 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
 	}
     int currentY = 0;
     int whites = 0;
+	int NEEDED = 2;
+	if (!topCamera) {
+		NEEDED = 3;
+	}
 	// scan out from each edge to see if there is a significant
     // jump in Y in at least two directions
 	for (int i = leftX; i > leftX - scan; i--) {
@@ -210,21 +227,21 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
 			i = i + scan;
 		}
 	}
-	for (int i = topY; i > topY - scan; i--) {
+	for (int i = topY; i > topY - scan && whites < NEEDED; i--) {
         currentY = *(yImage.pixelAddr(currentSpot.ix() + width / 2, i)) / 4;
         if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i - scan;
 		}
 	}
-	for (int i = bottomY; i < bottomY + scan; i++) {
+	for (int i = bottomY; i < bottomY + scan && whites < NEEDED; i++) {
         currentY = *(yImage.pixelAddr(currentSpot.ix() + width / 2, i)) / 4;
         if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i + scan;
 		}
 	}
-    if (whites > 1) {
+    if (whites >= NEEDED) {
         if (debugBall) {
             debugDraw.drawPoint(currentSpot.ix() + width / 2, -currentSpot.iy() + height / 2, BLUE);
             std::cout << "Black blob " << (currentSpot.ix() + width / 2) << " " <<
@@ -238,33 +255,6 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
         }
         return false;
     }
-}
-
-int BallDetector::scanX(int startX, int startY, int direction, int stop) {
-    int newX = startX;
-    for (int i = startX; i != stop && i >= 0 && i < width; i += direction) {
-        getColor(i, startY);
-        if (!(isWhite() || isBlack()) && isGreen()) {
-            break;
-        } else {
-            newX = i;
-        }
-    }
-    //std::cout << "Returning " << newX << std::endl;
-    return newX;
-}
-
-int BallDetector::scanY(int startX, int startY, int direction, int stop) {
-    int newY = startY;
-    for (int i = startY; i != stop && i >= 0 && i < height; i += direction) {
-        getColor(startX, i);
-        if (!(isWhite() || isBlack()) && isGreen()) {
-            break;
-        } else {
-            newY = i;
-        }
-    }
-    return newY;
 }
 
 //this expects coordinates in Bill's coordinate system;
@@ -419,165 +409,6 @@ void BallDetector::adjustWindow(int & startCol, int & endCol, int & endRow) {
     }
 }
 
-/* We have a potential ball on the horizon. Do some checking to
-   screen out potential other stuff.
-   This is a substantial area of possible improvement - more sanity
-   checks are definitely needed!
-*/
-bool BallDetector::farSanityChecks(Blob blob)
-{
-    // if it is too close to the horizon - bad
-    // if it is too greeen - bad
-    int centerX = static_cast<int>(blob.centerX());
-    int centerY = static_cast<int>(blob.centerY());
-    int prinLength = static_cast<int>(blob.firstPrincipalLength());
-    int prinLength2 = static_cast<int>(blob.secondPrincipalLength());
-    // the black in the ball tends to make our blob footprint too small
-    // try to expand it
-    int leftX = centerX;
-    int rightX = centerX;
-    int bottomY = centerY;
-    int topY = centerY;
-
-    leftX = scanX(centerX - 1, centerY, -1, 1);
-    rightX = scanX(centerX + 1, centerY, 1, width - 1);
-    centerX = leftX + (rightX - leftX) / 2;
-    topY = scanY(centerX, centerY - 1, -1, max(0, field->horizonAt(centerX)));
-    bottomY = scanY(centerX, centerY + 1, 1, height - 1);
-    centerY = topY + (bottomY - topY) / 2;
-    int boxWidth = rightX - leftX;
-    int boxHeight = bottomY - topY;
-    leftX = scanX(centerX - 1, centerY, -1, 1);
-    rightX = scanX(centerX + 1, centerY, 1, width - 1);
-    centerX = leftX + (rightX - leftX) / 2;
-    topY = scanY(centerX, centerY - 1, -1, max(0, field->horizonAt(centerX)));
-    bottomY = scanY(centerX, centerY + 1, 1, height - 1);
-    centerY = topY + (bottomY - topY) / 2;
-
-    boxWidth = rightX - leftX;
-    boxHeight = bottomY - topY;
-    if (debugBall) {
-        //debugDraw.drawBox(leftX, rightX, bottomY, topY, ORANGE);
-        std::cout << "Box " << boxWidth << " " << boxHeight << std::endl;
-        std::cout << "Ending at " << centerX << " " << centerY << std::endl;
-    }
-    int MINBOX = 8;
-    if (boxWidth < MINBOX || boxHeight < MINBOX) {
-        return false;
-    }
-    if (boxWidth > 2 * boxHeight || boxHeight > 2 * boxWidth) {
-        return false;
-    }
-	if (boxWidth > 25 || boxHeight > 25) {
-		return false;
-	}
-	int count = 0;
-	for (int i = leftX; i < rightX; i++) {
-		getColor(i, bottomY + 3);
-		if (isGreen()) {
-			count++;
-		}
-		if (count == 3) {
-			return true;
-		}
-	}
-    return false;
-}
-
-/* We have a white blob that is relatively near us. For whatever
-   reason we didn't see any black blobs in it. Make sure that
-   wasn't just because our black detector was bad. Watch out for
-   field crosses though.
- */
-bool BallDetector::nearSanityChecks(Blob blob)
-{
-    int centerX = static_cast<int>(blob.centerX());
-    int centerY = static_cast<int>(blob.centerY());
-    int prinLength = static_cast<int>(blob.firstPrincipalLength());
-    int prinLength2 = static_cast<int>(blob.secondPrincipalLength());
-    // the black in the ball tends to make our blob footprint too small
-    // try to expand it
-    int leftX = centerX;
-    int rightX = centerX;
-    int bottomY = centerY;
-    int topY = centerY;
-
-    leftX = scanX(centerX - 1, centerY, -1, 1);
-    rightX = scanX(centerX + 1, centerY, 1, width - 1);
-    centerX = leftX + (rightX - leftX) / 2;
-    topY = scanY(centerX, centerY - 1, -1, max(0, field->horizonAt(centerX)));
-    bottomY = scanY(centerX, centerY + 1, 1, height - 1);
-    centerY = topY + (bottomY - topY) / 2;
-    int boxWidth = rightX - leftX;
-    int boxHeight = bottomY - topY;
-    if (debugBall) {
-        //debugDraw.drawBox(leftX, rightX, bottomY, topY, ORANGE);
-        std::cout << "Near Box " << boxWidth << " " << boxHeight << std::endl;
-        std::cout << "Ending at " << centerX << " " << centerY << std::endl;
-    }
-    int MINBOXWIDTH = 12;
-	int MINBOXHEIGHT = 12;
-    int MAXBOX = 50;
-	bool atEdge = false;
-	if (centerX < prinLength || centerX > width - prinLength) {
-		MINBOXWIDTH = 8;
-		atEdge = true;
-	}
-    if (boxWidth < MINBOXWIDTH || boxHeight < MINBOXHEIGHT ||
-		boxWidth > MAXBOX || boxHeight > MAXBOX) {
-        return false;
-    }
-    if (boxWidth > 2 * boxHeight || (boxHeight > 2 * boxWidth && !atEdge)
-		|| boxHeight > 3 * boxWidth) {
-        return false;
-    }
-	if (abs(boxWidth - boxHeight) > 15) {
-		return false;
-	}
-	if (boxWidth > 5 * prinLength || boxHeight > 5 * prinLength) {
-		return false;
-	}
-	// field cross check
-	int count = 0;
-    return true;
-
-}
-
-bool BallDetector::hardSanityCheck(int leftx, int rightx, int topy, int bottomy)
-{
-	int boxWidth = rightx - leftx;
-	int boxHeight = bottomy - topy;
-
-}
-
-/* Our worst ball detector. Tries to find small white blobs
-   off in the distance. The trouble is that such blobs might
-   be other things. This will require a number of sanity checks.
-*/
-bool BallDetector::lookForFarAwayBalls(Blob blob)
-{
-    int FARAWAY_WHITE_SIZE = 15;
-    float MIN_AREA = 10.0f;
-    int centerX = static_cast<int>(blob.centerX());
-    int centerY = static_cast<int>(blob.centerY());
-    int prinLength = static_cast<int>(blob.firstPrincipalLength());
-    int prinLength2 = static_cast<int>(blob.secondPrincipalLength());
-    if (topCamera && centerY < height /3 &&
-        prinLength < FARAWAY_WHITE_SIZE &&
-        prinLength2 > prinLength / 2 && blob.area() > MIN_AREA &&
-        prinLength2 >= 1 &&
-        (centerY > field->horizonAt(centerX) || !topCamera)) {
-		//return false;
-        return farSanityChecks(blob);
-    } else if (topCamera && centerY >= height / 3 &&
-               centerY > field->horizonAt(centerX) &&
-               prinLength > 3 && prinLength2 > 3) {
-		return false;
-        //return nearSanityChecks(blob);
-	}
-    return false;
-}
-
 /* Checks if two black blobs are close enough to be potentially
    part of the same ball.
 */
@@ -587,6 +418,11 @@ bool BallDetector::blobsAreClose(std::pair<int,int> p, std::pair<int,int> q)
 
     double cx = (p.first + q.first) / 2;
     double cy = (p.second + q.second) / 2;
+
+    int midY = *(yImage.pixelAddr(cx, cy)) / 4;
+	if (midY < 100) {
+		return false;
+	}
 
     double bcx = 0, bcy = 0;
     imageToBillCoordinates(cx, cy, bcx, bcy);
@@ -670,6 +506,7 @@ bool BallDetector::findCorrelatedBlackSpots
 
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
+
                     if (debugBall) { debugDraw.drawPoint(ix,iy,MAROON); }
                     
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
@@ -744,7 +581,7 @@ bool BallDetector::findCorrelatedBlackSpots
     					ballSpot.rawX = ix;
     					ballSpot.rawY = iy;
     					ballSpot.innerDiam = 5;
-    				    
+
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
 #ifdef OFFLINE
                         foundBall = true;
@@ -821,7 +658,9 @@ void BallDetector::makeBall(Spot spot, double cameraHeight, double conf,
                             bool foundBall, bool isBlack)
 {
     double x_rel, y_rel;
-    bool belowHoriz = homography->fieldCoords(spot.ix(), spot.iy(), x_rel, y_rel);
+    int r = projectedBallRadius(std::make_pair(spot.ix(), spot.iy()));
+    bool belowHoriz = homography->fieldCoords(spot.ix(), spot.iy()-r, x_rel, y_rel);
+
     Ball b(spot, x_rel, -1 * y_rel, cameraHeight, height,
            width, topCamera, spot.ix() + width / 2, -spot.iy() + height / 2, conf);
     _best = b;
@@ -830,54 +669,6 @@ void BallDetector::makeBall(Spot spot, double cameraHeight, double conf,
 #endif
 }
 
-void BallDetector::sanityChecks(int bx, int by, int radius)
-{
-
-}
-
-void BallDetector::edgeSanityCheck(int bx, int by, int radius)
-{
-    int count = 0;
-    radius = max(12, radius);
-    if (by > ( 2 * height ) / 2) {
-        radius = max(20, radius);
-    }
-    // Get edges from vision
-    for (int i = 0; i < goodEdges.size(); i++) {
-        int x = goodEdges[i].x() + width/2;
-        int y = height/2 - goodEdges[i].y();
-        int ang = goodEdges[i].angle();
-
-        if (abs(bx - x) < radius && abs(by - y) < radius) {
-            if (debugBall) {
-                debugDraw.drawPoint(x, y, BLUE);
-            }
-            count++;
-        }
-    }
-    if (debugBall) {
-        std::cout << "Edge count: " << count << std::endl;
-    }
-
-}
-
-/* Filter the edge list down to possible balls */
-void BallDetector::makeEdgeList(EdgeList & edges)
-{
-    // Get edges from vision
-    goodEdges.clear();
-    AngleBinsIterator<Edge> abi(edges);
-    for (Edge* e = *abi; e; e = *++abi){
-        // If we are part of a hough line, we are not a ball edge
-        if (e->memberOf()) { continue; }
-
-        int x = e->x() + width/2;
-        int y = height/2 - e->y();
-        // if we're off the field we aren't a ball edge
-        if (y < field->horizonAt(x)) { continue; }
-        goodEdges.push_back(*e);
-    }
-}
 
 /* The next two are very similar, but the first one assumes that the
    "spot" actually comes from the blob detector.
@@ -906,18 +697,18 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
     }
     // for now, if there are no black spots then it is too dangerous
     if (spots < 1) {
-		if (!whiteNoBlack(spot)) {
+		if (!topCamera || !whiteNoBlack(spot)) {
 			return false;
 		}
     }
 	if (spots == 1) {
-		if (!checkGradientInSpot(spot)) {
+		if ((spot.innerDiam < 25 || !topCamera) &&!checkGradientInSpot(spot)) {
 			return false;
 		}
 	}
 
     // count up how many bad black spots are inside
-    int badspots = 0;
+    /*int badspots = 0;
     for (int j = 0; j < badBlack.size(); j++) {
         std::pair<int,int> blackspot = badBlack[j];
         if (blackspot.first > spot.xLo() + width / 2 &&
@@ -926,11 +717,11 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
             blackspot.second < spot.yHi() + height / 2) {
             badspots++;
         }
-    }
+		}*/
     // for now, if there are several bad spots then it is too dangerous
-    if (badspots > 1) {
-        return false;
-    }
+    //if (badspots > 1) {
+        //return false;
+    //}
     return true;
 }
 
@@ -977,8 +768,11 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	int y = topY;
 	getColor(x, y);
 	int THRESHOLD = 110;
-	if (!checkGradientInSpot(spot)) {
-        // std::cout<<"returning false 1\n";
+    
+	// normally check the gradient to get rid of crosses, but if ball is really large
+	// it could be blurry and low gradient
+	if ((diam < 15 || !topCamera) && !checkGradientInSpot(spot)) {
+        //std::cout<<"returning false " << diam << "\n";
 		return false;
 	}
 	int length1, length2, length3, length4;
@@ -1010,6 +804,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 				" " << length4 << std::endl;
 		}
+		// anything way off is bad
 		if (length1 > 15 || length2 > 15 || length3 > 15 || length4 > 15) {
 			return false;
 		}
@@ -1033,23 +828,25 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		y = topY;
 		getColor(x, y);
 	}
+	// bunch of checks to ensure uniformity
 	if (abs(length1 + length2 - length3 - length4) > 4) {
 		return false;
 	}
 	if (abs(length1 + length3 - length2 - length4) > 4) {
 		return false;
 	}
-	if (abs(length1 - length2) > 4) {
+	if (abs(length1 - length2) > 5) {
 		return false;
 	}
-	if (max(length1, length2) < 2 || max(length3, length4) < 2) {
+	int minl = min(min(length1, length2), min(length3, length4));
+	if (minl < 3) {
 		return false;
 	}
 	if (bottomY < height - 8 && topY > 5) {
 		// straight up
 		midX = (rightX + leftX) / 2;
 		midY = (bottomY + topY) / 2;
-		debugDraw.drawPoint(midX, midY, BLUE);
+		//debugDraw.drawPoint(midX, midY, BLUE);
 		getColor(midX, topY);
 		for (x = midX, y = topY; y > 0 && getGreen() < THRESHOLD; y--) {
 			getColor(x, y);
@@ -1061,6 +858,13 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			getColor(x, y);
 		}
 		int elength5 = y - bottomY;
+		if (elength5 > 2 * diam) {
+			if (debugBall) {
+				debugDraw.drawPoint(x, y, RED);
+				std::cout << "Problem finding green below " << elength5 << std::endl;
+			}
+			return false;
+		}
 		// left
 		getColor(leftX, midY);
 		for (x = leftX, y = midY; x > 0 && getGreen() < THRESHOLD; x--) {
@@ -1115,49 +919,51 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
 
 bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
     int THRESHOLD = 110;
-    int checkedPixels = 0;
+    int topCheckedPixels = 0, botCheckedPixels = 0;
+    int topGreenSum = 0, botGreenSum = 0;
 
     double bx = 0, by = 0;
     imageToBillCoordinates(p.first, p.second, bx, by);
     int r = projectedBallRadius(std::make_pair(bx, by));
 
-    bool bottomHalf = false;
-    if(p.second > height/2) {
-        bottomHalf = true;
+    int topY = std::round(p.second - r - 1);
+    int bottomY = std::round(p.second + r + 1);
+
+    getColor(p.first, topY);
+    for(int i = 0; i < r && (topY - i) >= 0; i++) {
+        topGreenSum += getGreen();
+        topCheckedPixels++;
+        getColor(p.first, topY - i);
     }
 
-    int greenMagnitudeSums = 0;
-
-    if(bottomHalf) {
-        int topY = std::round(p.second - r - 1.5);
-        if(debugBall) {
-            debugDraw.drawDot(p.first, topY, BLUE);
-            debugDraw.drawDot(p.first, topY-r, BLUE);
-        }
-
-        getColor(p.first, topY);
-        for(int i = 0; i < r && (topY - i >= 0); i++) {
-            greenMagnitudeSums += getGreen();
-            checkedPixels++;
-            getColor(p.first, topY-i);
-        }
-    } else {
-        int bottomY = std::round(p.second + r + 1.5);
-        if(debugBall) {
-            debugDraw.drawDot(p.first, bottomY, RED);
-            debugDraw.drawDot(p.first, bottomY+r, RED);
-        }
-
-        getColor(p.first, bottomY);
-        for(int i = 0; i < r && (bottomY + i <= width); i++) {
-            greenMagnitudeSums += getGreen();
-            checkedPixels++;
-            getColor(p.first, bottomY+i);
-        }
+    getColor(p.first, bottomY);
+    for(int i = 0; i < r && (bottomY + i <= width); i++) {
+        botGreenSum += getGreen();
+        botCheckedPixels++;
+        getColor(p.first, bottomY + i);
     }
 
-    if((greenMagnitudeSums / checkedPixels) >= THRESHOLD) {
-        if(debugBall) { std::cout<<"[BALL INFO] Green Test Passed\n"; }
+    if(debugBall) {
+        debugDraw.drawDot(p.first, bottomY, RED);
+        debugDraw.drawDot(p.first, bottomY + botCheckedPixels, RED);
+        debugDraw.drawDot(p.first, topY, BLUE);
+        debugDraw.drawDot(p.first, topY - topCheckedPixels, BLUE); //wont draw if too close to top
+    }
+
+    int topGreenAvg = 0, botGreenAvg = 0;
+    ((topCheckedPixels > 0) ? topGreenAvg = topGreenSum / topCheckedPixels : topGreenAvg = 0);
+    ((botCheckedPixels > 0) ? botGreenAvg = botGreenSum / botCheckedPixels : botGreenAvg = 0);
+
+    if(topGreenAvg >= THRESHOLD || botGreenAvg >= THRESHOLD) {
+        if(debugBall) { 
+            std::cout<<"[BALL INFO] Green Test Passed\n"; 
+            for(int i = 0; i < topCheckedPixels; i++) {
+                debugDraw.drawDot(p.first, topY - i, GREEN);
+            }
+            for(int i = 0; i < botCheckedPixels; i++) {
+                debugDraw.drawDot(p.first, bottomY + i, GREEN);
+            }
+        }
         return true;
     } else {
         if(debugBall) { std::cout<<"[BALL INFO] Green Test Failed\n"; }
@@ -1179,6 +985,11 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	// don't take any chances at edges
 	int extra = spot.innerDiam / 4;
 	if (leftX - extra < 3 || rightX + extra > width - 3 || topY - extra < 3) {
+		return false;
+	}
+
+	imagePoint p = imagePoint(midX, midY);
+	if (!greenAroundBallFromCentroid(p)) {
 		return false;
 	}
 
@@ -1210,29 +1021,6 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	if (!checkDiagonalCircle(spot)) {
 		return false;
 	}
-	/*greens = 0;
-	total = 0;
-	int whiteTotal = 0;
-	for (int i = leftX; i < rightX; i+=2) {
-		for (int j = topY; j < bottomY; j+=2) {
-			getColor(i, j);
-			if (debugBall) {
-				debugDraw.drawDot(i, j, BLUE);
-			}
-			if (isGreen()) {
-				greens++;
-			}
-			whiteTotal += getWhite();
-			total++;
-		}
-	}
-	if (whiteTotal  < (THRESHOLD - 10) * total) {
-		if (debugBall) {
-			std::cout << "Rejecting ball because not white enough " << midX <<
-				" " << midY << " " << whiteTotal << " " << total << std::endl;
-		}
-		return false;
-		}*/
 	return true;
 }
 
@@ -1252,10 +1040,10 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
         return false;
     }
     // when it is too small it is very dangerous
-	if (spot.innerDiam < 4) {
+	if (spot.innerDiam < 6) {
 		return false;
 	}
-    if (spot.innerDiam < 8) {
+    if (spot.innerDiam <= 8) {
 		if (spot.green > 0) {
 			return false;
 		}
@@ -1281,12 +1069,20 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
         }
     }
     // for now, if there are no black spots then it is too dangerous
+	int THRESHOLD = 110;
     if (spots < 1) {
-		if (!whiteNoBlack(spot)) {
+		if (!topCamera || !whiteNoBlack(spot)) {
 			return false;
 		}
     } else if (spots == 1) {
-		if (!checkGradientInSpot(spot) || !checkDiagonalCircle(spot)) {
+		// circle detection can be hard if the ball is on a line or in front of a robot
+		// check whiteness?
+		imagePoint p = imagePoint(midX, midY);
+		if (((!topCamera || spot.innerDiam < 25) && !checkGradientInSpot(spot)) ||
+			!greenAroundBallFromCentroid(p)) {
+			if (debugBall) {
+				std::cout << "Checking one spot " << spot.green << " " << std::endl;
+			}
 			return false;
 		}
 	}
@@ -1391,6 +1187,9 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         smallerY = ImageLiteU16(yImage, 0, 0, yImage.width(), yImage.height());
         smallerGreen = ImageLiteU8(greenImage, 0, 0, greenImage.width(),greenImage.height());
 	} else {
+        ((startCol - 3 > 0) ? startCol = startCol-3 : startCol = 0);
+        ((endCol + 3 < width) ? endCol = endCol+3 : endCol = width);
+        ((endRow + 3 < height) ? endRow = endRow+3 : endRow = height);
         smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
         smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
     }
@@ -1429,7 +1228,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
 	// run blobber on parts of the image where spot detector won't work
-	int bottomThird = height * 2 / 3;
+	int bottomThird = max(field->horizonAt(width / 2), height * 3 / 4); //height * 1 /2;
 	if (topCamera) {
 		ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
 								height - bottomThird);
@@ -1448,10 +1247,10 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 #else
         return true;
 #endif
-    }
+}
 
     SpotDetector whiteSpotDetector;
-    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 25.0f,
+    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
 							  0.5);
     if(whiteSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {

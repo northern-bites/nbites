@@ -47,7 +47,7 @@ from objects import Location, RelRobotLocation
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 def executeSweetKick(player):
     """
-    Kick the ball using sweet move. But don't do it. They suck!
+    Kick the ball using sweet move.
     """
     if player.firstFrame():
         print("Using kick: ", str(player.kick))
@@ -95,8 +95,20 @@ def afterKick(player):
     """
     if player.firstFrame():
         # player.stand()        # stand up right, ready to walk
+        afterKick.numTimes += 1
         player.brain.tracker.afterKickScan(player.kick.name)
         return player.stay()
+
+    if not player.brain.motion.calibrated:
+        # Wait until sensors are calibrated before moving
+        return player.stay()
+
+    print "afterKick.numTimes = " + str(afterKick.numTimes)
+
+    if afterKick.numTimes >= 5:
+        afterKick.numTimes = 0
+        print "Too many afterkick numtimes, going into spinsearch"
+        return player.goNow('spinSearch')    
 
     if player.penaltyKicking:
         return player.stay()
@@ -108,6 +120,8 @@ def afterKick(player):
         destinationOfKick = Location(player.kick.destinationX,
                                      player.kick.destinationY)
         if player.kick.destinationX == 0 and player.kick.destinationY == 0:
+            afterKick.numTimes = 0
+            print "transitions.shouldkickagain, going into spinsearch"
             player.goNow('spinSearch')
 
         if not player.brain.ball.vis.frames_on > 5:
@@ -120,6 +134,8 @@ def afterKick(player):
         #     player.motionKick = False
         #     return player.goNow('spinToBall')
         # else:
+        
+        afterKick.numTimes = 0
         return player.goNow('positionForKick')
 
     elif player.kickedOut:
@@ -128,7 +144,10 @@ def afterKick(player):
 
     if player.counter < 300:
         print "going to chaseAfterBall"
+        afterKick.numTimes = 0
         return player.goNow('chaseAfterBall')
+
+
 
     # while not transitions.shouldChaseBall(player) and player.counter < 300:
     #     print "Walking forward"
@@ -153,17 +172,24 @@ def afterKick(player):
 
     return player.stay()
 
+afterKick.numTimes = 0
+
 @superState('gameControllerResponder')
-@ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
-@ifSwitchNow(shared.walkingOffField, 'spinSearch')
+# @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
+# @ifSwitchNow(shared.walkingOffField, 'spinSearch')
 def chaseAfterBall(player):
+
     if player.firstFrame():
-        print "in chaseAfterBall"
-        player.brain.nav.destinationWalkTo(RelRobotLocation(200, 0, 0))
+        player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
+        player.brain.nav.destinationWalkTo(RelRobotLocation(player.brain.ball.x, player.brain.ball.y, 0))
         return player.stay()
+
     if transitions.shouldChaseBall(player):
         print "I can see the ball!"
         return player.goNow('approachBall')
+    if shared.walkingOffField(player):
+        print "I'm walking off the field!"
+        return player.goNow('spinSearch')
     if shared.navAtPosition(player) or player.counter > 100:
         return player.goNow('lookAroundForBall')
     return player.stay()
@@ -172,14 +198,13 @@ def chaseAfterBall(player):
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 def lookAroundForBall(player):
     if player.firstFrame():
-        player.brain.nav.walk(0.1, 0, 0)
+        player.brain.nav.walk(0.1, 0, 0.05)
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         return player.stay()
     if transitions.shouldChaseBall(player):
         print "I can see the ball!"
         return player.goNow('approachBall')
     if player.counter > 50:
-        print "going back to afterKick"
         return player.goNow('afterKick')
     return player.stay()
 

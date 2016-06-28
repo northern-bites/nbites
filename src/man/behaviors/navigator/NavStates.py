@@ -48,8 +48,12 @@ def goToPosition(nav):
     relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
 
     if nav.firstFrame():
-        print("Resetting at position transition!!")
+        # print("Resetting at position transition!!")
         nav.atLocPositionTransition.reset()
+
+    if not nav.brain.motion.calibrated:
+        helper.stand(nav)
+        return nav.stay()
 
     # if nav.counter % 10 is 0:
     # print "\ngoing to " + str(relDest)
@@ -58,8 +62,8 @@ def goToPosition(nav):
     #                                             nav.brain.ball.loc.bearing)
 
     
-    if nav.counter < 2:
-        print("In go to position, walking in place")
+    if nav.counter < 5:
+        # print("In go to position, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
 
@@ -151,14 +155,14 @@ def goToPosition(nav):
 
 
         # TODO nikki walk unsw hack
-        if relDest.relY < DISTANCE_ADAPT_CUTOFF:
-            velY = 0.0
+        # if relDest.relY < DISTANCE_ADAPT_CUTOFF:
+        #     velY = 0.0
 
         if (fabs(relDest.relH) > 20.0):
             goToPosition.speeds = (0, 0, velH)
         else:
             goToPosition.speeds = (velX, velY, velH)
-        # print("My speeds:", velX, velY, velH)
+        # print("     NAV: My speeds:", velX, velY, velH)
 
         helper.setSpeed(nav, goToPosition.speeds)
 
@@ -173,6 +177,7 @@ def goToPosition(nav):
             speed = goToPosition.speed
 
         helper.setDestination(nav, relDest, speed)
+        # print("     NAV Setting dest: ", str(relDest))
 
     # if navTrans.shouldDodge(nav):
     #     return nav.goNow('dodge')
@@ -244,8 +249,12 @@ def destinationWalkingTo(nav):
     if nav.firstFrame():
         destinationWalkingTo.enqueAZeroVector = False
 
+    if not nav.brain.motion.calibrated:
+        helper.stand(nav)
+        return nav.stay()
+
     if nav.counter < 4:
-        print("In dest walking to, walking in place")
+        # print("In dest walking to, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
 
@@ -294,9 +303,16 @@ def walkingTo(nav):
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         print ("MY dest: ", nav.destination.relX, nav.destination.relY, nav.destination.relH)
-        # helper.stand(nav)
+        helper.walkInPlace(nav)
         return nav.stay()
 
+    
+    if not nav.brain.motion.calibrated:
+        helper.stand(nav)
+        return nav.stay()
+
+    if nav.counter < 5:
+        return nav.stay()
 
     walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
                          nav.brain.interface.odometry.y,
@@ -368,6 +384,12 @@ def atPosition(nav):
 
     return Transition.getNextState(nav, atPosition)
 
+def walkInPlace(nav):
+    if nav.firstFrame():
+        helper.walkInPlace(nav)
+
+    return nav.stay()
+
 def stand(nav):
     """
     Transitional state between walking and standing
@@ -375,7 +397,8 @@ def stand(nav):
     the stand if desired
     """
     if (nav.brain.player.gameState == 'gameInitial'
-     or nav.brain.player.gameState == 'gameSet'):
+     or nav.brain.player.gameState == 'gameSet'
+     or nav.lastState == 'stand'):
         helper.stand(nav)
         return nav.stay()
 

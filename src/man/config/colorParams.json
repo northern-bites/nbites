@@ -4,32 +4,32 @@
       "green" :
         {
           "uAtY0" :
-            166,
+            163,
           "uAtY255" :
-            160,
-          "vAtY0" :
-            126,
-          "vAtY255" :
             182,
+          "vAtY0" :
+            134,
+          "vAtY255" :
+            181,
           "u_fuzzy_range" :
-            100,
+            71,
           "v_fuzzy_range" :
-            132
+            133
         },
       "white" :
         {
           "uAtY0" :
-            106,
+            160,
           "uAtY255" :
-            159,
+            143,
           "vAtY0" :
-            152,
+            212,
           "vAtY255" :
-            60,
+            0,
           "u_fuzzy_range" :
-            122,
+            117,
           "v_fuzzy_range" :
-            137
+            153
         },
       "black" :
         {
@@ -54,11 +54,11 @@
           "uAtY0" :
             156,
           "uAtY255" :
-            147,
+            151,
           "vAtY0" :
-            122,
+            129,
           "vAtY255" :
-            206,
+            200,
           "u_fuzzy_range" :
             115,
           "v_fuzzy_range" :
@@ -67,13 +67,13 @@
       "white" :
         {
           "uAtY0" :
-            53,
+            101,
           "uAtY255" :
-            214,
+            200,
           "vAtY0" :
-            92,
+            130,
           "vAtY255" :
-            228,
+            223,
           "u_fuzzy_range" :
             139,
           "v_fuzzy_range" :

@@ -27,6 +27,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "DebugConfig.h"
+#include "utilities-pp.hpp"
+
 namespace man{
     namespace gamestate{
 
@@ -65,6 +68,13 @@ namespace man{
         {
             latchInputs();
             update();
+
+#ifdef USE_LOGGING
+            if (control::check(control::flags::state_playing_override)) {
+                flag_setPlaying();
+                flag_setPenalized(control::check(control::flags::state_penalty_override));
+            }
+#endif
 
             latest_data.set_penalty_is_placement(true);
 
@@ -172,8 +182,15 @@ namespace man{
             latest_data.set_state( (int) next);
         }
 
+        enum spl_bp_state {
+            FIRST_INITIAL,
+            FIRST_PENALTY,
+            NORMAL_PLAYING
+        };
+
         void GameStateModule::advanceState()
         {
+#ifndef USE_SPL_BUTTONS
             switch (latest_data.state())
             {
                 case STATE_INITIAL:
@@ -191,6 +208,49 @@ namespace man{
                     manual_penalize();
                     break;
             }
+#else
+            static spl_bp_state bp_state = FIRST_INITIAL;
+
+            switch (latest_data.state())
+            {
+                case STATE_INITIAL:
+                    latest_data.set_state(STATE_PLAYING);
+                    manual_penalize();
+
+                    if ( bp_state == FIRST_INITIAL ) {
+                        NBL_WARN("spl button presses FIRST_INITIAL -> FIRST_PENALTY");
+                        bp_state = FIRST_PENALTY;
+                    }
+                    break;
+
+                case STATE_READY:
+                    latest_data.set_state(STATE_PLAYING);
+                    keep_time = true;
+                    start_time = realtime_micro_time();
+                    break;
+
+                case STATE_SET:
+                    latest_data.set_state(STATE_PLAYING);
+                    keep_time = true;
+                    start_time = realtime_micro_time();
+                    break;
+
+                case STATE_PLAYING:
+                    if (bp_state == FIRST_PENALTY) {
+                        NBL_WARN("spl button presses FIRST_PENALTY -> NORMAL_PLAYING");
+                        bp_state = NORMAL_PLAYING;
+                        manual_penalize();
+
+                        keep_time = true;
+                        start_time = realtime_micro_time();
+                    } else {
+                        NBL_WARN("spl button presses PENALTY SWITCH");
+                        bp_state = NORMAL_PLAYING;
+                        manual_penalize();
+                    }
+                    break;
+            }
+#endif
         }
 
         void GameStateModule::manual_penalize()
@@ -215,6 +275,38 @@ namespace man{
                     }
                     break;
                 }
+            }
+        }
+
+
+        void GameStateModule::flag_setPenalized(bool p) {
+            for (int i = 0; i < latest_data.team_size(); ++i)
+            {
+                messages::TeamInfo* team = latest_data.mutable_team(i);
+                if (team->team_number() == team_number)
+                {
+                    messages::RobotInfo* player = team->mutable_player(player_number-1);
+
+                    if (p) {
+                        player->set_penalty(PENALTY_MANUAL);
+                        //                response_status = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
+                    } else {
+                        //                response_status = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
+                        player->set_penalty(PENALTY_NONE);
+                    }
+
+                    break;
+                }
+            }
+        }
+        
+        void GameStateModule::flag_setPlaying() {
+            latest_data.set_state(STATE_PLAYING);
+            
+            keep_time = true;
+            if (!start_time)
+            {
+                start_time = realtime_micro_time();
             }
         }
 

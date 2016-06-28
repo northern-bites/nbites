@@ -29,7 +29,6 @@ public class UtilityManager {
 	public static final CameraOffsetsUtility CameraOffsetsUtility = new CameraOffsetsUtility();
 	public static final CameraSettingsUtility CameraSettingsUtility = new CameraSettingsUtility();
 
-//	public static final ColorCalibrationUtility ColorCalibrationUtility = new ColorCalibrationUtility();
 	public static final ColorCalibrationUtility ColorCalibrationUtility = new ColorCalibrationUtility();
 
 	public static final BallTestUtility BallTestUtility = new BallTestUtility();
