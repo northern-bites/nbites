@@ -255,7 +255,7 @@ void MotionModule::processBodyJoints()
                 inertialsInput_.message(), fsrInput_.message());
 
             // std::cout << "Resetting calibration inertials\n";
-            walkProvider.resetIMU();
+            // walkProvider.resetIMU();
 
         }
         else
@@ -489,7 +489,6 @@ void MotionModule::preProcessBody()
 
         if (!curProvider->isActive())
         {
-            std::cout << "[MOTION MODULE] Swapping body providers \n";
             swapBodyProvider();
         }
     }
