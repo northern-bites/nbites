@@ -216,9 +216,9 @@ namespace man {
 #else
 			static const bool debugBall = false;
 			static const bool debugSpots = false;
-			static const int filterThresholdDark = 144;
-			static const int greenThresholdDark = 12; //104;
-			static const int filterThresholdBrite = 144;
+			static const int filterThresholdDark = 104;
+			static const int greenThresholdDark = 12;
+			static const int filterThresholdBrite = 134;
 			static const int greenThresholdBrite = 80;
 #endif
 		};
