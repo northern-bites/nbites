@@ -245,17 +245,17 @@ struct Channel {
         
         if (in_range(this_peak.first, whistle_peak_range)) {
             //----------detection----------------
+//
+//            double efrac = efraction_at_peak(spectrum, this_peak);
+//            START(1) << "efrac " << efrac END
 
-            double efrac = efraction_at_peak(spectrum, this_peak);
-            START(1) << "efrac " << efrac END
-
-            double sdratio = sdev_fraction_at_peak(spectrum, this_peak, this_sdev);
-            START(1) << "sdratio " << sdratio END
-
-            if (sdratio < .2) {
-                on = true;
-                goto failed;
-            }
+//            double sdratio = sdev_fraction_at_peak(spectrum, this_peak, this_sdev);
+//            START(1) << "sdratio " << sdratio END
+//
+//            if (sdratio < .2) {
+//                on = true;
+//                goto failed;
+//            }
 
             if (!hearing()) {
                 START(1) << "looking for new peak..." END;
@@ -280,12 +280,12 @@ struct Channel {
                     goto failed;
                 }
 
-                if ( efrac > min_efrac_start_ratio ) {
-                    START(1) << "efrac " << efrac << " above thresh" END;
-                } else {
-                    START(1) << "efrac " << efrac << " FAILS" END;
-                    goto failed;
-                }
+//                if ( efrac > min_efrac_start_ratio ) {
+//                    START(1) << "efrac " << efrac << " above thresh" END;
+//                } else {
+//                    START(1) << "efrac " << efrac << " FAILS" END;
+//                    goto failed;
+//                }
 
                 START(2) << "found new peak:" << this_peak.first END;
                 set_last_peak(this_peak, this_sdev, spectrum);

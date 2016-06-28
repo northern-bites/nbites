@@ -74,10 +74,10 @@ public class ColorCalibrationTab extends javax.swing.JPanel {
         UndoButton = new javax.swing.JButton();
         SaveButton = new javax.swing.JButton();
         SendButton = new javax.swing.JButton();
-        imagePanel = new javax.swing.JPanel();
-        imageTabs = new javax.swing.JTabbedPane();
         tabTitle = new javax.swing.JLabel();
         globalCheckBox = new javax.swing.JCheckBox();
+        takeCheckBox = new javax.swing.JCheckBox();
+        imageSplitPane = new javax.swing.JSplitPane();
 
         internal.setBackground(new java.awt.Color(242, 242, 242));
         internal.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "camera color calibration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("PT Serif", 1, 14))); // NOI18N
@@ -410,35 +410,29 @@ public class ColorCalibrationTab extends javax.swing.JPanel {
             }
         });
 
-        SaveButton.setText("Save");
+        SaveButton.setText("save to config");
         SaveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SaveButtonActionPerformed(evt);
             }
         });
 
-        SendButton.setText("Send");
+        SendButton.setText("sent to robot");
         SendButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SendButtonActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout imagePanelLayout = new javax.swing.GroupLayout(imagePanel);
-        imagePanel.setLayout(imagePanelLayout);
-        imagePanelLayout.setHorizontalGroup(
-            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(imageTabs)
-        );
-        imagePanelLayout.setVerticalGroup(
-            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(imageTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
-        );
-
         tabTitle.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
         tabTitle.setText("jLabel1");
 
+        globalCheckBox.setSelected(true);
         globalCheckBox.setText("apply globally");
+
+        takeCheckBox.setText("take from selection");
+
+        imageSplitPane.setDividerLocation(500);
 
         javax.swing.GroupLayout internalLayout = new javax.swing.GroupLayout(internal);
         internal.setLayout(internalLayout);
@@ -447,16 +441,18 @@ public class ColorCalibrationTab extends javax.swing.JPanel {
             .addGroup(internalLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(internalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(imageSplitPane)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, internalLayout.createSequentialGroup()
                         .addComponent(UndoButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(takeCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(globalCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SendButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(SendButton, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SaveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(SaveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(internalLayout.createSequentialGroup()
                         .addComponent(tabTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -469,13 +465,14 @@ public class ColorCalibrationTab extends javax.swing.JPanel {
                 .addGap(3, 3, 3)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(imageSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(internalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SaveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SendButton)
                     .addComponent(UndoButton)
-                    .addComponent(globalCheckBox))
+                    .addComponent(globalCheckBox)
+                    .addComponent(takeCheckBox))
                 .addContainerGap())
         );
 
@@ -542,8 +539,7 @@ public class ColorCalibrationTab extends javax.swing.JPanel {
     protected javax.swing.JSpinner Y255VSpinner;
     protected javax.swing.JLabel Y255VText2;
     protected javax.swing.JCheckBox globalCheckBox;
-    protected javax.swing.JPanel imagePanel;
-    protected javax.swing.JTabbedPane imageTabs;
+    protected javax.swing.JSplitPane imageSplitPane;
     protected javax.swing.JPanel internal;
     protected javax.swing.JLabel jLabel13;
     protected javax.swing.JLabel jLabel14;
@@ -556,5 +552,6 @@ public class ColorCalibrationTab extends javax.swing.JPanel {
     protected javax.swing.JPanel jPanelY2;
     protected javax.swing.JPanel jPanelY257;
     protected javax.swing.JLabel tabTitle;
+    protected javax.swing.JCheckBox takeCheckBox;
     // End of variables declaration//GEN-END:variables
 }

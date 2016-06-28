@@ -4,6 +4,9 @@
 #include "whistle.hpp"
 
 #include <sys/file.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <errno.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -16,7 +19,7 @@ const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
 
 void cleanup() {
 
-    printf(":::::::::::::::::::MAN cleanup code executing!\n:::::::::::::::::::");
+    printf("::::::::::::::::::: MAN cleanup code executing! :::::::::::::::::::\n");
 
     if (whistlePID > 0) {
         kill(whistlePID, SIGTERM);
@@ -33,7 +36,7 @@ void cleanup() {
     fclose(stdout);
 
     if (instance) delete instance;
-    printf(":::::::::::::::::::MAN cleanup code finished!\n:::::::::::::::::::");
+    printf("::::::::::::::::::: MAN cleanup code finished! :::::::::::::::::::\n");
 }
 
 void handler(int signal)
@@ -52,10 +55,14 @@ void error_signal_handler(int signal) {
     fflush(stdout);
     fflush(stderr);
 
-    cleanup();
+    // while(1) {
+    // 	//man::tts::say(IN_GAME, "g d b me");
+    // 	sleep(10);
+    // }
 
-    printf("error_signal_handler() done.\n");
-    exit(-1);
+    // cleanup();
+
+    abort();
 }
 
 // Deal with lock file. To ensure that we only have ONE instance of man
@@ -111,8 +118,11 @@ int main() {
         // (Diagram threads are daemon threads, and man will exit if they're the
         // only ones left)
         sleep(10);
+
         int status;
+        // clear zombie mans
         while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
+
     return 1;
 }

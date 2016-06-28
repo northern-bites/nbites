@@ -4,8 +4,8 @@ USE_BOUNCE_TRACKING = False
 
 MAX_PAN_SPEED = 125.0              # deg/sec
 
-TRACKER_FRAMES_ON_TRACK_THRESH = 2
-TRACKER_FRAMES_OFF_REFIND_THRESH = 10
+TRACKER_FRAMES_ON_TRACK_THRESH = 1
+TRACKER_FRAMES_OFF_REFIND_THRESH = 25
 
 ####
 #### Active tracking constants
@@ -25,7 +25,8 @@ TIME_OF_PAN = 0.2
 NUMBER_OF_PANS = 7
 TIME_PER_LOG = 1.0
 
-
+# Pan contants
+FULL_WIDE_PAN_TIME = 4.5
 
 FIXED_PITCH_VALUE = 20
 
@@ -57,7 +58,9 @@ KICK_DICT = {"L_Side"               : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
              "M_Left_Side"          : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
              "M_Right_Side"         : HeadMoves.FIXED_PITCH_LOOK_LEFT,
              "BH_L_FORWARD"         : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "BH_R_FORWARD"         : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT
+             "BH_R_FORWARD"         : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "Left_Diagonal"        : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "Right_Diagonal"        : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT
              }
 # TODO: Test and improve these pans.
 

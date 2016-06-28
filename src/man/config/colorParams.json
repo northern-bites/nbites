@@ -1,1 +1,98 @@
-{"camera_TOP":{"green":{"uAtY0":178.15,"uAtY255":117.8,"vAtY0":123.75,"vAtY255":132.25,"u_fuzzy_range":88.05,"v_fuzzy_range":129.7},"white":{"uAtY0":123,"uAtY255":162,"vAtY0":145,"vAtY255":84,"u_fuzzy_range":121,"v_fuzzy_range":129},"black":{"uAtY0":198.125,"uAtY255":18.35000000000001,"vAtY0":200.675,"vAtY255":29.825000000000003,"u_fuzzy_range":135.65,"v_fuzzy_range":158.6}},"camera_BOT":{"green":{"uAtY0":153.5,"uAtY255":149.25,"vAtY0":107.6,"vAtY255":167.1,"u_fuzzy_range":110.15,"v_fuzzy_range":134.8},"white":{"uAtY0":115.25,"uAtY255":214.7,"vAtY0":92.3,"vAtY255":228.72500000000002,"u_fuzzy_range":139.475,"v_fuzzy_range":134.375},"black":{"uAtY0":157.325,"uAtY255":175.175,"vAtY0":113.975,"vAtY255":191.75,"u_fuzzy_range":102.5,"v_fuzzy_range":129.275}}}
+{
+  "camera_TOP" :
+    {
+      "green" :
+        {
+          "uAtY0" :
+            163,
+          "uAtY255" :
+            182,
+          "vAtY0" :
+            134,
+          "vAtY255" :
+            181,
+          "u_fuzzy_range" :
+            71,
+          "v_fuzzy_range" :
+            133
+        },
+      "white" :
+        {
+          "uAtY0" :
+            160,
+          "uAtY255" :
+            143,
+          "vAtY0" :
+            212,
+          "vAtY255" :
+            0,
+          "u_fuzzy_range" :
+            117,
+          "v_fuzzy_range" :
+            153
+        },
+      "black" :
+        {
+          "uAtY0" :
+            198.125,
+          "uAtY255" :
+            18.35000000000001,
+          "vAtY0" :
+            200.675,
+          "vAtY255" :
+            29.825000000000003,
+          "u_fuzzy_range" :
+            135.65,
+          "v_fuzzy_range" :
+            158.6
+        }
+    },
+  "camera_BOT" :
+    {
+      "green" :
+        {
+          "uAtY0" :
+            156,
+          "uAtY255" :
+            151,
+          "vAtY0" :
+            129,
+          "vAtY255" :
+            200,
+          "u_fuzzy_range" :
+            115,
+          "v_fuzzy_range" :
+            130
+        },
+      "white" :
+        {
+          "uAtY0" :
+            101,
+          "uAtY255" :
+            200,
+          "vAtY0" :
+            130,
+          "vAtY255" :
+            223,
+          "u_fuzzy_range" :
+            139,
+          "v_fuzzy_range" :
+            134
+        },
+      "black" :
+        {
+          "uAtY0" :
+            157.325,
+          "uAtY255" :
+            175.175,
+          "vAtY0" :
+            113.975,
+          "vAtY255" :
+            191.75,
+          "u_fuzzy_range" :
+            102.5,
+          "v_fuzzy_range" :
+            129.275
+        }
+    }
+}

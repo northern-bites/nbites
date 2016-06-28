@@ -10,4 +10,7 @@ message FallStatus
     optional bool falling  = 1;
     optional bool fallen   = 2;
     optional bool on_front = 3; //On back if false, undefined if not fallen.
+
+    //-1 is put down, 0 is none, 1 is picked up
+    optional int32 pickup = 4;
 }

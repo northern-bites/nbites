@@ -77,4 +77,10 @@ option(
   ON
 )
 
+option(
+  USE_SPL_BUTTONS
+  "Use SPL button presses to change state."
+  OFF
+)
+
 endif( NOT OFFLINE )

@@ -54,7 +54,8 @@ def ballForNFramesAndMFar(atleastThisManyFrames, atleastThisFar):
 
 def ballMovedNCMsFromWhereSeenLast(ballMovedTolerance):
     """
-    The ball is atleast N cms from where it was seen when ballBeforeCheck was set.
+    The ball is atleast N centimeters from where it was seen when 
+    ballBeforeCheck was set.
 
     @requires player.ballBeforeCheck to be set to a tuple of filtered ball
               relative coordinates for comparision,
@@ -117,6 +118,13 @@ def betweenCrosses(player):
     """
     return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
             player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
+
+def walkingOffField(player):
+    edge_offset = 50;
+    return (player.brain.loc.x < (0 + edge_offset) or
+            player.brain.loc.x > (nogginConstants.FIELD_WHITE_WIDTH - edge_offset) or
+            player.brain.loc.y > (0 + edge_offset) or
+            player.brain.loc.y < (nogginConstants.FIELD_WHITE_HEIGHT - edge_offset))
 
 def middleThird(player):
     """

@@ -64,11 +64,14 @@ def stopSpinning(player):
     return player.brain.ball.vis.frames_on > 0
   
 def shouldApproachBall(player):
+    # print("In approachball")
     if ballNotInBox(player):
+        # print("Returning false bc ball not in box")
         player.claimedBall = False
         return False
 
     if claimTransitions.shouldCedeClaim(player):
+        # print("Ceding claim")
         return False
 
     return True
@@ -104,3 +107,22 @@ def shouldNotBeSupporter(player):
     if role.isChaser(player.role):
         return shared.ballOffForNFrames(120)(player)
     return not shouldBeSupporter(player)
+
+def shouldChangeDefenderPosition(player):
+    if player.brain.defendingStateTime >= 750: #Number of frames. #Should change to constant.
+        player.brain.defendingStateTime = 0
+        return True
+    else:
+        return False
+
+def ballInOurHalf(player):
+    if role.isDefender(player.role):
+        return player.brain.sharedBall.ball_on and (player.brain.sharedBall.x < (nogginC.MIDFIELD_X - nogginC.CENTER_CIRCLE_RADIUS))
+    return False
+
+def ballInTheirHalf(player):
+    if role.isDefender(player.role):
+        return player.brain.sharedBall.ball_on and (player.brain.sharedBall.x > (nogginC.MIDFIELD_X + nogginC.CENTER_CIRCLE_RADIUS))
+    return False
+
+
