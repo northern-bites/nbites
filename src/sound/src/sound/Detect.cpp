@@ -7,8 +7,6 @@
 #include <signal.h>
 #include <cmath>
 
-#if DETECT_METHOD == DETECT_WITH_SDEV_RATIO
-
 using namespace nbsound;
 
 namespace detect {
@@ -198,8 +196,6 @@ namespace detect {
     }
     
 }
-
-#endif
 
 
 

@@ -13,13 +13,6 @@
 extern std::vector<nbl::Block> detect_results;
 #endif
 
-#define DETECT_WITH_SDEV 1
-#define DETECT_WITH_IMPULSE 2
-#define DETECT_WITH_SDEV_RATIO 3
-
-//#define DETECT_METHOD DETECT_WITH_SDEV
-#define DETECT_METHOD DETECT_WITH_SDEV_RATIO
-
 #define DETECT_PRINT
 
 namespace detect {

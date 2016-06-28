@@ -1,8 +1,6 @@
 #include "Detect.hpp"
 #include <cmath>
 
-#if DETECT_METHOD == DETECT_WITH_SDEV_RATIO
-
 namespace detect {
     size_t Channel::_iteration_ = 0;
 
@@ -87,5 +85,3 @@ namespace detect {
         return std::sqrt(sdevsum);
     }
 }
-
-#endif
