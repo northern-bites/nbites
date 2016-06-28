@@ -127,11 +127,23 @@ namespace nbsound {
             if (needs_delete && buffer) delete[] buffer;
         }
 
+        Buffer(const Buffer& other) :
+            channels(other.channels), frames(other.frames)
+        {
+            buffer = new T[channels * frames];
+            needs_delete = true;
+
+            init_channels();
+            memcpy(buffer, other.buffer, other.size_bytes());
+        }
+
+        Buffer& operator=(Buffer& other);   //no assignment operator
+
         BufferChannel& operator[](int c) {
             return _channels[c];
         }
 
-        bool is_in_bounds(int chan, int frm) {
+        bool is_in_bounds(int chan, int frm) const {
             return (chan < channels) && (frm < frames);
         }
 
@@ -139,25 +151,67 @@ namespace nbsound {
             return Buffer(*this, frame_start, frame_end);
         }
 
-        size_t sample_bytes() {
+        size_t sample_bytes() const {
             return sizeof(T);
         }
 
-        size_t sample_max() {
+        size_t sample_max() const {
             return std::numeric_limits<T>::max();
         }
 
-        size_t size_bytes() {
+        size_t size_bytes() const {
             return sizeof(T) * frames * channels;
         }
 
-        size_t size_samples() {
+        size_t size_samples() const {
             return frames * channels;
+        }
+
+        std::string toString() const {
+            return std::string((const char *) buffer, size_bytes());
         }
     };
 
     typedef Buffer<nbs_sample_t> SampleBuffer;
-    typedef Buffer<double> TransformBuffer;
+    typedef Buffer<float> TransformBuffer;
+
+    class SampleRingBuffer {
+        int position;
+        std::vector<SampleBuffer> buckets;
+    public:
+        
+        SampleRingBuffer(int nbuck, int nchan, int nframe)
+        {
+            NBL_ASSERT(nbuck > 0);
+
+            for (int i = 0; i < nbuck; ++i) {
+                buckets.push_back(SampleBuffer{nchan, nframe});
+            }
+
+            position = 0;
+        }
+
+        void push(SampleBuffer& fb) {
+            NBL_ASSERT(fb.size_bytes() == buckets[position].size_bytes());
+            memcpy(buckets[position].buffer, fb.buffer, fb.size_bytes());
+
+            position = (position + 1) % buckets.size();
+        }
+
+        std::string toString() {
+            std::string ret;
+            ret.reserve( buckets.size() * buckets[0].size_bytes() );
+
+            for (int i = 0; i < buckets.size(); ++i) {
+                const int index = (position + i) % buckets.size();
+                ret.append( (const char *) buckets[index].buffer, buckets[index].size_bytes() );
+            }
+
+            return ret;
+        }
+
+        NBL_DISALLOW_COPY(SampleRingBuffer)
+    };
     
     class Handler;  //Same format for both capture and playback handlers.
 

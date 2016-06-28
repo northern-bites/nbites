@@ -11,7 +11,7 @@ def setRoleConstants(player, role):
         player.box = evenDefenderBox
         player.isKickingOff = False
     elif isRightDefender(role):
-        player.homePosition = oddDefenderHome
+        player.homePosition = oddDefenderBack
         player.kickoffPosition = oddDefenderKickoff
         #player.kickoffPosition = oddDefenderKickoff
         player.box = oddDefenderBox
@@ -137,18 +137,18 @@ boxBuffer = 100 # Used for the buffered box when approach ball is potentially
 
 ### HOME POSITIONS
 # Trapezoid of terror (defender positioning)
-oddDefenderForward = RobotLocation(NogginConstants.MIDFIELD_X - 60,
-                                    NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 70,
-                                    0)
-evenDefenderForward = RobotLocation(NogginConstants.MIDFIELD_X - 60,
-                                    NogginConstants.BLUE_GOALBOX_TOP_Y + 70,
-                                    0)
-oddDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20, 
-                                NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 10,
-                                0)
-evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20, 
-                                NogginConstants.BLUE_GOALBOX_TOP_Y + 10,
-                                0)
+oddDefenderForward = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 330,
+                                   NogginConstants.MY_GOALBOX_BOTTOM_Y - 120,
+                                   35)
+evenDefenderForward = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 330,
+                                    NogginConstants.MY_GOALBOX_TOP_Y + 120,
+                                    -25)
+oddDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 90,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y - 30,
+                                10)
+evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 80,
+                                 NogginConstants.MY_GOALBOX_TOP_Y,
+                                 -20)
 
 # Tomultuous triangle (odd chaser positioning)
 strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 175,
@@ -184,19 +184,19 @@ if NogginConstants.LEFT_FORWARD_DEFENSE:
     evenDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 200,
                                     NogginConstants.MY_GOALBOX_TOP_Y + 60,
                                     0)
-    
+
 else:
-    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 120,
-                                    NogginConstants.MY_GOALBOX_TOP_Y,
-                                    0)
+    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
+                                     NogginConstants.MY_GOALBOX_TOP_Y + 70,
+                                     -35)
     evenDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 110,
                                     NogginConstants.MY_GOALBOX_TOP_Y,
                                     0)
 
 if NogginConstants.RIGHT_FORWARD_DEFENSE:
-    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 160,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
-                                0)
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 330,
+                                    NogginConstants.MY_GOALBOX_BOTTOM_Y - 120,
+                                    35)
     oddDefenderKickoff = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)

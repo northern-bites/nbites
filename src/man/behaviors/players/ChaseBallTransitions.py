@@ -216,8 +216,19 @@ def shouldWalkFindBall(player):
 
 def shouldChangeKickingStrategy(player):
     """
-    It is the end of the game and we are loosing. Time to kick more aggresively!
+    It is the end of the game and we are losing. Time to kick more aggresively!
     """
     return (player.brain.game.have_remote_gc and 
             player.brain.game.secs_remaining <= 30 and
             player.brain.theirScore > player.brain.ourScore)
+
+def shouldNotDribble(player):
+    return (player.brain.game.secs_remaining <= 30 or
+            # If we're in our own half, kick
+            player.brain.loc.x < NogginConstants.CENTER_FIELD_X or
+
+            # If we're between their cross and halfway between their cross and the half, kick.
+            (player.brain.loc.x > ((NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X + NogginConstants.CENTER_FIELD_X) / 2) and
+             player.brain.loc.x < NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)) 
+
+            # Basically we only dribble if we're really close to their goal or close to the half on their side

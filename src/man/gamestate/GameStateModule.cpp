@@ -27,6 +27,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "DebugConfig.h"
+#include "utilities-pp.hpp"
+
 namespace man{
     namespace gamestate{
 
@@ -172,8 +175,15 @@ namespace man{
             latest_data.set_state( (int) next);
         }
 
+        enum spl_bp_state {
+            FIRST_INITIAL,
+            FIRST_PENALTY,
+            NORMAL_PLAYING
+        };
+
         void GameStateModule::advanceState()
         {
+#ifndef USE_SPL_BUTTONS
             switch (latest_data.state())
             {
                 case STATE_INITIAL:
@@ -191,6 +201,49 @@ namespace man{
                     manual_penalize();
                     break;
             }
+#else
+            static spl_bp_state bp_state = FIRST_INITIAL;
+
+            switch (latest_data.state())
+            {
+                case STATE_INITIAL:
+                    latest_data.set_state(STATE_PLAYING);
+                    manual_penalize();
+
+                    if ( bp_state == FIRST_INITIAL ) {
+                        NBL_WARN("spl button presses FIRST_INITIAL -> FIRST_PENALTY");
+                        bp_state = FIRST_PENALTY;
+                    }
+                    break;
+
+                case STATE_READY:
+                    latest_data.set_state(STATE_PLAYING);
+                    keep_time = true;
+                    start_time = realtime_micro_time();
+                    break;
+
+                case STATE_SET:
+                    latest_data.set_state(STATE_PLAYING);
+                    keep_time = true;
+                    start_time = realtime_micro_time();
+                    break;
+
+                case STATE_PLAYING:
+                    if (bp_state == FIRST_PENALTY) {
+                        NBL_WARN("spl button presses FIRST_PENALTY -> NORMAL_PLAYING");
+                        bp_state = NORMAL_PLAYING;
+                        manual_penalize();
+
+                        keep_time = true;
+                        start_time = realtime_micro_time();
+                    } else {
+                        NBL_WARN("spl button presses PENALTY SWITCH");
+                        bp_state = NORMAL_PLAYING;
+                        manual_penalize();
+                    }
+                    break;
+            }
+#endif
         }
 
         void GameStateModule::manual_penalize()

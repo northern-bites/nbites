@@ -24,7 +24,6 @@ namespace man {
         static inline void internal_say(const char * line) {
             if (!fork()) {
                 execl("/usr/bin/say", "", line, NULL);
-
                 exit(0);
                 kill(getpid(), SIGKILL);
             }

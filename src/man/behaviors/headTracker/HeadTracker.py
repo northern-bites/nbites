@@ -209,6 +209,9 @@ class HeadTracker(FSA.FSA):
         Look to the direction we are spinning.
         """
         if direction < 0:
+
+            print "Look right"
+
             self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEAST_RIGHT)
         else:
             self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEAST_LEFT)
