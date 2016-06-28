@@ -4,42 +4,42 @@ import GoalieConstants
 
 
 ### SETS PLAYER STATE PER ROLE
-def setRoleConstants(player, role):
-    player.role = role
-    if isLeftDefender(role):
-        player.homePosition = evenDefenderHome
-        player.kickoffPosition = evenDefenderKickoff
-        player.box = evenDefenderBox
-        player.isKickingOff = False
-    elif isRightDefender(role):
-        player.homePosition = oddDefenderBack
-        player.kickoffPosition = oddDefenderKickoff
-        #player.kickoffPosition = oddDefenderKickoff
-        player.box = oddDefenderBox
-        player.isKickingOff = False
-    elif isFirstChaser(role):
-        player.homePosition = evenChaserHome
-        player.kickoffPosition = theirKickoff
-        player.box = chaserBox
-        player.isKickingOff = True
-    elif isSecondChaser(role):
-        player.homePosition = oddChaserHome
-        player.kickoffPosition = oddChaserKickoff
-        player.box = chaserBox
-        player.isKickingOff = False
-    elif isStriker(role):
-        player.homePosition = strikerTriangle
-        player.kickoffPosition = oddChaserKickoff
-        player.box = strikerBox
-        player.isKickingOff = False
-    elif isCherryPicker(role):
-        player.homePosition = cherryPickerHome
-        if role == 2: # if there are two chasers
-            player.kickoffPosition = cherryPickerKickoff
-        else:         # if there is only one chaser, role (should) == 5
-            player.kickoffPosition = oddChaserKickoff
-        player.box = cherryPickerBox
-        player.isKickingOff = False
+# def setRoleConstants(player, role):
+#     player.role = role
+#     if isLeftDefender(role):
+#         player.homePosition = evenDefenderHome
+#         player.kickoffPosition = evenDefenderKickoff
+#         player.box = evenDefenderBox
+#         player.isKickingOff = False
+#     elif isRightDefender(role):
+#         player.homePosition = oddDefenderBack
+#         player.kickoffPosition = oddDefenderKickoff
+#         #player.kickoffPosition = oddDefenderKickoff
+#         player.box = oddDefenderBox
+#         player.isKickingOff = False
+#     elif isFirstChaser(role):
+#         player.homePosition = evenChaserHome
+#         player.kickoffPosition = theirKickoff
+#         player.box = chaserBox
+#         player.isKickingOff = True
+#     elif isSecondChaser(role):
+#         player.homePosition = oddChaserHome
+#         player.kickoffPosition = oddChaserKickoff
+#         player.box = chaserBox
+#         player.isKickingOff = False
+#     elif isStriker(role):
+#         player.homePosition = strikerTriangle
+#         player.kickoffPosition = oddChaserKickoff
+#         player.box = strikerBox
+#         player.isKickingOff = False
+#     elif isCherryPicker(role):
+#         player.homePosition = cherryPickerHome
+#         if role == 2: # if there are two chasers
+#             player.kickoffPosition = cherryPickerKickoff
+#         else:         # if there is only one chaser, role (should) == 5
+#             player.kickoffPosition = oddChaserKickoff
+#         player.box = cherryPickerBox
+#         player.isKickingOff = False
 
 
 
