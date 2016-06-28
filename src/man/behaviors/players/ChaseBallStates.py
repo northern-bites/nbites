@@ -23,8 +23,8 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
     if player.firstFrame():
-        player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
-                                                 0.8, 10)
+        # player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
+        #                                          0.8, 10)
         playOffStates.playerFourSearchBehavior.pointIndex = -1
         playOffStates.playerFiveSearchBehavior.pointIndex = -1
 
@@ -345,6 +345,7 @@ orbitBall.X_BACKUP_SPEED = .2
 def dribble(player):
     if transitions.shouldNotDribble(player):
         print "It's no longer dribble time"
+        
         return player.goNow('orbitBall')
     print "Dribble time"
     ball = player.brain.ball

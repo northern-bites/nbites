@@ -23,9 +23,9 @@ def shouldReturnHome(player):
     If the ball IS in our box, check the claims for a higher priority claim
     """
 
-    if player.buffBoxFiltered.checkCondition(player):
-        player.claimedBall = False
-        return True
+    # if player.buffBoxFiltered.checkCondition(player):
+    #     player.claimedBall = False
+    #     return True
 
     return claimTrans.shouldCedeClaim(player)
 
@@ -105,6 +105,9 @@ def ballInPosition(player, kickPose):
     # print("Relx: ", kickPose.relX, " RelY:", kickPose.relY)
     # NOTE don't take the absolute value of kickPose.relX because being too
     # close to the ball is not a problem for kicking
+    print("kickPose.relX:", kickPose.relX)
+    print("kickPose.relY:", kickPose.relY)
+    print("kickPOse.relH:", kickPose.relH)
     return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and
             fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
             fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
@@ -224,12 +227,14 @@ def shouldChangeKickingStrategy(player):
             player.brain.theirScore > player.brain.ourScore)
 
 def shouldNotDribble(player):
+    print("My loc x is greater than the center field minus fifty:", player.brain.loc.x > (NogginConstants.CENTER_FIELD_X - 70))
+    print("My loc x is less than the cross:", player.brain.loc.x < NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
+
     return (player.brain.game.secs_remaining <= 30 or
             # If we're in our own half, kick
-            player.brain.loc.x < NogginConstants.CENTER_FIELD_X or
+            (player.brain.loc.x < (NogginConstants.CENTER_FIELD_X - 70)) or
 
-            # If we're between their cross and halfway between their cross and the half, kick.
-            (player.brain.loc.x > ((NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X + NogginConstants.CENTER_FIELD_X) / 2) and
-             player.brain.loc.x < NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)) 
+            # If we're between their cross and halfway between their cross and the half, kick. and
+             (player.brain.loc.x > (NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X + NogginConstants.YELLOW_GOALBOX_LEFT_X) / 2) 
 
             # Basically we only dribble if we're really close to their goal or close to the half on their side
