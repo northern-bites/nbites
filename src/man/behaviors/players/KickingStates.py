@@ -99,10 +99,15 @@ def afterKick(player):
         player.brain.tracker.afterKickScan(player.kick.name)
         return player.stay()
 
+    if not player.brain.motion.calibrated:
+        # Wait until sensors are calibrated before moving
+        return player.stay()
+
     print "afterKick.numTimes = " + str(afterKick.numTimes)
 
     if afterKick.numTimes >= 5:
         afterKick.numTimes = 0
+        print "Too many afterkick numtimes, going into spinsearch"
         return player.goNow('spinSearch')    
 
     if player.penaltyKicking:
@@ -116,6 +121,7 @@ def afterKick(player):
                                      player.kick.destinationY)
         if player.kick.destinationX == 0 and player.kick.destinationY == 0:
             afterKick.numTimes = 0
+            print "transitions.shouldkickagain, going into spinsearch"
             player.goNow('spinSearch')
 
         if not player.brain.ball.vis.frames_on > 5:
@@ -177,6 +183,7 @@ def chaseAfterBall(player):
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         player.brain.nav.destinationWalkTo(RelRobotLocation(player.brain.ball.x, player.brain.ball.y, 0))
         return player.stay()
+
     if transitions.shouldChaseBall(player):
         print "I can see the ball!"
         return player.goNow('approachBall')

@@ -48,8 +48,12 @@ def goToPosition(nav):
     relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
 
     if nav.firstFrame():
-        print("Resetting at position transition!!")
+        # print("Resetting at position transition!!")
         nav.atLocPositionTransition.reset()
+
+    if not nav.brain.motion.calibrated:
+        helper.stand(nav)
+        return nav.stay()
 
     # if nav.counter % 10 is 0:
     # print "\ngoing to " + str(relDest)
@@ -59,7 +63,7 @@ def goToPosition(nav):
 
     
     if nav.counter < 5:
-        print("In go to position, walking in place")
+        # print("In go to position, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
 
@@ -245,8 +249,12 @@ def destinationWalkingTo(nav):
     if nav.firstFrame():
         destinationWalkingTo.enqueAZeroVector = False
 
+    if not nav.brain.motion.calibrated:
+        helper.stand(nav)
+        return nav.stay()
+
     if nav.counter < 4:
-        print("In dest walking to, walking in place")
+        # print("In dest walking to, walking in place")
         helper.walkInPlace(nav)
         return nav.stay()
 
@@ -296,6 +304,11 @@ def walkingTo(nav):
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         print ("MY dest: ", nav.destination.relX, nav.destination.relY, nav.destination.relH)
         helper.walkInPlace(nav)
+        return nav.stay()
+
+    
+    if not nav.brain.motion.calibrated:
+        helper.stand(nav)
         return nav.stay()
 
     if nav.counter < 5:
