@@ -43,7 +43,8 @@ public class UserSettings {
 
 	public static LogLevel logLevel = LogLevel.levelINFO;
 
-	public static String venue = "edwards16";
+//	public static String venue = "edwards16";
+	public static String venue = "leipzig16";
 
 	private static final String INTERNAL_KEY = "__INTERNAL__";
 	private static final String BOUNDS_KEY = "__BOUNDS__";

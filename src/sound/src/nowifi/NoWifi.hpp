@@ -29,6 +29,7 @@ namespace nowifi {
 
     public:
         SendrBase();
+        virtual ~SendrBase(){}
         bool isRunning() const { return running; }
         bool isSending() const { return sending; }
 
@@ -41,14 +42,19 @@ namespace nowifi {
     class RecvrBase {
         Callback callback;
         bool running;
-        bool sending;
+        bool recving;
 
+        time_t start;
         std::string current;
+        time_t end;
+        virtual void finish();
 
     public:
         RecvrBase(Callback cb);
+        virtual ~RecvrBase(){}
+
         bool isRunning() const { return running; }
-        bool isSending() const { return sending; }
+        bool isRecving() const { return recving; }
 
         virtual void parse(nbsound::SampleBuffer& buffer, nbsound::Config& conf) = 0;
 
@@ -59,8 +65,6 @@ namespace nowifi {
     RecvrBase * getRecvr(Callback callback);
 }
 
-#include "SimpleFSK.hpp"
-
-#define NOWIFI_CHECK(val) if (val) { NBL_ERROR(
+//#define NOWIFI_CHECK(val) if (val) { NBL_ERROR(
 
 #endif /* NoWifi_h */

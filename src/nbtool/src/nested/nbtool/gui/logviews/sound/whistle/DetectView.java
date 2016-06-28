@@ -1,13 +1,18 @@
 package nbtool.gui.logviews.sound.whistle;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -35,6 +40,10 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 	JCheckBox containsBox = new JCheckBox("annotate:");
 	JLabel detection = new JLabel();
+	JLabel channel = new JLabel();
+
+	int channel_index = 0;
+	int max_index = 0;
 
 	@Override
 	public void setupDisplay() {
@@ -122,9 +131,9 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 			JPanel container = new JPanel(new BorderLayout());
 			container.add(detection, BorderLayout.CENTER);
 			container.add(containsBox, BorderLayout.WEST);
+			container.add(channel, BorderLayout.EAST);
 
 			this.add(container, BorderLayout.NORTH);
-//			this.add(heardBox, BorderLayout.NORTH);
 
 			if (displayedLog.topLevelDictionary.get("WhistleHeard") != null)
 				containsBox.setSelected(displayedLog.topLevelDictionary.get("WhistleHeard").asBoolean().bool());
@@ -143,6 +152,34 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 					}
 				}
 			});
+
+			channel.setText(String.format(" (%d / %d)", channel_index, max_index ));
+			this.getActionMap().put("NextIndex", new AbstractAction(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					channel_index = Math.min(channel_index + 1, max_index);
+					Debug.print("channel index: %d", channel_index);
+					channel.setText(String.format(" (%d / %d)", channel_index, max_index ));
+					repaint();
+				}
+			});
+
+			this.getActionMap().put("PrevIndex", new AbstractAction(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					channel_index = Math.max(channel_index - 1, 0);
+					Debug.print("channel index: %d", channel_index);
+					channel.setText(String.format(" (%d / %d)", channel_index, max_index ));
+					repaint();
+				}
+			});
+
+			this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+					KeyStroke.getKeyStroke(KeyEvent.VK_CLOSE_BRACKET, 0)
+					, "NextIndex");
+			this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+					KeyStroke.getKeyStroke(KeyEvent.VK_OPEN_BRACKET, 0)
+					, "PrevIndex");
 		}
 	}
 
@@ -170,6 +207,7 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 			offset += b.data.length;
 		}
 
+		max_index = out[0].blocks.size() - 1;
 		buff = new FloatBuffer(new Block(all, ""), out[0].blocks.size(),
 				SPECTRUM_OUTPUT_LENGTH);
 
@@ -179,11 +217,11 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 		detection.setText("detect: " + out[0].topLevelDictionary.get("WhistleHeard").asBoolean().bool());
 
-		pane = new SoundPane(out[0].blocks.size(), 1024) {
+		pane = new SoundPane(1, 2048) {
 
 			@Override
 			public int pixels(int c, int f, int radius) {
-				return (int) ((buff.get(f, c) / buff.max()) * radius * -1);
+				return (int) ((buff.get(f, channel_index) / buff.max()) * radius * -1);
 			}
 
 			@Override
@@ -193,7 +231,7 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 			@Override
 			public String selectionString(int c, int f) {
-				String fmat = String.format("c%df%d: %f", c, f, buff.get(f, c));
+				String fmat = String.format("c%df%d: %f", channel_index, f, buff.get(f, channel_index));
 				Debug.print("%s", fmat);
 				return fmat;
 			}
@@ -205,7 +243,6 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 	@Override
 	public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

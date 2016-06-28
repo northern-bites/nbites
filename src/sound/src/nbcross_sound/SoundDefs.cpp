@@ -30,8 +30,10 @@ NBCROSS_FUNCTION(whistle_detect, true )
         memcpy(buffer.buffer, block.data.data(), block.data.size());
 
         detect::reset();
+
         NBL_INFO("before detect...")
-        bool heard = detect::detect(buffer);
+        bool heard = detect::detect(buffer, true);
+        
         NBL_INFO("after detect...")
         NBL_INFO("results...")
         for (Block& blck : detect_results) {
