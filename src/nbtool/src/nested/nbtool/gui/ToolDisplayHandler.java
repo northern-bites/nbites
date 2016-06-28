@@ -617,6 +617,10 @@ public class ToolDisplayHandler implements IOFirstResponder, Events.LogsFound, E
 				LogReference reference = (LogReference) value;
 
 				if (!reference.temporary()) {
+
+//					rendered.setText(reference.loadPath().getFileName().toString());
+//					rendered.setText("" + reference.loadPath().getFileName().toString().length());
+
 					Path lp = reference.loadPath();
 					String last = lp.getFileName().toString();
 
