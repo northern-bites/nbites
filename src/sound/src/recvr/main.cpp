@@ -23,6 +23,7 @@ const char * LAST_MODIFIED = "6/24 15:22";
 const int WINDOW_SIZE = 16384;
 Config used_config{ 48000, WINDOW_SIZE };
 
+pthread_t capture_thread;
 Capture * capture;
 nowifi::RecvrBase * recvr;
 

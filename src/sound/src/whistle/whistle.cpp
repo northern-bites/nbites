@@ -20,7 +20,7 @@
 
 #include "Logging.hpp"
 
-const char * LAST_MODIFIED = "6/23 22:28";
+const char * LAST_MODIFIED = "6/28 09:05";
 const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
 using namespace nbl;
@@ -113,6 +113,8 @@ SampleRingBuffer ringBuffer(4, used_config.num_channels, used_config.window_size
 size_t iteration = 0;
 size_t listening = 0;
 
+#define INIT_TIME (3.0)
+
 void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
 
 #ifdef SAVE_HEARD_WHISTLES
@@ -133,15 +135,17 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
         bool ignore_for_start = false;
         double buffer_fraction = config.window_size / (double) config.sample_rate;
 
-        if ( (listening * buffer_fraction) < 1.5) {
+        if ( (listening * buffer_fraction) < INIT_TIME ) {
             ignore_for_start = true;
         }
 
-        bool heard = detect::detect(buffer);
+        bool heard = detect::detect( buffer,
+                (listening * buffer_fraction) > INIT_TIME);
 
         if (heard) {
             if (ignore_for_start) {
-                NBL_WARN("WHISTLE HEARD but ignoring for first 1.5 seconds");
+                NBL_WARN("WHISTLE HEARD but ignoring for first %f seconds",
+                         INIT_TIME);
             } else {
                 do_heard();
             }

@@ -205,6 +205,10 @@ public class LogReference {
 		return loadPath;
 	}
 
+	public Path tempPath() {
+		return tempPath;
+	}
+
 	public boolean manages(Log log) {
 		return log.jvm_unique_id == this.savedID;
 	}

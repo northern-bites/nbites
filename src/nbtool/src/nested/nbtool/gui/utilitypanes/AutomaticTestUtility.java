@@ -67,8 +67,8 @@ public abstract class AutomaticTestUtility <K, R> extends UtilityParent {
 						}
 
 						@Override
-						public void finishAnnotations(K key, Log log) {
-							wrapped.finishAnnotations(key, log);
+						public boolean finishAnnotations(K key, Log log) {
+							return wrapped.finishAnnotations(key, log);
 						}
 
 						@Override
