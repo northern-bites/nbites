@@ -118,10 +118,10 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 		if (!topCamera && goodSize && diam > 25) {
 			goodSize = false;
 		}
-		if (topCamera && cy + bottomQuarter + diam > height - 5 && diam < radius && diam * 2 > radius) {
+		/*if (topCamera && cy + bottomQuarter + diam > height - 5 && diam < radius && diam * 2 > radius) {
 			goodSize = true;
 			diam2 = diam;
-		}
+			}*/
 		if (!goodSize && debugBall) {
 			std::cout << "Bad size on blob " << radius << " " <<
 				diam << " " << diam2 << " " << cx << " " <<
@@ -778,7 +778,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
     
 	// normally check the gradient to get rid of crosses, but if ball is really large
 	// it could be blurry and low gradient
-	if ((diam < 15 || !topCamera) && !checkGradientInSpot(spot)) {
+	if (!checkGradientInSpot(spot)) {
         //std::cout<<"returning false " << diam << "\n";
 		return false;
 	}
@@ -812,7 +812,8 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 				" " << length4 << std::endl;
 		}
 		// anything way off is bad
-		if (length1 > 15 || length2 > 15 || length3 > 15 || length4 > 15) {
+		int bad = max(15, diam);
+		if (length1 > bad || length2 > bad || length3 > bad || length4 > bad) {
 			return false;
 		}
 		if (abs(length1 + length2 - length3 - length4) < 4) {
@@ -1047,7 +1048,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
     if (topCamera && midY < field->horizonAt(midX)) {
         return false;
     }
-    if (spot.innerDiam <= 8) {
+    if (spot.innerDiam <= 14) {
 		if (spot.green > 10) {
 			return false;
 		}
@@ -1087,7 +1088,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 		// check whiteness?
 		imagePoint p = imagePoint(midX, midY);
 		if (((!topCamera || spot.innerDiam < 25) && !checkGradientInSpot(spot)) ||
-			!greenAroundBallFromCentroid(p) || spot.green > 25) {
+			!greenAroundBallFromCentroid(p) || spot.green > 40) {
 			if (debugBall) {
 				std::cout << "Checking one spot " << spot.green << " " << std::endl;
 			}
