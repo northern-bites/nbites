@@ -1,142 +1,22 @@
 #include "Detect.hpp"
 #include "Transform.hpp"
+#include "utilities-pp.hpp"
 
 #include <iostream>
 #include <cmath>
 #include <signal.h>
+#include <cmath>
 
-#ifdef DETECT_LOG_RESULTS
-std::vector<nbl::Block> detect_results;
-#endif
+#if DETECT_METHOD == DETECT_WITH_SDEV_RATIO
 
 using namespace nbsound;
-
-#if DETECT_METHOD == DETECT_WITH_SDEV
 
 namespace detect {
 
     bool inited = false;
     Transform * transform = nullptr;
 
-    const int transform_input_length = 4096;
-    const int transform_output_length = transform_input_length / 2;
-
-    const std::pair<int, int> start_range = {70,160};
-    const float start_min_thresh = 50.0;
-    //const float start_min_thresh = 0.0;
-
-    const int mid_integral_radius = 15;
-    const int mid_vary_radius = 10;
-
-    const float sdev_min = 600.0;
-
-    const int on_windows_target = 4;
-    const int off_windows_fail = 2;
-
-    int on_count[2];
-    int off_count[2];
-    int middle[2];
-
-    void window_on(int ch) {
-        ++on_count[ch];
-        off_count[ch] = 0;
-    }
-
-    void window_off(int ch) {
-        ++off_count[ch];
-        if (off_count[ch] >= off_windows_fail) {
-            off_count[ch] = 0;
-            on_count[ch] = 0;
-            middle[ch] = 0;
-        }
-    }
-
-    std::pair<int, float> peak1() {
-        int ri = -1;
-        float rv = 0;
-        for (int i = 0; i < transform->get_freq_len(); ++i) {
-            double iv = std::abs(transform->get(i));
-            if (iv > rv) {
-                rv = iv;
-                ri = i;
-            }
-        }
-
-        return {ri, rv};
-    }
-
-    double sum(int start, int end) {
-        double total = 0;
-        int _s = std::max(start, 0);
-        int _e = std::min(transform->get_freq_len(), end);
-
-        for (int i = _s; i < _e; ++i) {
-            float val = transform->get(i);
-            total += val*val;
-        }
-
-        return total;
-    }
-
-    double mean() {
-        double fullsum = sum(0, transform->get_freq_len());
-        return fullsum / transform->get_freq_len() ;
-    }
-
-    double stddev(double mean) {
-        double sdev = 0;
-
-        for (int i = 0; i < transform->get_freq_len(); ++i) {
-            double val = transform->get(i) - mean;
-            sdev += (val*val);
-        }
-
-        return std::sqrt(sdev);
-    }
-
-    bool window_check(int i, int start, int end) {
-        std::pair<int, float> peak = peak1();
-        printf("c(%d) m(%d) on/off %d/%d w{%d -> %d} peak = {%d, %f}\n",
-               i, middle[i], on_count[i], off_count[i],
-               start, end, peak.first, peak.second);
-
-        if (peak.first >= start_range.first && peak.first <= start_range.second) {
-            printf("\tranged\n");
-            if (peak.second >= start_min_thresh) {
-                printf("\tmin_threshed\n");
-
-                double total = sum(peak.first - mid_integral_radius, peak.first + mid_integral_radius);
-                printf("\t\tsum %lf\n", total);
-
-                double theMean = mean();
-                double theDev = stddev(theMean);
-
-                printf("\t\tmean %lf stddev %lf (needs %lf)\n",
-                       theMean, theDev, sdev_min);
-
-                if (theDev < sdev_min) {
-                    return false;
-                }
-
-                if (middle[i] <= 0) {
-                    middle[i] = peak.first;
-                    printf("\t\tMIDDLE SET TO %d\n", peak.first);
-                    window_on(i);
-                    return true;
-                    
-                } else if ( std::abs(middle[i] - peak.first) < mid_vary_radius ) {
-                    window_on(i);
-                    return true;
-                    
-                } else {
-                    printf("\t\t%d is %d from %d\n",
-                           peak.first, std::abs(middle[i] - peak.first), middle[i]);
-                }
-            }
-        }
-        
-        return false;
-    }
+    Channel channels[2];
 
     bool init() {
         if (inited) return false;
@@ -148,7 +28,10 @@ namespace detect {
         NBL_INFO("\tsize %d.", detect_results.size())
 #endif
 
-        transform = new Transform(transform_input_length);
+        channels[0]._left_ = true;
+        channels[1]._left_ = false;
+
+        transform = new Transform(AMPLITUDE_LENGTH);
         reset();
 
         return (inited = true);
@@ -156,10 +39,10 @@ namespace detect {
 
     bool reset() {
         for (int i = 0; i < 2; ++i) {
-            on_count[i] = 0;
-            off_count[i] = 0;
-            middle[1] = 0;
+            channels[i].reset();
         }
+
+        Channel::_iteration_ = 0;
 
 #ifdef DETECT_LOG_RESULTS
         detect_results.clear();
@@ -167,7 +50,8 @@ namespace detect {
 
         return true;
     }
-     bool detect(nbsound::SampleBuffer& buffer) {
+
+    bool detect(nbsound::SampleBuffer& buffer, bool initialized) {
 
         init();
 
@@ -177,26 +61,21 @@ namespace detect {
 
         for (int i = 0; i < buffer.channels; ++i) {
             int window_start = 0;
-            int window_end = transform_input_length;
+            int window_end = AMPLITUDE_LENGTH;
 
             while(buffer.is_in_bounds(i, window_end - 1)) {
+
                 SampleBuffer window = buffer.window(window_start, window_end);
                 transform->transform(window, i);
 
+                bool heard = channels[i].analyze(transform->get_freq_buffer(), initialized);
 
-                if (!window_check(i, window_start, window_end)) {
-                    window_off(i);
-                }
-
-                bool heard = false;
-
-                if (on_count[i] >= on_windows_target) {
-                    NBL_WARN(" [ whistle detector HEARD ] ")
-                    heard = true;
+                if (heard) {
+                    NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
                 }
 
 #ifdef DETECT_LOG_RESULTS
-                nbl::Block block;
+                    nbl::Block block;
                 block.data = transform->get_all();
                 block.type = "WhistleDetection1";
 
@@ -206,22 +85,13 @@ namespace detect {
 
                 block.dict["WhistleWasHeard"] = json::Boolean(heard);
 
-                json::Array ja_off, ja_on, ja_mid;
-                for (int i = 0; i < 2; ++i) {
-                    ja_on.push_back(json::Number(off_count[i]));
-                    ja_off.push_back(json::Number(on_count[i]));
-                    ja_mid.push_back(json::Number(middle[i]));
-                }
-
-                block.dict["WhistleOff"] = ja_off;
-                block.dict["WhistleOn"] = ja_on;
-                block.dict["WhistleMiddle"] = ja_mid;
                 detect_results.push_back(block);
 #endif
 
                 if (heard) return true;
-                window_start += transform_input_length;
-                window_end += transform_input_length;
+
+                window_start += AMPLITUDE_LENGTH;
+                window_end += AMPLITUDE_LENGTH;
             }
         }
 
@@ -229,8 +99,130 @@ namespace detect {
     }
 
     bool cleanup() {
-        return true;
+        return false;
     }
+
+
+    const int PEAK_RADIUS = 15;
+    const int FRAMES_ON = 3;
+    const int FRAMES_OFF = 2;
+
+    const float SDEV_IMPULSE_START = 3.0;
+    const float SUM_IMPULSE_START = 5.0;
+
+    const float CONT_SDEV_RATIO_TO_PEAK = 0.6;
+    const float CONT_SUM_RATIO_TO_PEAK = 0.5;
+
+    const float MAX_SDRATIO = 0.3;
+
+    bool Channel::_analyze() {
+
+        print(0, "peak @ %d {%f}: sum %f sdev %f sdratio %f", current.center, current.value, this_attr.sum, this_attr.sdev, this_attr.sdratio);
+
+        if (!WHISTLE_RANGE.contains(current)) {
+            print(1, "not in range {%d, %d}",
+                  WHISTLE_RANGE.left, WHISTLE_RANGE.right);
+
+            return count(false, FRAMES_ON, FRAMES_OFF);
+        }
+
+        if ( this_attr.sdratio > MAX_SDRATIO ) {
+            print(1, "frame sdev ratio fails %f (%f)",
+                  this_attr.sdratio, MAX_SDRATIO);
+
+            return count(false, FRAMES_ON, FRAMES_OFF);
+        }
+
+        if (last_peak.valid() && Range::around(last_peak).contains(current)) {
+
+            print(1, "continuing peak at %d...",
+                  last_peak.center );
+            bool passing = true;
+            //do checks for continuing peak...
+
+//            float sdev_ratio_to_peak = this_attr.sdev / peak_attr.sdev;
+//            if (passing && (sdev_ratio_to_peak < CONT_SDEV_RATIO_TO_PEAK)) {
+//                print(1, "sdev ratio to peak fails: %f (%f)",
+//                      sdev_ratio_to_peak, CONT_SDEV_RATIO_TO_PEAK);
+//                passing = false;
+//            }
+
+            float sum_ratio_to_peak = this_attr.sum / peak_attr.sum;
+            if (passing && (sum_ratio_to_peak < CONT_SUM_RATIO_TO_PEAK)) {
+                print(1, "sum ratio to peak fails: %f (%f)",
+                      sum_ratio_to_peak, CONT_SUM_RATIO_TO_PEAK);
+                passing = false;
+            }
+
+            //Should we update the peak index? (sliding whistle)
+
+            if (passing) {
+                if (current.value > last_peak.value) {
+                    this_peak = current;
+                    peak_attr = this_attr;
+                } else {
+                    this_peak = last_peak;
+                }
+
+                return count(true, FRAMES_ON, FRAMES_OFF);
+            }
+        }
+
+        //Check for the start of a peak
+
+        bool passing = true;
+
+        print(1, "looking for new peak...");
+
+//        float sdev_impulse = this_attr.sdev / last_attr.sdev;
+//        if ( passing && (sdev_impulse < SDEV_IMPULSE_START) ) {
+//            print(1, "new peak sdev impulse %f fails (%f)",
+//                  sdev_impulse, SDEV_IMPULSE_START);
+//            passing = false;
+//        }
+
+        float sum_impulse = this_attr.sum / sum_over(last_spectrum, Range::around(this_peak));
+        if ( passing && (sum_impulse < SUM_IMPULSE_START) ) {
+
+            print(1, "new peak sum impulse %f fails (%f)", sum_impulse, SUM_IMPULSE_START);
+            passing = false;
+        }
+
+        if (passing) {
+            this_peak = current;
+            peak_attr = this_attr;
+            return count(true, FRAMES_ON, FRAMES_OFF);
+        } else {
+            return count(false, FRAMES_ON, FRAMES_OFF);
+        }
+    }
+    
 }
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
