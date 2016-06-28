@@ -1164,11 +1164,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         adjustWindow(startCol, endCol, endRow);
     }
 
-    if(debugBall) {
-        std::cout<<"Top Camera: "<<topCamera<<std::endl;
-        if(!topCamera) { debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW); }
-    }
-
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
     intPairVector blackSpots;
@@ -1193,6 +1188,11 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         ((endRow + 3 < height) ? endRow = endRow+3 : endRow = height);
         smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
         smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
+    }
+
+    if(debugBall) {
+        std::cout<<"Top Camera: "<<topCamera<<std::endl;
+        if(!topCamera) { debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW); }
     }
 
     if(!topCamera && (!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions())) {
@@ -1237,7 +1237,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 					bottomWhite.height(), bottomWhite.pitch());
 	} else {
 		bottomThird = 0;
-		blobber.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
+		blobber.run(white.pixelAddr(), white.width(), endRow, white.pitch());
 	}
 
     if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots,
@@ -1248,7 +1248,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 #else
         return true;
 #endif
-}
+    }
 
     SpotDetector whiteSpotDetector;
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
