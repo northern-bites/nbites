@@ -118,6 +118,10 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 		if (!topCamera && goodSize && diam > 25) {
 			goodSize = false;
 		}
+		if (topCamera && cy + bottomQuarter + diam > height - 5 && diam < radius && diam * 2 > radius) {
+			goodSize = true;
+			diam2 = diam;
+		}
 		if (!goodSize && debugBall) {
 			std::cout << "Bad size on blob " << radius << " " <<
 				diam << " " << diam2 << " " << cx << " " <<
