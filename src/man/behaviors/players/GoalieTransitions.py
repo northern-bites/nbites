@@ -301,9 +301,9 @@ def shouldTurn(player):
         and not GoalieStates.watchWithLineChecks.correctFacing:
             h_dest = 0.0
             player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
-            print ("t: ", t)
-            print ("r: ", r)
-            print "Should turn was TRUE"
+            # print ("t: ", t)
+            # print ("r: ", r)
+            # print "Should turn was TRUE"
             return True
 
         # Assumptions: not facing forward...

@@ -42,15 +42,20 @@ def gameReady(player):
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
         player.stand()
-        # if player.dropIn:
-        #     ## walk to homeposition
-        #     player.brain.tracker.repeatWidePan()
-        #     player.timeReadyBegan = player.brain.time
-        #     if player.lastDiffState == 'gameInitial':
-        #         print "Goalie should walk to goalbox"
-        #         player.brain.resetInitialLocalization()
+        if player.dropIn:
+            print("I am a dropIn goalie!")
+            print "Goalie should walk to goalbox"
+            player.brain.resetLocalizationFromPenalty(False) # HACK sets loc to cross w/goal on the left side
         else:
             player.brain.tracker.lookToAngle(0)
+
+    if player.dropIn:
+        ## walk to homeposition
+        print("Dropin player")
+        player.brain.tracker.repeatWideSnapPan()
+        player.timeReadyBegan = player.brain.time
+        if player.lastDiffState == 'gameInitial':
+            return player.goNow('walkToGoal')
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):

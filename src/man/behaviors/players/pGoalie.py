@@ -31,7 +31,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         ### THE STATE OF THE PLAYER ###
         self.role = 1
-        self.dropIn = False  # If we are assigned player number 1 for the drop in player, change this to true
+        self.dropIn = True  # If we are assigned player number 1 for the drop in player, change this to true
         # these need to be set for drop in player
         # roleConstants.setRoleConstants(self, self.role)
         self.squatTime = 0
