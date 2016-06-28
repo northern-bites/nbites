@@ -517,7 +517,7 @@ bool BallDetector::findCorrelatedBlackSpots
                         Spot ballSpot;
 
                         ballSpot.x = ballSpotX * 2;
-                        ballSpot.y = ballSpotY * 2;
+                        ballSpot.y = ballSpotY * -2;
 					    ballSpot.rawX = ix;
 					    ballSpot.rawY = iy;
 					    ballSpot.innerDiam = 5;
@@ -581,7 +581,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
                         ballSpot.x = ballSpotX * 2;
-                        ballSpot.y = ballSpotY * 2;
+                        ballSpot.y = ballSpotY * -2;
     					ballSpot.rawX = ix;
     					ballSpot.rawY = iy;
     					ballSpot.innerDiam = 5;
@@ -629,7 +629,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
                         ballSpot.x = ballSpotX * 2; // in half pixels
-                        ballSpot.y = ballSpotY * 2;
+                        ballSpot.y = ballSpotY * -2;
         				ballSpot.rawX = ix;
         				ballSpot.rawY = iy;
         				ballSpot.innerDiam = 5;
@@ -894,6 +894,28 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		std::cout << "Circle check passed" << std::endl;
 	}
 	return true;
+}
+
+bool BallDetector::checkBallHasNoGreen(int r) {
+    int greens = 0;
+    int green_tolerance = (r >> 1) >> 1;
+    std::cout<<"Center X: "<<_best.centerX<<", Y: "<<_best.centerY<<std::endl;
+    for(int i = _best.centerX - r/2; i < _best.centerX + r/2; i++) {
+        getColor(i, _best.centerY);
+        if(isGreen()) {
+            std::cout<<"Green\n";
+            greens++;
+            if(greens > green_tolerance) { return false; }
+        }
+    }
+    for(int i = _best.centerY - r/2; i < _best.centerY + r/2; i++){
+        getColor(i, _best.centerX);
+        if(isGreen()){
+            greens++;
+            if(greens > green_tolerance) { return false; }
+        }
+    }
+    return true;
 }
 
 /* We don't want white below the ball. The tricky thing is that it is ok
@@ -1335,7 +1357,7 @@ int BallDetector::getWhite() {
 }
 
 bool BallDetector::isWhite() {
-    if (*(whiteImage.pixelAddr(currentX, currentY)) > 88)// &&
+    if (*(whiteImage.pixelAddr(currentX, currentY)) > 140)// &&
         //*(yImage.pixelAddr(currentX, currentY)) < 350) {
     {
         return true;
