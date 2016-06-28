@@ -190,7 +190,7 @@ namespace man{
                     latest_data.set_state(STATE_READY);
                     break;
                 case STATE_READY:
-                    latest_data.set_state(STATE_SET);
+                    latest_data.set_state(STATE_FINISHED);
                     break;
                 case STATE_SET:
                     latest_data.set_state(STATE_PLAYING);
