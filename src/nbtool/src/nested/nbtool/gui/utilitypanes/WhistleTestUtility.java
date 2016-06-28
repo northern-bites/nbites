@@ -7,7 +7,11 @@ import nbtool.util.Debug;
 
 public class WhistleTestUtility extends AutomaticTestUtility<String, String> {
 
-	private static final String HEARD = "contains whistle", NHEARD = "no whistle", ERROR_FP = "false positive", ERROR_FN = "false negative";
+	private static final String HEARD = "contains whistle",
+			NHEARD = "no whistle",
+			ERROR_FP = "false positive",
+			ERROR_FN = "false negative",
+			ERROR_NOT_ANNOTATED = "not annotated";
 
 	private static boolean heard(LogReference ref) {
 		return heard(ref.get());
@@ -51,6 +55,8 @@ public class WhistleTestUtility extends AutomaticTestUtility<String, String> {
 						return NHEARD;
 					}
 
+				} else if (logr.get().logClass.equals("DetectAmplitude")) {
+					return ERROR_NOT_ANNOTATED;
 				} else {
 					return null;
 				}
@@ -62,10 +68,18 @@ public class WhistleTestUtility extends AutomaticTestUtility<String, String> {
 			}
 
 			@Override
-			public void finishAnnotations(String key, Log log) { }
+			public boolean finishAnnotations(String key, Log log) {
+//				return log.topLevelDictionary.containsKey("WhistleHeard");
+				return true;
+			}
 
 			@Override
 			public String getResult(LogReference from, String key, Log... out) {
+
+				if (!from.description.contains("WhistleHeard")) {
+					return ERROR_NOT_ANNOTATED;
+				}
+
 				assert(key == HEARD || key == NHEARD);
 
 				boolean found = heard(out[0]);

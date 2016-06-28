@@ -1,7 +1,13 @@
 #include "Detect.hpp"
 #include <cmath>
+#include <vector>
+
+#ifdef DETECT_LOG_RESULTS
+std::vector<nbl::Block> detect_results;
+#endif
 
 namespace detect {
+
     size_t Channel::_iteration_ = 0;
 
     const Channel::Range Channel::FULL_RANGE = {0, FREQUENCY_LENGTH};

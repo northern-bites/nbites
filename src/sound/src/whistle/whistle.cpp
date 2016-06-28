@@ -135,7 +135,7 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
         bool ignore_for_start = false;
         double buffer_fraction = config.window_size / (double) config.sample_rate;
 
-        if ( (listening * buffer_fraction) < INIT_TIME) {
+        if ( (listening * buffer_fraction) < INIT_TIME ) {
             ignore_for_start = true;
         }
 
