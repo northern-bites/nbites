@@ -287,29 +287,29 @@ public class FrontEndView extends VisionView {
             //g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
             g.drawImage(whiteImage, width + vB,  height + sH*6 + tB*3, null);
             g.drawImage(greenImage, width + vB,  height + sH*6 + tB*3, null);
-	    int max = 0;
-	    int maxY = 0;
-	    int maxU = 0;
-	    int maxV = 0;
-	    for (int col = 0; col < width; col++) {
-		for (int row = 0; row < height; row++) {
-		    int gr = (green8.data[row * width + col]) & 0xFF;
-		    int wh = (white8.data[row * width + col]) & 0xFF;
-		    int bl = (black8.data[row * width + col]) & 0xFF;
-		    if (gr < 100 && wh < 100 && bl < 100) {
-			g.setColor(Color.GRAY);
-		    } else if (gr > wh && gr > bl) {
-			g.setColor(Color.GREEN);
-		    } else if (wh > gr && wh > bl) {
-			g.setColor(Color.WHITE);
-		    } else {
-			g.setColor(Color.BLACK);
-		    }
-		    g.fillRect(col + width + vB, row + height + sH*6 + tB*3, 2, 2);
+			int max = 0;
+			int maxY = 0;
+			int maxU = 0;
+			int maxV = 0;
+			for (int col = 0; col < width; col++) {
+				for (int row = 0; row < height; row++) {
+					int gr = (green8.data[row * width + col]) & 0xFF;
+					int wh = (white8.data[row * width + col]) & 0xFF;
+					int bl = (black8.data[row * width + col]) & 0xFF;
+					if (gr < 100 && wh < 100 && bl < 100) {
+						g.setColor(Color.GRAY);
+					} else if (gr > wh && gr > bl) {
+						g.setColor(Color.GREEN);
+					} else if (wh > gr && wh > bl) {
+						g.setColor(Color.WHITE);
+					} else {
+						g.setColor(Color.BLACK);
+					}
+					g.fillRect(col + width + vB, row + height + sH*6 + tB*3, 2, 2);
+				}
+			}
 		}
-	    }
-	}
-	g.setColor(Color.BLACK);
+		g.setColor(Color.BLACK);
 
 
         // TODO fix slider glitch
