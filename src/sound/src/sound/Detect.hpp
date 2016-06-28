@@ -41,7 +41,7 @@ namespace detect {
 #ifdef DETECT_PRINT
             std::string in(indent, '\t');
             std::string prefix = nbl::utilities::format("%s[%C][%zd] (on%d/off%d)", in.c_str(),
-                                                        _left_ ? 'L' : 'R', _iteration_,
+                            _left_ ? 'L' : 'R', _iteration_,
                                                         frames_on, frames_off);
 
             va_list vaargs;
