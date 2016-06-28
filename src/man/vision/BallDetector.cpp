@@ -171,6 +171,9 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
 {
     int WHITE_JUMP = 40;
     int MIN_CENTER_Y = 110;
+	if (topCamera) {
+		MIN_CENTER_Y = 130;
+	}
 	// Some ideas: spots on the ball should have white in at least two directions
     int buff = 0;
     int leftX = currentSpot.xLo() + width / 2 - buff;
@@ -184,7 +187,7 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
     int midY = *(yImage.pixelAddr(currentSpot.ix() + width / 2,
                                   -currentSpot.iy() + height / 2)) / 4;
 	if (topCamera && topY < height / 3) {
-		return false;
+		//return false;
 	}
     // spots in robots are often actually bright, just surrounded by brighter
     if (midY > MIN_CENTER_Y) {
@@ -1044,12 +1047,8 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
     if (topCamera && midY < field->horizonAt(midX)) {
         return false;
     }
-    // when it is too small it is very dangerous
-	if (spot.innerDiam < 6) {
-		return false;
-	}
     if (spot.innerDiam <= 8) {
-		if (spot.green > 0) {
+		if (spot.green > 10) {
 			return false;
 		}
     }
@@ -1076,6 +1075,10 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
     // for now, if there are no black spots then it is too dangerous
 	int THRESHOLD = 110;
     if (spots < 1) {
+		// when it is too small it is very dangerous
+		if (spot.innerDiam < 6) {
+			return false;
+		}
 		if (!topCamera || !whiteNoBlack(spot)) {
 			return false;
 		}
@@ -1084,7 +1087,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 		// check whiteness?
 		imagePoint p = imagePoint(midX, midY);
 		if (((!topCamera || spot.innerDiam < 25) && !checkGradientInSpot(spot)) ||
-			!greenAroundBallFromCentroid(p)) {
+			!greenAroundBallFromCentroid(p) || spot.green > 25) {
 			if (debugBall) {
 				std::cout << "Checking one spot " << spot.green << " " << std::endl;
 			}
@@ -1335,7 +1338,7 @@ int BallDetector::getWhite() {
 }
 
 bool BallDetector::isWhite() {
-    if (*(whiteImage.pixelAddr(currentX, currentY)) > 88)// &&
+    if (*(whiteImage.pixelAddr(currentX, currentY)) > 160)// &&
         //*(yImage.pixelAddr(currentX, currentY)) < 350) {
     {
         return true;
