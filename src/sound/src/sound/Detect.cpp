@@ -111,7 +111,8 @@ namespace detect {
     const float CONT_SDEV_RATIO_TO_PEAK = 0.6;
     const float CONT_SUM_RATIO_TO_PEAK = 0.5;
 
-    const float MAX_SDRATIO = 0.3;
+    const float MAX_SDRATIO_ALWAYS = 0.4;
+    const float MAX_SDRATIO_PEAK = 0.3;
 
     bool Channel::_analyze() {
 
@@ -124,9 +125,9 @@ namespace detect {
             return count(false, FRAMES_ON, FRAMES_OFF);
         }
 
-        if ( this_attr.sdratio > MAX_SDRATIO ) {
+        if ( this_attr.sdratio > MAX_SDRATIO_ALWAYS ) {
             print(1, "frame sdev ratio fails %f (%f)",
-                  this_attr.sdratio, MAX_SDRATIO);
+                  this_attr.sdratio, MAX_SDRATIO_ALWAYS);
 
             return count(false, FRAMES_ON, FRAMES_OFF);
         }
@@ -181,8 +182,12 @@ namespace detect {
 
         float sum_impulse = this_attr.sum / sum_over(last_spectrum, Range::around(this_peak));
         if ( passing && (sum_impulse < SUM_IMPULSE_START) ) {
-
             print(1, "new peak sum impulse %f fails (%f)", sum_impulse, SUM_IMPULSE_START);
+            passing = false;
+        }
+
+        if (passing && (this_attr.sdratio > MAX_SDRATIO_PEAK)) {
+            print(1, "new peak sdratio %f fails (%f)", this_attr.sdratio, MAX_SDRATIO_PEAK);
             passing = false;
         }
 
