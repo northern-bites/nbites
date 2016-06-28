@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import nbtool.data.log.Block;
+import nbtool.util.Debug;
 
 public class FloatBuffer extends Buffer<Float> {
 
@@ -37,6 +38,7 @@ public class FloatBuffer extends Buffer<Float> {
 
 	@Override
 	public void parse(Block fromBlock) {
+		Debug.info("found %d expected %d\n", fromBlock.data.length, 4 * channels * frames);
 		assert(fromBlock.data.length == 4 * channels * frames);
 		ByteBuffer buf = ByteBuffer.wrap(fromBlock.data);
 		buf.order(ByteOrder.LITTLE_ENDIAN);

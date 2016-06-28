@@ -109,7 +109,7 @@ def gamePlaying(player):
         player.penalized = False
         return player.goLater('afterPenalty')
 
-    if player.lastDiffState == 'afterPenalty':
+    if player.lastDiffState == 'determineRole':
         return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
@@ -145,6 +145,7 @@ def gamePenalized(player):
         player.stopWalking()
         player.penalizeHeads()
         player.penalized = True
+        player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
 
     # TODO is this actually possible?
     if player.lastDiffState == '':
@@ -198,8 +199,6 @@ def watchWithLineChecks(player):
         player.goodRightCornerObservation = False
         player.goodLeftCornerObservation = False
         watchWithLineChecks.counter = 0
-        # print ("My num turns:", watchWithLineChecks.numTurns)
-        # print ("My num fix:", watchWithLineChecks.numFixes)
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
         watchWithLineChecks.hasPanned = False

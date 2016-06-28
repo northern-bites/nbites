@@ -17,7 +17,6 @@ bool inited = false;
 Transform * transform = nullptr;
 
 const int transform_input_length = 4096;
-const int transform_output_length = SPECTRUM_LENGTH( transform_input_length );
 
 typedef std::pair<int,int> Range;
 typedef std::pair<int,float> Peak;
@@ -25,20 +24,24 @@ typedef std::pair<int,float> Peak;
 NBL_OSTREAM_OVERLOAD(Range, range, "r{" << range.first << "," << range.second << "}")
 NBL_OSTREAM_OVERLOAD(Peak, peak, "p{" << peak.first << "," << peak.second << "}")
 
-const int frequency_output_length = 2049;
+const int frequency_output_length = SPECTRUM_LENGTH( transform_input_length );
 const Range full_range = {0, frequency_output_length};
 const Range whistle_peak_range = {70,160};
 
 const int min_frames_on = 4;
 const int max_frames_off = 2;
 
-const int peak_radius = 15;
+const int peak_radius = 20;
 
 const float min_sdev_start_ratio = 3.0;
 const float min_integral_start_ratio = 6.0;
+//const float min_integral_start_ratio = 10.0;
+
+//const double min_efrac_start_ratio = 0.3;
+const double min_efrac_start_ratio = 0.2;
 
 const float min_sdev_cont_ratio = .6;
-const float min_integral_cont_ratio = 0.8;
+const float min_integral_cont_ratio = 0.5;
 
 Range range_around(int i, int r) { return {i - r, i + r}; }
 
@@ -85,6 +88,60 @@ double sdev(float * spectrum) {
     return std::sqrt(_sdev);
 }
 
+double efraction_at_peak(float * spectrum, Peak& peak, int radius = peak_radius) {
+    double sum_outside = 0;
+    double sum_inside = 0;
+
+    int p_start = std::max(peak.first - radius, 0);
+    int p_end = std::min(peak.first + radius, frequency_output_length);
+
+    for (int i = 0; i < p_start; ++i) {
+        sum_outside += spectrum[i];
+    }
+
+    for (int i = p_start; i < p_end; ++i) {
+        sum_inside += spectrum[i];
+    }
+
+    for (int i = p_end; i < frequency_output_length; ++i) {
+        sum_outside += spectrum[i];
+    }
+
+    return sum_inside / (sum_outside + sum_inside);
+}
+
+double sdev_fraction_at_peak(float * spectrum, Peak& peak, float cur_sdev, int radius = peak_radius) {
+    double sum_outside = 0;
+    int used = 0;
+    Range pr = range_around(peak.first, radius);
+
+    for (int i = 0; i < pr.first; ++i) {
+        sum_outside += spectrum[i];
+        ++used;
+    }
+
+    for (int i = pr.second; i < frequency_output_length; ++i) {
+        sum_outside += spectrum[i];
+        ++used;
+    }
+
+    double mean = sum_outside / used;
+
+    double sum_sdev = 0;
+
+    for (int i = 0; i < pr.first; ++i) {
+        double val = spectrum[i] - mean;
+        sum_sdev += (val*val);
+    }
+
+    for (int i = pr.second; i < frequency_output_length; ++i) {
+        double val = spectrum[i] - mean;
+        sum_sdev += (val*val);
+    }
+
+    return std::sqrt(sum_sdev) / cur_sdev;
+}
+
 class NullOut {
 public:
     template<typename T>
@@ -124,6 +181,7 @@ struct Channel {
         last_peak = pk; last_peak_sdev = sd;
         last_peak_integral = sum(spectrum, range_around(pk.first, peak_radius));
     }
+
     Peak last_peak = {-1,0.0};
     float last_peak_sdev;
     float last_peak_integral;
@@ -187,6 +245,17 @@ struct Channel {
         
         if (in_range(this_peak.first, whistle_peak_range)) {
             //----------detection----------------
+//
+//            double efrac = efraction_at_peak(spectrum, this_peak);
+//            START(1) << "efrac " << efrac END
+
+//            double sdratio = sdev_fraction_at_peak(spectrum, this_peak, this_sdev);
+//            START(1) << "sdratio " << sdratio END
+//
+//            if (sdratio < .2) {
+//                on = true;
+//                goto failed;
+//            }
 
             if (!hearing()) {
                 START(1) << "looking for new peak..." END;
@@ -210,6 +279,13 @@ struct Channel {
                     START(1) << "sum_ratio " << sum_ratio << " FAILS" END;
                     goto failed;
                 }
+
+//                if ( efrac > min_efrac_start_ratio ) {
+//                    START(1) << "efrac " << efrac << " above thresh" END;
+//                } else {
+//                    START(1) << "efrac " << efrac << " FAILS" END;
+//                    goto failed;
+//                }
 
                 START(2) << "found new peak:" << this_peak.first END;
                 set_last_peak(this_peak, this_sdev, spectrum);
@@ -272,7 +348,7 @@ struct Channel {
 //            START(1) << "peak sum " << peak_sum_thn << " -> " << peak_sum_now << " ratio " << peak_sum_now / peak_sum_thn END
 
         } else {
-            START(0) << "outside peak range" END;
+            START(1) << "outside peak range" END;
             on = false;
         }
 
@@ -339,7 +415,7 @@ bool detect(nbsound::SampleBuffer& buffer) {
             if (heard)
                 NBL_WARN(" [ WHISTLE DETECTOR HEARD ] ")
 
-    #ifdef DETECT_LOG_RESULTS
+#ifdef DETECT_LOG_RESULTS
             nbl::Block block;
             block.data = transform->get_all();
             block.type = "WhistleDetection1";
@@ -351,7 +427,7 @@ bool detect(nbsound::SampleBuffer& buffer) {
             block.dict["WhistleWasHeard"] = json::Boolean(heard);
 
             detect_results.push_back(block);
-    #endif
+#endif
             
             if (heard) return true;
             window_start += transform_input_length;
