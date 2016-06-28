@@ -305,7 +305,9 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 		// TODO handle kick
 	}
 	request->body.speed = 0.0f;
-	adjustIMU(sensorInertials);
+	if (!standby) {
+		adjustIMU(sensorInertials);
+	}
 
 
 	// Testing kick
