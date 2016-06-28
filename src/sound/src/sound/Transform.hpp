@@ -32,6 +32,16 @@ namespace nbsound {
 
         ~Transform();
 
+        double frequency_at(int bin, int sampling_rate) {
+            double dbin = bin, dsr = sampling_rate;
+            return (dbin / get_freq_len()) * dsr;
+        }
+
+        double bin_for_frequency(double frequency, int sampling_rate) {
+            double dsr = sampling_rate;
+            return (frequency / dsr) * get_freq_len();
+        }
+
     private:
         int frequency_length;
         float * outputmag;

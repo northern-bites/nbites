@@ -26,9 +26,17 @@ NBL_ADD_TEST_TO(transform, fsk) {
 
     transform->transform(buffer, 0);
 
-    for (int i = 0; i < transform->get_freq_len(); ++i) {
-        printf("%d %f\n", i, transform->get(i));
-    }
+//    for (int i = 0; i < transform->get_freq_len(); ++i) {
+//        printf("%d %f\n", i, transform->get(i));
+//    }
+
+    printf("bins %lf %lf\n",
+           transform->bin_for_frequency(8192, 48000),
+           transform->bin_for_frequency(19000, 48000) );
+
+    printf("freqs %lf %lf\n",
+           transform->frequency_at(350, 48000),
+           transform->frequency_at(811, 48000) );
 
     return true;
 }
