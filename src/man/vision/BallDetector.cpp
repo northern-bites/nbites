@@ -1247,7 +1247,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 #else
         return true;
 #endif
-}
+    }
 
     SpotDetector whiteSpotDetector;
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
