@@ -1017,8 +1017,9 @@ bool BallDetector::whiteNoBlack(Spot spot) {
 	if (total * THRESHOLD > bigGreen) {
 		return false;
 	}
-	// check the diagonals
-	if (!checkDiagonalCircle(spot)) {
+	// check the diagonals - nicely sized spots on the bottom are
+	// generally not false positives
+	if ((!topCamera || bottomY < height - 5) && !checkDiagonalCircle(spot)) {
 		return false;
 	}
 	return true;
