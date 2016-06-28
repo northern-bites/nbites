@@ -897,10 +897,14 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 }
 
 bool BallDetector::checkBallHasNoGreen(int r) {
+    std::cout<<"Radius: "<<r<<std::endl;
     int greens = 0;
     int green_tolerance = (r >> 1) >> 1;
-    std::cout<<"Center X: "<<_best.centerX<<", Y: "<<_best.centerY<<std::endl;
-    for(int i = _best.centerX - r/2; i < _best.centerX + r/2; i++) {
+    r -= 2;
+    std::cout<<"Tolerance: "<<green_tolerance<<std::endl;
+    std::cout<<"Ball Center X: "<<_best.centerX<<", Y: "<<_best.centerY<<std::endl;
+    for(int i = _best.centerX - (r * 0.75); i < _best.centerX + (r * 0.75); i++) {
+        debugDraw.drawDot(i, _best.centerY, ORANGE);
         getColor(i, _best.centerY);
         if(isGreen()) {
             std::cout<<"Green\n";
@@ -908,9 +912,11 @@ bool BallDetector::checkBallHasNoGreen(int r) {
             if(greens > green_tolerance) { return false; }
         }
     }
-    for(int i = _best.centerY - r/2; i < _best.centerY + r/2; i++){
-        getColor(i, _best.centerX);
+    for(int i = _best.centerY - (r * 0.75); i < _best.centerY + (r * 0.75); i++){
+        debugDraw.drawDot(_best.centerX, i, ORANGE);
+        getColor(_best.centerX, i);
         if(isGreen()){
+            std::cout<<"Green 2\n";
             greens++;
             if(greens > green_tolerance) { return false; }
         }
