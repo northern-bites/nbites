@@ -8,6 +8,8 @@
 #include "SoundPaths.h"
 #include "Profiler.h"
 
+#include "TextToSpeech.h"
+
 //#define DEBUG_GUARDIAN_FALLING
 
 namespace man{
@@ -29,6 +31,8 @@ static const int FALLING_RESET_FRAMES_THRESH = 10;
 static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.5f; // 72 degrees
 
 const int GuardianModule::NO_CLICKS = -1;
+
+float GuardianModule::PICKUP_NOT_SET = -9999.0;
 
 GuardianModule::GuardianModule()
     : portals::Module(),
@@ -56,6 +60,12 @@ GuardianModule::GuardianModule()
       lastKickOffSwitch(0),
       audioQueue()
 {
+    for (int i = 0; i < PICKUP_FRAMES; ++i) {
+        pickupFrames[i] = PICKUP_NOT_SET;
+    }
+
+    pickupCalibrated = false;
+    pickupIndex = 0;
 }
 
 GuardianModule::~GuardianModule()
@@ -78,6 +88,13 @@ void GuardianModule::run_()
     checkFalling();
     checkFallen();
     checkFeetOnGround();
+
+    /*
+     doPickupDetection() takes input from checkFeetOnGround() and 
+     outputs in processFallingProtection()
+     */
+    doPickupDetection();
+
     checkBatteryLevels();
     checkTemperatures();
     processFallingProtection();
@@ -242,6 +259,67 @@ void GuardianModule::checkFallen()
 #endif
 }
 
+void GuardianModule::doPickupDetection() {
+    static const float MAX_DIFF_FOR_CALIB = 2.0;
+    static const float PICKUP_INTEGRAL_THRESH = -400.0f;
+    static const float PUTDOWN_INTEGRAL_THRESH = 1000.0f;
+
+    static time_t lastReport = 0;
+
+    static float zCalibIntegral = 0;
+
+    pickupFrames[pickupIndex] = inertialInput.message().acc_z();
+    pickupIndex = (pickupIndex + 1) % PICKUP_FRAMES;
+    latestPickupStatus = NONE;
+
+    float max = PICKUP_NOT_SET;
+    float min = std::numeric_limits<float>::max();
+    float sum = 0;
+
+    for (int i = 0; i < PICKUP_FRAMES; ++i) {
+        float z = pickupFrames[i];
+        sum += z;
+
+        max = max > z ? max : z;
+        min = min < z ? min : z;
+    }
+
+    if (!pickupCalibrated) {
+
+        if (min == PICKUP_NOT_SET) {
+//            printf("not calibrated because not enough frames\n");
+            return;
+        }
+
+        if ( (max - min) < MAX_DIFF_FOR_CALIB ) {
+            printf("\t PICK UP HAS BEEN CALIBRATED\n");
+            pickupCalibrated = true;
+            pickupZCalibration = (sum / PICKUP_FRAMES);
+            zCalibIntegral = (PICKUP_FRAMES * pickupZCalibration);
+        } else {
+//            printf("not calibrated because diff %f\n", (max - min));
+        }
+    } else {
+        float integral = sum - (zCalibIntegral);
+
+        if (integral < PICKUP_INTEGRAL_THRESH && !feetOnGround) {
+            printf("\t%f counts as pickup.\n", integral);
+
+            if (difftime(time(NULL), lastReport) > 10) {
+                lastReport = time(NULL);
+                man::tts::say(IN_SCRIMMAGE, "weeeeeeeeee");
+            }
+
+            latestPickupStatus = PICKED_UP;
+        }
+
+        if (integral > PUTDOWN_INTEGRAL_THRESH ) {
+//            printf("\t%f counts as put down.\n", integral);
+            latestPickupStatus = PUT_DOWN;
+        }
+    }
+}
+
 /**
  * Method to check whether or not one of the robot's feet is on the
  * ground. This is used to stop the motion engine (primarily) when we
@@ -312,6 +390,7 @@ void GuardianModule::checkFeetOnGround()
 
     if (groundOffCounter > GROUND_FRAMES_THRESH)
     {
+//        printf("\t feet off ground\n");
         feetOnGround = false;
         groundOnCounter = groundOffCounter = 0;
 
@@ -321,6 +400,7 @@ void GuardianModule::checkFeetOnGround()
     }
     else if (groundOnCounter > GROUND_FRAMES_THRESH)
     {
+//        printf("\t feet on ground\n");
         feetOnGround = true;
         groundOnCounter = groundOffCounter = 0;
 
@@ -499,6 +579,9 @@ void GuardianModule::processFallingProtection()
     {
         status.get()->set_fallen(false);
     }
+
+    /* updated by the time this method is called, takes from instance var */
+    status.get()->set_pickup(latestPickupStatus);
 
     fallStatusOutput.setMessage(status);
 

@@ -1,3 +1,4 @@
+
 from .. import SweetMoves
 from objects import Location, RobotLocation
 import math
@@ -73,11 +74,11 @@ good to thoroughly test each kick you want to put back in.
                                                     <3
 """
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", 
-                                 x = 18.5, y = 5,
+                                 x = 8.5, y = 3,
                                  dist = 270,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
-                                 x = 18.5, y = -5,
+                                 x = 8.5, y = -3,
                                  dist = 270,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
@@ -152,6 +153,7 @@ def chooseAlignedKickFromKick(player, kick):
     ballRelY = player.brain.ball.stat_rel_y
     if (kick == LEFT_SHORT_STRAIGHT_KICK or
           kick == RIGHT_SHORT_STRAIGHT_KICK):
+        print("I think my ballRelY: ", ballRelY)
         if ballRelY > 0:
             return LEFT_SHORT_STRAIGHT_KICK
         else:

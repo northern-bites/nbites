@@ -1,22 +1,22 @@
 {
-  "wash" :
+  "wasp" :
     {
       "camera_TOP" :
         {
           "d_roll" :
-            -0.013589,
+            0.028408,
           "d_tilt" :
-            -0.052398
+            -0.209464
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.013021,
+            0.022422,
           "d_tilt" :
-            -0.042207
+            -0.143848
         }
     },
-  "vera" :
+  "inara" :
     {
       "camera_TOP" :
         {
@@ -38,16 +38,67 @@
       "camera_TOP" :
         {
           "d_roll" :
-            0.004137,
+            0.027693,
           "d_tilt" :
-            -0.058447
+            -0.179514
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.055696,
+            0.020433,
           "d_tilt" :
-            0.022088
+            -0.092984
+        }
+    },
+  "vera" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            0,
+          "d_tilt" :
+            0
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0,
+          "d_tilt" :
+            0
+        }
+    },
+  "buzz" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            -0.013984,
+          "d_tilt" :
+            -0.166296
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            -0.004215,
+          "d_tilt" :
+            -0.110232
+        }
+    },
+  "wash" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            -0.013589,
+          "d_tilt" :
+            -0.052398
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            -0.013021,
+          "d_tilt" :
+            -0.042207
         }
     },
   "none" :
@@ -72,135 +123,16 @@
       "camera_TOP" :
         {
           "d_roll" :
-            -0.028668,
+            -0.032507,
           "d_tilt" :
-            -0.035212
+            -0.15329
         },
       "camera_BOT" :
         {
           "d_roll" :
-            -0.019414,
+            -0.008063,
           "d_tilt" :
-            0.002756
-        }
-    },
-  "kaylee" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            0.003291,
-          "d_tilt" :
-            0.340564
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            -0.016782,
-          "d_tilt" :
-            0.001572
-        }
-    },
-  "wasp" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.0671,
-          "d_tilt" :
-            -0.012289
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            0.002811,
-          "d_tilt" :
-            -0.014835
-        }
-    },
-  "inara" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            0,
-          "d_tilt" :
-            0
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            0,
-          "d_tilt" :
-            0
-        }
-    },
-  "zoe" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.04876,
-          "d_tilt" :
-            -0.029965
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            -0.000237,
-          "d_tilt" :
-            -0.025905
-        }
-    },
-  "simon" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.019676,
-          "d_tilt" :
-            -0.039569
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            0.016359,
-          "d_tilt" :
-            -0.068056
-        }
-    },
-  "elektra" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.019501,
-          "d_tilt" :
-            -0.039135
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            0.018001,
-          "d_tilt" :
-            0.016866
-        }
-    },
-  "shehulk" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.088202,
-          "d_tilt" :
-            -0.003025
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            -0.051534,
-          "d_tilt" :
-            0.018336
+            -0.143226
         }
     },
   "mal" :
@@ -220,6 +152,57 @@
             -0.024966
         }
     },
+  "simon" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            -0.019676,
+          "d_tilt" :
+            -0.039569
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0.016359,
+          "d_tilt" :
+            -0.068056
+        }
+    },
+  "shehulk" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            0.012212,
+          "d_tilt" :
+            -0.204698
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0.042942,
+          "d_tilt" :
+            -0.132761
+        }
+    },
+  "elektra" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            0.025743,
+          "d_tilt" :
+            -0.169588
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0.016764,
+          "d_tilt" :
+            -0.085234
+        }
+    },
   "jayne" :
     {
       "camera_TOP" :
@@ -237,6 +220,40 @@
             0
         }
     },
+  "kaylee" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            0.003291,
+          "d_tilt" :
+            0.340564
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            -0.016782,
+          "d_tilt" :
+            0.001572
+        }
+    },
+  "zoe" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            -0.026107,
+          "d_tilt" :
+            -0.14981
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0.002952,
+          "d_tilt" :
+            -0.119275
+        }
+    },
   "river" :
     {
       "camera_TOP" :
@@ -252,23 +269,6 @@
             0,
           "d_tilt" :
             0
-        }
-    },
-  "buzz" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            -0.019392,
-          "d_tilt" :
-            -0.052269
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            0.016876,
-          "d_tilt" :
-            0.089381
         }
     }
 }

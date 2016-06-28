@@ -1,9 +1,13 @@
-#pragma once
+ #pragma once
 
 #include "RoboGrams.h"
 #include "Toggle.pb.h"
 #include "GameState.pb.h"
 #include "GCResponse.pb.h"
+
+#include "Control.hpp"
+
+#include "whistle.hpp"
 
 namespace man{
 namespace gamestate{
@@ -57,6 +61,12 @@ private:
 
     bool keep_time;
     long long start_time;
+
+    whistle::SharedMemory sharedMemory;
+
+    typedef int game_state_t;
+
+    void whistleHandler(game_state_t lastState, game_state_t& nextState);
 };
 
 }

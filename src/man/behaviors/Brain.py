@@ -109,6 +109,10 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
+        self.pickedUpInSet = False
+
+        self.penaltyCount = 0
+
         # CHINA HACK(s)
         self.penalizedHack = False
         self.penalizedEdgeClose = 0
@@ -121,6 +125,11 @@ class Brain(object):
         self.ballMemRatio = 0.0
         for i in range(self.BALL_MEM_SIZE):
             self.ballMem.append(0)
+
+        # New defender positioning
+        self.defendingStateTime = 0 #Number of frames.
+        self.staggeredPositioning = False
+        self.defenderPositioning = 0
 
     def initTeamMembers(self):
         self.teamMembers = []

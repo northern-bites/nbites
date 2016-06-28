@@ -29,8 +29,10 @@ def walkToGoal(player):
     if player.firstFrame():
         player.brain.tracker.repeatWideSnapPan()
         player.returningFromPenalty = False
-        player.brain.nav.goTo(RobotLocation(FIELD_WHITE_LEFT_SIDELINE_X,
-                                       CENTER_FIELD_Y, 0.0))
+        dest = constants.HOME_POSITION
+        player.brain.nav.goTo(dest, speed = speeds.SPEED_SEVEN,
+                                    precision = nav.GENERAL_AREA,
+                                    fast = True)
 
     return Transition.getNextState(player, walkToGoal)
 
@@ -62,6 +64,7 @@ def checkSafePlacement(player):
     elif checkSafePlacement.turnCount >= 2:
         player.brain.tracker.lookToAngle(0)
     if player.brain.tracker.isStopped():
+        print("setting is looking to false")
         checkSafePlacement.looking = False
 
     # if player.counter > 50:
@@ -89,6 +92,7 @@ def clearBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
+        # Moved kick transition to transitions
     if player.brain.ball.distance < constants.POSITION_FOR_KICK_DIST:
         # print "Now positioning for kick"
         return player.goNow('positionForGoalieKick')
@@ -97,7 +101,7 @@ def clearBall(player):
         player.brain.nav.chaseBall(speeds.SPEED_FIVE, fast = True)
     else:
         # print "approaching ball"
-        player.brain.nav.chaseBall(speeds.SPEED_EIGHT, fast = True)
+        player.brain.nav.chaseBall(speeds.SPEED_SEVEN, fast = True)
 
     # if player.counter % 2 == 0:
     #     nball = player.brain.naiveBall
