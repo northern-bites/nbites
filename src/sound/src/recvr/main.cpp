@@ -13,12 +13,11 @@
 #include "../nowifi/NoWifi.hpp"
 #include "Input.hpp"
 #include "../sound/Capture.hpp"
-#include "../nowifi/NoWifi.hpp"
 
 using namespace nbsound;
 using namespace nbl;
 
-const char * LAST_MODIFIED = "6/24 15:22";
+const char * LAST_MODIFIED = "6/28 15:46";
 
 const int WINDOW_SIZE = 16384;
 Config used_config{ 48000, WINDOW_SIZE };
@@ -40,7 +39,7 @@ void cleanup() {
 }
 
 void handler(int signal) {
-    NBL_WARN("whistle got signal (%d): %s\n", signal, strsignal(signal));
+    NBL_WARN("recvr got signal (%d): %s\n", signal, strsignal(signal));
 
     psignal(signal, "the signal");
     cleanup();
@@ -49,6 +48,7 @@ void handler(int signal) {
 
 size_t iteration = 0;
 void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
+    ++iteration;
     printf("iteration %zd\n", iteration);
     recvr->parse(buffer, config);
 }
@@ -59,7 +59,7 @@ void recvr_callback(time_t start, time_t end, std::string data) {
 
 int main(int argc, char ** argv) {
     printf("\t[ northern-bites data recvr ]\n");
-    printf("\t[LM: %s]\m", LAST_MODIFIED);
+    printf("\t[LM: %s]\n", LAST_MODIFIED);
 
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
