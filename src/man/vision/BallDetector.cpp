@@ -590,11 +590,13 @@ bool BallDetector::findCorrelatedBlackSpots
     					ballSpot.innerDiam = 5;
 
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
+                        if(checkBallHasNoGreen(r)) {
 #ifdef OFFLINE
-                        foundBall = true;
+                            foundBall = true;
 #else
-                        return true;
+                            return true;
 #endif
+                        }
                     }
                 }
             } else if(correlatedSpots.size() == 3) {
@@ -638,11 +640,13 @@ bool BallDetector::findCorrelatedBlackSpots
         				ballSpot.innerDiam = 5;
 
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
+                        if(checkBallHasNoGreen(r)) {
 #ifdef OFFLINE
-                        foundBall = true;
+                            foundBall = true;
 #else
-                        return true;
+                            return true;
 #endif
+                        }
                     }
                 }
             }
@@ -901,30 +905,20 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 }
 
 bool BallDetector::checkBallHasNoGreen(int r) {
-    std::cout<<"Radius: "<<r<<std::endl;
     int greens = 0;
-    int green_tolerance = (r >> 1) >> 1;
+    int green_tolerance = r * 0.5;
     r -= 2;
-    std::cout<<"Tolerance: "<<green_tolerance<<std::endl;
-    std::cout<<"Ball Center X: "<<_best.centerX<<", Y: "<<_best.centerY<<std::endl;
-    for(int i = _best.centerX - (r * 0.75); i < _best.centerX + (r * 0.75); i++) {
-        debugDraw.drawDot(i, _best.centerY, ORANGE);
-        getColor(i, _best.centerY);
-        if(isGreen()) {
-            std::cout<<"Green\n";
-            greens++;
-            if(greens > green_tolerance) { return false; }
+    for(int i = _best.centerX - (r * 0.75); i < _best.centerX + (r * 0.75); i+=2) {
+        for(int j = _best.centerY - (r * 0.75); j < _best.centerY + (r * 0.75); j+=2) {
+            if(debugBall) { debugDraw.drawDot(i, j, ORANGE); }
+            getColor(i, j);
+            if(isGreen()) {
+                greens++;
+                if(greens > green_tolerance) { return false; }
+            }
         }
     }
-    for(int i = _best.centerY - (r * 0.75); i < _best.centerY + (r * 0.75); i++){
-        debugDraw.drawDot(_best.centerX, i, ORANGE);
-        getColor(_best.centerX, i);
-        if(isGreen()){
-            std::cout<<"Green 2\n";
-            greens++;
-            if(greens > green_tolerance) { return false; }
-        }
-    }
+    if(debugBall) { debugDraw.drawPoint(_best.centerX, _best.centerY, GREEN); }
     return true;
 }
 
@@ -1002,7 +996,10 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
         }
         return true;
     } else {
-        if(debugBall) { std::cout<<"[BALL INFO] Green Test Failed\n"; }
+        if(debugBall) { 
+            std::cout<<"[BALL INFO] Green Test Failed. Top. Avg: " << topGreenAvg <<
+                        ", Bot. Avg: "<<botGreenAvg<<std::endl; 
+        }
         return false;
     }
 }
