@@ -214,6 +214,9 @@ namespace man{
             switch (latest_data.state())
             {
                 case STATE_INITIAL:
+                    /* for button presses, not sure if this will have negative effect on time in playing */
+                    bp_state = FIRST_INITIAL;
+
                     latest_data.set_state(STATE_PLAYING);
                     manual_penalize();
 
