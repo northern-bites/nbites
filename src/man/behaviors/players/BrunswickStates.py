@@ -54,8 +54,6 @@ def gameReady(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.repeatWideSnapPan()
-        player.brain.whistleCounter = 0
-        player.brain.whistled = False
 
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
@@ -95,6 +93,9 @@ def gameSet(player):
         player.gainsOn()
         player.stand()
         player.brain.nav.stand()
+
+        player.brain.whistleCounter = 0
+        player.brain.whistled = False
 
         player.brain.gameSetX = player.brain.loc.x
         player.brain.gameSetY = player.brain.loc.y
