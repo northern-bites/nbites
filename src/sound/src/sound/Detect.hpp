@@ -29,6 +29,7 @@ namespace detect {
     bool cleanup();
 
     extern const int PEAK_RADIUS;
+    extern const int SUM_PEAK_RADIUS;
 
     static const int AMPLITUDE_LENGTH = 4096;
     static const int FREQUENCY_LENGTH = SPECTRUM_LENGTH(AMPLITUDE_LENGTH);
@@ -156,9 +157,9 @@ namespace detect {
                 current.update(i, this_spectrum[i]);
             }
 
-            this_attr.sum = sum_over(Range::around(current));
+            this_attr.sum = sum_over(Range::around(current, SUM_PEAK_RADIUS));
             this_attr.sdev = sdev_over();
-            this_attr.sdratio = sdev_except( FULL_RANGE, Range::around(current)) / this_attr.sdev;
+            this_attr.sdratio = sdev_except( FULL_RANGE, Range::around(current, SUM_PEAK_RADIUS)) / this_attr.sdev;
         }
 
         void loop_end() {

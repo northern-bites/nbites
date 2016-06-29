@@ -101,8 +101,9 @@ namespace detect {
     }
 
 
-    const int PEAK_RADIUS = 15;
-    const int FRAMES_ON = 3;
+    const int PEAK_RADIUS = 30;
+    const int SUM_PEAK_RADIUS = 15;
+    const int FRAMES_ON = 2;
     const int FRAMES_OFF = 2;
 
     const float SDEV_IMPULSE_START = 3.0;
