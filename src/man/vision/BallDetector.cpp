@@ -482,9 +482,6 @@ bool BallDetector::findCorrelatedBlackSpots
                 if (correlations[i] > 2) {
                     // grab this blob from our vector
                     foundThree = true;
-#ifdef OFFLINE
-                    //std::cout << "Found correlated, punting for now" << std::endl;
-#endif
                     std::vector<Spot> correlatedSpots;
                     // find our correlated blobs and merge them in
                     for (int k = 0; k < blackSpots.size(); k++) {
@@ -783,7 +780,6 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	// normally check the gradient to get rid of crosses, but if ball is really large
 	// it could be blurry and low gradient
 	if (!checkGradientInSpot(spot)) {
-        //std::cout<<"returning false " << diam << "\n";
 		return false;
 	}
 	int length1, length2, length3, length4;
