@@ -1265,7 +1265,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
 	// run blobber on parts of the image where spot detector won't work
-	int bottomThird = max(field->horizonAt(width / 2), height * 3 / 4); //height * 1 /2;
+	int bottomThird = max(field->horizonAt(width / 2), height * 2 / 3); //height * 1 /2;
 	if (topCamera) {
 		ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
 								height - bottomThird);
