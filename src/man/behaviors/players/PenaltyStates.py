@@ -39,6 +39,7 @@ def afterPenalty(player):
 
         if player.brain.penaltyCount < 300:
             print "We were in penalty for less than 10 seconds, it probably doesn't count"
+            print("My penalty count: ", player.brain.penaltyCount)
             player.brain.penaltyCount = 0
             return player.goNow("gamePlaying")
 
@@ -299,6 +300,10 @@ def manualPlacement(player):
 @superState('gameControllerResponder')
 def walkOut(player):
     player.brain.nav.walk(0.2, 0, 0)
+
+    if player.brain.playerNumber == 1:
+        # Goalie
+        return player.goNow(player.gameState)
 
     if player.stateTime > 5:
         return player.goNow('determineRole')

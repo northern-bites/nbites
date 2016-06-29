@@ -136,7 +136,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             
             Transition.CountTransition(GoalieTransitions.shouldClearNotMovingBall,
                                        Transition.MOST_OF_THE_TIME,
-                                       Transition.HIGH_PRECISION)
+                                       Transition.EXTREME_PRECISION)
             : VisualGoalieStates.clearBall,
 
 
@@ -147,10 +147,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.OK_PRECISION + 5)
             : VisualGoalieStates.clearBall,
 
-            Transition.CountTransition(GoalieTransitions.adjustPosition,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : GoalieStates.shiftPosition,
+            # Transition.CountTransition(GoalieTransitions.adjustPosition,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : GoalieStates.shiftPosition,
 
 
             }
@@ -184,10 +184,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.OK_PRECISION)
             : GoalieStates.returnUsingLoc,
 
-            # Transition.CountTransition(GoalieTransitions.shouldGoalieKick,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.LOW_PRECISION)
-            # : GoalieStates.positionForGoalieKick,
+            Transition.CountTransition(GoalieTransitions.saveWhileMoving,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.saveCenter,
 
             }
 
@@ -436,7 +436,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.checkSafePlacement,
 
             Transition.CountTransition(GoalieTransitions.ballWithinLocClearingDist,
-                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.clearBall
 

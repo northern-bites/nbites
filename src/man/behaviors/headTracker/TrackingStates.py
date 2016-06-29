@@ -321,7 +321,7 @@ def goalieSnapPan(tracker):
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
 
-        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN_WIDE)
+        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
         # tracker.helper.startingPan(HeadMoves.GOALIE_WIDE_SNAP_PAN)
         # tracker.lookToAngleWithTime(-75, 0.75)
         # tracker.lookToAngleWithTime(-75,1)
@@ -329,7 +329,7 @@ def goalieSnapPan(tracker):
 
     if not tracker.brain.motion.head_is_active or tracker.isStopped():
         # tracker.helper.executeHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
-        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
         if tracker.target.on:

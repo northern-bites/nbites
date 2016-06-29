@@ -97,7 +97,7 @@ def gamePlaying(player):
         player.penalized = False
         return player.goLater('afterPenalty')
 
-    if player.lastDiffState == 'determineRole':
+    if player.lastDiffState == 'walkOut':
         return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
@@ -133,12 +133,16 @@ def gamePenalized(player):
         player.stopWalking()
         player.penalizeHeads()
         player.penalized = True
+        player.brain.penaltyCount = 0
+
         player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
 
     # TODO is this actually possible?
     if player.lastDiffState == '':
         # Just started up! Need to calibrate sensors
         player.brain.nav.stand()
+
+    player.brain.penaltyCount += 1
 
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):
@@ -242,6 +246,9 @@ watchWithLineChecks.numTurns = 0
 @superState('gameControllerResponder')
 def lineCheckReposition(player):
     if player.firstFrame():
+        player.brain.nav.walkInPlace()
+
+    elif player.counter == 10:
         player.brain.tracker.trackBall()
         dest = average(player.homeDirections)
         dest = constants.HOME_POSITION
@@ -274,7 +281,8 @@ goToGoalbox.dest = RelRobotLocation(0,0,0)
 def returnUsingLoc(player):
     if player.firstFrame():
         player.brain.nav.walkInPlace()
-        returnUsingLoc.panning = False
+        player.brain.tracker.trackBall(False, True)
+        # returnUsingLoc.panning = False
         
 
     elif player.counter == 10:
@@ -284,13 +292,13 @@ def returnUsingLoc(player):
         print("I'm trying to return using loc!")
         player.brain.tracker.trackBall()
 
-    if (player.counter % 90 == 0):
-        print("Switching headtracker")
-        if not returnUsingLoc.panning:
-            # @SNAPPAN-CHANGE
-            player.brain.tracker.repeatGoalieWideSnapPan()
-        else:
-            player.brain.tracker.trackBall
+    # if (player.counter % 90 == 0):
+    #     print("Switching headtracker")
+    #     if not returnUsingLoc.panning:
+    #         # @SNAPPAN-CHANGE
+    #         player.brain.tracker.repeatGoalieWideSnapPan()
+    #     else:
+    #         player.brain.tracker.trackBall
 
     if player.counter > 600:
         print "This is taking a suspiciously long time"
@@ -352,8 +360,8 @@ def watch(player):
         # player.brain.tracker.lookToAngle(0)
 
 
-    if player.brain.ball.vis.on:
-        print("Ball dist: ", player.brain.ball.distance)
+    # if player.brain.ball.vis.on:
+    #     print("Ball dist: ", player.brain.ball.distance)
 
 #TestingChange
     if player.counter % 2 == 0 and savedebug:

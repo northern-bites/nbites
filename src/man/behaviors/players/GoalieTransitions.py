@@ -840,8 +840,11 @@ def saveWhileMoving(player):
     #     nball.yintercept != 0.0 and
     #     ball.distance < constants.SAVE_DIST and
     #     sightOk)
+    save = False
 
     # save = shouldSquat(player) and ball.distance 
+    if ball.mov_vel_x < -9:
+        save = True
 
     if save and savedebug:
         print ("Should adjust save!!")
@@ -984,7 +987,7 @@ def shouldClearBall(player):
         player.aggressive = False
 
     # ball must be visible
-    if player.brain.ball.vis.frames_off > 20:
+    if player.brain.ball.vis.frames_off > 15:
         return False
 
     shouldGo = False
@@ -1027,7 +1030,8 @@ def shouldClearBall(player):
 def shouldClearNotMovingBall(player):
     shouldGo = False
     # Ball is not moving and is at the edge of the goalie's box
-    if (player.brain.ball.distance < constants.CLEARIT_DIST_FAR
+    if (player.brain.ball.vis.frames_on > 3
+        and player.brain.ball.distance < constants.CLEARIT_DIST_FAR
         and player.inPosition is not constants.FAR_RIGHT_POSITION
         and player.inPosition is not constants.FAR_LEFT_POSITION
         and math.fabs(player.brain.ball.rel_x - shouldClearNotMovingBall.lastBallRelX) < 3.0):
@@ -1036,6 +1040,8 @@ def shouldClearNotMovingBall(player):
     shouldClearNotMovingBall.lastBallRelX = player.brain.ball.rel_x
 
     if shouldGo:
+        walkedTooFar.xThresh = constants.CLEARIT_DIST_FAR + 10.0
+        walkedTooFar.yThresh = constants.CLEARIT_DIST_FAR + 10.0
         if player.brain.ball.bearing_deg < 0.0:
             VisualGoalieStates.clearBall.ballSide = constants.RIGHT
         else:
