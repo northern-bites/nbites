@@ -927,29 +927,40 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 }
 
 bool BallDetector::checkBallHasNoGreen(int r) {
-    int greens = 0;
+    int greens = 0, whites = 0;
+    double counter = 0;
     int green_tolerance = r * 0.5;
+    bool green_thresh_reached = false;
     r -= 3;
     for(int i = _best.centerX - (r * 0.75); i < _best.centerX + (r * 0.75); i+=2) {
         for(int j = _best.centerY - (r * 0.75); j < _best.centerY + (r * 0.75); j+=2) {
             if(debugBall) { debugDraw.drawDot(i, j, ORANGE); }
+            counter++;
             getColor(i, j);
             if(isGreen()) {
                 greens++;
                 if(greens > green_tolerance) { 
-                    if(debugBall) {
-                        std::cout<<"Greens: "<<greens<<std::endl;
-                        std::cout<<"Tolerance: "<<green_tolerance<<std::endl;
-                    }
-                    return false; 
+                    green_thresh_reached = true;
                 }
+            }
+            if(isWhite()) {
+                whites++;
             }
         }
     }
+
     if(debugBall) {
         std::cout<<"Greens: "<<greens<<std::endl;
         std::cout<<"Tolerance: "<<green_tolerance<<std::endl;
+        std::cout<<"Whites: "<<whites<<std::endl;
+        std::cout<<"Counter: "<<counter<<std::endl;
     }
+
+    if(green_thresh_reached) { return false; }
+
+    double white_percentage = whites / counter;
+    if(white_percentage < 0.40) { return false; }
+
     if(debugBall) { debugDraw.drawPoint(_best.centerX, _best.centerY, GREEN); }
     return true;
 }
