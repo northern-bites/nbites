@@ -112,6 +112,11 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 		int radius = projectedBallRadius(p);
 		int fudge = radius / 4;
 		bool goodSize = radius <= diam + fudge && diam < 2 * radius + fudge;
+		if (topCamera && diam2 >= 10 && diam < 2 * radius + fudge) {
+			goodSize = true;
+		}
+		// The black spots sometimes depress the size of the first principle axis
+		// so on big blobs that are relatively circular let them have another chance
 		if (!topCamera && !goodSize) {
 			goodSize = diam > 8 && diam < 2 * radius + fudge && diam < 30;
 		}
