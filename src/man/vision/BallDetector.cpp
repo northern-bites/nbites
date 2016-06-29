@@ -777,49 +777,63 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
     int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
     int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
 	// scan each diagonal
-	int x = rightX;
-	int y = topY;
-	getColor(x, y);
 	int THRESHOLD = 110;
-    
+
 	// normally check the gradient to get rid of crosses, but if ball is really large
 	// it could be blurry and low gradient
 	if (!checkGradientInSpot(spot)) {
 		return false;
 	}
 	int length1, length2, length3, length4;
+	// anything way off is bad
+	int bad = max(15, diam);
+	int x = rightX;
+	int y = topY;
+	getColor(x, y);
 	for (int i = 0; i < 2; i++) {
 		// top right corner
-		for ( ; x < width && y >= 0 && getGreen() < THRESHOLD; x++, y--) {
+		for (x = rightX, y = topY ; x < min(width,rightX+bad+1) && y >= max(0,topY - bad-1) &&
+				  getGreen() < THRESHOLD; x++, y--) {
 			getColor(x, y);
 		}
+		//debugDraw.drawPoint(x, y, RED);
 		length1 = x - rightX;
+		if (length1 >= bad) {
+			return false;
+		}
 		// top left corner
 		getColor(leftX, topY);
-		for (x = leftX, y = topY; x >= 0 && y >= 0 && getGreen() < THRESHOLD; x--, y--) {
+		for (x = leftX, y = topY; x >= max(0,leftX-bad-1) && y >= max(0,topY-bad-1)
+				 && getGreen() < THRESHOLD; x--, y--) {
 			getColor(x, y);
 		}
 		length2 = leftX - x;
+		if (length2 >= bad) {
+			return false;
+		}
 		// bottom right corner
 		getColor(rightX, bottomY);
-		for (x = rightX, y = bottomY; x < width && y < height && getGreen() < THRESHOLD; x++, y++) {
+		for (x = rightX, y = bottomY; x < min(width,rightX+bad+1) && y < min(height,bottomY+bad+1)
+				 && getGreen() < THRESHOLD; x++, y++) {
 			getColor(x, y);
 		}
 		length3 = x - rightX;
+		if (length3 >= bad) {
+			return false;
+		}
 		// bottom left
 		getColor(leftX, bottomY);
-		for (x = leftX, y = bottomY; x >= 0 && y < height && getGreen() < THRESHOLD; x--, y++) {
+		for (x = leftX, y = bottomY; x >= max(0,leftX - bad-1) && y < min(height, topY-bad-1)
+				 && getGreen() < THRESHOLD; x--, y++) {
 			getColor(x, y);
 		}
 		length4 = leftX - x;
+		if (length4 >= bad) {
+			return false;
+		}
 		if (debugBall) {
 			std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 				" " << length4 << std::endl;
-		}
-		// anything way off is bad
-		int bad = max(15, diam);
-		if (length1 > bad || length2 > bad || length3 > bad || length4 > bad) {
-			return false;
 		}
 		if (abs(length1 + length2 - length3 - length4) < 4) {
 			break;
