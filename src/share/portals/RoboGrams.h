@@ -12,7 +12,10 @@
 #include <pthread.h>
 #include <assert.h>
 #include <vector>
+#include <map>
 #include <string>
+
+#include <typeinfo>
 
 #include "DebugConfig.h"
 
@@ -184,6 +187,15 @@ MessagePool<T>::~MessagePool()
 template<class T>
 T* MessagePool<T>::alloc()
 {
+//  static time_t last_report = 0;
+//
+//  if ( difftime(time(NULL), last_report) > 20.0 ) {
+//      last_report = time(NULL);
+//
+//      printf("POOL PRINTOUT {%s} %d\n",
+//             typeid(T).name(), highWatermark() );
+//  }
+
   T* p = &pool_[MessagePoolBase::alloc()];
   if (initialize_)
     p->initialize();
