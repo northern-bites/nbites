@@ -45,6 +45,18 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 	int channel_index = 0;
 	int max_index = 0;
 
+	private void setAndSave(boolean heard) {
+		displayedLog.topLevelDictionary.put("WhistleHeard", heard);
+		if (!displayedLog.temporary()) {
+			try {
+				displayedLog.saveChangesToLoadFile();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				ToolMessage.displayError("could not write log!!");
+			}
+		}
+	}
+
 	@Override
 	public void setupDisplay() {
 		Debug.info("view!");
@@ -122,8 +134,10 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 		if (displayedLog.logClass.equals("DetectAmplitude")) {
 			CrossInstance ci = CrossServer.instanceByIndex(0);
-			if (ci == null) return;
-			ci.tryAddCall(this, "whistle_detect", this.displayedLog);
+			if (ci != null) {
+				ci.tryAddCall(this, "whistle_detect", this.displayedLog);
+			}
+
 			this.add(scroll, BorderLayout.CENTER);
 			scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -137,19 +151,14 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 			if (displayedLog.topLevelDictionary.get("WhistleHeard") != null)
 				containsBox.setSelected(displayedLog.topLevelDictionary.get("WhistleHeard").asBoolean().bool());
+			else {
+				setAndSave(false);
+			}
 
 			containsBox.addChangeListener(new ChangeListener() {
 				@Override
 				public void stateChanged(ChangeEvent e) {
-					displayedLog.topLevelDictionary.put("WhistleHeard", containsBox.isSelected());
-					if (!displayedLog.temporary()) {
-						try {
-							displayedLog.saveChangesToLoadFile();
-						} catch (Exception e1) {
-							e1.printStackTrace();
-							ToolMessage.displayError("could not write log!!");
-						}
-					}
+					setAndSave(containsBox.isSelected());
 				}
 			});
 
