@@ -60,9 +60,9 @@ def waitForNum(player):
         currNum = float(currNumString)
 
         print "using currNum", currNum
-            
-            if (player.lastNum != currNum):
-                return player.goNow('pleaseTurn')
+
+        if (player.lastNum != currNum):
+            return player.goNow('pleaseTurn')
 
     return player.stay()
 
