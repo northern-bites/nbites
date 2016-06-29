@@ -10,7 +10,7 @@ import math
 import VisualGoalieStates
 import GoalieStates
 from objects import RelRobotLocation
-savedebug = False
+savedebug = True
 
 def safelyPlaced(player):
     getLines(player)
@@ -727,7 +727,7 @@ def shouldDiveRight(player):
     if player.inPosition == constants.FAR_RIGHT_POSITION:
         return False
 
-    if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on < 20:
+    if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on < 2:
         sightOk = False
 
     if not ball.vis.on:
@@ -780,7 +780,7 @@ def shouldDiveLeft(player):
     ball = player.brain.ball
     nball = player.brain.naiveBall
 
-    if shouldDiveLeft.lastFramesOff > 20 and ball.vis.frames_on < 20:
+    if shouldDiveLeft.lastFramesOff > 20 and ball.vis.frames_on < 2:
         sightOk = False
 
     if not ball.vis.on:
@@ -863,7 +863,7 @@ def shouldSquat(player):
     ball = player.brain.ball
     nball = player.brain.naiveBall
 
-    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 2:
         sightOk = False
 
     if not ball.vis.on:
@@ -1019,7 +1019,7 @@ def shouldClearBall(player):
         else:
             VisualGoalieStates.clearBall.ballSide = constants.LEFT
 
-        # print ("Ball dist:", player.brain.ball.distance)
+        print ("Ball dist:", player.brain.ball.distance)
 
     return shouldGo
 

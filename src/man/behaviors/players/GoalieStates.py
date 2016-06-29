@@ -342,7 +342,7 @@ def watch(player):
     if player.firstFrame():
         player.brain.fallController.enabled = True
         player.brain.tracker.trackBall(False, True)
-        # player.brain.tracker.repeatWideSnapPan()
+        # player.brain.tracker.repeatWidePan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
         if (player.lastState is not 'shiftPosition'
@@ -351,6 +351,9 @@ def watch(player):
         print ("I'm moving to watch! I think I'm in the right position")
         # player.brain.tracker.lookToAngle(0)
 
+
+    if player.brain.ball.vis.on:
+        print("Ball dist: ", player.brain.ball.distance)
 
 #TestingChange
     if player.counter % 2 == 0 and savedebug:
