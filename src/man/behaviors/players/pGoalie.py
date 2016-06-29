@@ -133,16 +133,24 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveRight,
 
-            # TODO RECOMMENT !!!!!!!! SO IMPORTANT SO IMPORTATN
-            # Transition.CountTransition(GoalieTransitions.shouldClearBall,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION + 5)
-            # : VisualGoalieStates.clearBall,
+            
+            Transition.CountTransition(GoalieTransitions.shouldClearNotMovingBall,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.HIGH_PRECISION)
+            : GoalieStates.clearBall,
 
-            # Transition.CountTransition(GoalieTransitions.adjustPosition,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : GoalieStates.shiftPosition,
+
+
+            # TODO RECOMMENT !!!!!!!! SO IMPORTANT SO IMPORTATN
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION + 5)
+            : VisualGoalieStates.clearBall,
+
+            Transition.CountTransition(GoalieTransitions.adjustPosition,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.shiftPosition,
 
 
             }

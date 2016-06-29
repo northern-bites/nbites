@@ -1023,6 +1023,31 @@ def shouldClearBall(player):
 
     return shouldGo
 
+
+def shouldClearNotMovingBall(player):
+    shouldGo = False
+    # Ball is not moving and is at the edge of the goalie's box
+    if (player.brain.ball.distance < constants.CLEARIT_DIST_FAR
+        and player.inPosition is not constants.FAR_RIGHT_POSITION
+        and player.inPosition is not constants.FAR_LEFT_POSITION
+        and math.fabs(player.brain.ball.relX - shouldClearNotMovingBall.lastBallRelX) < 3.0):
+        shouldGo = True
+
+    shouldClearNotMovingBall.lastBallRelX = player.brain.ball.relX
+
+    if shouldGo:
+        if player.brain.ball.bearing_deg < 0.0:
+            VisualGoalieStates.clearBall.ballSide = constants.RIGHT
+        else:
+            VisualGoalieStates.clearBall.ballSide = constants.LEFT
+
+        print ("    SHOULD CLEAR NOT MOVING BALL Ball dist:", player.brain.ball.distance)
+
+    return shouldGo
+
+
+shouldClearNotMovingBall.lastBallRelX = 0.0
+
 def shouldGoalieKick(player):
     if player.brain.ball.distance < constants.POSITION_FOR_KICK_DIST:
         # print "Now positioning for kick"
