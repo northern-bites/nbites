@@ -56,8 +56,11 @@ def pleaseTurn(player):
 @superState('gameControllerResponder')
 def waitForNum(player):
     currNumString = os.environ.get('NowifiAngle')
+    print currNumString
+    print type(currNumString)
+
     if (currNumString != 'None'):
-        currNum = float(currNumString)
+        #currNum = float(currNumString)
 
         print "using currNum", currNum
 
