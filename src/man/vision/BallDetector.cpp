@@ -1264,29 +1264,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         }
     }
 
-	// run blobber on parts of the image where spot detector won't work
-	int bottomThird = max(field->horizonAt(width / 2), height *3 / 10);
-	debugDraw.drawLine(0, bottomThird, width - 1, bottomThird, BLUE);
-	if (topCamera) {
-		ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
-								height - bottomThird);
-		blobber.run(bottomWhite.pixelAddr(), bottomWhite.width(),
-					bottomWhite.height(), bottomWhite.pitch());
-	} else {
-		bottomThird = 0;
-		blobber.run(white.pixelAddr(), white.width(), endRow, white.pitch());
-	}
-
-    if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots,
-					actualWhiteSpots,
-                 cameraHeight, bottomThird)) {
-#ifdef OFFLINE
-        foundBall = true;
-#else
-        return true;
-#endif
-    }
-
     SpotDetector whiteSpotDetector;
     initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
 							  topCamera, filterThresholdBrite, greenThresholdBrite,
@@ -1319,6 +1296,29 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
             return true;
 #endif
         }
+    }
+
+	// run blobber on parts of the image where spot detector won't work
+	int bottomThird = max(field->horizonAt(width / 2), height *3 / 10);
+	//debugDraw.drawLine(0, bottomThird, width - 1, bottomThird, BLUE);
+	if (topCamera) {
+		ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
+								height - bottomThird);
+		blobber.run(bottomWhite.pixelAddr(), bottomWhite.width(),
+					bottomWhite.height(), bottomWhite.pitch());
+	} else {
+		bottomThird = 0;
+		blobber.run(white.pixelAddr(), white.width(), endRow, white.pitch());
+	}
+
+    if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots,
+					actualWhiteSpots,
+                 cameraHeight, bottomThird)) {
+#ifdef OFFLINE
+        foundBall = true;
+#else
+        return true;
+#endif
     }
 
     if(blackSpots.size() != 0) {
