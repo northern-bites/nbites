@@ -1030,10 +1030,10 @@ def shouldClearNotMovingBall(player):
     if (player.brain.ball.distance < constants.CLEARIT_DIST_FAR
         and player.inPosition is not constants.FAR_RIGHT_POSITION
         and player.inPosition is not constants.FAR_LEFT_POSITION
-        and math.fabs(player.brain.ball.relX - shouldClearNotMovingBall.lastBallRelX) < 3.0):
+        and math.fabs(player.brain.ball.rel_x - shouldClearNotMovingBall.lastBallRelX) < 3.0):
         shouldGo = True
 
-    shouldClearNotMovingBall.lastBallRelX = player.brain.ball.relX
+    shouldClearNotMovingBall.lastBallRelX = player.brain.ball.rel_x
 
     if shouldGo:
         if player.brain.ball.bearing_deg < 0.0:
