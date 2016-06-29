@@ -112,7 +112,7 @@ namespace detect {
     const float CONT_SUM_RATIO_TO_PEAK = 0.5;
 
     const float MAX_SDRATIO_ALWAYS = 0.4;
-    const float MAX_SDRATIO_PEAK = 0.3;
+    const float MAX_SDRATIO_PEAK = 0.4;
 
     bool Channel::_analyze() {
 
