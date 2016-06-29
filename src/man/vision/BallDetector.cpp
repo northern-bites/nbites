@@ -851,7 +851,14 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 		return false;
 	}
 	int minl = min(min(length1, length2), min(length3, length4));
-	if (minl < 3) {
+	int tooSmall = 3;
+	if (diam > 10) {
+		tooSmall = 2;
+	}
+	if (minl < tooSmall) {
+		if (debugBall) {
+			std::cout << "Min length is too small" << std::endl;
+		}
 		return false;
 	}
 	if (bottomY < height - 8 && topY > 5) {
@@ -1262,7 +1269,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
 	// run blobber on parts of the image where spot detector won't work
-	int bottomThird = max(field->horizonAt(width / 2), height * 3 / 4); //height * 1 /2;
+	int bottomThird = max(field->horizonAt(width / 2), height *3 / 10);
+	debugDraw.drawLine(0, bottomThird, width - 1, bottomThird, BLUE);
 	if (topCamera) {
 		ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
 								height - bottomThird);
