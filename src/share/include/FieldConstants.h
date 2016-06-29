@@ -5,20 +5,81 @@
 #include "DebugConfig.h"
 
 
+/* 
+ * ABOUT THIS FILE:
+ * Everything is measured in cm and all measurements are from the middle
+ * of one line to the middle of another.
+ */
 
 // Nao field constants
+//HACK HACK HACKITY HACK HACK GERMANY HACK
+static const float FIELD_WHITE_WIDTH = 900.0f;
+static const float FIELD_WHITE_HEIGHT = 595.0f;
+static const float GREEN_PAD_X = 70.0f;
+static const float GREEN_PAD_Y = 70.0f;
 
+static const float CENTER_CIRCLE_RADIUS = 72.5f; // Not scaled
+
+static const float GOALBOX_DEPTH = 55.0f;
+static const float GOALBOX_WIDTH = 215.0f;
+
+
+//END OF GERMANY HACK HACK HACKITY HACK HACK
+
+//these are the same as normal
+// Crosses on the Field to the goal
 #ifdef USE_LAB_FIELD
-static const float FIELD_WHITE_WIDTH = 500.f;
-static const float FIELD_WHITE_HEIGHT = 330.f;
-static const float GREEN_PAD_X = 20.f;
-static const float GREEN_PAD_Y = 15.f;
+static const float LINE_CROSS_OFFSET = 130.0f;
 #else
-static const float FIELD_WHITE_WIDTH = 900.f;
-static const float FIELD_WHITE_HEIGHT = 600.f;
-static const float GREEN_PAD_X = 69.5f;
-static const float GREEN_PAD_Y = 69.5f;
+static const float LINE_CROSS_OFFSET = 130.0f;
 #endif // USE_LAB_FIELD
+
+static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross in cm
+
+
+
+
+
+
+
+// #ifdef USE_LAB_FIELD
+// static const float FIELD_WHITE_WIDTH = 500.f;
+// static const float FIELD_WHITE_HEIGHT = 330.f;
+// static const float GREEN_PAD_X = 20.f;
+// static const float GREEN_PAD_Y = 15.f;
+// #else
+// static const float FIELD_WHITE_WIDTH = 900.f;
+// static const float FIELD_WHITE_HEIGHT = 600.f;
+// static const float GREEN_PAD_X = 69.5f;
+// static const float GREEN_PAD_Y = 69.5f;
+// #endif // USE_LAB_FIELD
+
+
+
+// static const float CENTER_CIRCLE_RADIUS = 75.0f; // Not scaled
+
+// #ifdef USE_LAB_FIELD
+// static const float GOALBOX_DEPTH = 60.f;
+// static const float GOALBOX_WIDTH = 200.f;
+// #else
+// static const float GOALBOX_DEPTH = 60.f;
+// static const float GOALBOX_WIDTH = 220.f;
+// #endif // USE_LAB_FIELD
+
+
+// // Crosses on the Field
+// #ifdef USE_LAB_FIELD
+// static const float LINE_CROSS_OFFSET = 130.0f;
+// #else
+// static const float LINE_CROSS_OFFSET = 130.0f;
+// #endif // USE_LAB_FIELD
+
+// static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross in cm
+
+
+
+
+
 
 static const float LINE_WIDTH = 5.0f;
 
@@ -73,17 +134,6 @@ static const float LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y =
 static const float LANDMARK_YELLOW_GOAL_TOP_POST_Y =
     CENTER_FIELD_Y + CROSSBAR_CM_WIDTH / 2.0f;
 
-static const float CENTER_CIRCLE_RADIUS = 75.0f; // Not scaled
-
-#ifdef USE_LAB_FIELD
-static const float GOALBOX_DEPTH = 60.f;
-static const float GOALBOX_WIDTH = 200.f;
-#else
-static const float GOALBOX_DEPTH = 60.f;
-static const float GOALBOX_WIDTH = 220.f;
-#endif // USE_LAB_FIELD
-
-
 // These are used by the vision system
 // The distance the goalie box extends out past each goal post
 static const float GOALBOX_OVERAGE = (GOALBOX_WIDTH -
@@ -111,12 +161,7 @@ static const float YELLOW_GOALBOX_LEFT_X =
     FIELD_WHITE_RIGHT_SIDELINE_X - GOALBOX_DEPTH;
 static const float YELLOW_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
 
-// Crosses on the Field
-#ifdef USE_LAB_FIELD
-static const float LINE_CROSS_OFFSET = 130.0f;
-#else
-static const float LINE_CROSS_OFFSET = 130.0f;
-#endif // USE_LAB_FIELD
+
 
 static const float LANDMARK_BLUE_GOAL_CROSS_X = FIELD_WHITE_LEFT_SIDELINE_X +
     LINE_CROSS_OFFSET;
@@ -133,7 +178,6 @@ static const float TOP_CC_X = CENTER_FIELD_X;
 static const float BOTTOM_CC_Y = CENTER_FIELD_Y - CENTER_CIRCLE_RADIUS;
 static const float BOTTOM_CC_X = CENTER_FIELD_X;
 
-static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross in cm
 
 // Useful constants for initial localization
 static const float BLUE_CC_NEAREST_POINT_X = CENTER_FIELD_X -

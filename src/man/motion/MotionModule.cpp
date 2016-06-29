@@ -93,7 +93,7 @@ void MotionModule::run_()
     // (2) If motion is enabled, perform a single iteration
     //     of the main motion loop.
     if (frameCount % 800 == 0) {
-        std::cout << "RESETTING ODOMETRY oh god! \n";
+        // std::cout << "RESETTING ODOMETRY oh god! \n";
         resetOdometry();
     }
 
@@ -255,7 +255,7 @@ void MotionModule::processBodyJoints()
                 inertialsInput_.message(), fsrInput_.message());
 
             // std::cout << "Resetting calibration inertials\n";
-            walkProvider.resetIMU();
+            // walkProvider.resetIMU();
 
         }
         else
@@ -489,7 +489,6 @@ void MotionModule::preProcessBody()
 
         if (!curProvider->isActive())
         {
-            std::cout << "[MOTION MODULE] Swapping body providers \n";
             swapBodyProvider();
         }
     }

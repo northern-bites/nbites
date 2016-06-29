@@ -5,6 +5,8 @@
 #include "GameState.pb.h"
 #include "GCResponse.pb.h"
 
+#include "Control.hpp"
+
 #include "whistle.hpp"
 
 namespace man{
@@ -43,6 +45,9 @@ private:
     void reset();
     void switchTeam();
     void switchKickOff();
+
+    void flag_setPenalized(bool p);
+    void flag_setPlaying();
 
     messages::GameState latest_data;
     unsigned int team_number;

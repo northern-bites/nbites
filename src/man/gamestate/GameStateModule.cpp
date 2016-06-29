@@ -69,6 +69,13 @@ namespace man{
             latchInputs();
             update();
 
+#ifdef USE_LOGGING
+            if (control::check(control::flags::state_playing_override)) {
+                flag_setPlaying();
+                flag_setPenalized(control::check(control::flags::state_penalty_override));
+            }
+#endif
+
             latest_data.set_penalty_is_placement(true);
 
             portals::Message<messages::GameState> output(&latest_data);
@@ -171,7 +178,7 @@ namespace man{
             }
 
             next = (game_state_t) latest_data.state();
-//            whistleHandler(last, next);
+            whistleHandler(last, next);
             latest_data.set_state( (int) next);
         }
 
@@ -268,6 +275,38 @@ namespace man{
                     }
                     break;
                 }
+            }
+        }
+
+
+        void GameStateModule::flag_setPenalized(bool p) {
+            for (int i = 0; i < latest_data.team_size(); ++i)
+            {
+                messages::TeamInfo* team = latest_data.mutable_team(i);
+                if (team->team_number() == team_number)
+                {
+                    messages::RobotInfo* player = team->mutable_player(player_number-1);
+
+                    if (p) {
+                        player->set_penalty(PENALTY_MANUAL);
+                        //                response_status = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
+                    } else {
+                        //                response_status = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
+                        player->set_penalty(PENALTY_NONE);
+                    }
+
+                    break;
+                }
+            }
+        }
+        
+        void GameStateModule::flag_setPlaying() {
+            latest_data.set_state(STATE_PLAYING);
+            
+            keep_time = true;
+            if (!start_time)
+            {
+                start_time = realtime_micro_time();
             }
         }
 

@@ -49,7 +49,7 @@ const float MAX_FORWARD = .25; //.3;                              // meters
 const float MAX_BACKWARDS = .15;
 const float MAX_LEFT = .1; //.2;                                 // meters
 const float MAX_TURN = .87;                                // radians
-const float BASE_LEG_LIFT = 0.02; //0.010;                         // meters
+const float BASE_LEG_LIFT = 0.012; //0.010;                         // meters
 
 void checkNaN(float n, string s){
    if(n != n){

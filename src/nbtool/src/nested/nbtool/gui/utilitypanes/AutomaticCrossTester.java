@@ -31,7 +31,9 @@ public class AutomaticCrossTester <K, R> {
 		public K qualifiesForTesting(LogReference logr);
 
 		public String crossFunctionName();
-		public void finishAnnotations(K key, Log log);
+
+		//true if the test should continue with this log
+		public boolean finishAnnotations(K key, Log log);
 
 		public R getResult(LogReference from, K key, Log ... out );
 
@@ -175,10 +177,10 @@ public class AutomaticCrossTester <K, R> {
 
 				for (LogReference ref : list) {
 					Log arg = ref.get();
-					theInterface.finishAnnotations(key, arg);
-					theInstance.tryAddCall(new TestResponder(ref, key), theInterface.crossFunctionName(), arg);
-
-					++outstanding_tests;
+					if (theInterface.finishAnnotations(key, arg)) {
+						theInstance.tryAddCall(new TestResponder(ref, key), theInterface.crossFunctionName(), arg);
+						++outstanding_tests;
+					}
 				}
 			}
 		}

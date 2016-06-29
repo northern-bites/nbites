@@ -9,6 +9,15 @@ using namespace std;
 using boost::program_options::variables_map;
 
 bool setStand = false;
+// const float INITIAL_BODY_POSE_ANGLES[] {
+//    89.5f, 8.6f, -2.0f, 2.5f,
+//    0.0f, 0.0f,
+//    0.0f, 0.2f, -27.5f, 50.0f, -25.0f, 0.0f,
+//    0.2f, -27.5f, 50.0f, -25.0f, 0.0f,
+//    89.5f, -8.6f, -2.0f, -2.5f,
+//    0.f,0.f,
+// };
+
 const float INITIAL_BODY_POSE_ANGLES[] {
    1.57f, 0.17f, 0.0f, 0.0f,
    0.0f, 0.0f,
