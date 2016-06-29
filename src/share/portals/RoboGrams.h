@@ -397,10 +397,10 @@ public:
 // redefinition of pool_ for our compiler.
 #ifdef OFFLINE
 template<class T>
-SET_POOL_SIZE_DEFAULT(T, 24);
+SET_POOL_SIZE_DEFAULT(T, 48);
 #else
 template<class T>
-SET_POOL_SIZE_DEFAULT(T, 8);
+SET_POOL_SIZE_DEFAULT(T, 16);
 #endif
 
 template<class T>
