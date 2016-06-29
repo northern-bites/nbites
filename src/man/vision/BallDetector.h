@@ -126,6 +126,7 @@ namespace man {
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
 			bool checkDiagonalCircle(Spot spot);
+			bool checkBallHasNoGreen(int r);
 
             bool filterBlackSpots(Spot currentBlob);
             bool filterWhiteBlob(Spot spot, intPairVector & blackSpots,
@@ -215,9 +216,9 @@ namespace man {
 #else
 			static const bool debugBall = false;
 			static const bool debugSpots = false;
-			static const int filterThresholdDark = 144;
-			static const int greenThresholdDark = 60;
-			static const int filterThresholdBrite = 144;
+			static const int filterThresholdDark = 104;
+			static const int greenThresholdDark = 12;
+			static const int filterThresholdBrite = 134;
 			static const int greenThresholdBrite = 80;
 #endif
 		};
