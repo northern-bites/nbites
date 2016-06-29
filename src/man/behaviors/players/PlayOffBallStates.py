@@ -50,7 +50,7 @@ def branchOnRole(player):
     if role.isFirstChaser(player.role):
         if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
             return player.goNow('searchFieldForSharedBall')
-        return player.goNow('playerFourSearchBehavior')
+        return player.goNow('playerFourSearchBehavior') 
     elif role.isStriker(player.role):
         return player.goNow('playerFiveSearchBehavior')
     elif role.isLeftDefender(player.role):
@@ -267,7 +267,9 @@ def defenderPan(player):
 
     if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME:
 
-        if role.isLeftDefender(player.role):
+        global leftDefenderIsForward
+
+        if not leftDefenderIsForward:
             return player.goNow('adjustSpin')
         else:
             return player.goNow('playOffBall')
@@ -422,7 +424,7 @@ def leftDefenderForward(player):
         return player.goNow('adjustHeading')
 
 @superState('playOffBall')
-@stay
+@stay/
 # @ifSwitchNow(transitions.ballInOurHalf, 'playOffBall')
 def leftDefenderBack(player):
 
