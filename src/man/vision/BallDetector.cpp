@@ -1078,6 +1078,9 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
     }
     if (spot.innerDiam <= 14) {
 		if (spot.green > 10) {
+			if (debugBall) {
+				std::cout << "Dangerous small ball " << spot.green << std::endl;
+			}
 			return false;
 		}
     }
