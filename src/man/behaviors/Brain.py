@@ -113,6 +113,8 @@ class Brain(object):
 
         self.penaltyCount = 0
 
+        self.buttonPenaltyPlacement = False;
+
         # CHINA HACK(s)
         self.penalizedHack = False
         self.penalizedEdgeClose = 0
@@ -209,6 +211,9 @@ class Brain(object):
 
         # Set myWorldModel for Comm
         self.updateComm()
+
+        if player.brain.interface.gameState.penalty_is_placement:
+            self.buttonPenaltyPlacement = True
 
         # Flush the output
         sys.stdout.flush()
