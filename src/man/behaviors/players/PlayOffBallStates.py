@@ -456,6 +456,9 @@ def playerFourSearchBehavior(player):
         elif playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 1:
             adjustHeading.desiredHeading = -90
             return player.goNow("adjustHeading")
+        elif playerFourSearchBehavior.pointIndex % len(playerFourPoints) == 2:
+            adjustHeading.desiredHeading = 0
+            return player.goNow("adjustHeading")
         else:
             adjustHeading.desiredHeading = 90
             return player.goNow("adjustHeading")
@@ -463,9 +466,10 @@ def playerFourSearchBehavior(player):
     player.brain.nav.updateDest(playerFourSearchBehavior.dest)
 
 playerFourWayPoint1 = Location(NogginConstants.CENTER_FIELD_X - 160, NogginConstants.CENTER_FIELD_Y - 40)
-playerFourWayPoint2 = Location(NogginConstants.CENTER_FIELD_X + 170, NogginConstants.MY_GOALBOX_TOP_Y + 110)
-playerFourWayPoint3 = Location(NogginConstants.CENTER_FIELD_X + 70, NogginConstants.MY_GOALBOX_BOTTOM_Y - 110)
-playerFourPoints = [playerFourWayPoint1, playerFourWayPoint2, playerFourWayPoint3]
+playerFourWayPoint2 = Location(NogginConstants.CENTER_FIELD_X + 170, NogginConstants.MY_GOALBOX_TOP_Y + 95)
+playerFourWayPoint3 = Location(NogginConstants.CENTER_FIELD_X + 220, NogginConstants.CENTER_FIELD_Y)
+playerFourWayPoint4 = Location(NogginConstants.CENTER_FIELD_X + 70, NogginConstants.MY_GOALBOX_BOTTOM_Y - 95)
+playerFourPoints = [playerFourWayPoint1, playerFourWayPoint2, playerFourWayPoint3, playerFourWayPoint4]
 playerFourSearchBehavior.pointIndex = -1
 playerFourSearchBehavior.pointsWalked = 0
 playerFourSearchBehavior.dest = playerFourWayPoint1
@@ -519,6 +523,7 @@ def adjustHeading(player):
     if player.firstFrame():
         # Spin to home heading
         player.stand()
+        player.brain.tracker.repeatFixedPitchLookAhead()
         dest = RelRobotLocation(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
         player.brain.nav.goTo(dest, precision = nav.HOME,
                           speed = speeds.SPEED_FIVE, avoidObstacles = False,
