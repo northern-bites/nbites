@@ -38,9 +38,9 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
-        if player.brain.whistlePenalty == True:
+        if player.brain.whistleCounter < 300 and player.brain.whistleCounter != 0:
             print "Penalized because of false whistle"
-            player.brain.whistlePenalty = False
+            player.brain.whistleCounter = 0
             return player.goNow('overeagerWhistle')
 
         if player.brain.penaltyCount < 300:
@@ -303,8 +303,8 @@ def manualPlacement(player):
 
 @superState('gameControllerResponder')
 def overeagerWhistle(player):
-    player.brain.resetLocTo(player.brain.loc.x, player.brain.loc.y, player.brain.loc.h)
-    print "heading: " + str(player.brain.loc.h)
+    print "Resetting loc to game set values"
+    player.brain.resetLocTo(player.brain.gameSetX, player.brain.gameSetY, player.brain.gameSetH)
     player.brain.tracker.lookToAngle(0)
     return player.goNow('gamePlaying')
 

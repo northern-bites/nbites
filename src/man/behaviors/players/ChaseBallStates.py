@@ -346,9 +346,7 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
-        print "It's no longer dribble time"
         return player.goNow('orbitBall')
-    print "Dribble time"
     ball = player.brain.ball
     relH = player.decider.normalizeAngle(player.brain.loc.h)
     if ball.distance < constants.LINE_UP_X and not (relH > -constants.ORBIT_GOOD_BEARING and

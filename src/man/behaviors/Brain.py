@@ -110,6 +110,9 @@ class Brain(object):
         self.sitting = False
 
         self.whistlePenalty = False
+        self.whistled = False
+        self.whistleCounter = 0
+
         self.pickedUpInSet = False
         self.penaltyCount = 0
 
@@ -217,7 +220,7 @@ class Brain(object):
             self.whistled = True
 
         if self.whistled:
-            self.whistleCounter += 1;
+            self.whistleCounter += 1
 
         # US OPEN :(
         if self.ball.vis.on:

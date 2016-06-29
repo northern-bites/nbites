@@ -32,8 +32,8 @@ def gameInitial(player):
         #Reset role to player number
         player.role = player.brain.playerNumber
         roleConstants.setRoleConstants(player, player.role)
-        player.brain.whistled = False
-        player.brain.whistleCounter = 0
+        # player.brain.whistled = False
+        # player.brain.whistleCounter = 0
 
     # print "Current Angle: " + str(degrees(player.brain.interface.joints.head_yaw))
     # If stiffnesses were JUST turned on, then stand up.
@@ -54,6 +54,8 @@ def gameReady(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.repeatWideSnapPan()
+        player.brain.whistleCounter = 0
+        player.brain.whistled = False
 
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
@@ -93,6 +95,10 @@ def gameSet(player):
         player.gainsOn()
         player.stand()
         player.brain.nav.stand()
+
+        player.brain.gameSetX = player.brain.loc.x
+        player.brain.gameSetY = player.brain.loc.y
+        player.brain.gameSetH = player.brain.loc.h
 
         # player.brain.tracker.helper.boundsSnapPan(-90, 90, False)
         player.brain.tracker.performGameSetInitialWideSnapPan()
@@ -145,8 +151,8 @@ def gamePlaying(player):
         player.wasPenalized = False
         if player.lastDiffState != 'gameSet': 
             # Remove the next two lines once we're done testing manual placement
-            if DEBUG_MANUAL_PLACEMENT:
-                return player.goNow('manualPlacement')
+            # if DEBUG_MANUAL_PLACEMENT:
+            #     return player.goNow('manualPlacement')
             return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
@@ -199,6 +205,7 @@ def gamePenalized(player):
         player.brain.penalizedEdgeClose = 0
         player.brain.penalizedCount = 0
         player.brain.penaltyCount = 0
+        player.brain.whistled = False
         player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
@@ -209,7 +216,10 @@ def gamePenalized(player):
         player.brain.penalizedEdgeClose += 1
 
     if player.brain.interface.gameState.whistle_override:
+        print "whistle override in brunswick states"
         player.brain.whistlePenalty = True
+    else:
+        player.brain.whistlePenalty = False
 
     player.brain.penaltyCount += 1
     return player.stay()
