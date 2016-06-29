@@ -235,6 +235,6 @@ def shouldNotDribble(player):
             (player.brain.loc.x < (NogginConstants.CENTER_FIELD_X - 70)) or
 
             # If we're between their cross and halfway between their cross and the half, kick. and
-             (player.brain.loc.x > (NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X + NogginConstants.YELLOW_GOALBOX_LEFT_X) / 2) 
+            (player.brain.loc.x > (NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X + NogginConstants.YELLOW_GOALBOX_LEFT_X) / 2)) 
 
             # Basically we only dribble if we're really close to their goal or close to the half on their side
