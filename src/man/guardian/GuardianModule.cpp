@@ -303,10 +303,10 @@ void GuardianModule::doPickupDetection() {
         float integral = sum - (zCalibIntegral);
 
         if (integral < PICKUP_INTEGRAL_THRESH && !feetOnGround) {
-            printf("\t%f counts as pickup.\n", integral);
 
             if (difftime(time(NULL), lastReport) > 10) {
                 lastReport = time(NULL);
+                printf("\t%f counts as pickup.\n", integral);
                 man::tts::say(IN_SCRIMMAGE, "weeeeeeeeee");
             }
 
