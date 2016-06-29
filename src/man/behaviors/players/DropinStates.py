@@ -27,7 +27,7 @@ def gameInitial(player):
         player.gainsOn()
         player.stand()
         player.zeroHeads()
-        # player.brain.resetInitialLocalization()
+        player.brain.resetInitialLocalization()
         player.lastStiffStatus = True
 
         roleConstants.setRoleConstants(player, player.role)
@@ -53,8 +53,8 @@ def gameReady(player):
         player.brain.tracker.repeatWideSnapPan()
 
         player.timeReadyBegan = player.brain.time
-        # if player.lastDiffState == 'gameInitial':
-            # player.brain.resetInitialLocalization()
+        if player.lastDiffState == 'gameInitial':
+            player.brain.resetInitialLocalization()
 
         if player.wasPenalized:
             player.wasPenalized = False
@@ -148,7 +148,7 @@ def gamePlaying(player):
                 player.brain.ball.vis.on):
                 player.shouldKickOff = True
                 print "SHOULD KICK OFF"
-                return player.goNow('walkToWayPoint')
+                return player.goNow('approachBall')
             else:
                 return player.goNow('playOffBall')
         else:
