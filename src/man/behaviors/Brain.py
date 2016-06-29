@@ -391,7 +391,7 @@ class Brain(object):
                             Constants.HEADING_UP)
         elif self.role == 4:
             print "I should be offense, player 4!"
-            self.resetLocTo(Constants.MIDFIELD_X - Constants.CENTER_CIRCLE_RADIUS,
+            self.resetLocTo(Constants.BLUE_CC_NEAREST_POINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.role == 5:
