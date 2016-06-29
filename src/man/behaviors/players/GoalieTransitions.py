@@ -10,7 +10,7 @@ import math
 import VisualGoalieStates
 import GoalieStates
 from objects import RelRobotLocation
-savedebug = True
+savedebug = False
 
 def safelyPlaced(player):
     getLines(player)

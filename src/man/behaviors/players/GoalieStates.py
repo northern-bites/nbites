@@ -11,8 +11,8 @@ import math
 import noggin_constants as nogginConstants
 
 #TestingChange
-SAVING = False
-DIVING = False
+SAVING = True
+DIVING = True
 savedebug = False
 
 @superState('gameControllerResponder')
