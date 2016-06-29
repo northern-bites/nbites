@@ -137,7 +137,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.shouldClearNotMovingBall,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
-            : GoalieStates.clearBall,
+            : VisualGoalieStates.clearBall,
 
 
 
