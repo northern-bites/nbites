@@ -66,6 +66,8 @@ namespace man{
 
         void GameStateModule::run_()
         {
+            latest_data.set_penalty_is_placement(false);
+
             latchInputs();
             update();
 
@@ -75,9 +77,6 @@ namespace man{
                 flag_setPenalized(control::check(control::flags::state_penalty_override));
             }
 #endif
-
-            latest_data.set_penalty_is_placement(true);
-
             portals::Message<messages::GameState> output(&latest_data);
             gameStateOutput.setMessage(output);
 
@@ -215,15 +214,14 @@ namespace man{
             {
                 case STATE_INITIAL:
                     /* for button presses, not sure if this will have negative effect on time in playing */
-                    bp_state = FIRST_INITIAL;
 
                     latest_data.set_state(STATE_PLAYING);
                     manual_penalize();
+                    latest_data.set_penalty_is_placement(true);
 
-                    if ( bp_state == FIRST_INITIAL ) {
-                        NBL_WARN("spl button presses FIRST_INITIAL -> FIRST_PENALTY");
-                        bp_state = FIRST_PENALTY;
-                    }
+                    NBL_WARN("spl button presses FIRST_INITIAL -> FIRST_PENALTY");
+                    bp_state = FIRST_PENALTY;
+
                     break;
 
                 case STATE_READY:
@@ -250,7 +248,10 @@ namespace man{
                         NBL_WARN("spl button presses PENALTY SWITCH");
                         bp_state = NORMAL_PLAYING;
                         manual_penalize();
+
+                        latest_data.set_penalty_is_placement(false);
                     }
+
                     break;
             }
 #endif
