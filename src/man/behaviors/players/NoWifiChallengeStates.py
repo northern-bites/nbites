@@ -1,4 +1,5 @@
 import math
+import os
 
 from .. import SweetMoves
 from ..headTracker import HeadMoves
@@ -7,33 +8,27 @@ from ..navigator import BrunswickSpeeds as speeds
 from objects import RelRobotLocation
 from ..navigator import Navigator
 from ..util import *
-
+import PMotion_proto
 
 @superState('gameControllerResponder')
 def gameInitial(player):
     if player.firstFrame():
-        player.returningFromPenalty = False
-        player.brain.tracker.lookToAngle(0)
+        player.gainsOn()
+        player.brain.nav.stand()
+        player.runfallController = False
     return player.stay()
 
 @superState('gameControllerResponder')
 def gameReady(player):
-    if player.firstFrame():
-        player.brain.tracker.lookToAngle(0)
     return player.stay()
 
 @superState('gameControllerResponder')
 def gameSet(player):
-    if player.firstFrame():
-        player.brain.tracker.lookToAngle(0)
     return player.stay()
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
-    
-    if player.firstFrame():
-        player.goNow('waitingForNum')
-    return player.stay()
+    return player.goNow('waitForNum')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -45,15 +40,30 @@ def fallen(player):
     return player.stay()
 
 @superState('gameControllerResponder')
-def waitingForNum(player):
+def pleaseTurn(player):
     if player.firstFrame():
-        PHILNUMBER = 30#the number phil gives me
-        degAngle = math.degrees(PHILNUMBER)
-    if player.brain.#THE NUMBER CHANGED AHHHH
-        player.goNow('moveHead')
+        player.brain.interface.motionRequest.reset_odometry = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+    elif player.counter == 1:
+        player.setWalk(0,0,player.currNum)
 
-
+    elif player.counter == 2:
+        player.brain.nav.stand()
+        player.executeMove(SweetMoves.POINT)
+        player.lastNum = currNum
+        return player.goNow('waitForNum')
+    return player.stay()
 @superState('gameControllerResponder')
-def moveHead(player,degAngle):
-    if player.firstFrame()
-        player.brain.walkTo(0,0,degAngle)
+def waitForNum(player):
+    currNumString = os.environ.get('NowifiAngle')
+    if (currNumString != 'None'):
+        currNum = float(currNumString)
+
+        print "using currNum", currNum
+            
+            if (player.lastNum != currNum):
+                return player.goNow('pleaseTurn')
+
+    return player.stay()
+
+#DONT FORGET TO MAKE SURE INITIALIZED PLAYER.LAST NUM IS FINE
