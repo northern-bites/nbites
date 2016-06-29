@@ -45,9 +45,9 @@
       "camera_BOT" :
         {
           "d_roll" :
-            �,
+            0,
           "d_tilt" :
-            �
+            0
         }
     },
   "vera" :
@@ -164,9 +164,9 @@
       "camera_BOT" :
         {
           "d_roll" :
-            �,
+            0,
           "d_tilt" :
-            �
+            0
         }
     },
   "jayne" :
@@ -242,16 +242,16 @@
       "camera_TOP" :
         {
           "d_roll" :
-            �,
+            0,
           "d_tilt" :
-            �
+            0
         },
       "camera_BOT" :
         {
           "d_roll" :
-            �,
+            0,
           "d_tilt" :
-            �
+            0
         }
     },
   "river" :
