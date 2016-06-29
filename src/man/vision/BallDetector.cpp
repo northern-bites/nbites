@@ -431,10 +431,10 @@ bool BallDetector::blobsAreClose(std::pair<int,int> p, std::pair<int,int> q)
     double cx = (p.first + q.first) / 2;
     double cy = (p.second + q.second) / 2;
 
-    int midY = *(yImage.pixelAddr(cx, cy)) / 4;
-	if (midY < 100) {
-		return false;
-	}
+    getColor(cx, cy);
+    if(isGreen()) {
+        return false;
+    }
 
     double bcx = 0, bcy = 0;
     imageToBillCoordinates(cx, cy, bcx, bcy);
@@ -598,6 +598,10 @@ bool BallDetector::findCorrelatedBlackSpots
 #else
                             return true;
 #endif
+                        } else {
+#ifdef OFFLINE
+                            candidates.pop_back();
+#endif
                         }
                     }
                 }
@@ -647,6 +651,10 @@ bool BallDetector::findCorrelatedBlackSpots
                             foundBall = true;
 #else
                             return true;
+#endif
+                        } else {
+#ifdef OFFLINE
+                            candidates.pop_back();
 #endif
                         }
                     }
@@ -939,7 +947,7 @@ bool BallDetector::checkBallHasNoGreen(int r) {
             getColor(i, j);
             if(isGreen()) {
                 greens++;
-                if(greens > green_tolerance) { 
+                if(greens >= green_tolerance) { 
                     green_thresh_reached = true;
                 }
             }
