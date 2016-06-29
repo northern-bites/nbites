@@ -196,7 +196,6 @@ namespace detect {
             printf("\n");
 #endif
 
-            ++_iteration_;
             loop_start(spectrum);
 
             if (!initialized) {
@@ -206,6 +205,8 @@ namespace detect {
             bool ret = initialized ? _analyze() : false;
 
             loop_end();
+
+            ++_iteration_;
 
             return ret;
         }

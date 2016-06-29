@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -200,6 +201,8 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 	@Override
 	public void ioFinished(IOInstance instance) { }
 
+	final ArrayList<FloatBuffer> channels = new ArrayList<>();
+
 	@Override
 	public void ioReceived(IOInstance inst, int ret, Log... out) {
 		assert(out.length == 1);
@@ -211,9 +214,13 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 		byte[] all = new byte[total];
 		int offset = 0;
 
+		channels.clear();
+
 		for (Block b : out[0].blocks) {
 			System.arraycopy(b.data, 0, all, offset, b.data.length);
 			offset += b.data.length;
+
+			channels.add(new FloatBuffer(b, 1, SPECTRUM_OUTPUT_LENGTH));
 		}
 
 		max_index = out[0].blocks.size() - 1;
@@ -235,7 +242,9 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 			@Override
 			public String peakString() {
-				return "max = " + buff.max;
+				Debug.print("peakString()");
+				return String.format("max= { %f @ %d }", channels.get(channel_index).max,
+						channels.get(channel_index).max_index);
 			}
 
 			@Override
