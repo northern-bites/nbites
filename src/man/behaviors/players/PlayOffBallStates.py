@@ -29,6 +29,8 @@ def playOffBall(player):
     """
     Superstate for all off ball play.
     """
+
+
     player.inKickingState = False
 
 #USOPEN2016: Back to Search Field by Quad
@@ -38,6 +40,8 @@ def branchOnRole(player):
     Chasers are going to have a different behavior again.
     We will branch on behavior based on role here
     """
+
+    print "----------In branch on role----------"
 
     # print "Entered Branch on Role"
     # print "----- evenDefenderIsForward, lastEvenDefenderForwardVal ----"
@@ -139,9 +143,14 @@ def positionAtHome(player):
     Go to the player's home position.
     """
 
+
+
     home = player.homePosition
 
     if player.firstFrame():
+
+        print "-----------Positioning at home-------------"
+
         player.brain.tracker.trackBall()
         fastWalk = role.isChaser(player.role)
         player.brain.nav.goTo(home, precision = nav.HOME,
@@ -161,7 +170,7 @@ def watchForBall(player):
     """
 
     if player.firstFrame():
-        print "-----------Player at home-----------"
+        print "-----------Player at home - Watching for ball-----------"
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
@@ -201,6 +210,9 @@ def doFirstHalfSpin(player):
     """
 
     if player.firstFrame():
+
+        print "-------------Doing first half spin--------------"
+
         player.brain.tracker.repeatFixedPitchLookAhead()
 
         if player.brain.playerNumber == 3:
@@ -242,6 +254,7 @@ def doSecondHalfSpin(player):
     """
 
     if player.firstFrame():
+        print "----------Doing second half spin-------------"
         player.brain.tracker.repeatFixedPitchLookAhead()
 
         if player.brain.playerNumber == 3:
@@ -262,6 +275,9 @@ def doSecondHalfSpin(player):
 def defenderPan(player):
 
     if player.firstFrame():
+
+        print "-----------Doing defender pan------------"
+
         player.stand()
         player.brain.tracker.trackBall()
 
@@ -270,8 +286,14 @@ def defenderPan(player):
         global leftDefenderIsForward
 
         if not leftDefenderIsForward:
+
+            print "---------Left defender is forward - go to adjust spin-------------"
+            adjustSpin.desiredHeading = 180
             return player.goNow('adjustSpin')
         else:
+
+            print "--------Left defender is back----------------"
+
             return player.goNow('playOffBall')
 
 @superState('spinAtHome')
@@ -281,14 +303,20 @@ def defenderPan(player):
 def adjustSpin(player):
 
     if player.firstFrame():
+        # Spin to home heading
+        player.stand()
         player.brain.tracker.repeatFixedPitchLookAhead()
+        desiredHeading = 180
+        dest = RelRobotLocation(0, 0, adjustSpin.desiredHeading - player.brain.loc.h)
+        player.brain.nav.goTo(dest, precision = nav.HOME,
+                          speed = speeds.SPEED_SIX, avoidObstacles = False,
+                          fast = True, pb = False)
+        # player.setWalk(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
 
-        if player.brain.playerNumber == 3:
-            player.setWalk(0, 0, speeds.SPEED_SIX)
-        else:
-            player.setWalk(0, 0, -speeds.SPEED_SIX)
+        # or math.fabs()
+    if fabs(player.brain.loc.h - adjustSpin.desiredHeading) < 15:
+        player.stand()
 
-    if player.stateTime > chaseConstants.SPEED_SIX_SPUN_ONCE_TIME / 2:
         return player.goNow('playOffBall')
 
 @superState('playOffBall')
@@ -408,6 +436,9 @@ def searchFieldForFlippedSharedBall(player):
 def leftDefenderForward(player):
 
     if player.firstFrame():
+
+        print "------------Left defender forward------------"
+
         player.brain.tracker.trackBall()
         player.brain.home = role.evenDefenderForward
 
@@ -424,11 +455,14 @@ def leftDefenderForward(player):
         return player.goNow('adjustHeading')
 
 @superState('playOffBall')
-@stay/
+@stay
 # @ifSwitchNow(transitions.ballInOurHalf, 'playOffBall')
 def leftDefenderBack(player):
 
     if player.firstFrame():
+
+        print "----------------Left defender back----------------"
+
         player.brain.tracker.trackBall()
         player.brain.home = role.evenDefenderBack
 
