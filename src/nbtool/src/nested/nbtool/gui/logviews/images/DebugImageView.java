@@ -153,7 +153,7 @@ public class DebugImageView extends VisionView implements
 			// ideally these would actually be read from NBCROSS
 			filterThresholdDark = 104;
 			greenThresholdDark = 12;
-			filterThresholdBrite = 134;
+			filterThresholdBrite = 130;
 			greenThresholdBrite = 80;
 			displayParams[6] = filterThresholdDark;
 			displayParams[7] = greenThresholdDark;
