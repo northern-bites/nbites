@@ -83,6 +83,7 @@ def walkToWayPoint(player):
                                  ball.y - constants.WAYPOINT_DIST*sin(radians(player.kick.setupH)),
                                  player.brain.loc.h)
 
+        # print("Going to waypoint")
         player.brain.nav.goTo(wayPoint, Navigator.GENERAL_AREA, speed, True, fast = True)
 
         if transitions.shouldSpinToKickHeading(player):
@@ -225,9 +226,9 @@ def orbitBall(player):
         #player.stopWalking()
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
-        print("     ORBIT I'm in orbit and deciding my chooseAlignedKickFromKick")
+        # print("     ORBIT I'm in orbit and deciding my chooseAlignedKickFromKick")
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
-        print("     ORBIT chosen kick:", str(player.kick))
+        # print("     ORBIT chosen kick:", str(player.kick))
         player.kick.destinationX = destinationX
         player.kick.destinationY = destinationY
 
@@ -250,24 +251,24 @@ def orbitBall(player):
     if relH < 0:
         if relH < -20:
             xSpeed = 0.0
-            ySpeed = 0.85
+            ySpeed = 1.0
             hSpeed = -0.45
             # player.setWalk(0, 0.7, -0.25)
         else:
             xSpeed = 0.0
             ySpeed = 0.6
-            hSpeed = -0.2
+            hSpeed = -0.25
             # player.setWalk(0, 0.5, -0.15)
     elif relH > 0:
         if relH > 20:
             xSpeed = 0.0
-            ySpeed = -0.85
+            ySpeed = -1.0
             hSpeed = 0.45
             # player.setWalk(0, -0.7, 0.25)
         else:
             xSpeed = 0.0
             ySpeed = -0.6
-            hSpeed = 0.2
+            hSpeed = 0.25
             # player.setWalk(0, -0.5, 0.15)
 
     # X correction
@@ -288,7 +289,7 @@ def orbitBall(player):
     # H correction
     if relH < 0: # Orbiting clockwise
         if player.brain.ball.rel_y > 2:
-            hSpeed = 0.0
+            hSpeed = -0.2
             # player.brain.nav.setHSpeed(0)
         elif player.brain.ball.rel_y < -2:
             if relH < -20:
@@ -299,10 +300,10 @@ def orbitBall(player):
                 # player.brain.nav.setHSpeed(-0.2)
         else:
             if relH < -20:
-                hSpeed = -0.25
+                hSpeed = -0.45
                 # player.brain.nav.setHSpeed(-0.25)
             else:
-                hSpeed = -0.15
+                hSpeed = -0.2
                 # player.brain.nav.setHSpeed(-0.15)
     else: # Orbiting counter-clockwise
         if player.brain.ball.rel_y > 2:
@@ -313,17 +314,19 @@ def orbitBall(player):
                 hSpeed = 0.2
                 # player.brain.nav.setHSpeed(0.2)
         elif player.brain.ball.rel_y < -2:
-            hSpeed = 0.0
+            hSpeed = 0.2
             # player.brain.nav.setHSpeed(0)
         else:
             if relH > 20:
-                hSpeed = 0.25
+                hSpeed = 0.45
                 # player.brain.nav.setHSpeed(0.25)
             else:
-                hSpeed = 0.15
+
+                hSpeed = 0.2
                 # player.brain.nav.setHSpeed(0.15)
 
     player.setWalk(xSpeed, ySpeed, hSpeed)
+    # print("     IN ORBIT: x:", xSpeed, " y:", ySpeed, " h:", hSpeed)
     # DEBUGGING PRINT OUTS
     if constants.DEBUG_ORBIT and player.counter%10 == 0:
         print "desiredHeading is:  | ", player.kick.setupH
