@@ -59,8 +59,8 @@ def waitForNum(player):
     print currNumString
     print type(currNumString)
 
-    if (currNumString != 'None'):
-        #currNum = float(currNumString)
+    if ( currNumString != None ):
+        currNum = float(currNumString)
 
         print "using currNum", currNum
 
