@@ -65,6 +65,15 @@ namespace control {
             nbl::io::writeStringToFile(arguments[0]->blocks[0].data, path);
         }
 
+    CONTROL_FUNCTION(SetAngleEnv, false, nbl::SharedConstants::LogClass_Null())
+        (const std::vector<nbl::logptr> &arguments) {
+            NBL_WARN("RUNNING SetAngleEnv!")
+            std::string toEnv = arguments[0]->topLevelDictionary["AngleEnv"].asString();
+            NBL_WARN("env: %s\n", toEnv.c_str() );
+
+            putenv( (char *) toEnv.c_str() );
+    }
+
 }
 
 #if !defined(NBL_STANDALONE) && !defined(__APPLE__)
