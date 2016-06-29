@@ -108,6 +108,8 @@ Config used_config{ 48000, WINDOW_SIZE };
 
 #ifdef SAVE_HEARD_WHISTLES
 SampleRingBuffer ringBuffer(4, used_config.num_channels, used_config.window_size);
+
+bool logNextFrame = false;
 #endif
 
 size_t iteration = 0;
@@ -119,6 +121,11 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
 
 #ifdef SAVE_HEARD_WHISTLES
     ringBuffer.push(buffer);
+
+    if (logNextFrame) {
+        simple_write_log(logFromRingBuffer(ringBuffer), iteration);
+        logNextFrame = false;
+    }
 #endif
 
     if (useLogging) {
@@ -151,7 +158,7 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
             }
 
 #ifdef SAVE_HEARD_WHISTLES
-            simple_write_log(logFromRingBuffer(ringBuffer), iteration);
+            logNextFrame = true;
 #endif
         }
 
