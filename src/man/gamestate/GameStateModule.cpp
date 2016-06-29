@@ -83,6 +83,11 @@ namespace man{
             portals::Message<messages::GCResponse> response(0);
             response.get()->set_status(response_status);
             gcResponseOutput.setMessage(response);
+
+            //for debugging penalty_is_placement override
+//            printf( "\toverride %s\n",
+//                   latest_data.penalty_is_placement() ?
+//                   "TRUE" : "FALSE" );
         }
 
         void GameStateModule::latchInputs()
