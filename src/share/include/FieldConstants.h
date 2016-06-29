@@ -38,7 +38,7 @@ static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross in cm
 
 
 
-
+//NORMAL FIELD CONSTANTS!!!!!!!!
 
 
 
