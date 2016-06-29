@@ -41,7 +41,7 @@ def branchOnRole(player):
     We will branch on behavior based on role here
     """
 
-    print "----------In branch on role----------"
+    # print "----------In branch on role----------"
 
     # print "Entered Branch on Role"
     # print "----- evenDefenderIsForward, lastEvenDefenderForwardVal ----"
@@ -149,7 +149,7 @@ def positionAtHome(player):
 
     if player.firstFrame():
 
-        print "-----------Positioning at home-------------"
+        # print "-----------Positioning at home-------------"
 
         player.brain.tracker.trackBall()
         fastWalk = role.isChaser(player.role)
@@ -170,7 +170,7 @@ def watchForBall(player):
     """
 
     if player.firstFrame():
-        print "-----------Player at home - Watching for ball-----------"
+        # print "-----------Player at home - Watching for ball-----------"
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
@@ -211,7 +211,7 @@ def doFirstHalfSpin(player):
 
     if player.firstFrame():
 
-        print "-------------Doing first half spin--------------"
+        # print "-------------Doing first half spin--------------"
 
         player.brain.tracker.repeatFixedPitchLookAhead()
 
@@ -233,7 +233,7 @@ def doPan(player):
     """
 
     if player.firstFrame():
-        print "------------Doing Pan-------------"
+        # print "------------Doing Pan-------------"
 
         player.stand()
         player.brain.tracker.trackBall()
@@ -254,7 +254,7 @@ def doSecondHalfSpin(player):
     """
 
     if player.firstFrame():
-        print "----------Doing second half spin-------------"
+        # print "----------Doing second half spin-------------"
         player.brain.tracker.repeatFixedPitchLookAhead()
 
         if player.brain.playerNumber == 3:
@@ -276,8 +276,8 @@ def defenderPan(player):
 
     if player.firstFrame():
 
-        print "-----------Doing defender pan------------"
-
+        # print "-----------Doing defender pan------------"
+        
         player.stand()
         player.brain.tracker.trackBall()
 
@@ -287,12 +287,12 @@ def defenderPan(player):
 
         if not leftDefenderIsForward:
 
-            print "---------Left defender is forward - go to adjust spin-------------"
+            # print "---------Left defender is forward - go to adjust spin-------------"
             adjustSpin.desiredHeading = 180
             return player.goNow('adjustSpin')
         else:
 
-            print "--------Left defender is back----------------"
+            # print "--------Left defender is back----------------"
 
             return player.goNow('playOffBall')
 
@@ -437,7 +437,7 @@ def leftDefenderForward(player):
 
     if player.firstFrame():
 
-        print "------------Left defender forward------------"
+        # print "------------Left defender forward------------"
 
         player.brain.tracker.trackBall()
         player.brain.home = role.evenDefenderForward
@@ -461,7 +461,7 @@ def leftDefenderBack(player):
 
     if player.firstFrame():
 
-        print "----------------Left defender back----------------"
+        # print "----------------Left defender back----------------"
 
         player.brain.tracker.trackBall()
         player.brain.home = role.evenDefenderBack
