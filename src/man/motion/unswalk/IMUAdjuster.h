@@ -14,7 +14,7 @@ public:
 	IMUAdjuster();
 	~IMUAdjuster();
 
-	static const int DONE = 400;
+	static const int DONE = 500;
 
 	// Vec2 gyroBiasProcessNoise;
 	// Vec2 gyroBiasStandMeasurementNoise;
