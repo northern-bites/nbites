@@ -37,6 +37,10 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
+        if player.brain.buttonPenaltyPlacement == True:
+            player.brain.player.brain.resetLocTo(999, 999, 999)
+            return player.goNow("gamePlaying")
+
         if player.brain.penaltyCount < 300:
             print "We were in penalty for less than 10 seconds, it probably doesn't count"
             player.brain.penaltyCount = 0
@@ -71,6 +75,7 @@ def afterPenalty(player):
     # Update number of frames since player entered
     afterPenalty.frameCount += 1
     vis = player.brain.vision
+    player.brain.buttonPenaltyPlacement = False
 
     if afterPenalty.frameCount % 50 == 0:
 
