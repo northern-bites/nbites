@@ -349,11 +349,13 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
+        print("NO THIS OCCURED")
         return player.goNow('orbitBall')
     ball = player.brain.ball
     relH = player.decider.normalizeAngle(player.brain.loc.h)
     if ball.distance < constants.LINE_UP_X and not (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
+        print("THIS OCCURED")
         player.setWalk(0, 0, 0)
         return player.goLater('orbitBall')
 
@@ -379,8 +381,8 @@ def spinToBall(player):
     theta = degrees(player.brain.ball.bearing)
     spinToBall.isFacingBall = fabs(theta) <= 2*constants.FACING_KICK_ACCEPTABLE_BEARING
 
-    if spinToBall.isFacingBall and not transitions.shouldNotDribble(player):
-        return player.goLater('dribble')
+    if spinToBall.isFacingBall:
+        return player.goLater('approachBall')
 
     # spins the appropriate direction
     if theta < 0:
