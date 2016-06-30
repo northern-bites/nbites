@@ -114,8 +114,11 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
-        self.pickedUpInSet = False
+        self.whistlePenalty = False
+        self.whistled = False
+        self.whistleCounter = 0
 
+        self.pickedUpInSet = False
         self.penaltyCount = 0
 
         # CHINA HACK(s)
@@ -218,6 +221,12 @@ class Brain(object):
 
         # Flush the output
         sys.stdout.flush()
+
+        if self.interface.gameState.whistle_override:
+            self.whistled = True
+
+        if self.whistled:
+            self.whistleCounter += 1
 
         # US OPEN :(
         if self.ball.vis.on:

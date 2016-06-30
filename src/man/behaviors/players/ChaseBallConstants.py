@@ -1,7 +1,7 @@
 from ..navigator import BrunswickSpeeds as speeds
 
 # Ball on and off frame thresholds
-BALL_ON_THRESH = 4
+BALL_ON_THRESH = 2 # Lowered this from 4 to 2 in germany
 BALL_OFF_THRESH = 20
 BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 
@@ -10,7 +10,7 @@ SLOW_CHASE_DIST = 80.
 
 # Should position for kick
 BALL_PFK_LEFT_Y = 16.0
-PREPARE_FOR_KICK_DIST = 35.0
+PREPARE_FOR_KICK_DIST = 45.0
 SETUP_DISTANCE_X = 6
 SLOW_DOWN_TO_BALL_DIST = 25.
 WAIT_COUNT = 0
@@ -96,7 +96,7 @@ SPUN_ONCE_TIME_THRESH = 8
 WALK_FIND_BALL_TIME_THRESH = SPUN_ONCE_TIME_THRESH * 3 # Roughly 3 spins
 SPEED_FOUR_SPUN_ONCE_TIME = 14
 SPEED_FIVE_SPUN_ONCE_TIME = 12
-SPEED_SIX_SPUN_ONCE_TIME = 10
+SPEED_SIX_SPUN_ONCE_TIME = 9
 
 SPIN_SEARCH_BEARING = 20
 

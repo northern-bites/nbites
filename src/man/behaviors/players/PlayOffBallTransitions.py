@@ -71,7 +71,7 @@ def shouldApproachBall(player):
         return False
 
     if claimTransitions.shouldCedeClaim(player):
-        # print("Ceding claim")
+        print("Ceding claim")
         return False
 
     return True

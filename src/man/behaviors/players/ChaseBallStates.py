@@ -10,6 +10,7 @@ import PlayOffBallStates as playOffStates
 from ..navigator import Navigator
 from ..navigator import PID
 from ..navigator import BrunswickSpeeds as speeds
+import ClaimTransitions as claimTransitions
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 # from noggin_constants import MAX_SPEED, MIN_SPEED
@@ -21,6 +22,7 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @stay
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
+@ifSwitchNow(claimTransitions.shouldCedeClaim, 'playOffBall')
 def approachBall(player):
     if player.firstFrame():
         # player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
@@ -78,7 +80,7 @@ def walkToWayPoint(player):
     else:
         speed = speeds.SPEED_EIGHT
 
-    if fabs(relH) <= constants.MAX_BEARING_DIFF:
+    if fabs(relH) <= 50: #constants.MAX_BEARING_DIFF:
         wayPoint = RobotLocation(ball.x - constants.WAYPOINT_DIST*cos(radians(player.kick.setupH)),
                                  ball.y - constants.WAYPOINT_DIST*sin(radians(player.kick.setupH)),
                                  player.brain.loc.h)
@@ -347,10 +349,9 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
-        print "It's no longer dribble time"
-        
+        if player.lastDiffState == 'orbitBall':
+            return player.goNow('approachBall')
         return player.goNow('orbitBall')
-    print "Dribble time"
     ball = player.brain.ball
     relH = player.decider.normalizeAngle(player.brain.loc.h)
     if ball.distance < constants.LINE_UP_X and not (relH > -constants.ORBIT_GOOD_BEARING and
@@ -381,7 +382,7 @@ def spinToBall(player):
     spinToBall.isFacingBall = fabs(theta) <= 2*constants.FACING_KICK_ACCEPTABLE_BEARING
 
     if spinToBall.isFacingBall:
-        return player.goLater('dribble')
+        return player.goLater('approachBall')
 
     # spins the appropriate direction
     if theta < 0:

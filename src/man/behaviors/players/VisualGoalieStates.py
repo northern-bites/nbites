@@ -63,6 +63,7 @@ def checkSafePlacement(player):
             checkSafePlacement.lastLook = constants.RIGHT
     elif checkSafePlacement.turnCount >= 2:
         player.brain.tracker.lookToAngle(0)
+        return player.goLater('watchWithLineChecks')
     if player.brain.tracker.isStopped():
         print("setting is looking to false")
         checkSafePlacement.looking = False
@@ -106,10 +107,10 @@ def clearBall(player):
     # if player.counter % 2 == 0:
     #     nball = player.brain.naiveBall
     #     ball = player.brain.ball
-    #     print "================================="
-    #     print("yintercept:", nball.yintercept)
-    #     print("Ball dist:", ball.distance)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
+    # #     print "================================="
+    # #     print("yintercept:", nball.yintercept)
+    # #     print("Ball dist:", ball.distance)
+    # #     print("ball.vis.frames_on", ball.vis.frames_on)
     #     print("nb xvel:", nball.x_vel)
     #     print("ball mov vel:", ball.mov_vel_x)
 
@@ -128,10 +129,11 @@ def positionForGoalieKick(player):
                                     ball.rel_y - player.kick.setupY,
                                     0)
         print("Kickpose:", positionForGoalieKick.kickPose.relX, positionForGoalieKick.kickPose.relY)
-        positionForGoalieKick.speed = speeds.SPEED_THREE
+        positionForGoalieKick.speed = speeds.SPEED_FIVE
 
         player.brain.nav.goTo(positionForGoalieKick.kickPose,
                                             speed = positionForGoalieKick.speed,
+                                            fast = True,
                                             precision = nav.CLOSE_ENOUGH)
     ball = player.brain.ball
     positionForGoalieKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,

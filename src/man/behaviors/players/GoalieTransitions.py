@@ -727,31 +727,41 @@ def shouldDiveRight(player):
     if player.inPosition == constants.FAR_RIGHT_POSITION:
         return False
 
-    if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on < 20:
+    if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on > 2:
         sightOk = False
 
     if not ball.vis.on:
         shouldDiveRight.lastFramesOff = ball.vis.frames_off
 
-    save = (nball.x_vel < -7.0 and
-        ball.mov_vel_x < constants.SAVE_X_VEL_SIDE and
-        not nball.stationary and
-        nball.yintercept < -25.0 and
-        nball.yintercept > -105.0 and
-        ball.distance < constants.SAVE_DIST and
-        sightOk)
+    if  nball.yintercept != 0.0:
+        player.lastYIntercept = nball.yintercept
 
-    if sightOk and veryFastBall(player, -105.0, -25.0):
+    save = (((nball.x_vel < -5.0 and ball.mov_vel_x < constants.SAVE_X_VEL_SIDE) or (ball.mov_vel_x < -9)) and
+        # not nball.stationary and
+        nball.yintercept < -25.0 and
+        # player.lastYIntercept > -105.0 and
+        ball.distance < constants.SAVE_DIST
+        and sightOk)
+
+    # if ball.distance < 150 and ball.mov_vel_x < -6 and ball.bearing_deg < -15:
+    #     save = True
+
+    if veryFastBall(player, -105.0, -25.0):
         save = True
 #TestingChange
-    if save and savedebug:
+    if savedebug:
         print "DIVE RIGHT"
         print("yintercept:", nball.yintercept)
+        print("playeryintercept:", player.lastYIntercept)
+        print("stationary:", nball.stationary)
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
+        print("ball bearing:", ball.bearing_deg)
         print("ball mov vel:", ball.mov_vel_x)
+        print("Save=", save)
+        print("sightok:", sightOk)
     #     nb = player.brain.naiveBall
     #     print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
     #     print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
@@ -769,6 +779,7 @@ def shouldDiveRight(player):
     #         ball.distance < 150.0 and
     #         sightOk)
 
+
 def shouldDiveLeft(player):
     if player.firstFrame():
         shouldDiveLeft.lastFramesOff = 21
@@ -780,7 +791,7 @@ def shouldDiveLeft(player):
     ball = player.brain.ball
     nball = player.brain.naiveBall
 
-    if shouldDiveLeft.lastFramesOff > 20 and ball.vis.frames_on < 20:
+    if shouldDiveLeft.lastFramesOff > 20 and ball.vis.frames_on < 2:
         sightOk = False
 
     if not ball.vis.on:
@@ -795,12 +806,16 @@ def shouldDiveLeft(player):
         ball.distance < constants.SAVE_DIST and
         sightOk)
 
-    if sightOk and veryFastBall(player, 25.0, 105.0):
+    if veryFastBall(player, 25.0, 105.0):
         save = True
 
 
+    # if ball.distance < 150 and ball.mov_vel_x < -6 and ball.bearing_deg > 15:
+    #     save = True
+
 #TestingChange
-    if save and savedebug:
+    if savedebug:
+        print("")
         print "DIVE LEFT"
         print("yintercept:", nball.yintercept)
         print("Ball dist:", ball.distance)
@@ -840,11 +855,14 @@ def saveWhileMoving(player):
     #     nball.yintercept != 0.0 and
     #     ball.distance < constants.SAVE_DIST and
     #     sightOk)
+    save = False
 
     # save = shouldSquat(player) and ball.distance 
+    if ball.mov_vel_x < -10 and ball.vis.on:
+        save = True
 
-    if save and savedebug:
-        print ("Should adjust save!!")
+    if save:
+        print ("Should moving save!!")
         print "SQUAT"
         print("yintercept:", nball.yintercept)
         print("Ball dist:", ball.distance)
@@ -863,7 +881,7 @@ def shouldSquat(player):
     ball = player.brain.ball
     nball = player.brain.naiveBall
 
-    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 2:
         sightOk = False
 
     if not ball.vis.on:
@@ -984,7 +1002,7 @@ def shouldClearBall(player):
         player.aggressive = False
 
     # ball must be visible
-    if player.brain.ball.vis.frames_off > 20:
+    if player.brain.ball.vis.frames_off > 15:
         return False
 
     shouldGo = False
@@ -1019,9 +1037,37 @@ def shouldClearBall(player):
         else:
             VisualGoalieStates.clearBall.ballSide = constants.LEFT
 
-        # print ("Ball dist:", player.brain.ball.distance)
+        print ("Ball dist:", player.brain.ball.distance)
 
     return shouldGo
+
+
+def shouldClearNotMovingBall(player):
+    shouldGo = False
+    # Ball is not moving and is at the edge of the goalie's box
+    if (player.brain.ball.vis.frames_on > 3
+        and player.brain.ball.distance < constants.CLEARIT_DIST_FAR
+        and player.inPosition is not constants.FAR_RIGHT_POSITION
+        and player.inPosition is not constants.FAR_LEFT_POSITION
+        and math.fabs(player.brain.ball.rel_x - shouldClearNotMovingBall.lastBallRelX) < 3.0):
+        shouldGo = True
+
+    shouldClearNotMovingBall.lastBallRelX = player.brain.ball.rel_x
+
+    if shouldGo:
+        walkedTooFar.xThresh = constants.CLEARIT_DIST_FAR + 10.0
+        walkedTooFar.yThresh = constants.CLEARIT_DIST_FAR + 10.0
+        if player.brain.ball.bearing_deg < 0.0:
+            VisualGoalieStates.clearBall.ballSide = constants.RIGHT
+        else:
+            VisualGoalieStates.clearBall.ballSide = constants.LEFT
+
+        print ("    SHOULD CLEAR NOT MOVING BALL Ball dist:", player.brain.ball.distance)
+
+    return shouldGo
+
+
+shouldClearNotMovingBall.lastBallRelX = 0.0
 
 def shouldGoalieKick(player):
     if player.brain.ball.distance < constants.POSITION_FOR_KICK_DIST:
