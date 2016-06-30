@@ -45,11 +45,11 @@ const float STAND_HIP_HEIGHT = 0.248;                      // for tall power sav
 const float KNEE_PITCH_RANGE = UNSWDEG2RAD(60);                // the knee pitch range from standing to crouching
 const float BASE_WALK_PERIOD = .23; //.25;                 // seconds to walk one step, ie 1/2 walk cycle
 const float WALK_HIP_HEIGHT = .23;                         // Walk hip height - seems to work from .2 to .235
-const float MAX_FORWARD = .25; //.3;                              // meters
+const float MAX_FORWARD = .2;//2; //.3;                              // meters
 const float MAX_BACKWARDS = .15;
-const float MAX_LEFT = .15; //.2;                                 // meters
+const float MAX_LEFT = .11; //.2;                                 // meters
 const float MAX_TURN = .87;                                // radians
-const float BASE_LEG_LIFT = 0.012; //0.010;                         // meters
+const float BASE_LEG_LIFT = 0.016; //0.010;                         // meters
 
 void checkNaN(float n, string s){
    if(n != n){
