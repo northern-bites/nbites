@@ -80,7 +80,7 @@ def walkToWayPoint(player):
     else:
         speed = speeds.SPEED_EIGHT
 
-    if fabs(relH) <= constants.MAX_BEARING_DIFF:
+    if fabs(relH) <= 50: #constants.MAX_BEARING_DIFF:
         wayPoint = RobotLocation(ball.x - constants.WAYPOINT_DIST*cos(radians(player.kick.setupH)),
                                  ball.y - constants.WAYPOINT_DIST*sin(radians(player.kick.setupH)),
                                  player.brain.loc.h)
@@ -349,13 +349,13 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
-        print("NO THIS OCCURED")
+        if player.lastDiffState == 'orbitBall':
+            return player.goNow('approachBall')
         return player.goNow('orbitBall')
     ball = player.brain.ball
     relH = player.decider.normalizeAngle(player.brain.loc.h)
     if ball.distance < constants.LINE_UP_X and not (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
-        print("THIS OCCURED")
         player.setWalk(0, 0, 0)
         return player.goLater('orbitBall')
 
