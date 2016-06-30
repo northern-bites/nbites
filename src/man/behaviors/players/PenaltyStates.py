@@ -39,6 +39,7 @@ def afterPenalty(player):
 
         if player.brain.buttonPenaltyPlacement == True:
             player.brain.player.brain.resetLocTo(999, 999, 999)
+            player.brain.buttonPenaltyPlacement = False
             return player.goNow("gamePlaying")
 
         if player.brain.penaltyCount < 300:
@@ -75,7 +76,6 @@ def afterPenalty(player):
     # Update number of frames since player entered
     afterPenalty.frameCount += 1
     vis = player.brain.vision
-    player.brain.buttonPenaltyPlacement = False
 
     if afterPenalty.frameCount % 50 == 0:
 
