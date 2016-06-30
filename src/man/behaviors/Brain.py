@@ -109,9 +109,8 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
+        self.whistleHeard = False
         self.whistlePenalty = False
-        self.whistled = False
-        self.whistleCounter = 0
 
         self.pickedUpInSet = False
         self.penaltyCount = 0
@@ -218,14 +217,11 @@ class Brain(object):
         if self.interface.gameState.penalty_is_placement:
             self.buttonPenaltyPlacement = True
 
+        if self.interface.gameState.whistle_override:
+            self.whistleHeard = True
+
         # Flush the output
         sys.stdout.flush()
-
-        if self.interface.gameState.whistle_override:
-            self.whistled = True
-
-        if self.whistled:
-            self.whistleCounter += 1
 
         # US OPEN :(
         if self.ball.vis.on:

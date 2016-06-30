@@ -32,8 +32,6 @@ def gameInitial(player):
         #Reset role to player number
         player.role = player.brain.playerNumber
         roleConstants.setRoleConstants(player, player.role)
-        # player.brain.whistled = False
-        # player.brain.whistleCounter = 0
 
     # print "Current Angle: " + str(degrees(player.brain.interface.joints.head_yaw))
     # If stiffnesses were JUST turned on, then stand up.
@@ -94,8 +92,8 @@ def gameSet(player):
         player.stand()
         player.brain.nav.stand()
 
-        player.brain.whistleCounter = 0
-        player.brain.whistled = False
+        player.brain.whistleHeard = False
+        player.brain.whistlePenalty = False
 
         player.brain.gameSetX = player.brain.loc.x
         player.brain.gameSetY = player.brain.loc.y
@@ -184,9 +182,10 @@ def gameFinished(player):
         player.brain.fallController.enabled = False
         player.stopWalking()
         player.zeroHeads()
-        player.brain.whistleCounter = 0
-        player.brain.whistled = False
         player.wasPenalized = False
+
+        player.brain.whistleHeard = False
+
 
         if nogginConstants.V5_ROBOT:
             player.executeMove(SweetMoves.SIT_POS_V5)
@@ -210,11 +209,14 @@ def gamePenalized(player):
         player.brain.penalizedEdgeClose = 0
         player.brain.penalizedCount = 0
         player.brain.penaltyCount = 0
-        player.brain.whistled = False
+
+        if player.brain.whistleHeard:
+            print "BrunswickStates.py: whistle heard and now a penalty?!?! I'm hearing things!"
+            player.brain.whistlePenalty = True
 
         # save current score so we can check in afterPenalty
-        player.brain.scoreAtPenaltyUs = self.brain.ourScore
-        player.brain.scoreAtPenaltyThem = self.brain.theirScore
+        player.brain.scoreAtPenaltyUs = player.brain.ourScore
+        player.brain.scoreAtPenaltyThem = player.brain.theirScore
 
         player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
         # RESET LOC TO FIELD CROSS
@@ -225,10 +227,10 @@ def gamePenalized(player):
     if player.brain.vision.horizon_dist < 200.0:
         player.brain.penalizedEdgeClose += 1
 
-    if player.brain.interface.gameState.whistle_override:
-        player.brain.whistlePenalty = True
-    else:
-        player.brain.whistlePenalty = False
+#    if player.brain.interface.gameState.whistle_override:
+#        player.brain.whistleHeard = True
+#    else:
+#        player.brain.whistleHeard = False
 
     player.brain.penaltyCount += 1
     return player.stay()

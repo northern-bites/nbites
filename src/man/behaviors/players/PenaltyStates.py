@@ -52,19 +52,19 @@ def afterPenalty(player):
             return player.goNow("gamePlaying")
 
         # penalties accrued from whistle-false positives do not result in us being moved
-        if player.brain.whistleCounter < 600 and player.brain.whistleCounter != 0:
-            print "Penalized because of false whistle"
-            player.brain.whistleCounter = 0
+        if player.brain.whistlePenalty:
+            print "PenaltyStates.py: *** Penalized because of false whistle"
+            player.brain.whistlePenalty = False
             return player.goNow('overeagerWhistle')
 
         # if someone scores while we're penalized, we get manually placed (always?)
-        if player.brain.scoreAtPenaltyUs != player.brain.ourScore or
-            player.brain.scoreAtPenaltyThem != player.brain.theirScore:
-            print "PenaltyStates.py: Resetting loc to manual placement because SOMEONE SCORED"
+        if (player.brain.scoreAtPenaltyUs != player.brain.ourScore
+            or player.brain.scoreAtPenaltyThem != player.brain.theirScore):
+            
+            print "PenaltyStates.py: *** Resetting loc to manual placement because SOMEONE SCORED"
             player.brain.resetLocTo(999, 999, 999)
             return player.goNow("gamePlaying")
 
-        player.brain.whistleCounter = 0
         player.brain.penaltyCount = 0
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
