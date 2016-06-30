@@ -358,7 +358,13 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 		            if (!offsets.verify()) {
 		            	Debug.error("invalid offsets! %s\n", offsets.serialize().print());
-		            	throw new RuntimeException("fix this!");
+		            	ToolMessage.displayError("cannot write offsets! "
+		            			+ "One or more values must be invalid, check stdout");
+
+		            	Debug.error("written: %s", written);
+		            	Debug.error("serialized: %s", offsets.serialize().serialize());
+
+		            	return;
 		            }
 
 		            try {

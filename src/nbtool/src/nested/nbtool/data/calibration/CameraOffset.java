@@ -25,7 +25,7 @@ public class CameraOffset {
 	private static final double MIN_VALID = -1 * (MAX_VALID);
 
 	private static boolean verify(double val) {
-		return val > MIN_VALID && val < MAX_VALID;
+		return val > MIN_VALID && val < MAX_VALID && val != Double.NaN;
 	}
 
 	public boolean verify() {
