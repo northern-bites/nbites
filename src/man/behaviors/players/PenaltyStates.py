@@ -33,6 +33,8 @@ def afterPenalty(player):
 
     ## TODO TEST VALUES: NUMBER OF FRAMES AND RIGHT/LEFT DIFFS
     # TODO add a check for whistle override
+    # 
+    print "DEBUG: Wwhistle counter",player.brain.whistleCounter
 
     if player.firstFrame():
         if DEBUG_PENALTY_STATES:
@@ -48,6 +50,7 @@ def afterPenalty(player):
             player.brain.penaltyCount = 0
             return player.goNow("gamePlaying")
 
+        player.brain.whistleCounter = 0
         player.brain.penaltyCount = 0
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
@@ -168,7 +171,7 @@ def afterPenalty(player):
             print ("left horizon:", afterPenalty.leftHorizSum, "right horizon", afterPenalty.rightHorizSum)
             print ("-------------------------------------------------------------\n")
             if not SCRIMMAGE:
-                return player.goNow('gamePenalized')
+                return player.goNow(player.gameState)
 
         # TODO see if the goalie role affects this
         player.brain.tracker.lookToAngle(0)
@@ -240,7 +243,7 @@ def manualPlacement(player):
 
     if manualPlacement.frameCounter > 200:
         print("Horizon totals RIGHT:", manualPlacement.rightHorizon, "LEFT:", manualPlacement.leftHorizon)
-        return player.goNow('gamePenalized')
+        return player.goNow(player.gameState)
 
 
     # if player.brain.interface.vision.circle.on  and DEBUG_MANUAL_PLACEMENT:

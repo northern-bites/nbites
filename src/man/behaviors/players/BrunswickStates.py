@@ -61,7 +61,7 @@ def gameReady(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
-            player.goNow('manualPlacement')
+            return player.goNow('manualPlacement')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
@@ -108,7 +108,7 @@ def gameSet(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
-            player.goNow('manualPlacement')
+            return player.goNow('manualPlacement')
 
     elif player.brain.tracker.isStopped():
 
@@ -217,7 +217,6 @@ def gamePenalized(player):
         player.brain.penalizedEdgeClose += 1
 
     if player.brain.interface.gameState.whistle_override:
-        print "whistle override in brunswick states"
         player.brain.whistlePenalty = True
     else:
         player.brain.whistlePenalty = False
