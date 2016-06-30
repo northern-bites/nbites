@@ -466,7 +466,6 @@ bool BallDetector::edgeSanityCheck(int x, int y, int radius) {
         int ang = e->angle();
         // binary angles, so 128 = pi radians
         if ( ang > 128) {
-			debugDraw.drawPoint(ex, ey, BLUE);
 			if ((ex - x) * (ex - x) + (ey - y) * (ey - y) < diam) {
 				return true;
 			}
