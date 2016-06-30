@@ -90,9 +90,9 @@ int MessagePoolBase::alloc()
       std::cout << "WARNING: A message pool has exceeded its max size."
                 << std::endl;
 
-      describe("[unknown pool]");
-
-      throw std::runtime_error("MESSAGE POOL EXCEEDED MAX SIZE!");
+//      describe("[unknown pool]");
+//
+//      throw std::runtime_error("MESSAGE POOL EXCEEDED MAX SIZE!");
   }
   int i;
   {
