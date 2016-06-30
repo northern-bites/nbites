@@ -10,6 +10,7 @@ import PlayOffBallStates as playOffStates
 from ..navigator import Navigator
 from ..navigator import PID
 from ..navigator import BrunswickSpeeds as speeds
+import ClaimTransitions as claimTransitions
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 # from noggin_constants import MAX_SPEED, MIN_SPEED
@@ -21,6 +22,7 @@ from math import fabs, degrees, radians, cos, sin, pi, copysign
 @stay
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
+@ifSwitchNow(claimTransitions.shouldCedeClaim, 'playOffBall')
 def approachBall(player):
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
@@ -347,9 +349,7 @@ orbitBall.X_BACKUP_SPEED = .2
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
-        print "It's no longer dribble time"
         return player.goNow('orbitBall')
-    print "Dribble time"
     ball = player.brain.ball
     relH = player.decider.normalizeAngle(player.brain.loc.h)
     if ball.distance < constants.LINE_UP_X and not (relH > -constants.ORBIT_GOOD_BEARING and
