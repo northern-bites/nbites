@@ -211,6 +211,11 @@ def gamePenalized(player):
         player.brain.penalizedCount = 0
         player.brain.penaltyCount = 0
         player.brain.whistled = False
+
+        # save current score so we can check in afterPenalty
+        player.brain.scoreAtPenaltyUs = self.brain.ourScore
+        player.brain.scoreAtPenaltyThem = self.brain.theirScore
+
         player.executeMove(SweetMoves.STAND_STRAIGHT_POS)
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
