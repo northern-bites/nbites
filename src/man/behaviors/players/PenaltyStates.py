@@ -34,8 +34,7 @@ def afterPenalty(player):
     ## TODO TEST VALUES: NUMBER OF FRAMES AND RIGHT/LEFT DIFFS
     # TODO add a check for whistle override
     # 
-    print "DEBUG: Wwhistle counter",player.brain.whistleCounter
-
+    # 
     if player.firstFrame():
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
