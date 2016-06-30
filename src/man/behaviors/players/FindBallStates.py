@@ -51,10 +51,10 @@ def spinSearch(player):
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
-        player.setWalk(0, 0, spinDir*speeds.SPEED_FIVE)
+        player.setWalk(0, 0, spinDir*speeds.SPEED_SIX)
         player.brain.tracker.repeatFixedPitchLookAhead()
 
-    if player.stateTime >= constants.SPEED_FIVE_SPUN_ONCE_TIME / 2:
+    if player.stateTime >= constants.SPEED_SIX_SPUN_ONCE_TIME / 2:
         return player.goNow("fastPan")
 
 @superState('gameControllerResponder')
