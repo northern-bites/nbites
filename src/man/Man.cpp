@@ -11,12 +11,12 @@
 #include "TextToSpeech.h"
 
 #ifndef OFFLINE
-SET_POOL_SIZE(messages::WorldModel,  48);
-SET_POOL_SIZE(messages::JointAngles, 48);
-SET_POOL_SIZE(messages::InertialState, 32);
-SET_POOL_SIZE(messages::YUVImage, 32);
-SET_POOL_SIZE(messages::RobotLocation, 32);
-SET_POOL_SIZE(messages::Toggle, 32);
+SET_POOL_SIZE(messages::WorldModel,  24);
+SET_POOL_SIZE(messages::JointAngles, 24);
+SET_POOL_SIZE(messages::InertialState, 16);
+SET_POOL_SIZE(messages::YUVImage, 16);
+SET_POOL_SIZE(messages::RobotLocation, 16);
+SET_POOL_SIZE(messages::Toggle, 16);
 #endif
 
 namespace man {
