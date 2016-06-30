@@ -115,13 +115,17 @@ namespace detect {
     const float MAX_SDRATIO_ALWAYS = 0.4;
     const float MAX_SDRATIO_PEAK = 0.4;
 
+    const float MIN_SDRATIO_CLOSE = 0.25;
+
     bool Channel::_analyze() {
 
         print(0, "peak @ %d {%f}: sum %f sdev %f sdratio %f", current.center, current.value, this_attr.sum, this_attr.sdev, this_attr.sdratio);
 
-        if (!WHISTLE_RANGE.contains(current)) {
+        const Range& range_check = this_attr.sdratio < MIN_SDRATIO_CLOSE ? WHISTLE_RANGE_CLOSE : WHISTLE_RANGE ;
+
+        if (!range_check.contains(current)) {
             print(1, "not in range {%d, %d}",
-                  WHISTLE_RANGE.left, WHISTLE_RANGE.right);
+                  range_check.left, range_check.right);
 
             return count(false, FRAMES_ON, FRAMES_OFF);
         }

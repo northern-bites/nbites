@@ -115,7 +115,7 @@ namespace detect {
             }
         };
 
-        static const Range FULL_RANGE, WHISTLE_RANGE;
+        static const Range FULL_RANGE, WHISTLE_RANGE, WHISTLE_RANGE_CLOSE;
         static const Peak NO_PEAK;
 
         double sum_over( float * spectrum, const Range& range = FULL_RANGE);

@@ -12,6 +12,7 @@ namespace detect {
 
     const Channel::Range Channel::FULL_RANGE = {0, FREQUENCY_LENGTH};
     const Channel::Range Channel::WHISTLE_RANGE = {90, 160};
+    const Channel::Range Channel::WHISTLE_RANGE_CLOSE = {70, 160};
     const Channel::Peak Channel::NO_PEAK = Peak(-1, 0.0);
 
     double Channel::sum_over (float * spectrum, const Range& range ) {
