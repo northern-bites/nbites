@@ -36,7 +36,7 @@ void CommTimer::teamPacketSent()
     int random;
     random = rand() / RAND_MAX * 30000;
 
-    nextSendTime += random + 190000;
+    nextSendTime += random + 220000;
 }
 
 }
