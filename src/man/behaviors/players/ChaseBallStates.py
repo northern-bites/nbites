@@ -379,7 +379,7 @@ def spinToBall(player):
     theta = degrees(player.brain.ball.bearing)
     spinToBall.isFacingBall = fabs(theta) <= 2*constants.FACING_KICK_ACCEPTABLE_BEARING
 
-    if spinToBall.isFacingBall:
+    if spinToBall.isFacingBall and not transitions.shouldNotDribble(player):
         return player.goLater('dribble')
 
     # spins the appropriate direction
