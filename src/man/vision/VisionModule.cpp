@@ -521,6 +521,10 @@ void VisionModule::outportalVisionField()
 
         vb->set_radius(best.radius);
 
+		if (best.y_rel == 0) {
+			std::cout << "***\n***\n***\nDisasterous Y-REL in BALL!!!" << std::endl;
+			best.y_rel = 0.1;
+		}
         double bearing = atan(best.x_rel / best.y_rel);
         vb->set_bearing(bearing);
         vb->set_bearing_deg(bearing * TO_DEG);
