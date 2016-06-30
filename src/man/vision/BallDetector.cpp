@@ -577,7 +577,7 @@ bool BallDetector::findCorrelatedBlackSpots
 					std::cout<<"[BALL INFO] Distance Between Spots: "<<distance<<std::endl;
 				}
 
-                if(distance >= lower && distance <= upper) {
+                if(distance >= lower && distance <= upper && r > 6) {
     				if (debugBall) { std::cout<<"[BALL INFO] Distance OK"<<std::endl; }
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
@@ -843,7 +843,10 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 				" " << length4 << std::endl;
 		}
-		if (abs(length1 + length2 - length3 - length4) < 4) {
+		// if we already pass our tests then stop
+		if (abs(length1 + length2 - length3 - length4) < 4 &&
+			abs(length1 + length3 - length2 - length4) < 4 &&
+			abs(length1 - length2 < 5)) {
 			break;
 		}
 		// recalculate the center
