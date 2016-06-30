@@ -184,6 +184,10 @@ def gameFinished(player):
         player.brain.fallController.enabled = False
         player.stopWalking()
         player.zeroHeads()
+        player.brain.whistleCounter = 0
+        player.brain.whistled = False
+        player.wasPenalized = False
+
         if nogginConstants.V5_ROBOT:
             player.executeMove(SweetMoves.SIT_POS_V5)
         else:

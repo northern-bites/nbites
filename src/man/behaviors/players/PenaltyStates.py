@@ -39,7 +39,8 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
-        if player.brain.whistleCounter < 300 and player.brain.whistleCounter != 0:
+        # we used to use the whistleCounter here but it's not needed
+        if player.brain.interface.gameState.whistle_override:
             print "Penalized because of false whistle"
             player.brain.whistleCounter = 0
             return player.goNow('overeagerWhistle')
