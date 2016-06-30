@@ -38,6 +38,7 @@ import nbtool.nio.RobotConnection;
 import nbtool.util.Debug;
 import nbtool.util.Robots;
 import nbtool.util.SharedConstants;
+import nbtool.util.Utility;
 
 public class CameraOffsetsUtility extends UtilityParent {
 
@@ -349,14 +350,26 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 		            String written = updateSet(offsets);
 
+		            if (!offsets.verify()) {
+		            	Debug.error("invalid offsets! %s\n", offsets.serialize().print());
+		            	throw new RuntimeException("fix this!");
+		            }
+
 		            try {
-						Files.write(CameraOffset.getPath(),
-								offsets.serialize().print().getBytes(StandardCharsets.UTF_8));
+		            	byte[] data = offsets.serialize()
+		            			.print().getBytes(StandardCharsets.UTF_8);
+
+		            	if (!Utility.checkASCIIBytes(data)) {
+		            		Debug.error("invalid bytes! %s\n", new String(data));
+			            	throw new RuntimeException("fix this!");
+		            	}
+
+						Files.write(CameraOffset.getPath(), data);
 			            ToolMessage.displayWarn("camera offsets written: %s", written);
 
 					} catch (IOException e1) {
 						e1.printStackTrace();
-						ToolMessage.displayError("could not write camera offsets.");
+						ToolMessage.displayError("!!!!!!!!!!!!!! could not write camera offsets.!!!!!!!!!!!!!!!");
 					}
 				}
 
