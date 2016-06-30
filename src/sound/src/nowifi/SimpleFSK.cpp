@@ -13,7 +13,7 @@
 using namespace nbsound;
 
 namespace nowifi {
-
+    
 }
 
 NBL_ADD_TEST_TO(transform, fsk) {
