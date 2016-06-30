@@ -288,6 +288,12 @@ public class CameraOffsetsUtility extends UtilityParent {
         			continue;
         		}
 
+        		if (!r.offset.verify()) {
+        			ToolMessage.displayWarn("cannot save offsets for %s, not successful",
+        					r.name);
+        			continue;
+        		}
+
         		Debug.info("replacing offsets for: %s %s", r.name, r.getCamera());
 
         		if (!offsets.containsKey(r.name)) {
@@ -356,11 +362,16 @@ public class CameraOffsetsUtility extends UtilityParent {
 		            }
 
 		            try {
-		            	byte[] data = offsets.serialize()
-		            			.print().getBytes(StandardCharsets.UTF_8);
+		            	String string = offsets.serialize().print();
+		            	byte[] data = string.getBytes(StandardCharsets.US_ASCII);
 
-		            	if (!Utility.checkASCIIBytes(data)) {
-		            		Debug.error("invalid bytes! %s\n", new String(data));
+		            	if (!Utility.isPureAscii(string)) {
+		            		Debug.error("invalid bytes! %s\n", new String(data) );
+			            	throw new RuntimeException("fix this!");
+		            	}
+
+		            	if (!Utility.isPureAscii2(string)) {
+		            		Debug.error("invalid bytes! %s\n", new String(data) );
 			            	throw new RuntimeException("fix this!");
 		            	}
 

@@ -24,6 +24,26 @@ public class CameraOffset {
 	private static final double MAX_VALID = Math.PI / 4;
 	private static final double MIN_VALID = -1 * (MAX_VALID);
 
+	private static boolean verify(double val) {
+		return val > MIN_VALID && val < MAX_VALID;
+	}
+
+	public boolean verify() {
+		if (!verify(this.d_roll)) {
+			Debug.error("error in d_roll: must be within {%f, %f}, is %f",
+					MIN_VALID, MAX_VALID, this.d_roll);
+			return false;
+		}
+
+		if (!verify(this.d_tilt)) {
+			Debug.error("error in d_tilt: must be within {%f, %f}, is %f",
+					MIN_VALID, MAX_VALID, this.d_tilt);
+			return false;
+		}
+
+		return true;
+	}
+
 	public double d_roll;
 	public double d_tilt;
 
@@ -78,36 +98,18 @@ public class CameraOffset {
 			return ret;
 		}
 
-		private boolean verify(double val) {
-			return val > MIN_VALID && val < MAX_VALID;
-		}
 
-		private boolean verify(CameraOffset offset) {
-			if (!verify( offset.d_roll )) {
-				Debug.error("error in d_roll: must be within {%f, %f}, is %f",
-						MIN_VALID, MAX_VALID, offset.d_roll);
-				return false;
-			}
-
-			if (!verify( offset.d_tilt )) {
-				Debug.error("error in d_tilt: must be within {%f, %f}, is %f",
-						MIN_VALID, MAX_VALID, offset.d_tilt);
-				return false;
-			}
-
-			return true;
-		}
 
 		public boolean verify() {
 			for (Entry<String,Pair> entry : this.entrySet()) {
 				String robotName = entry.getKey();
 
-				if (!verify(entry.getValue().top)) {
+				if (!entry.getValue().top.verify()) {
 					Debug.error("error in camera TOP of %s", robotName);
 					return false;
 				}
 
-				if (!verify(entry.getValue().bot)) {
+				if (!entry.getValue().bot.verify()) {
 					Debug.error("error in camera BOT of %s", robotName);
 					return false;
 				}

@@ -5,12 +5,16 @@ import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,25 +29,24 @@ import nbtool.util.test.Tests;
 
 public class Utility {
 
-	static final Set<Byte> legal_bytes = new HashSet<>();
+	public static boolean isPureAscii2(String v) {
+	    byte bytearray []  = v.getBytes();
+	    CharsetDecoder d = Charset.forName("US-ASCII").newDecoder();
+	    try {
+	      CharBuffer r = d.decode(ByteBuffer.wrap(bytearray));
+	      r.toString();
+	    }
+	    catch(CharacterCodingException e) {
+	      return false;
+	    }
+	    return true;
+	  }
 
-	static {
-		legal_bytes.add( (byte) (0 & 0xFF) );
-		for (int i = 41; i < 177; ++i) {
-			legal_bytes.add( (byte) (i & 0xFF) );
-		}
-	}
+	static CharsetEncoder asciiEncoder =
+		      Charset.forName("US-ASCII").newEncoder();
 
-	public static boolean checkASCIIBytes(byte[] bytes) {
-		for (int i = 0; i < bytes.length; ++i) {
-			if (!legal_bytes.contains(new Byte(bytes[i]))) {
-				Debug.error("byte at index %d is illegal (value = 0x%X)", i,
-						bytes[i]);
-				return false;
-			}
-		}
-
-		return true;
+	public static boolean isPureAscii(String v) {
+	    return asciiEncoder.canEncode(v);
 	}
 
 	/* true if top, false if bot */
