@@ -351,8 +351,8 @@ namespace json {
                                 if (nt.type == SEPARATOR) {
                                     rstate = NEED_VAL;
                                 } else {
-                                    throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i",
-                                                                     text[tok.startInd], tok.startInd));
+                                    throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %d",
+                                                                     (char) text[tok.startInd], tok.startInd));
                                 }
                                 
                             } else {
@@ -529,6 +529,8 @@ namespace json {
     Value parseFrom(const std::string& text, int from, int * end) {
         NBL_ASSERT_LT(from, text.size());
         NBL_ASSERT_GE(from, 0);
+
+        NBL_INFO("text is: %s", text.c_str())
 
         Parser parser(text, from);
         Value found = parser.parse(parser.next());

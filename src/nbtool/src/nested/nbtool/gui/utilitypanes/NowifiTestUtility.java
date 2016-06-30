@@ -38,7 +38,7 @@ public class NowifiTestUtility extends UtilityParent {
 	private void doSendAction(NowifiTestPane pane) {
 		String toSend = pane.thetaField.getText().trim();
 
-		toSend = String.format("NowifiAngle=\"%s\"", toSend);
+		toSend = String.format("NowifiAngle=%s", toSend);
 
 		Debug.print("sending: %s", pane.thetaField.getText());
 
