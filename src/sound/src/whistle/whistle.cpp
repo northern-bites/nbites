@@ -20,7 +20,7 @@
 
 #include "Logging.hpp"
 
-const char * LAST_MODIFIED = "6/28 09:05";
+const char * LAST_MODIFIED = "6/20 08:30";
 const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
 using namespace nbl;

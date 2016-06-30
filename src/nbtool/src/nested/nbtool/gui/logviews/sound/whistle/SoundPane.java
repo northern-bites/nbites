@@ -66,6 +66,8 @@ public abstract class SoundPane extends JPanel implements ChangeListener, MouseM
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 
+			peak.setText(peakString());
+
 			Dimension size = this.getSize();
 			if (size.height < 100 || size.width < frames) {
 				g.drawString("make me bigger", 0, 0);

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -44,6 +45,18 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 	int channel_index = 0;
 	int max_index = 0;
+
+	private void setAndSave(boolean heard) {
+		displayedLog.topLevelDictionary.put("WhistleHeard", heard);
+		if (!displayedLog.temporary()) {
+			try {
+				displayedLog.saveChangesToLoadFile();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				ToolMessage.displayError("could not write log!!");
+			}
+		}
+	}
 
 	@Override
 	public void setupDisplay() {
@@ -122,8 +135,10 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 		if (displayedLog.logClass.equals("DetectAmplitude")) {
 			CrossInstance ci = CrossServer.instanceByIndex(0);
-			if (ci == null) return;
-			ci.tryAddCall(this, "whistle_detect", this.displayedLog);
+			if (ci != null) {
+				ci.tryAddCall(this, "whistle_detect", this.displayedLog);
+			}
+
 			this.add(scroll, BorderLayout.CENTER);
 			scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -137,19 +152,14 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 			if (displayedLog.topLevelDictionary.get("WhistleHeard") != null)
 				containsBox.setSelected(displayedLog.topLevelDictionary.get("WhistleHeard").asBoolean().bool());
+			else {
+				setAndSave(false);
+			}
 
 			containsBox.addChangeListener(new ChangeListener() {
 				@Override
 				public void stateChanged(ChangeEvent e) {
-					displayedLog.topLevelDictionary.put("WhistleHeard", containsBox.isSelected());
-					if (!displayedLog.temporary()) {
-						try {
-							displayedLog.saveChangesToLoadFile();
-						} catch (Exception e1) {
-							e1.printStackTrace();
-							ToolMessage.displayError("could not write log!!");
-						}
-					}
+					setAndSave(containsBox.isSelected());
 				}
 			});
 
@@ -191,6 +201,8 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 	@Override
 	public void ioFinished(IOInstance instance) { }
 
+	final ArrayList<FloatBuffer> channels = new ArrayList<>();
+
 	@Override
 	public void ioReceived(IOInstance inst, int ret, Log... out) {
 		assert(out.length == 1);
@@ -202,9 +214,13 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 		byte[] all = new byte[total];
 		int offset = 0;
 
+		channels.clear();
+
 		for (Block b : out[0].blocks) {
 			System.arraycopy(b.data, 0, all, offset, b.data.length);
 			offset += b.data.length;
+
+			channels.add(new FloatBuffer(b, 1, SPECTRUM_OUTPUT_LENGTH));
 		}
 
 		max_index = out[0].blocks.size() - 1;
@@ -226,7 +242,9 @@ public class DetectView extends ViewParent implements IOFirstResponder {
 
 			@Override
 			public String peakString() {
-				return "max = " + buff.max;
+				Debug.print("peakString()");
+				return String.format("max= { %f @ %d }", channels.get(channel_index).max,
+						channels.get(channel_index).max_index);
 			}
 
 			@Override

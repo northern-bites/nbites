@@ -10,6 +10,7 @@ public class FloatBuffer extends Buffer<Float> {
 
 	float[][] data;
 	float max;
+	int max_index;
 
 	public Float index(int channel, int frame) {
 		if (channel < data.length && frame < data[0].length) {
@@ -44,12 +45,17 @@ public class FloatBuffer extends Buffer<Float> {
 		buf.order(ByteOrder.LITTLE_ENDIAN);
 
 		max = Float.NEGATIVE_INFINITY;
+		max_index = 0;
+
 		for (int i = 0; i < channels; ++i) {
 			for (int j = 0; j < frames; ++j) {
 				float f = buf.getFloat();
 				data[i][j] = f;
 				assert(f >= 0);
-				if (f > max) max = f;
+				if (f > max) {
+					max = f;
+					max_index = j;
+				}
 			}
 		}
 	}
