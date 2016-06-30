@@ -212,7 +212,7 @@ class Brain(object):
         # Set myWorldModel for Comm
         self.updateComm()
 
-        if player.brain.interface.gameState.penalty_is_placement:
+        if self.interface.gameState.penalty_is_placement:
             self.buttonPenaltyPlacement = True
 
         # Flush the output
