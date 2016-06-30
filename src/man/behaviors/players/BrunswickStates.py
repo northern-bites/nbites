@@ -202,7 +202,7 @@ def gameFinished(player):
 def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.brain.fallController.enabled = True
         player.gainsOn()
         player.stand()
         player.penalizeHeads()
