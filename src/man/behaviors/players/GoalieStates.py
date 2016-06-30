@@ -440,9 +440,9 @@ def moveBackwards(player):
 def spinToRecover(player):
     if player.firstFrame():
         player.brain.resetGoalieLocalization()
-        player.setWalk(0,0,15.0)
+        player.setWalk(0,0,speeds.SPEED_SIX)
 
-    if player.counter > 275:
+    if player.counter > 250:
         print("Too long... switch to a different state!")
         return player.goLater('returnUsingLoc')
 

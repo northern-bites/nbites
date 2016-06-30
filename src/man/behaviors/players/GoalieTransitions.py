@@ -727,31 +727,41 @@ def shouldDiveRight(player):
     if player.inPosition == constants.FAR_RIGHT_POSITION:
         return False
 
-    if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on < 2:
+    if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on > 2:
         sightOk = False
 
     if not ball.vis.on:
         shouldDiveRight.lastFramesOff = ball.vis.frames_off
 
-    save = (nball.x_vel < -7.0 and
-        ball.mov_vel_x < constants.SAVE_X_VEL_SIDE and
-        not nball.stationary and
-        nball.yintercept < -25.0 and
-        nball.yintercept > -105.0 and
-        ball.distance < constants.SAVE_DIST and
-        sightOk)
+    if  nball.yintercept != 0.0:
+        player.lastYIntercept = nball.yintercept
 
-    if sightOk and veryFastBall(player, -105.0, -25.0):
+    save = (((nball.x_vel < -5.0 and ball.mov_vel_x < constants.SAVE_X_VEL_SIDE) or (ball.mov_vel_x < -9)) and
+        # not nball.stationary and
+        nball.yintercept < -25.0 and
+        # player.lastYIntercept > -105.0 and
+        ball.distance < constants.SAVE_DIST
+        and sightOk)
+
+    # if ball.distance < 150 and ball.mov_vel_x < -6 and ball.bearing_deg < -15:
+    #     save = True
+
+    if veryFastBall(player, -105.0, -25.0):
         save = True
 #TestingChange
-    if save and savedebug:
+    if savedebug:
         print "DIVE RIGHT"
         print("yintercept:", nball.yintercept)
+        print("playeryintercept:", player.lastYIntercept)
+        print("stationary:", nball.stationary)
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
+        print("ball bearing:", ball.bearing_deg)
         print("ball mov vel:", ball.mov_vel_x)
+        print("Save=", save)
+        print("sightok:", sightOk)
     #     nb = player.brain.naiveBall
     #     print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
     #     print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
@@ -768,6 +778,7 @@ def shouldDiveRight(player):
     #         ball.rel_y_intersect_dest < -20.0 and
     #         ball.distance < 150.0 and
     #         sightOk)
+
 
 def shouldDiveLeft(player):
     if player.firstFrame():
@@ -795,12 +806,16 @@ def shouldDiveLeft(player):
         ball.distance < constants.SAVE_DIST and
         sightOk)
 
-    if sightOk and veryFastBall(player, 25.0, 105.0):
+    if veryFastBall(player, 25.0, 105.0):
         save = True
 
 
+    # if ball.distance < 150 and ball.mov_vel_x < -6 and ball.bearing_deg > 15:
+    #     save = True
+
 #TestingChange
-    if save and savedebug:
+    if savedebug:
+        print("")
         print "DIVE LEFT"
         print("yintercept:", nball.yintercept)
         print("Ball dist:", ball.distance)
@@ -843,11 +858,11 @@ def saveWhileMoving(player):
     save = False
 
     # save = shouldSquat(player) and ball.distance 
-    if ball.mov_vel_x < -9:
+    if ball.mov_vel_x < -10 and ball.vis.on:
         save = True
 
-    if save and savedebug:
-        print ("Should adjust save!!")
+    if save:
+        print ("Should moving save!!")
         print "SQUAT"
         print("yintercept:", nball.yintercept)
         print("Ball dist:", ball.distance)

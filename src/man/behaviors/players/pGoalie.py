@@ -50,6 +50,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.inPosition = CENTER_POSITION
         self.inGoalbox = True
+        self.lastYIntercept = 0.0
 
         #HACK FOR PENALTY GOALIE IN WATSON2016
         self.lastPenDiveSide = RIGHT
@@ -186,7 +187,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.saveWhileMoving,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
+                                       Transition.OK_PRECISION)
             : GoalieStates.saveCenter,
 
             }
@@ -445,15 +446,15 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         GoalieStates.spinToRecover.transitions = {
-            Transition.CountTransition(GoalieTransitions.seeGoalbox,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.lineCheckReposition,
-
-            # Transition.CountTransition(GoalieTransitions.shouldClearBall,
+            # Transition.CountTransition(GoalieTransitions.seeGoalbox,
             #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION + 5)
-            # : VisualGoalieStates.clearBall,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.lineCheckReposition,
+
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION + 10)
+            : VisualGoalieStates.clearBall,
 
             # Transition.CountTransition(GoalieTransitions.facingBackward,
             #                            Transition.OCCASIONALLY,
