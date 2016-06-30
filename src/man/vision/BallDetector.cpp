@@ -453,6 +453,32 @@ bool BallDetector::blobsAreClose(std::pair<int,int> p, std::pair<int,int> q)
     }
 }
 
+bool BallDetector::edgeSanityCheck(int x, int y, int radius) {
+	int diam = radius * radius * 1.5;
+
+    AngleBinsIterator<Edge> abi(*edgeList);
+    for (Edge* e = *abi; e; e = *++abi){
+        // If we are part of a hough line, we are not a ball edge
+        if (e->memberOf()) { continue; }
+
+        int ex = e->x() + width/2;
+        int ey = height/2 - e->y();
+        int ang = e->angle();
+        // binary angles, so 128 = pi radians
+        if ( ang > 128) {
+			debugDraw.drawPoint(ex, ey, BLUE);
+			if ((ex - x) * (ex - x) + (ey - y) * (ey - y) < diam) {
+				return true;
+			}
+		}
+	}
+	if (debugBall) {
+		std::cout << "Did not find top edge in two spotted ball" << std::endl;
+	}
+	return false;
+}
+
+
 /* Sometimes our balls are not tidy blobs (e.g. they are up against a
    post or a robot). So we need other methods of finding them. This
    is one such method. It looks at our filtered list of black blobs
@@ -583,13 +609,14 @@ bool BallDetector::findCorrelatedBlackSpots
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
                     if (debugBall) { debugDraw.drawPoint(ix,iy,BLUE); }
 
-                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
+                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy)) &&
+					   edgeSanityCheck(ix, iy, r)) {
                         Spot ballSpot;
                         ballSpot.x = ballSpotX * 2;
                         ballSpot.y = ballSpotY * -2;
     					ballSpot.rawX = ix;
     					ballSpot.rawY = iy;
-    					ballSpot.innerDiam = 5;
+    					ballSpot.innerDiam = r * 2;
 
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
                         if(checkBallHasNoGreen(r)) {
@@ -1246,6 +1273,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     bool foundBall = false;
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
+    edgeList = &edges;
 
     int startCol = 0;
     int endCol = width;
