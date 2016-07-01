@@ -21,8 +21,13 @@ def positionReady(player):
         elif player.isKickingOff:
             player.kickoffPosition = roleConstants.theirKickoff
 
+        if roleConstants.isChaser(player.brain.playerNumber):
+          precision = Navigator.CLOSE_ENOUGH
+        else:
+          precision = Navigator.GRAINY
+
         player.brain.nav.goTo(player.kickoffPosition,
-                              precision = Navigator.PLAYBOOK ,
+                              precision = precision,
                               speed = speeds.SPEED_SEVEN,
                               avoidObstacles = True,
                               fast = True, pb = False)

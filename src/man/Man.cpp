@@ -11,12 +11,12 @@
 #include "TextToSpeech.h"
 
 #ifndef OFFLINE
-SET_POOL_SIZE(messages::WorldModel,  48);
-SET_POOL_SIZE(messages::JointAngles, 48);
-SET_POOL_SIZE(messages::InertialState, 32);
-SET_POOL_SIZE(messages::YUVImage, 32);
-SET_POOL_SIZE(messages::RobotLocation, 32);
-SET_POOL_SIZE(messages::Toggle, 32);
+SET_POOL_SIZE(messages::WorldModel,  24);
+SET_POOL_SIZE(messages::JointAngles, 24);
+SET_POOL_SIZE(messages::InertialState, 16);
+SET_POOL_SIZE(messages::YUVImage, 16);
+SET_POOL_SIZE(messages::RobotLocation, 16);
+SET_POOL_SIZE(messages::Toggle, 16);
 #endif
 
 namespace man {
@@ -49,6 +49,12 @@ Man::Man() :
     sharedBall(playerNum),
     naiveBall()
     {
+        size_t dot_local_pos = robotName.find(".local");
+
+        if (dot_local_pos != std::string::npos) {
+            robotName = robotName.substr(0, dot_local_pos);
+        }
+
         /** Sensors **/
         sensorsThread.addModule(sensors);
         sensorsThread.addModule(jointEnactor);
@@ -204,6 +210,8 @@ Man::Man() :
 #ifdef USE_TIME_PROFILING
         Profiler::getInstance()->profileFrames(1400);
 #endif
+
+        
 
         man::tts::say(IN_GAME, nbl::utilities::format("%s has started", robotName.c_str()).c_str() );
 
