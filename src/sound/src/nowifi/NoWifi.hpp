@@ -49,9 +49,8 @@ namespace nowifi {
         bool recving;
 
         time_t start;
-        std::string current;
         time_t end;
-        virtual void finish();
+        virtual void finish(std::string data);
 
     public:
         RecvrBase(Callback cb);

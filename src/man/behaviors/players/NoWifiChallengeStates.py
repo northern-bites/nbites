@@ -55,17 +55,11 @@ def pleaseTurn(player):
     return player.stay()
 @superState('gameControllerResponder')
 def waitForNum(player):
-    currNumString = os.environ.get('NowifiAngle')
-    print currNumString
-    print type(currNumString)
 
-    if ( currNumString != None ):
-        currNum = float(currNumString)
-
-        print "using currNum", currNum
-
-        if (player.lastNum != currNum):
-            return player.goNow('pleaseTurn')
+    if ( currNum != player.brain.nowifi_angle )
+        currNum = player.brain.nowifi_angle
+        print "NO WIFI ANGLE CHANGED TO ", currNum
+        return player.goNow('pleaseTurn')
 
     return player.stay()
 

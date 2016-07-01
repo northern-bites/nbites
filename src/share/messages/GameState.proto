@@ -20,6 +20,8 @@ message GameState
     optional bool whistle_override = 10;
     optional bool penalty_is_placement = 11;
 
+    optional int32 nowifi_angle = 12;
+
     repeated TeamInfo team = 9;
 }
 

@@ -77,6 +77,7 @@ namespace man{
 #endif
 
             latest_data.set_penalty_is_placement(true);
+            latest_data.set_nowifi_angle( NOWIFI_NEXT_ANGLE );
 
             portals::Message<messages::GameState> output(&latest_data);
             gameStateOutput.setMessage(output);

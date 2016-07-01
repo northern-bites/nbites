@@ -14,7 +14,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 		self.addStates(CommMonitorStates)
 		self.addStates(GameControllerStates)
 		self.addStates(NoWifiChallengeStates)
-		self.setName('pNoWifiChallenge')
+		self.setName('pNoWifi')
 		self.currentState = 'fallController' # initial state
 
 		self.brain.fallController.enabled = False 

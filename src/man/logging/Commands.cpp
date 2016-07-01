@@ -8,6 +8,8 @@
 #include "Control.hpp"
 #include "LogRPC.hpp"
 
+int NOWIFI_NEXT_ANGLE = 0;
+
 using nbl::SharedConstants;
 
 namespace control {
@@ -71,7 +73,7 @@ namespace control {
             std::string toEnv = arguments[0]->topLevelDictionary["AngleEnv"].asString();
             NBL_WARN("env: %s\n", toEnv.c_str() );
 
-            putenv( (char *) toEnv.c_str() );
+            NOWIFI_NEXT_ANGLE = std::stoi(toEnv);
     }
 
 }

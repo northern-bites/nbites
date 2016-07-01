@@ -37,12 +37,11 @@ namespace nowifi {
         recving = false;
     }
 
-    void RecvrBase::finish() {
+    void RecvrBase::finish(std::string data) {
         NBL_ASSERT(start > 0)
         NBL_ASSERT(end > 0)
 
-        callback(start, end, current);
-        current.clear();
+        callback(start, end, data);
     }
 
     SendrBase * getSender() {

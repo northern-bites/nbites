@@ -9,6 +9,8 @@
 
 #include "whistle.hpp"
 
+extern int NOWIFI_NEXT_ANGLE;
+
 namespace man{
 namespace gamestate{
 

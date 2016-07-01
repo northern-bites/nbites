@@ -16,9 +16,9 @@ namespace nowifi {
 
     //48khz sampling rate
     const int SIMPLE_FSK_WINDOW_SIZE = 8192;
-    const int SIMPLE_FSK_START_F = 16000;
-    const int SIMPLE_FSK_0_F = 15000;
-    const int SIMPLE_FSK_1_F = 17000;
+    const int SIMPLE_FSK_START_F = 15000;
+    const int SIMPLE_FSK_0_F = 12000;
+    const int SIMPLE_FSK_1_F = 18000;
 
     const double SIMPLE_FSK_START_THRESH = 2.0;
 
@@ -48,8 +48,12 @@ namespace nowifi {
             if (! (byte < current.size() ) ) {
                 NBL_WARN("send finished [of %zd bytes, at current_offset %zd]",
                        current.size(), current_offset);
+
                 sending = false;
                 current.clear();
+
+                /* send hangup frame */
+                filler_start.fill(buffer, conf);
                 return;
             }
 
@@ -99,8 +103,13 @@ namespace nowifi {
 
                 NBL_INFO("%le average, %le magnitude", average, start_magnitude)
                 if ( start_magnitude > (average * SIMPLE_FSK_START_THRESH) ) {
+
                     NBL_INFO("%le mag %le average :: MOVING TO SEARCHING")
                     current = SEARCHING;
+                    start = time(NULL);
+                    recving = true;
+                    data.clear();
+
                 } else {
                     running_start_mag += start_magnitude;
                 }
@@ -112,7 +121,24 @@ namespace nowifi {
             } break;
 
             case RECORDING: {
+                int result = do_parse(frame_1, frame_2, conf);
+                if (result < 0) {
+                    if ( data.empty() ) {
+                        NBL_WARN("ignoring empty first frame");
+                        break;
+                    }
 
+                    NBL_WARN("!!! finished !!!");
+
+                    std::string output = data_so_far();
+                    data.clear();
+                    recving = false;
+                    current = LISTENING;
+
+                    finish(output);
+                } else {
+                    data.push_back(result);
+                }
             } break;
 
             default:
@@ -126,45 +152,74 @@ namespace nowifi {
     }
 
     void SimpleFSKRecvr::do_search(nbsound::SampleBuffer &f0, nbsound::SampleBuffer &f1, nbsound::SampleBuffer &f2, nbsound::Config &conf) {
-        SampleBufferArray array;
+        double magnitudes[3];
 
-        array.add(f0);
-        array.add(f1);
-        array.add(f2);
+        detect_start.parse(f0, conf);
+        magnitudes[0] = detect_start.bin.magnitude();
 
-        double mag_max = 0;
-        int i_max = 0;
+        detect_start.parse(f1, conf);
+        magnitudes[1] = detect_start.bin.magnitude();
 
-        for (int i = 0; i < (2 * SIMPLE_FSK_WINDOW_SIZE); ++i) {
-            detect_start.correlate(array, conf, f0.sample_max(), i, SIMPLE_FSK_WINDOW_SIZE / 16);
+        detect_start.parse(f2, conf);
+        magnitudes[2] = detect_start.bin.magnitude();
 
-            double value = detect_start.bin.magnitude();
+        int     max_i = 0;
+        double  max_m = 0;
 
-            if (value > mag_max) {
-                mag_max = value;
-                i_max = i;
+        for (int i = 0; i < 3; ++i) {
+            if ( magnitudes[i] > max_m ) {
+                max_m = magnitudes[i];
+                max_i = i;
             }
         }
 
-        NBL_WARN("max correlation at %d ( %lf )", i_max, mag_max);
+        NBL_INFO("max in %d (%lf)", max_i, max_m);
 
-        size_t rel1 = i_max / SIMPLE_FSK_WINDOW_SIZE;
+        int frame_start;
+        double f;
 
-        NBL_WARN("max frame offset is %zd", rel1);
+        SampleBuffer * start = NULL, * end = NULL;
 
-        frame_offset = ( i_max + (SIMPLE_FSK_WINDOW_SIZE / 2) ) %
-            SIMPLE_FSK_WINDOW_SIZE ;
-
-        NBL_WARN("frame_offset is %zd", frame_offset);
-
-        switch (rel1) {
+        switch (max_i) {
             case 0:
-                NBL_ERROR("max is in frame 0, do_search() should have been called earlier!")
+                NBL_ERROR("case 0! this is not supposed to happen!")
+
+                f = magnitudes[1] /
+                    ( magnitudes[0] + magnitudes[1] );
+                NBL_INFO("case 0: fraction %lf", f)
+                frame_start = f * SIMPLE_FSK_WINDOW_SIZE;
+
+                start = &f0;
+                end = &f1;
                 break;
+
             case 1:
+                if ( magnitudes[0] > magnitudes[2] ) {
+                    f = magnitudes[0] /
+                        (magnitudes[0] + magnitudes[1]);
+                    NBL_INFO("case 1 low: fraction %lf", f)
+                    frame_start = (1 - f) * SIMPLE_FSK_WINDOW_SIZE;
+                    start = &f0;
+                    end = &f1;
+                } else {
+                    f = magnitudes[2] /
+                        (magnitudes[1] + magnitudes[2]);
+                    NBL_INFO("case 1 hgh: fraction %lf", f)
+                    frame_start = (1 + f) * SIMPLE_FSK_WINDOW_SIZE;
+                    start = &f1;
+                    end = &f2;
+                }
 
                 break;
+
             case 2:
+                f = magnitudes[1] /
+                    ( magnitudes[1] + magnitudes[2] );
+                NBL_INFO("case 2: fraction %lf", f)
+                frame_start = (2 - f) * SIMPLE_FSK_WINDOW_SIZE;
+
+                start = &f1;
+                end = &f2;
 
                 break;
                 
@@ -172,144 +227,115 @@ namespace nowifi {
                 break;
         }
 
-        exit(1);
+        NBL_INFO("calculated frame_start is at %d", frame_start)
+
+        NBL_ASSERT_GE(frame_start, 0)
+        NBL_ASSERT_LE(frame_start, 2 * SIMPLE_FSK_WINDOW_SIZE)
+
+        NBL_ASSERT(start && end);
+
+        frame_offset = frame_start % SIMPLE_FSK_WINDOW_SIZE;
+
+        NBL_WARN("frame offset is %d samples.", frame_offset)
+
+        /* need to run detection on these two frames... */
+        do_parse(*start, *end, conf);
+    }
+
+    static inline void combine(SampleBuffer& dest, SampleBuffer& one, SampleBuffer& two, size_t offset) {
+        size_t from_one = SIMPLE_FSK_WINDOW_SIZE - offset;
+        size_t from_two = SIMPLE_FSK_WINDOW_SIZE - from_one;
+
+        memcpy(dest.buffer, one.buffer + offset, from_one);
+        memcpy(dest.buffer + from_one, two.buffer, from_two);
+    }
+
+    int closest(int point, std::vector<int> points, std::vector<int> keys) {
+        if (point <= points[0]) return keys[0];
+        if (point >= points[points.size() - 1]) return keys[points.size() - 1];
+
+        int up = 0, down = 0;
+        //must be in between
+        for (int i = 0; i < points.size(); ++i) {
+            if (points[i] <= point && points[i + 1] >= point) {
+                NBL_WARN("%d <= %d <= %d",
+                         points[i], point, points[i + 1])
+                down = i; up = i + 1;
+            }
+        }
+
+        int dist_down = point - points[down];
+        int dist_up = points[up] - point;
+
+        if (dist_down < dist_up) {
+            NBL_WARN("down [%d %d]", dist_down, dist_up)
+            return keys[down];
+        } else if (dist_up < dist_down) {
+            NBL_WARN("up [%d %d]", dist_down, dist_up)
+            return keys[up];
+        } else {
+            //round down.
+            NBL_WARN("equal [%d %d]", dist_down, dist_up)
+            return keys[down];
+        }
+    }
+
+    std::vector<int> KEYS = {0, -1, 1};
+
+    int SimpleFSKRecvr::do_parse(nbsound::SampleBuffer& start, nbsound::SampleBuffer& end, nbsound::Config& conf) {
+
+        SampleBuffer full{1, start.frames};
+        combine(full, start, end, frame_offset);
+
+        detect_data.transform(full, 0);
+
+        int     mi = 0;
+        float   mf = 0;
+
+        for (int i = 0; i < detect_data.get_freq_len(); ++i) {
+            if (detect_data.get(i) > mf) {
+                mi = i;
+                mf = detect_data.get(i);
+            }
+        }
+
+        NBL_ASSERT(mf > 0);
+
+        int bin0 = detect_data.bin_for_frequency(SIMPLE_FSK_0_F, conf.sample_rate);
+        int bin1 = detect_data.bin_for_frequency(SIMPLE_FSK_1_F, conf.sample_rate);
+        int binD = detect_data.bin_for_frequency(SIMPLE_FSK_START_F, conf.sample_rate);
+
+        printf(" [%4d %4d %4d] %d\n",
+               bin0, binD, bin1, mi);
+
+        std::vector<int> points = {bin0, binD, bin1};
+        int ret = closest(mi, points, KEYS);
+        return ret;
+    }
+
+    std::string SimpleFSKRecvr::data_so_far() {
+        std::string buffer;
+
+        int offset = 0;
+
+        while ( (data.size() - offset) >= 8 ) {
+            uint8_t byte = 0;
+            for (int i = 0; i < 8; ++i) {
+                byte |= data[offset + i] << i;
+            }
+
+            buffer.push_back(byte);
+            offset += 8;
+        }
+
+        if (offset != data.size()) {
+            NBL_ERROR("throwing away %d bits of unmatched data!",
+                      data.size() - offset);
+        }
+        return buffer;
     }
     
 }
-
-using namespace nowifi;
-
-NBL_ADD_TEST_TO(simple_fsk_send, fsk) {
-    Config config{48000, 8192};
-    SampleBuffer full_buffer{1, SIMPLE_FSK_WINDOW_SIZE * 9};
-
-    uint8_t alt = 0x55;
-    std::string data((char *) &alt, 1);
-
-    SimpleFSKSendr test;
-    test.send(data);
-
-    int cycle = 0;
-    while (test.isSending()) {
-        SampleBuffer window = full_buffer.window(cycle * SIMPLE_FSK_WINDOW_SIZE, (cycle + 1) * SIMPLE_FSK_WINDOW_SIZE);
-
-        test.fill(window, config);
-    }
-
-    return true;
-}
-
-NBL_ADD_TEST_TO(corr_and_transform, fsk) {
-    Config config{48000, 8192};
-    SampleBuffer buffer{1, 8192};
-
-    nowifi::CorrSender corr(nowifi::SIMPLE_FSK_START_F);
-
-    corr.fill(buffer, config);
-
-    Transform transform(8192);
-    transform.transform(buffer, 0);
-
-    float expected = transform.bin_for_frequency(SIMPLE_FSK_START_F, config.sample_rate);
-
-    printf("freq len %d\n", transform.get_freq_len());
-    printf("bin expected at %f\n",
-           expected);
-
-    int max = 0;
-    float fmax = 0;
-    for (int i = 0; i < transform.get_freq_len(); ++i) {
-        if (transform.get(i) > fmax) {
-            max = i;
-            fmax = transform.get(i);
-        }
-    }
-
-    printf("max %f @ %d, expected %f\n",
-           fmax, max, expected);
-
-    NBL_ASSERT(fabs(max - expected) < 1.0);
-
-
-    return true;
-}
-
-NBL_ADD_TEST_TO(transform, fsk) {
-    Config config{48000, 4096};
-    SampleBuffer buffer{1, 4096};
-    nowifi::CorrSender sender;
-
-    Transform * transform = new Transform(4096);
-    sender.fill(buffer, config);
-
-    transform->transform(buffer, 0);
-
-//    for (int i = 0; i < transform->get_freq_len(); ++i) {
-//        printf("%d %f\n", i, transform->get(i));
-//    }
-
-    printf("bins %lf %lf\n",
-           transform->bin_for_frequency(8192, 48000),
-           transform->bin_for_frequency(19000, 48000) );
-
-    printf("freqs %lf %lf\n",
-           transform->frequency_at(350, 48000),
-           transform->frequency_at(811, 48000) );
-
-    delete transform;
-
-    return true;
-}
-
-NBL_ADD_TEST_TO(sfsk_recv, fsk) {
-
-    Config config{48000, 8192};
-    SampleBuffer full_buffer{1, SIMPLE_FSK_WINDOW_SIZE * 9};
-    memset(full_buffer.buffer, 0, full_buffer.size_bytes());
-    NBL_INFO("zero fill done");
-
-    uint8_t alt = 0x55;
-    std::string data((char *) &alt, 1);
-
-    SimpleFSKSendr test;
-    size_t offset = SIMPLE_FSK_WINDOW_SIZE / 2;
-    test.send(data);
-
-    SampleBuffer window = full_buffer.window(SIMPLE_FSK_WINDOW_SIZE * 4 + offset, SIMPLE_FSK_WINDOW_SIZE * 5 + offset);
-    test.fill(window, config);
-
-    for (int i = 0; i < full_buffer.size_samples(); ++i) {
-        if (full_buffer[0][i]) {
-            printf("start at %d\n", i);
-            break;
-        }
-    }
-
-    for (int i = full_buffer.size_samples(); i > 0; --i) {
-        if (full_buffer[0][i]) {
-            printf("end at %d\n", i);
-            break;
-        }
-    }
-
-    NBL_INFO("offset fill done");
-    SimpleFSKRecvr recvr(nullptr);
-    recvr.NUM_FRAMES_TO_CALIBRATE = 2;
-//    NBL_INFO("after constructor");
-
-    for (int i = 0; i < 9; ++i) {
-//        NBL_INFO("loop %d", i);
-        SampleBuffer window = full_buffer.window(i * SIMPLE_FSK_WINDOW_SIZE, (i + 1) * SIMPLE_FSK_WINDOW_SIZE);
-
-        recvr.parse(window, config);
-    }
-        
-    return true;
-}
-
-
-
-
 
 
 
