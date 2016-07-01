@@ -51,7 +51,6 @@ namespace nbsound {
     }
     
     void Transform::transform(SampleBuffer& buffer, int channel) {
-
         NBL_ASSERT(SPECTRUM_LENGTH(buffer.frames) == frequency_length);
 
         SampleBuffer::BufferChannel chnl = buffer[channel];
@@ -60,7 +59,9 @@ namespace nbsound {
         for (int i = 0; i < buffer.frames; ++i) {
             _the_input[i] = makeFloat(chnl[i], sample_max);
         }
-        
+
+        memset(_the_output, 0, sizeof(fftwf_complex) * frequency_length);
+
         fftwf_execute(_the_plan);
         
         for( int i = 0; i < frequency_length; ++i ) {

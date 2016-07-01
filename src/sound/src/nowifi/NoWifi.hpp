@@ -15,11 +15,14 @@ namespace nowifi {
 
     NBL_MAKE_ENUM_FULL(CommType, Test, SimpleFSK, MultiFSK)
 
-    static const CommType USING = Test;
+    static const CommType USING = SimpleFSK;
 
     typedef void (*Callback)(time_t start, time_t end, std::string data);
 
     class SendrBase {
+        NBL_DISALLOW_COPY(SendrBase)
+
+    protected:
         pthread_mutex_t mutex;
         bool running;
         bool sending;
@@ -36,10 +39,11 @@ namespace nowifi {
         virtual void send(std::string data);
         virtual void fill(nbsound::SampleBuffer& buffer, nbsound::Config& conf) = 0;
 
-        NBL_DISALLOW_COPY(SendrBase)
     };
 
     class RecvrBase {
+        NBL_DISALLOW_COPY(RecvrBase)
+
         Callback callback;
         bool running;
         bool recving;
@@ -58,7 +62,6 @@ namespace nowifi {
 
         virtual void parse(nbsound::SampleBuffer& buffer, nbsound::Config& conf) = 0;
 
-        NBL_DISALLOW_COPY(RecvrBase)
     };
 
     SendrBase * getSender();

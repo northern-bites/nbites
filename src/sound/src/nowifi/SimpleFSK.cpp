@@ -20,26 +20,90 @@ namespace nowifi {
     const int SIMPLE_FSK_0_F = 15000;
     const int SIMPLE_FSK_1_F = 17000;
 
+    CorrSender filler_start(SIMPLE_FSK_START_F);
+    CorrSender filler_0(SIMPLE_FSK_0_F);
+    CorrSender filler_1(SIMPLE_FSK_1_F);
+
+    CorrRecvr  detect_start(nullptr, SIMPLE_FSK_START_F);
+    Transform  detect_data(SIMPLE_FSK_WINDOW_SIZE);
+
     void SimpleFSKSendr::fill(nbsound::SampleBuffer &buffer, nbsound::Config &conf) {
-        if (iteration == 0) {
-            printf("iteration 0, FIRST FRAME");
-        } else {
-            size_t bit = (iteration / SIMPLE_FSK_WINDOW_SIZE) - 1;
-            size_t byte = bit / 8;
-            printf("data frame %zd");
+
+        if (!isSending()) {
+            memset(buffer.buffer, 0, buffer.size_bytes());
+            return;
         }
+
+        if (current_offset == 0) {
+            NBL_WARN("current_offset 0, FIRST FRAME");
+            filler_start.fill(buffer, conf);
+        } else {
+            size_t bit = (current_offset) - 1;
+            size_t byte = bit / 8;
+            NBL_INFO("data frame %zd bit %zd byte %zd",
+                   current_offset, bit, byte);
+
+            if (! (byte < current.size() ) ) {
+                NBL_WARN("send finished [of %zd bytes, at current_offset %zd]",
+                       current.size(), current_offset);
+                sending = false;
+                current.clear();
+                return;
+            }
+
+            uint8_t theByte = current[byte];
+            int bitIndex = bit & 0x07;
+            int bitMask = (1 << bitIndex);
+            uint8_t bitSet = theByte & bitMask;
+
+            NBL_INFO("bit %zd of 0x%x [index %d mask 0x%x] was %x",
+                     bit, theByte, bitIndex, bitMask, bitSet
+                     );
+
+            if (bitSet) {
+                filler_1.fill(buffer, conf);
+            } else {
+                filler_0.fill(buffer, conf);
+            }
+        }
+
+        ++current_offset;
     }
 
     void SimpleFSKRecvr::parse(nbsound::SampleBuffer &buffer, nbsound::Config &conf) {
+        
+        if (iteration > 0) {
 
+        }
+
+        lastFrame.take(buffer);
     }
     
 }
 
 using namespace nowifi;
 
-NBL_ADD_TEST_TO(corr_and_transform, fsk) {
+NBL_ADD_TEST_TO(simple_fsk_send, fsk) {
+    Config config{48000, 8192};
+    SampleBuffer full_buffer{1, SIMPLE_FSK_WINDOW_SIZE * 9};
 
+    uint8_t alt = 0x55;
+    std::string data((char *) &alt, 1);
+
+    SimpleFSKSendr test;
+    test.send(data);
+
+    int cycle = 0;
+    while (test.isSending()) {
+        SampleBuffer window = full_buffer.window(cycle * SIMPLE_FSK_WINDOW_SIZE, (cycle + 1) * SIMPLE_FSK_WINDOW_SIZE);
+
+        test.fill(window, config);
+    }
+
+    return true;
+}
+
+NBL_ADD_TEST_TO(corr_and_transform, fsk) {
     Config config{48000, 8192};
     SampleBuffer buffer{1, 8192};
 
@@ -52,6 +116,7 @@ NBL_ADD_TEST_TO(corr_and_transform, fsk) {
 
     float expected = transform.bin_for_frequency(SIMPLE_FSK_START_F, config.sample_rate);
 
+    printf("freq len %d\n", transform.get_freq_len());
     printf("bin expected at %f\n",
            expected);
 

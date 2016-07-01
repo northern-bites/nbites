@@ -22,37 +22,38 @@ namespace nowifi {
     extern const int SIMPLE_FSK_1_F;
 
     class SimpleFSKSendr : public SendrBase {
-        size_t iteration;
+        NBL_DISALLOW_COPY(SimpleFSKSendr)
 
     public:
 
         SimpleFSKSendr() :
             SendrBase()
-        {
-            iteration = 0;
-        }
+        {  }
 
         void fill(nbsound::SampleBuffer& buffer, nbsound::Config& conf);
 
-        NBL_DISALLOW_COPY(SimpleFSKSendr)
     };
 
     class SimpleFSKRecvr : public RecvrBase {
+        NBL_DISALLOW_COPY(SimpleFSKRecvr)
+
         size_t iteration;
         size_t signal_start;
         size_t frame_offset;
 
+        nbsound::SampleBuffer lastFrame;
+
     public:
 
         SimpleFSKRecvr(Callback cb) :
-            RecvrBase(cb)
+            RecvrBase(cb),
+            lastFrame(1, SIMPLE_FSK_WINDOW_SIZE)
         {
-
+            
         }
 
         void parse(nbsound::SampleBuffer& buffer, nbsound::Config& conf);
 
-        NBL_DISALLOW_COPY(SimpleFSKRecvr)
     };
 
 }

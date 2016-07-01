@@ -73,6 +73,9 @@ int main(int argc, char ** argv) {
     playback->init();
     playback->start_new_thread(capture_thread, NULL);
 
+    std::string data = "hello";
+    sendr->send(data);
+
     while(true) sleep(5);
 
     return 0;

@@ -4,7 +4,7 @@
 
 namespace nowifi {
     SendrBase::SendrBase() {
-        running = false;
+        running = true;
         sending = false;
         pthread_mutex_init(&mutex, NULL);
 
@@ -27,12 +27,13 @@ namespace nowifi {
         sending = true;
         current = data;
         current_offset = 0;
+
         pthread_mutex_unlock(&mutex);
     }
 
     RecvrBase::RecvrBase(Callback cb) {
         callback = cb;
-        running = false;
+        running = true;
         recving = false;
     }
 
@@ -47,7 +48,7 @@ namespace nowifi {
     SendrBase * getSender() {
         switch (USING) {
             case Test: return new CorrSender{};
-            case SimpleFSK: return nullptr;
+            case SimpleFSK: return new SimpleFSKSendr{};
             case MultiFSK: return nullptr;
         }
     }
@@ -55,7 +56,7 @@ namespace nowifi {
     RecvrBase * getRecvr(Callback callback) {
         switch (USING) {
             case Test: return new CorrRecvr{callback};
-            case SimpleFSK: return nullptr;
+            case SimpleFSK: return new SimpleFSKRecvr{callback};
             case MultiFSK: return nullptr;
         }
     }

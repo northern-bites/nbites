@@ -530,7 +530,7 @@ namespace json {
         NBL_ASSERT_LT(from, text.size());
         NBL_ASSERT_GE(from, 0);
 
-        NBL_INFO("text is: %s", text.c_str())
+//        NBL_INFO("text is: %s", text.c_str())
 
         Parser parser(text, from);
         Value found = parser.parse(parser.next());

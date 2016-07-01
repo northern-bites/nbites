@@ -70,6 +70,8 @@ namespace nbsound {
     class Buffer {
     private:
 
+        Buffer& operator=(Buffer& other);   //no assignment operator
+
         void init_channels() {
             NBL_ASSERT_EQ(_channels.size(), 0)
 
@@ -137,7 +139,12 @@ namespace nbsound {
             memcpy(buffer, other.buffer, other.size_bytes());
         }
 
-        Buffer& operator=(Buffer& other);   //no assignment operator
+        void take(const Buffer& other) {
+            NBL_ASSERT_EQ(other.frames, frames)
+            NBL_ASSERT_EQ(other.channels, channels)
+
+            memcpy(buffer, other.buffer, other.size_bytes());
+        }
 
         BufferChannel& operator[](int c) {
             return _channels[c];
