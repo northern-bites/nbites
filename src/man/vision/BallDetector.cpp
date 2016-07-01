@@ -453,6 +453,31 @@ bool BallDetector::blobsAreClose(std::pair<int,int> p, std::pair<int,int> q)
     }
 }
 
+bool BallDetector::edgeSanityCheck(int x, int y, int radius) {
+	int diam = radius * radius * 1.5;
+
+    AngleBinsIterator<Edge> abi(*edgeList);
+    for (Edge* e = *abi; e; e = *++abi){
+        // If we are part of a hough line, we are not a ball edge
+        if (e->memberOf()) { continue; }
+
+        int ex = e->x() + width/2;
+        int ey = height/2 - e->y();
+        int ang = e->angle();
+        // binary angles, so 128 = pi radians
+        if ( ang > 128) {
+			if ((ex - x) * (ex - x) + (ey - y) * (ey - y) < diam) {
+				return true;
+			}
+		}
+	}
+	if (debugBall) {
+		std::cout << "Did not find top edge in two spotted ball" << std::endl;
+	}
+	return false;
+}
+
+
 /* Sometimes our balls are not tidy blobs (e.g. they are up against a
    post or a robot). So we need other methods of finding them. This
    is one such method. It looks at our filtered list of black blobs
@@ -577,19 +602,20 @@ bool BallDetector::findCorrelatedBlackSpots
 					std::cout<<"[BALL INFO] Distance Between Spots: "<<distance<<std::endl;
 				}
 
-                if(distance >= lower && distance <= upper) {
+                if(distance >= lower && distance <= upper && r > 6) {
     				if (debugBall) { std::cout<<"[BALL INFO] Distance OK"<<std::endl; }
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
                     if (debugBall) { debugDraw.drawPoint(ix,iy,BLUE); }
 
-                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
+                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy)) &&
+					   edgeSanityCheck(ix, iy, r)) {
                         Spot ballSpot;
                         ballSpot.x = ballSpotX * 2;
                         ballSpot.y = ballSpotY * -2;
     					ballSpot.rawX = ix;
     					ballSpot.rawY = iy;
-    					ballSpot.innerDiam = 5;
+    					ballSpot.innerDiam = r * 2;
 
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
                         if(checkBallHasNoGreen(r)) {
@@ -843,7 +869,10 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 			std::cout << "Lengths: " << length1 << " " << length2 << " " << length3 <<
 				" " << length4 << std::endl;
 		}
-		if (abs(length1 + length2 - length3 - length4) < 4) {
+		// if we already pass our tests then stop
+		if (abs(length1 + length2 - length3 - length4) < 4 &&
+			abs(length1 + length3 - length2 - length4) < 4 &&
+			abs(length1 - length2 < 5)) {
 			break;
 		}
 		// recalculate the center
@@ -1243,6 +1272,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     bool foundBall = false;
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
+    edgeList = &edges;
 
     int startCol = 0;
     int endCol = width;
