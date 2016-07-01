@@ -74,11 +74,11 @@ good to thoroughly test each kick you want to put back in.
                                                     <3
 """
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", 
-                                 x = 8.5, y = 2,
+                                 x = 8.5, y = 3,
                                  dist = 270,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
-                                 x = 8.5, y = -2,
+                                 x = 8.5, y = -3,
                                  dist = 270,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
