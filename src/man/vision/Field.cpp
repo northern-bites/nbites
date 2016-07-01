@@ -328,7 +328,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 	}
 	// prepare for the convex hull algorithm
     for (good = 0; convex[good].y == height && good < HULLS; good++) {}
-    if (good < HULLS) {
+    if (good < HULLS && convex[0].y != height) {
         for (int i = good-1; i > -1; i--) {
             convex[i].y = convex[i+1].y;
         }
