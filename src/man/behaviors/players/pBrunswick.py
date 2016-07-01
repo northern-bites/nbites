@@ -67,7 +67,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we will role switch
         self.roleSwitching = True
         # Controls whether we use claims
-        self.useClaims = False
+        self.useClaims = True
         self.returningFromPenalty = False
 
         # Trinary flag indicating state of communications

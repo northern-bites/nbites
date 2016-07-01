@@ -847,7 +847,7 @@ GOALIE_TEST_CENTER_SAVE = ( ((0, -5, -90, 0),
 #**********************
 
 # This is a relatively stable straight kick for arms back
-OLD_LEFT_SHORT_STRAIGHT_KICK = (
+LEFT_SHORT_STRAIGHT_KICK = (
     #stand for a bit
     ((90.,10.,-90.,-10.),
      (-0.2,5,-25,43.5,-21.2, 0.0),
@@ -905,10 +905,10 @@ OLD_LEFT_SHORT_STRAIGHT_KICK = (
       0.3,0,stiff.NORMAL_STIFFNESSES),
     )
 
-OLD_RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(OLD_LEFT_SHORT_STRAIGHT_KICK)
+RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
 
 # NEW KICK GERMANY 2016 BELLA MARCUS NIKKI
-LEFT_SHORT_STRAIGHT_KICK = (
+NEW_BAD_LEFT_SHORT_STRAIGHT_KICK = (
     #stand for a bit
     ((90.,10.,-90.,-10.),
      (-0.2,5,-25,43.5,-21.2, 0.0),
@@ -969,7 +969,7 @@ LEFT_SHORT_STRAIGHT_KICK = (
       0.3,0,stiff.NORMAL_STIFFNESSES),
     )
 
-RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
+NEW_BAD_RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
 
 # =========================================================================
 
