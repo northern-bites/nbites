@@ -18,11 +18,20 @@ namespace nowifi {
 
     class CorrSender : public SendrBase {
         size_t iteration;
+        int frequency;
 
     public:
         CorrSender() :
             SendrBase()
         {
+            frequency = CORRELATION_FREQUENCY;
+            iteration = 0;
+        }
+
+        CorrSender(int f) :
+            SendrBase()
+        {
+            frequency = f;
             iteration = 0;
         }
 
@@ -44,13 +53,22 @@ namespace nowifi {
     };
 
     class CorrRecvr : public RecvrBase {
+        int frequency;
     public:
 
         CorrelationBin bin;
 
         CorrRecvr(Callback cb) :
             RecvrBase(cb)
-        { }
+        {
+            frequency = CORRELATION_FREQUENCY;
+        }
+
+        CorrRecvr(Callback cb, int f) :
+            RecvrBase(cb)
+        {
+            frequency = f;
+        }
 
         void parse(nbsound::SampleBuffer& buffer, nbsound::Config& conf);
     };

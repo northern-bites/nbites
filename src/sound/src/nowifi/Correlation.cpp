@@ -19,7 +19,7 @@ namespace nowifi {
     void CorrSender::fill(nbsound::SampleBuffer &buffer, nbsound::Config &conf) {
 
         double samples_per_cycle =
-            (double) conf.sample_rate / (double) CORRELATION_FREQUENCY;
+            (double) conf.sample_rate / (double) frequency;
 
 //        printf("samples per cycle %lf\n", samples_per_cycle);
 
@@ -50,7 +50,7 @@ namespace nowifi {
         bin.tcos = bin.tsin = 0;
 
         double samples_per_cycle =
-            (double) conf.sample_rate / (double) CORRELATION_FREQUENCY;
+            (double) conf.sample_rate / (double) frequency;
 
         for (int i = 0; i < buffer.frames; ++i) {
             double fraction = std::fmod( (double) i, samples_per_cycle ) / samples_per_cycle;
