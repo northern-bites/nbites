@@ -132,9 +132,14 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 				diam << " " << diam2 << " " << cx << " " <<
 				(cy+bottomQuarter) << std::endl;
 		}
+		if (goodSize && debugBall) {
+			std::cout << "Good size on blob " << radius << " " <<
+				diam << " " << diam2 << " " << cx << " " <<
+				(cy+bottomQuarter) << std::endl;
+		}
         if (goodSize && diam2 >= radius / 2 && cy - diam > 0 &&
 			cx - diam > 0 && cx + diam < width &&
-			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
+			(diam2 > diam * 0.6 || ((*i).centerY() + diam2 < height - 2) && diam2 > diam * 0.5)) {
             // convert this blob to a Spot
             //int cx = (*i).centerX();
             //int cy = (*i).centerY();
@@ -770,6 +775,9 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
     //if (badspots > 1) {
         //return false;
     //}
+	if (debugBall) {
+		std::cout << "Filter white blob returned true " << midX << " " << midY << std::endl;
+	}
     return true;
 }
 
