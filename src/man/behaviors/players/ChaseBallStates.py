@@ -242,7 +242,10 @@ def orbitBall(player):
         player.kick.destinationY = destinationY
 
         player.setWalk(0, 0, 0)
-        return player.goLater('positionForKick')
+        # return player.goLater('positionForKick')
+        if transitions.shouldNotDribble(player):
+            return player.goNow('positionForKick')
+        return player.goNow('dribble')
 
     if (transitions.orbitTooLong(player) or
         transitions.orbitBallTooFar(player)):
@@ -424,9 +427,12 @@ def dribble(player):
         return player.goLater('orbitBall')
 
     if player.brain.ball.vis == True:
-        player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_TWO)
+        if transitions.inGoalBox(player):
+            player.brain.nav.walk(0.8, 0, 0)
+        else:
+            player.brain.nav.goTo(Location(ball.x, ball.y), Navigator.GENERAL_AREA, speeds.SPEED_SIX)
     else:
-        player.brain.nav.walk(10, 0, 0)
+        player.brain.nav.walk(0.6, 0, 0)
     return player.stay()
 
 @superState('positionAndKickBall')
