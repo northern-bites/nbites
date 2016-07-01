@@ -37,6 +37,8 @@ namespace nowifi {
     class SimpleFSKRecvr : public RecvrBase {
         NBL_DISALLOW_COPY(SimpleFSKRecvr)
 
+        double
+
         size_t iteration;
         size_t signal_start;
         size_t frame_offset;

@@ -77,6 +77,7 @@ namespace nowifi {
         }
 
         lastFrame.take(buffer);
+        ++iteration;
     }
     
 }
