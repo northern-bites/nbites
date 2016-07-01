@@ -132,9 +132,14 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 				diam << " " << diam2 << " " << cx << " " <<
 				(cy+bottomQuarter) << std::endl;
 		}
+		if (goodSize && debugBall) {
+			std::cout << "Good size on blob " << radius << " " <<
+				diam << " " << diam2 << " " << cx << " " <<
+				(cy+bottomQuarter) << std::endl;
+		}
         if (goodSize && diam2 >= radius / 2 && cy - diam > 0 &&
 			cx - diam > 0 && cx + diam < width &&
-			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
+			(diam2 > diam * 0.6 || ((*i).centerY() + diam2 < height - 2) && diam2 > diam * 0.5)) {
             // convert this blob to a Spot
             //int cx = (*i).centerX();
             //int cy = (*i).centerY();
@@ -257,7 +262,8 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
         if (debugBall) {
             debugDraw.drawPoint(currentSpot.ix() + width / 2, -currentSpot.iy() + height / 2, BLUE);
             std::cout << "Black blob " << (currentSpot.ix() + width / 2) << " " <<
-                (-currentSpot.iy() + width / 2) << std::endl;
+                (-currentSpot.iy() + width / 2) << " " << currentSpot.filterOutput <<
+				" " << currentSpot.green << std::endl;
         }
 		return true;
     } else {
@@ -608,9 +614,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
                     if (debugBall) { debugDraw.drawPoint(ix,iy,BLUE); }
 
-                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy)) &&
-					   edgeSanityCheck(ix, iy, r)) {
-                        
+                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
                         ballSpot.x = ballSpotX * 2;
                         ballSpot.y = ballSpotY * -2;
@@ -772,6 +776,9 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
     //if (badspots > 1) {
         //return false;
     //}
+	if (debugBall) {
+		std::cout << "Filter white blob returned true " << midX << " " << midY << std::endl;
+	}
     return true;
 }
 
