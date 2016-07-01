@@ -46,7 +46,7 @@ whistle:
 
 sendr:
 	@echo $(CYAN) compiling SENDR executable $(NORMAL)
-	$(BUILD) -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(SENDR_SRC) -lasound -lrt lib/libfftw3f.a -o sendr
+	$(BUILD) -ggdb -I $(LOGGING_DIR) $(LOGGING_SRC) $(SOUND_SRC) $(SENDR_SRC) -lasound -lrt lib/libfftw3f.a -o sendr
 
 recvr:
 	@echo $(CYAN) compiling RECVR executable $(NORMAL)

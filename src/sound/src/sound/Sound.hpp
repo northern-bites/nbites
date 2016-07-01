@@ -219,7 +219,34 @@ namespace nbsound {
 
         NBL_DISALLOW_COPY(SampleRingBuffer)
     };
-    
+
+//    class SampleBufferArray {
+//        std::vector<SampleBuffer *> buffers;
+//
+//    public:
+//
+//        SampleBufferArray() { }
+//
+//        void add(SampleBuffer& buffer) {
+//            buffers.push_back(&buffer);
+//        }
+//
+//        nbs_sample_t get(size_t channel, size_t offset) {
+//            size_t ioff = offset;
+//            size_t bi = 0;
+//
+//            for (; ioff >= buffers[bi]->frames; ++bi ) {
+//                ioff -= buffers[bi]->frames;
+//            }
+//
+//            NBL_ASSERT(ioff >= 0);
+//            NBL_ASSERT(ioff < buffers[bi]->frames)
+//
+//            SampleBuffer::BufferChannel& sbc = buffers[bi]->operator[](channel);
+//            return sbc[ioff];
+//        }
+//    };
+
     class Handler;  //Same format for both capture and playback handlers.
 
     typedef void (*Callback)(Handler&, Config&, SampleBuffer&);

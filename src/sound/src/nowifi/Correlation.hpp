@@ -54,6 +54,7 @@ namespace nowifi {
 
     class CorrRecvr : public RecvrBase {
         int frequency;
+        
     public:
 
         CorrelationBin bin;
@@ -71,6 +72,8 @@ namespace nowifi {
         }
 
         void parse(nbsound::SampleBuffer& buffer, nbsound::Config& conf);
+
+//        void correlate(nbsound::SampleBufferArray& array, nbsound::Config& conf, size_t smax, size_t offset, size_t length);
     };
 }
 
