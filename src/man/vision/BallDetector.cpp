@@ -610,6 +610,7 @@ bool BallDetector::findCorrelatedBlackSpots
 
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy)) &&
 					   edgeSanityCheck(ix, iy, r)) {
+                        
                         Spot ballSpot;
                         ballSpot.x = ballSpotX * 2;
                         ballSpot.y = ballSpotY * -2;
@@ -618,7 +619,8 @@ bool BallDetector::findCorrelatedBlackSpots
     					ballSpot.innerDiam = r * 2;
 
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
-                        if(checkBallHasNoGreen(r)) {
+                        //checkGradientAroundSpot(r);
+                        if(checkBallHasNoGreenAndSomeWhite(r)) {
 #ifdef OFFLINE
                             foundBall = true;
 #else
@@ -672,7 +674,8 @@ bool BallDetector::findCorrelatedBlackSpots
         				ballSpot.innerDiam = 5;
 
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
-                        if(checkBallHasNoGreen(r)) {
+                        //checkGradientAroundSpot(r);
+                        if(checkBallHasNoGreenAndSomeWhite(r)) {
 #ifdef OFFLINE
                             foundBall = true;
 #else
@@ -963,7 +966,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	return true;
 }
 
-bool BallDetector::checkBallHasNoGreen(int r) {
+bool BallDetector::checkBallHasNoGreenAndSomeWhite(int r) {
     int greens = 0, whites = 0;
     double counter = 0;
     int green_tolerance = r * 0.5;
@@ -1000,6 +1003,25 @@ bool BallDetector::checkBallHasNoGreen(int r) {
 
     if(debugBall) { debugDraw.drawPoint(_best.centerX, _best.centerY, GREEN); }
     return true;
+}
+
+bool BallDetector::checkGradientAroundSpot(int r) {
+    int gradCheckOffset = r/2;
+    int gradCheckPixelCount = 10;;
+    int left = _best.centerX - r - gradCheckOffset;
+    int right = _best.centerX + r + gradCheckOffset;
+    int bottom = _best.centerY + r + gradCheckOffset;
+    double gradient = 0.0;
+    std::cout<<"Right: "<<right<<std::endl;
+    for(int i = 0; i < gradCheckPixelCount; i++) {
+        int g = edgeDetector->mag(right + i, _best.centerY);
+        debugDraw.drawDot(right+i, _best.centerY, RED);
+        std::cout<<"Gradient: "<<g<<std::endl;
+        gradient += g;
+    }
+    std::cout<<"Gradient Final: "<<gradient<<std::endl;
+    std::cout<<"Average Grad: "<<gradient / gradCheckPixelCount<<std::endl;
+
 }
 
 /* We don't want white below the ball. The tricky thing is that it is ok
@@ -1063,6 +1085,45 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
     int topGreenAvg = 0, botGreenAvg = 0;
     ((topCheckedPixels > 0) ? topGreenAvg = topGreenSum / topCheckedPixels : topGreenAvg = 0);
     ((botCheckedPixels > 0) ? botGreenAvg = botGreenSum / botCheckedPixels : botGreenAvg = 0);
+
+    // if(topGreenAvg < THRESHOLD && botGreenAvg < THRESHOLD) {
+    //     if(debugBall) { 
+    //         std::cout<<"[BALL INFO] Green Test Failed. Top. Avg: " << topGreenAvg <<
+    //                    ", Bot. Avg: "<<botGreenAvg<<std::endl; 
+    //     }
+    //     return 0; 
+    // }
+    // if(topGreenAvg >= THRESHOLD || botGreenAvg >= THRESHOLD) {
+    //     if(debugBall) { 
+    //         std::cout<<"[BALL INFO] Green Test Passed - Top & Bottom\n"; 
+    //         for(int i = 0; i < topCheckedPixels; i++) {
+    //             debugDraw.drawDot(p.first, topY - i, GREEN);
+    //         }
+    //         for(int i = 0; i < botCheckedPixels; i++) {
+    //             debugDraw.drawDot(p.first, bottomY + i, GREEN);
+    //         }
+    //     }
+    //     return 1; 
+    // }
+    // if(topGreenAvg >= THRESHOLD) { 
+    //     if(debugBall) { 
+    //         std::cout<<"[BALL INFO] Green Test Passed - Top\n"; 
+    //         for(int i = 0; i < topCheckedPixels; i++) {
+    //             debugDraw.drawDot(p.first, topY - i, GREEN);
+    //         }
+    //     }
+    //     return 2; 
+    // }
+    // if(botGreenAvg >= THRESHOLD) { 
+    //     if(debugBall) { 
+    //         std::cout<<"[BALL INFO] Green Test Passed - Bot\n";
+    //         for(int i = 0; i < botCheckedPixels; i++) {
+    //             debugDraw.drawDot(p.first, bottomY + i, GREEN);
+    //         }
+    //     }
+    //     return 3; 
+    // }
+    // return -1;    
 
     if(topGreenAvg >= THRESHOLD || botGreenAvg >= THRESHOLD) {
         if(debugBall) { 
