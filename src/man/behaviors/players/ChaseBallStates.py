@@ -233,7 +233,6 @@ def orbitBall(player):
     # Check if within the acceptable heading range
     if (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
-        print "STOPPED! RelH: ", relH
 
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
@@ -256,7 +255,6 @@ def orbitBall(player):
     if relH > 0: ySpeed = -ySpeed
 
     ySpeed = ySpeed * 1.5
-    print("Orbit ySpeed:", ySpeed)
 
     # Calculate corrections in x and h using PID controller 
     xError = player.brain.ball.distance - constants.ORBIT_X
@@ -266,7 +264,6 @@ def orbitBall(player):
 
 
     hSpeedCorrect = hSpeedCorrect * 1.3
-    print("     hSpeedCorrect:", hSpeedCorrect)
 
     # Set walk vector
     player.setWalk(xSpeedCorrect, ySpeed, hSpeedCorrect)
@@ -476,7 +473,7 @@ def positionForKick(player):
     Get the ball in the sweet spot
     """
     if transitions.shouldRedecideKick(player):
-        print("I think I should redecide my kick!!")
+        # print("I think I should redecide my kick!!")
         return player.goLater('approachBall')
 
     ball = player.brain.ball
