@@ -614,8 +614,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
                     if (debugBall) { debugDraw.drawPoint(ix,iy,BLUE); }
 
-                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy)) &&
-					   edgeSanityCheck(ix, iy, r)) {
+                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
                         ballSpot.x = ballSpotX * 2;
                         ballSpot.y = ballSpotY * -2;
