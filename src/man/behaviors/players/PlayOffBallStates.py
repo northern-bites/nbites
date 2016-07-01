@@ -591,11 +591,7 @@ def adjustHeading(player):
         # Spin to home heading
         player.stand()
         player.brain.tracker.repeatFixedPitchLookAhead()
-<<<<<<< HEAD
-        dest = RelRobotLocation(0, 0, player.brain.loc.h - adjustHeading.desiredHeading)
-=======
         dest = RelRobotLocation(0, 0, adjustHeading.desiredHeading - player.brain.loc.h)
->>>>>>> origin/germany-develop
         player.brain.nav.goTo(dest, precision = nav.HOME,
                           speed = speeds.SPEED_SIX, avoidObstacles = False,
                           fast = True, pb = False)
