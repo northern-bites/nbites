@@ -257,7 +257,8 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
         if (debugBall) {
             debugDraw.drawPoint(currentSpot.ix() + width / 2, -currentSpot.iy() + height / 2, BLUE);
             std::cout << "Black blob " << (currentSpot.ix() + width / 2) << " " <<
-                (-currentSpot.iy() + width / 2) << std::endl;
+                (-currentSpot.iy() + width / 2) << " " << currentSpot.filterOutput <<
+				" " << currentSpot.green << std::endl;
         }
 		return true;
     } else {

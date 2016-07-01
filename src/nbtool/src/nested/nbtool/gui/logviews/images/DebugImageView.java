@@ -42,6 +42,7 @@ import nbtool.images.DebugImage;
 import nbtool.images.EdgeImage;
 import nbtool.images.Y8Image;
 import nbtool.images.Y8ThreshImage;
+import nbtool.images.Y16Image;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.util.Debug;
@@ -81,7 +82,7 @@ public class DebugImageView extends VisionView implements
      * */
 
     // Images that we can view in this view using the combo box
-    String[] imageViews = { "Original", "Green", "Black", "White", "Edge", "Thresh", "Learn" };
+    String[] imageViews = { "Original", "Green", "Y", "White", "Edge", "Thresh", "Learn" };
     JComboBox<String> viewList;
 
     JSlider greenThreshold;
@@ -305,7 +306,7 @@ public class DebugImageView extends VisionView implements
 		}
 		// if we don't have an black image we're in trouble
 		if (displayImages[BLACK_IMAGE] == null) {
-			System.out.println("No black image");
+			System.out.println("No Y image");
 			return;
 		}
         //Graphics2D graph = black.createGraphics();
@@ -436,7 +437,7 @@ public class DebugImageView extends VisionView implements
 			currentBottom = GREEN_IMAGE;
 		} else if (viewName == "White") {
 			currentBottom = WHITE_IMAGE;
-		} else if (viewName == "Black") {
+		} else if (viewName == "Y") {
 			currentBottom = BLACK_IMAGE;
 		} else if (viewName == "Edge") {
 			currentBottom = EDGE_IMAGE;
@@ -717,9 +718,9 @@ public class DebugImageView extends VisionView implements
 			displayImages[WHITE_IMAGE] = white8.toBufferedImage();
 		}
 
-		if (this.getOrangeBlock() != null) {
-			Y8Image orange8 = new Y8Image(width, height, this.getOrangeBlock().data);
-			displayImages[BLACK_IMAGE] = orange8.toBufferedImage();
+		if (this.getYBlock() != null) {
+            Y16Image yImg = new Y16Image(width, height, this.getYBlock().data);
+            displayImages[BLACK_IMAGE] = yImg.toBufferedImage();
 		}
 
 		if (this.getEdgeBlock() != null) {
