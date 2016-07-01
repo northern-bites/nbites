@@ -847,7 +847,7 @@ GOALIE_TEST_CENTER_SAVE = ( ((0, -5, -90, 0),
 #**********************
 
 # This is a relatively stable straight kick for arms back
-LEFT_SHORT_STRAIGHT_KICK = (
+OLD_LEFT_SHORT_STRAIGHT_KICK = (
     #stand for a bit
     ((90.,10.,-90.,-10.),
      (-0.2,5,-25,43.5,-21.2, 0.0),
@@ -889,6 +889,70 @@ LEFT_SHORT_STRAIGHT_KICK = (
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (40, -9, 80, -9),
      .7,0,stiff.NORMAL_STIFFNESSES),
+
+    #HACK transition to BH stand first
+    ((90., 10., -90., -3.),
+     (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+     (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+     (90., -10., 90., 3.),
+     1.2,0,stiff.NORMAL_STIFFNESSES),
+
+    #stand for a bit
+    ((90.4, 9.6, 0.2, -2.4),
+      (0.0, 0.1, -27.9, 50.1, -25.0, 0.0),
+      (0.0, -0.1, -28.7, 49.9, -25.0, 0.2),
+      (90.3, -9.3, -0.3, 2.7),
+      0.3,0,stiff.NORMAL_STIFFNESSES),
+    )
+
+OLD_RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(OLD_LEFT_SHORT_STRAIGHT_KICK)
+
+# NEW KICK GERMANY 2016 BELLA MARCUS NIKKI
+LEFT_SHORT_STRAIGHT_KICK = (
+    #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (-0.2,5,-25,43.5,-21.2, 0.0),
+     (-0.2,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     0.3,0,stiff.NORMAL_STIFFNESSES),
+
+    # HACK for scrimmage, TODO tune walk
+    ((90., 10., -90., -3.),
+    (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+    (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+    (90., -10., 90., 3.),
+    .30,0,stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((20.,30.,0.,0.),
+     (0.,20.,-30,70,-40,-25.),
+     (0.,20.,-22.3,50,-22.5,-17),
+     (100.,-30.,0.,0),
+     0.6,0, stiff.NORMAL_STIFFNESSES),
+
+    #kick
+    ((43.,30.,0.,0.),
+     # (0.,19.,-60,50,3,-19.),
+     # (1.9, 19.9, -67.6, 54.8, 22.1, -19.0),
+     (0.3, 19.5, -51.4, 45, 16, -13),
+     (0.,17,-22.3,43,-23,-17),
+     (40.,-30.,0.,0),
+     0.2,0, stiff.NORMAL_STIFFNESSES),
+
+    #recover
+    ((35.,30.,0.,0.),
+     # (0.,25.,-35,65,-30,-25.),
+     (-0.5, 22.8, -32.8, 69.6, -28.2, -20.7),
+     (0.,10.,-22.3,45,-22.5,-17),
+     (90.,-30.,0.,0),
+     0.6,0, stiff.NORMAL_STIFFNESSES),
+
+    #back to normal
+    ((40, 9, -80, -9),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (40, -9, 80, -9),
+     0.7,0,stiff.NORMAL_STIFFNESSES),
 
     #HACK transition to BH stand first
     ((90., 10., -90., -3.),

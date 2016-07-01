@@ -66,6 +66,8 @@ namespace man{
 
         void GameStateModule::run_()
         {
+            latest_data.set_penalty_is_placement(false);
+
             latchInputs();
             update();
 
@@ -75,15 +77,17 @@ namespace man{
                 flag_setPenalized(control::check(control::flags::state_penalty_override));
             }
 #endif
-
-            latest_data.set_penalty_is_placement(true);
-
             portals::Message<messages::GameState> output(&latest_data);
             gameStateOutput.setMessage(output);
 
             portals::Message<messages::GCResponse> response(0);
             response.get()->set_status(response_status);
             gcResponseOutput.setMessage(response);
+
+            //for debugging penalty_is_placement override
+//            printf( "\toverride %s\n",
+//                   latest_data.penalty_is_placement() ?
+//                   "TRUE" : "FALSE" );
         }
 
         void GameStateModule::latchInputs()
@@ -214,13 +218,15 @@ namespace man{
             switch (latest_data.state())
             {
                 case STATE_INITIAL:
+                    /* for button presses, not sure if this will have negative effect on time in playing */
+
                     latest_data.set_state(STATE_PLAYING);
                     manual_penalize();
+                    latest_data.set_penalty_is_placement(true);
 
-                    if ( bp_state == FIRST_INITIAL ) {
-                        NBL_WARN("spl button presses FIRST_INITIAL -> FIRST_PENALTY");
-                        bp_state = FIRST_PENALTY;
-                    }
+                    NBL_WARN("spl button presses FIRST_INITIAL -> FIRST_PENALTY");
+                    bp_state = FIRST_PENALTY;
+
                     break;
 
                 case STATE_READY:
@@ -247,7 +253,10 @@ namespace man{
                         NBL_WARN("spl button presses PENALTY SWITCH");
                         bp_state = NORMAL_PLAYING;
                         manual_penalize();
+
+                        latest_data.set_penalty_is_placement(false);
                     }
+
                     break;
             }
 #endif

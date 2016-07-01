@@ -90,7 +90,7 @@ namespace man {
 			~BallDetector();
 
 			void setDebugImage(DebugImage * di);
-            void edgeSanityCheck(int x, int y, int radius);
+            bool edgeSanityCheck(int x, int y, int radius);
             void sanityChecks(int bx, int by, int radius);
             void makeEdgeList(EdgeList & edges);
 
@@ -192,6 +192,7 @@ namespace man {
 			ImageLiteU8 whiteImage, greenImage, blackImage;
 			ImageLiteU16 yImage;
 			EdgeDetector * edgeDetector;
+			EdgeList * edgeList;
 
 			Ball _best;
 

@@ -5,6 +5,12 @@ import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +28,26 @@ import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
 public class Utility {
+
+	public static boolean isPureAscii2(String v) {
+	    byte bytearray []  = v.getBytes();
+	    CharsetDecoder d = Charset.forName("US-ASCII").newDecoder();
+	    try {
+	      CharBuffer r = d.decode(ByteBuffer.wrap(bytearray));
+	      r.toString();
+	    }
+	    catch(CharacterCodingException e) {
+	      return false;
+	    }
+	    return true;
+	  }
+
+	static CharsetEncoder asciiEncoder =
+		      Charset.forName("US-ASCII").newEncoder();
+
+	public static boolean isPureAscii(String v) {
+	    return asciiEncoder.canEncode(v);
+	}
 
 	/* true if top, false if bot */
 	public static boolean camera(Log imageLog) {
