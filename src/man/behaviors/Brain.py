@@ -272,7 +272,7 @@ class Brain(object):
 
     def updateMotion(self):
         self.motion = self.interface.motionStatus
-        self.nowifi_angle = self.interface.gamestate.nowifi_angle
+        self.nowifi_angle = self.interface.gameState.nowifi_angle
 
     def updateVision(self):
         self.visionLines = self.interface.vision.line

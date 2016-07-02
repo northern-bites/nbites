@@ -10,6 +10,16 @@ from ..navigator import Navigator
 from ..util import *
 import PMotion_proto
 
+# Nao
+#        _________   
+#       /         \   
+#      /           \   )
+#         0    0        )
+#     \      .      /  )
+#      \___________/
+#
+
+
 @superState('gameControllerResponder')
 def gameInitial(player):
     if player.firstFrame():
@@ -50,15 +60,14 @@ def pleaseTurn(player):
     elif player.counter == 2:
         player.brain.nav.stand()
         player.executeMove(SweetMoves.POINT)
-        player.lastNum = currNum
         return player.goNow('waitForNum')
     return player.stay()
 @superState('gameControllerResponder')
 def waitForNum(player):
-
-    if ( currNum != player.brain.nowifi_angle ):
-        currNum = player.brain.nowifi_angle
-        print "NO WIFI ANGLE CHANGED TO ", currNum
+    
+    if ( player.currNum != player.brain.nowifi_angle ):
+        player.currNum = player.brain.nowifi_angle
+        print "NO WIFI ANGLE CHANGED TO ", player.currNum
         return player.goNow('pleaseTurn')
 
     return player.stay()
