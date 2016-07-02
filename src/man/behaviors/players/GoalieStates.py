@@ -207,7 +207,7 @@ def watchWithLineChecks(player):
             print "I think I have corrected my facing now..."
             watchWithLineChecks.correctFacing = True
 
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
@@ -218,12 +218,14 @@ def watchWithLineChecks(player):
         watchWithLineChecks.looking = True
 
         # @SNAPPAN-CHANGE
-        player.brain.tracker.performGoalieWideSnapPan()
+        player.brain.tracker.trackBall(False, True)
+
+        # player.brain.tracker.performGoalieWideSnapPan()
         watchWithLineChecks.hasPanned = True
 
     if player.brain.tracker.isStopped():
         watchWithLineChecks.looking = False
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
 
     if watchWithLineChecks.counter > 150:
         print("Counter was over 150, I'm making sure I'm in the right place...")
@@ -249,7 +251,7 @@ def lineCheckReposition(player):
         player.brain.nav.walkInPlace()
 
     elif player.counter == 10:
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
         dest = average(player.homeDirections)
         dest = constants.HOME_POSITION
         print "My home directions: "
@@ -281,7 +283,7 @@ goToGoalbox.dest = RelRobotLocation(0,0,0)
 def returnUsingLoc(player):
     if player.firstFrame():
         player.brain.nav.walkInPlace()
-        player.brain.tracker.trackBall(False, True)
+        player.brain.tracker.trackBall()
         # returnUsingLoc.panning = False
         
 
@@ -309,7 +311,7 @@ def returnUsingLoc(player):
 @superState('gameControllerResponder')
 def shiftPosition(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
         player.inPosition = shiftPosition.dest
         print("H:", shiftPosition.dest.h)
 
@@ -330,7 +332,7 @@ shiftPosition.destb = constants.HOME_POSITION
 @superState('gameControllerResponder')
 def faceBall(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
         print("ball at ", player.brain.ball.bearing_deg)
         facingDest = RelRobotLocation(0.0, 0.0, 0.0)
 
@@ -454,7 +456,7 @@ def kickBall(player):
     Kick the ball
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
         player.brain.nav.stop()
 
     # print("Ball dist:", player.brain.ball.distance)
@@ -563,7 +565,7 @@ def penaltyShotsGameSet(player):
         player.returningFromPenalty = False
         player.brain.fallController.enabled = False
         player.stand()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
         player.side = constants.LEFT
         player.isSaving = False
         player.penaltyKicking = True
@@ -595,7 +597,7 @@ def penaltyShotsGamePlaying(player):
 @superState('gameControllerResponder')
 def waitForPenaltySave(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall(False, True)
         player.brain.nav.stop()
 
     return Transition.getNextState(player, waitForPenaltySave)

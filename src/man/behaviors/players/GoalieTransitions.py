@@ -861,16 +861,6 @@ def saveWhileMoving(player):
     if ball.mov_vel_x < -10 and ball.vis.on:
         save = True
 
-    if save:
-        print ("Should moving save!!")
-        print "SQUAT"
-        print("yintercept:", nball.yintercept)
-        print("Ball dist:", ball.distance)
-        print("shouldDiveRight.lastFramesOff:", shouldSquat.lastFramesOff)
-        print("ball.vis.frames_on", ball.vis.frames_on)
-        print("nb xvel:", nball.x_vel)
-        print("ball mov vel:", ball.mov_vel_x)
-
     return save
 
 def shouldSquat(player):
