@@ -816,7 +816,7 @@ void Field::findFieldEdge(int pH) {
 */
 
 void Field::findConvexHull(int pH) {
-	findFieldEdge(pH);
+	// findFieldEdge(pH);
     initialScanForTopGreenPoints(pH);
 
 	// save the points we calculated to use for other things such as robot detection
