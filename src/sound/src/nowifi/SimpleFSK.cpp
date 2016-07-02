@@ -179,6 +179,7 @@ namespace nowifi {
         double f;
 
         SampleBuffer * start = NULL, * end = NULL;
+        bool run_twice;
 
         switch (max_i) {
             case 0:
@@ -232,14 +233,32 @@ namespace nowifi {
         NBL_ASSERT_GE(frame_start, 0)
         NBL_ASSERT_LE(frame_start, 2 * SIMPLE_FSK_WINDOW_SIZE)
 
-        NBL_ASSERT(start && end);
-
         frame_offset = frame_start % SIMPLE_FSK_WINDOW_SIZE;
 
         NBL_WARN("frame offset is %d samples.", frame_offset)
 
+        switch (max_i) {
+            case 0:
+
+                break;
+            case 1:
+
+                break;
+            case 2:
+
+                break;
+                
+            default:
+                break;
+        }
+
         /* need to run detection on these two frames... */
-        do_parse(*start, *end, conf);
+        int ret = do_parse(*start, *end, conf);
+        if (ret < 0) {
+            NBL_WARN("got signal start frame in do_search()")
+        } else {
+            data.push_back(ret);
+        }
     }
 
     static inline void combine(SampleBuffer& dest, SampleBuffer& one, SampleBuffer& two, size_t offset) {
