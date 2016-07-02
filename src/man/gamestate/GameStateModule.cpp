@@ -30,6 +30,9 @@
 #include "DebugConfig.h"
 #include "utilities-pp.hpp"
 
+bool played_guten = false;
+bool killed_guten = false;
+
 namespace man{
     namespace gamestate{
 
@@ -182,6 +185,31 @@ namespace man{
             }
 
             next = (game_state_t) latest_data.state();
+
+            if (next == STATE_READY && !played_guten) {
+                NBL_WARN("\t playing guten morgen")
+                played_guten = true;
+
+                pid_t guten = fork();
+
+                if (guten == 0) {
+                    execl("/home/nao/guten/play_guten", "", NULL);
+
+                    for(;;) {
+                        printf("\n\n\n\\tGUTEN FAILED TO LOAD!!\n\n\n");
+                        exit(-1);
+                        kill(getpid(), SIGKILL);
+                    }
+                }
+            }
+
+            if (next == STATE_SET && !killed_guten) {
+                NBL_WARN("\t killing guten morgen")
+                killed_guten = true;
+                system("killall play_guten");
+                system("killall aplay");
+            }
+
             whistleHandler(last, next);
             latest_data.set_state( (int) next);
         }
