@@ -184,6 +184,8 @@ namespace man{
                 //TODO keep track of penalty times
             }
 
+            next = (game_state_t) latest_data.state();
+
             if (next == STATE_READY && !played_guten) {
                 NBL_WARN("\t playing guten morgen")
                 played_guten = true;
@@ -205,9 +207,9 @@ namespace man{
                 NBL_WARN("\t killing guten morgen")
                 killed_guten = true;
                 system("killall play_guten");
+                system("killall aplay");
             }
 
-            next = (game_state_t) latest_data.state();
             whistleHandler(last, next);
             latest_data.set_state( (int) next);
         }

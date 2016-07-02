@@ -5,5 +5,5 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-scp -r -v ../guten nao@$1:
+scp -r ../guten nao@$1:
 echo ">>>done<<<"
