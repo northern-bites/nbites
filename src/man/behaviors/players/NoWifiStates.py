@@ -70,9 +70,15 @@ def waitForNum(player):
     if ( player.currNum != player.brain.nowifi_angle ):
         player.currNum = player.brain.nowifi_angle
         print "NO WIFI ANGLE CHANGED TO ", player.currNum
-        return player.goNow('pleaseTurn')
+        return player.goNow('justPoint')
 
     return player.stay()
+@superState('gameControllerResponder')
+def justPoint(player):
+    if player.firstFrame():
+        if player.currNum != 0:
+            player.executeMove(SweetMoves.POINT)
+    return player.goLater("waitForNum")
 
 #DONT FORGET TO MAKE SURE INITIALIZED PLAYER.LAST NUM IS FINE
 
