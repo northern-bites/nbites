@@ -607,9 +607,8 @@ bool BallDetector::findCorrelatedBlackSpots
 				if (debugBall) {
 					std::cout<<"[BALL INFO] Distance Between Spots: "<<distance<<std::endl;
 				}
-                std::cout<<"Ball Radius: "<<r<<std::endl;
 
-                if(distance >= lower && distance <= upper) {
+                if(distance >= lower && distance <= upper && r > 6) {
     				if (debugBall) { std::cout<<"[BALL INFO] Distance OK"<<std::endl; }
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
@@ -1593,7 +1592,6 @@ Ball::Ball() :
 void Ball::compute()
 {
     dist = hypot(x_rel, y_rel);
-    std::cout<<"Distance: "<<dist<<std::endl;
     radius = int(pixDiameterFromDist(dist));
     double hypotDist = hypot(dist, cameraH);
     expectedDiam = pixDiameterFromDist(hypotDist);
