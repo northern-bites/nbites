@@ -1,0 +1,4 @@
+#!/bin/bash
+
+aplay /home/nao/guten/gutenmorgen.wav
+echo ">>>done<<<"

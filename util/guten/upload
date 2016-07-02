@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+    echo "usage: ./upload [robot_addr]"
+    exit 1
+fi
+
+scp -r -v ../guten nao@$1:
+echo ">>>done<<<"
