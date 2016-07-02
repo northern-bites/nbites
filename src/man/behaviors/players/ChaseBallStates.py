@@ -256,7 +256,6 @@ def orbitBall(player):
     if relH > 0: ySpeed = -ySpeed
 
     ySpeed = ySpeed * 1.5
-    print("Orbit ySpeed:", ySpeed)
 
     # Calculate corrections in x and h using PID controller 
     xError = player.brain.ball.distance - constants.ORBIT_X
@@ -266,7 +265,6 @@ def orbitBall(player):
 
 
     hSpeedCorrect = hSpeedCorrect * 1.3
-    print("     hSpeedCorrect:", hSpeedCorrect)
 
     # Set walk vector
     player.setWalk(xSpeedCorrect, ySpeed, hSpeedCorrect)
