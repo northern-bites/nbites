@@ -28,6 +28,8 @@ namespace nbsound {
         float get(int f) { return outputmag[f]; }
         float* get_freq_buffer() { return outputmag; }
 
+        std::pair<int, float> get_peak();
+
         std::string get_all();
 
         ~Transform();

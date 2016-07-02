@@ -45,9 +45,6 @@ namespace nowifi {
     class SimpleFSKRecvr : public RecvrBase {
         NBL_DISALLOW_COPY(SimpleFSKRecvr)
 
-        double running_start_mag;
-
-
         size_t iteration;
         size_t frame_offset;
 
@@ -77,10 +74,9 @@ namespace nowifi {
             frame_1(1, SIMPLE_FSK_WINDOW_SIZE),
             current(CALIBRATING),
             iteration(0),
-            frame_offset(0),
-            running_start_mag(0)
+            frame_offset(0)
         {
-            NUM_FRAMES_TO_CALIBRATE = 30;
+            NUM_FRAMES_TO_CALIBRATE = 2;
         }
 
         void parse(nbsound::SampleBuffer& buffer, nbsound::Config& conf);

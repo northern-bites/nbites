@@ -59,21 +59,28 @@ namespace nbsound {
         int window_size = 4096;
 
         const snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
-        const int num_channels = 2;
+        int num_channels = 2;
 
         Config( int sr, int ws ) :
             sample_rate(sr),
             window_size(ws) {}
+
+        Config( int sr, int ws, int nc ) :
+            sample_rate(sr),
+            window_size(ws),
+            num_channels(nc) {}
     };
 
     template<class T>
     class Buffer {
     private:
 
-        Buffer& operator=(Buffer& other);   //no assignment operator
+        const Buffer& operator=(const Buffer& other) = delete;
+
+        Buffer(){}
 
         void init_channels() {
-            NBL_ASSERT_EQ(_channels.size(), 0)
+            _channels.clear();
 
             for (int i = 0; i < channels; ++i) {
                 _channels.push_back(BufferChannel(i, *this));
@@ -125,24 +132,27 @@ namespace nbsound {
             init_channels();
         }
 
+
+
         ~Buffer() {
             if (needs_delete && buffer) delete[] buffer;
         }
 
+        void take(const Buffer& other) {
+            NBL_ASSERT_EQ(other.frames, frames)
+            NBL_ASSERT_GE(other.channels, channels)
+
+            memcpy(buffer, other.buffer, other.size_bytes());
+        }
+
+        /* copying and windowing */
         Buffer(const Buffer& other) :
-            channels(other.channels), frames(other.frames)
+        channels(other.channels), frames(other.frames)
         {
             buffer = new T[channels * frames];
             needs_delete = true;
 
             init_channels();
-            memcpy(buffer, other.buffer, other.size_bytes());
-        }
-
-        void take(const Buffer& other) {
-            NBL_ASSERT_EQ(other.frames, frames)
-            NBL_ASSERT_EQ(other.channels, channels)
-
             memcpy(buffer, other.buffer, other.size_bytes());
         }
 

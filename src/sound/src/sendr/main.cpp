@@ -16,13 +16,16 @@
 
 #include "utilities-test.hpp"
 
+#include "../nowifi/SimpleFSK.hpp"
+
+
 using namespace nbsound;
 using namespace nbl;
 
-const char * LAST_MODIFIED = "6/28 15:46";
+const char * LAST_MODIFIED = "7/2 07:30";
 
-const int WINDOW_SIZE = 16384;
-Config used_config{ 48000, WINDOW_SIZE };
+const int WINDOW_SIZE = nowifi::SIMPLE_FSK_WINDOW_SIZE;
+Config used_config{ 48000, WINDOW_SIZE, 2 };
 
 pthread_t capture_thread;
 Playback * playback;
@@ -73,7 +76,9 @@ int main(int argc, char ** argv) {
     playback->init();
     playback->start_new_thread(capture_thread, NULL);
 
-    std::string data = "hello";
+//    std::string data = "hello";
+    std::string data;
+    data.push_back(0x55);
     sendr->send(data);
 
     while(true) sleep(5);

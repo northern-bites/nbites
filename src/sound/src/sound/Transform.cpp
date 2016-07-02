@@ -71,4 +71,15 @@ namespace nbsound {
         
     }
 
+    std::pair<int, float> Transform::get_peak() {
+        std::pair<int, float> best = {0,0.0};
+        for (int i = 0; i < frequency_length; ++i) {
+            if (get(i) > best.second) {
+                best.first = i;
+                best.second = get(i);
+            }
+        }
+
+        return best;
+    }
 }

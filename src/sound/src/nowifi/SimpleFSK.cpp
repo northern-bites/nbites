@@ -91,28 +91,28 @@ namespace nowifi {
 
         switch (current) {
             case CALIBRATING: {
-                running_start_mag += start_magnitude;
-
                 if (iteration == (NUM_FRAMES_TO_CALIBRATE - 1)) {
                     current = LISTENING;
                 }
             } break;
 
             case LISTENING: {
-                double average = running_start_mag / iteration;
 
-                NBL_INFO("%le average, %le magnitude", average, start_magnitude)
-                if ( start_magnitude > (average * SIMPLE_FSK_START_THRESH) ) {
+                detect_data.transform(frame_2, 0);
+                std::pair<int,float> peak = detect_data.get_peak();
+                float peak_f = detect_data.frequency_at(peak.first, conf.sample_rate);
 
-                    NBL_INFO("%le mag %le average :: MOVING TO SEARCHING")
+                NBL_INFO("peak at %f (%f)", peak_f, peak.second);
+
+                if ( std::fabs(peak_f - SIMPLE_FSK_START_F) < 10) {
+                    NBL_INFO(" :: MOVING TO SEARCHING")
+
                     current = SEARCHING;
                     start = time(NULL);
                     recving = true;
                     data.clear();
-
-                } else {
-                    running_start_mag += start_magnitude;
                 }
+
             } break;
 
             case SEARCHING: {

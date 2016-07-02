@@ -1,4 +1,5 @@
 #include "Sound.hpp"
+#include "utilities-test.hpp"
 
 namespace nbsound {
     
@@ -55,3 +56,49 @@ namespace nbsound {
         printf("\tperiods_per_buffer=%d periods\n", val);
     }
 }
+
+using namespace nbsound;
+
+NBL_ADD_TEST_TO(buffers, sound_core) {
+
+    SampleBuffer b1{2, 1000};
+    SampleBuffer window = b1.window(50, 100);
+
+    NBL_ASSERT_EQ(b1.buffer + (50 * 2), window.buffer)
+
+    SampleBuffer b2(b1);
+    NBL_ASSERT_NE(b1.buffer, b2.buffer)
+
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

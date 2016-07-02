@@ -14,13 +14,15 @@
 #include "Input.hpp"
 #include "../sound/Capture.hpp"
 
+#include "../nowifi/SimpleFSK.hpp"
+
 using namespace nbsound;
 using namespace nbl;
 
-const char * LAST_MODIFIED = "6/28 15:46";
+const char * LAST_MODIFIED = "7/2 07:30";
 
-const int WINDOW_SIZE = 16384;
-Config used_config{ 48000, WINDOW_SIZE };
+const int WINDOW_SIZE = nowifi::SIMPLE_FSK_WINDOW_SIZE;
+Config used_config{ 48000, WINDOW_SIZE, 2 };
 
 pthread_t capture_thread;
 Capture * capture;
@@ -55,6 +57,10 @@ void the_callback(Handler& handler, Config& config, SampleBuffer& buffer) {
 
 void recvr_callback(time_t start, time_t end, std::string data) {
     printf("recvr callback!\n");
+
+    for (int i = 0; i < data.size(); ++i) {
+        printf("\t0x%X\n", data[i]);
+    }
 }
 
 int main(int argc, char ** argv) {
