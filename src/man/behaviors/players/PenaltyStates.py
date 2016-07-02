@@ -43,7 +43,6 @@ def afterPenalty(player):
             print "We were in penalty for less than 10 seconds, it probably doesn't count"
             print("My penalty count: ", player.brain.penaltyCount)
             player.brain.penaltyCount = 0
-            player.brain.whistlePenalty = False
             return player.goNow("gamePlaying")
 
         # the first penalty in a button-press game is always manual placement

@@ -217,7 +217,8 @@ class Brain(object):
         if self.interface.gameState.penalty_is_placement:
             self.buttonPenaltyPlacement = True
 
-        self.whistleHeard = self.interface.gameState.whistle_override
+        if self.interface.gameState.whistle_override:
+            self.whistleHeard = True
 
         # Flush the output
         sys.stdout.flush()
