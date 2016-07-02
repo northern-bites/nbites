@@ -213,6 +213,8 @@ def gamePenalized(player):
         if player.brain.whistleHeard:
             print "BrunswickStates.py: whistle heard and now a penalty?!?! I'm hearing things!"
             player.brain.whistlePenalty = True
+        else:
+            player.brain.whistlePenalty = False
 
         # save current score so we can check in afterPenalty
         player.brain.scoreAtPenaltyUs = player.brain.ourScore
