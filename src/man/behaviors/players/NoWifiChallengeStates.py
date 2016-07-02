@@ -56,7 +56,7 @@ def pleaseTurn(player):
 @superState('gameControllerResponder')
 def waitForNum(player):
 
-    if ( currNum != player.brain.nowifi_angle )
+    if ( currNum != player.brain.nowifi_angle ):
         currNum = player.brain.nowifi_angle
         print "NO WIFI ANGLE CHANGED TO ", currNum
         return player.goNow('pleaseTurn')
