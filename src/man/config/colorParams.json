@@ -8,7 +8,7 @@
           "uAtY255" :
             255,
           "vAtY0" :
-            116,
+            121,
           "vAtY255" :
             194,
           "u_fuzzy_range" :
@@ -21,9 +21,9 @@
           "uAtY0" :
             160,
           "uAtY255" :
-            143,
+            144,
           "vAtY0" :
-            212,
+            208,
           "vAtY255" :
             0,
           "u_fuzzy_range" :
@@ -67,11 +67,11 @@
       "white" :
         {
           "uAtY0" :
-            101,
+            111,
           "uAtY255" :
             200,
           "vAtY0" :
-            130,
+            145,
           "vAtY255" :
             223,
           "u_fuzzy_range" :
