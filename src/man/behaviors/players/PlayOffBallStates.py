@@ -57,37 +57,37 @@ def branchOnRole(player):
         return player.goNow('playerFourSearchBehavior') 
     elif role.isStriker(player.role):
         return player.goNow('playerFiveSearchBehavior')
-    # elif role.isLeftDefender(player.role):
+    elif role.isLeftDefender(player.role):
 
-    #     # print "Player Brain Left Forward 1: " + str(leftDefenderIsForward)
+        # print "Player Brain Left Forward 1: " + str(leftDefenderIsForward)
 
-    #     # if (player.brain.sharedBall.ball_on) and (player.brain.sharedBall.x < NogginConstants.MIDFIELD_X):
+        # if (player.brain.sharedBall.ball_on) and (player.brain.sharedBall.x < NogginConstants.MIDFIELD_X):
 
-    #         # print "WE ARE IN HERE"
+            # print "WE ARE IN HERE"
 
-    #         # return player.goNow('leftDefenderBack')
-    #     if leftDefenderIsForward:
+            # return player.goNow('leftDefenderBack')
+        if leftDefenderIsForward:
 
-    #         # print "Changing to False"
+            # print "Changing to False"
 
-    #         global leftDefenderIsForward
+            global leftDefenderIsForward
 
-    #         leftDefenderIsForward = False
+            leftDefenderIsForward = False
 
-    #         # print "Player Brain Left Forward 2: " + str(leftDefenderIsForward)
+            # print "Player Brain Left Forward 2: " + str(leftDefenderIsForward)
 
-    #         return player.goNow('leftDefenderForward')
-    #     else:
+            return player.goNow('leftDefenderForward')
+        else:
 
-    #         # print "Changing to True"
+            # print "Changing to True"
 
-    #         global leftDefenderIsForward
+            global leftDefenderIsForward
 
-    #         leftDefenderIsForward = True
+            leftDefenderIsForward = True
 
-    #         # print "Player Brain Left Forward 3: " + str(leftDefenderIsForward)
+            # print "Player Brain Left Forward 3: " + str(leftDefenderIsForward)
 
-    #         return player.goNow('leftDefenderBack')
+            return player.goNow('leftDefenderBack')
     else:
         return player.goNow('positionAtHome')
 
@@ -143,11 +143,11 @@ def positionAtHome(player):
     Go to the player's home position.
     """
 
+
+
     home = player.homePosition
 
     if player.firstFrame():
-
-        # print "Player Home: " + str(home)
 
         # print "-----------Positioning at home-------------"
 
@@ -163,7 +163,7 @@ def positionAtHome(player):
 @stay
 # @ifSwitchNow(transitions.shouldChangeDefenderPosition, 'positionAtHome')
 # @ifSwitchNow(transitions.ballInOurHalf, 'playOffBall')
-# @ifSwitchNow(transitions.shouldSpinSearchFromWatching, 'spinAtHome')
+@ifSwitchNow(transitions.shouldSpinSearchFromWatching, 'spinAtHome')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within box.
@@ -186,9 +186,9 @@ def watchForBall(player):
     elif role.isStriker(player.role):
         if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME * 2:
             return player.goNow('spinAtHome')
-    # else:
-    #     if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME * 2:
-    #         return player.goNow('spinAtHome')
+    else:
+        if player.stateTime >= tracking.INITIALIZE_HEADING_TIME + tracking.FULL_WIDE_PAN_TIME * 2:
+            return player.goNow('spinAtHome')
 
 @defaultState('doFirstHalfSpin')
 @superState('playOffBall')
