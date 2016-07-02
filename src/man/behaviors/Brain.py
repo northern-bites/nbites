@@ -109,9 +109,13 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
-        self.pickedUpInSet = False
+        self.whistleHeard = False
+        self.whistlePenalty = False
 
+        self.pickedUpInSet = False
         self.penaltyCount = 0
+
+        self.buttonPenaltyPlacement = False;
 
         # CHINA HACK(s)
         self.penalizedHack = False
@@ -209,6 +213,12 @@ class Brain(object):
 
         # Set myWorldModel for Comm
         self.updateComm()
+
+        if self.interface.gameState.penalty_is_placement:
+            self.buttonPenaltyPlacement = True
+
+        if self.interface.gameState.whistle_override:
+            self.whistleHeard = True
 
         # Flush the output
         sys.stdout.flush()
@@ -371,11 +381,11 @@ class Brain(object):
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 2:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 3:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 4:

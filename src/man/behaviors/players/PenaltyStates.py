@@ -7,6 +7,7 @@ import ChaseBallTransitions as transitions
 import RoleConstants as roleConstants
 import GoalieConstants as GoalieConstants
 from noggin_constants import LineID
+import noggin_constants as Constants
 from math import copysign, fabs, pi
 from objects import RelRobotLocation
 from ..navigator import Navigator
@@ -32,14 +33,36 @@ def afterPenalty(player):
 
     ## TODO TEST VALUES: NUMBER OF FRAMES AND RIGHT/LEFT DIFFS
     # TODO add a check for whistle override
-
+    # 
+    # 
     if player.firstFrame():
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
         if player.brain.penaltyCount < 300:
             print "We were in penalty for less than 10 seconds, it probably doesn't count"
+            print("My penalty count: ", player.brain.penaltyCount)
             player.brain.penaltyCount = 0
+            return player.goNow("gamePlaying")
+
+        # the first penalty in a button-press game is always manual placement
+        if player.brain.buttonPenaltyPlacement == True:
+            player.brain.resetLocTo(999, 999, 999)
+            player.brain.buttonPenaltyPlacement = False
+            return player.goNow("gamePlaying")
+
+        # penalties accrued from whistle-false positives do not result in us being moved
+        if player.brain.whistlePenalty:
+            print "PenaltyStates.py: *** Penalized because of false whistle"
+            player.brain.whistlePenalty = False
+            return player.goNow('overeagerWhistle')
+
+        # if someone scores while we're penalized, we get manually placed (always?)
+        if (player.brain.scoreAtPenaltyUs != player.brain.ourScore
+            or player.brain.scoreAtPenaltyThem != player.brain.theirScore):
+            
+            print "PenaltyStates.py: *** Resetting loc to manual placement because SOMEONE SCORED"
+            player.brain.resetLocTo(999, 999, 999)
             return player.goNow("gamePlaying")
 
         player.brain.penaltyCount = 0
@@ -162,7 +185,7 @@ def afterPenalty(player):
             print ("left horizon:", afterPenalty.leftHorizSum, "right horizon", afterPenalty.rightHorizSum)
             print ("-------------------------------------------------------------\n")
             if not SCRIMMAGE:
-                return player.goNow('gamePenalized')
+                return player.goNow(player.gameState)
 
         # TODO see if the goalie role affects this
         player.brain.tracker.lookToAngle(0)
@@ -212,7 +235,6 @@ def manualPlacement(player):
         after they've been manually placed. Those points are defined in
         LocalizationModule.cpp.
         Sorry.
-        -James
         """
         # print "resetting loc to (999, 999, 999)"
         player.brain.resetLocTo(999, 999, 999)
@@ -235,7 +257,7 @@ def manualPlacement(player):
 
     if manualPlacement.frameCounter > 200:
         print("Horizon totals RIGHT:", manualPlacement.rightHorizon, "LEFT:", manualPlacement.leftHorizon)
-        return player.goNow('gamePenalized')
+        return player.goNow(player.gameState)
 
 
     # if player.brain.interface.vision.circle.on  and DEBUG_MANUAL_PLACEMENT:
@@ -297,8 +319,19 @@ def manualPlacement(player):
     return player.stay()
 
 @superState('gameControllerResponder')
+def overeagerWhistle(player):
+    print "Resetting loc to game set values"
+    player.brain.resetLocTo(player.brain.gameSetX, player.brain.gameSetY, player.brain.gameSetH)
+    player.brain.tracker.lookToAngle(0)
+    return player.goNow('gamePlaying')
+
+@superState('gameControllerResponder')
 def walkOut(player):
     player.brain.nav.walk(0.2, 0, 0)
+
+    if player.brain.playerNumber == 1:
+        # Goalie
+        return player.goNow(player.gameState)
 
     if player.stateTime > 5:
         return player.goNow('determineRole')
