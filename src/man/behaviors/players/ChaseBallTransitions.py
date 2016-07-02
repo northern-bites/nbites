@@ -12,8 +12,8 @@ def shouldChaseBall(player):
     We see the ball. So go get it.
     """
     ball = player.brain.ball
-    return (ball.vis.frames_on > constants.BALL_ON_THRESH or
-     player.brain.ballMemRatio > constants.BALL_MEM_THRESH)
+    return (ball.vis.frames_on >= constants.BALL_ON_THRESH or
+     player.brain.ballMemRatio >= constants.BALL_MEM_THRESH)
 
 def shouldReturnHome(player):
     """
