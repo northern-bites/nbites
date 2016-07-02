@@ -125,8 +125,9 @@ namespace man {
 			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
+			bool checkGradientAroundSpot(int r);
 			bool checkDiagonalCircle(Spot spot);
-			bool checkBallHasNoGreen(int r);
+			bool checkBallHasNoGreenAndSomeWhite(int r);
 
             bool filterBlackSpots(Spot currentBlob);
             bool filterWhiteBlob(Spot spot, intPairVector & blackSpots,

@@ -132,9 +132,14 @@ bool BallDetector::processBlobs(Connectivity & blobber, intPairVector & blackSpo
 				diam << " " << diam2 << " " << cx << " " <<
 				(cy+bottomQuarter) << std::endl;
 		}
+		if (goodSize && debugBall) {
+			std::cout << "Good size on blob " << radius << " " <<
+				diam << " " << diam2 << " " << cx << " " <<
+				(cy+bottomQuarter) << std::endl;
+		}
         if (goodSize && diam2 >= radius / 2 && cy - diam > 0 &&
 			cx - diam > 0 && cx + diam < width &&
-			(diam2 > diam * 0.6 || (*i).centerY() + diam2 < height - 2)) {
+			(diam2 > diam * 0.6 || ((*i).centerY() + diam2 < height - 2) && diam2 > diam * 0.5)) {
             // convert this blob to a Spot
             //int cx = (*i).centerX();
             //int cy = (*i).centerY();
@@ -257,7 +262,8 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
         if (debugBall) {
             debugDraw.drawPoint(currentSpot.ix() + width / 2, -currentSpot.iy() + height / 2, BLUE);
             std::cout << "Black blob " << (currentSpot.ix() + width / 2) << " " <<
-                (-currentSpot.iy() + width / 2) << std::endl;
+                (-currentSpot.iy() + width / 2) << " " << currentSpot.filterOutput <<
+				" " << currentSpot.green << std::endl;
         }
 		return true;
     } else {
@@ -608,8 +614,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
                     if (debugBall) { debugDraw.drawPoint(ix,iy,BLUE); }
 
-                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy)) &&
-					   edgeSanityCheck(ix, iy, r)) {
+                    if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
                         ballSpot.x = ballSpotX * 2;
                         ballSpot.y = ballSpotY * -2;
@@ -618,7 +623,8 @@ bool BallDetector::findCorrelatedBlackSpots
     					ballSpot.innerDiam = r * 2;
 
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
-                        if(checkBallHasNoGreen(r)) {
+                        //checkGradientAroundSpot(r);
+                        if(checkBallHasNoGreenAndSomeWhite(r)) {
 #ifdef OFFLINE
                             foundBall = true;
 #else
@@ -672,7 +678,8 @@ bool BallDetector::findCorrelatedBlackSpots
         				ballSpot.innerDiam = 5;
 
                         makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
-                        if(checkBallHasNoGreen(r)) {
+                        //checkGradientAroundSpot(r);
+                        if(checkBallHasNoGreenAndSomeWhite(r)) {
 #ifdef OFFLINE
                             foundBall = true;
 #else
@@ -769,6 +776,9 @@ bool BallDetector::filterWhiteBlob(Spot spot, intPairVector & blackSpots,
     //if (badspots > 1) {
         //return false;
     //}
+	if (debugBall) {
+		std::cout << "Filter white blob returned true " << midX << " " << midY << std::endl;
+	}
     return true;
 }
 
@@ -963,7 +973,7 @@ bool BallDetector::checkDiagonalCircle(Spot spot) {
 	return true;
 }
 
-bool BallDetector::checkBallHasNoGreen(int r) {
+bool BallDetector::checkBallHasNoGreenAndSomeWhite(int r) {
     int greens = 0, whites = 0;
     double counter = 0;
     int green_tolerance = r * 0.5;
@@ -1000,6 +1010,25 @@ bool BallDetector::checkBallHasNoGreen(int r) {
 
     if(debugBall) { debugDraw.drawPoint(_best.centerX, _best.centerY, GREEN); }
     return true;
+}
+
+bool BallDetector::checkGradientAroundSpot(int r) {
+    int gradCheckOffset = 7;
+    int gradCheckPixelCount = 10;;
+    int left = _best.centerX - r - gradCheckOffset;
+    int right = _best.centerX + r + gradCheckOffset;
+    int bottom = _best.centerY + r + gradCheckOffset;
+    double gradient = 0.0;
+    std::cout<<"Right: "<<right<<std::endl;
+    for(int i = 0; i < gradCheckPixelCount; i++) {
+        int g = edgeDetector->mag(right + i, _best.centerY);
+        debugDraw.drawDot(right+i, _best.centerY, RED);
+        std::cout<<"Gradient: "<<g<<std::endl;
+        gradient += g;
+    }
+    std::cout<<"Gradient Final: "<<gradient<<std::endl;
+    std::cout<<"Average Grad: "<<gradient / gradCheckPixelCount<<std::endl;
+
 }
 
 /* We don't want white below the ball. The tricky thing is that it is ok
@@ -1063,6 +1092,45 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
     int topGreenAvg = 0, botGreenAvg = 0;
     ((topCheckedPixels > 0) ? topGreenAvg = topGreenSum / topCheckedPixels : topGreenAvg = 0);
     ((botCheckedPixels > 0) ? botGreenAvg = botGreenSum / botCheckedPixels : botGreenAvg = 0);
+
+    // if(topGreenAvg < THRESHOLD && botGreenAvg < THRESHOLD) {
+    //     if(debugBall) { 
+    //         std::cout<<"[BALL INFO] Green Test Failed. Top. Avg: " << topGreenAvg <<
+    //                    ", Bot. Avg: "<<botGreenAvg<<std::endl; 
+    //     }
+    //     return 0; 
+    // }
+    // if(topGreenAvg >= THRESHOLD || botGreenAvg >= THRESHOLD) {
+    //     if(debugBall) { 
+    //         std::cout<<"[BALL INFO] Green Test Passed - Top & Bottom\n"; 
+    //         for(int i = 0; i < topCheckedPixels; i++) {
+    //             debugDraw.drawDot(p.first, topY - i, GREEN);
+    //         }
+    //         for(int i = 0; i < botCheckedPixels; i++) {
+    //             debugDraw.drawDot(p.first, bottomY + i, GREEN);
+    //         }
+    //     }
+    //     return 1; 
+    // }
+    // if(topGreenAvg >= THRESHOLD) { 
+    //     if(debugBall) { 
+    //         std::cout<<"[BALL INFO] Green Test Passed - Top\n"; 
+    //         for(int i = 0; i < topCheckedPixels; i++) {
+    //             debugDraw.drawDot(p.first, topY - i, GREEN);
+    //         }
+    //     }
+    //     return 2; 
+    // }
+    // if(botGreenAvg >= THRESHOLD) { 
+    //     if(debugBall) { 
+    //         std::cout<<"[BALL INFO] Green Test Passed - Bot\n";
+    //         for(int i = 0; i < botCheckedPixels; i++) {
+    //             debugDraw.drawDot(p.first, bottomY + i, GREEN);
+    //         }
+    //     }
+    //     return 3; 
+    // }
+    // return -1;    
 
     if(topGreenAvg >= THRESHOLD || botGreenAvg >= THRESHOLD) {
         if(debugBall) { 
