@@ -52,19 +52,21 @@ def fallen(player):
 @superState('gameControllerResponder')
 def pleaseTurn(player):
     if player.firstFrame():
-        player.brain.interface.motionRequest.reset_odometry = True
-        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
-    elif player.counter == 1:
-        player.setWalk(0,0,player.currNum)
-
-    elif player.counter == 2:
+        dest = RelRobotLocation(0,0,-player.currNum)        
+        player.brain.nav.destinationWalkTo(dest, speeds.SPEED_SEVEN)
+    else:
+        dest = RelRobotLocation(0,0,-player.currNum)        
+        player.brain.nav.updateDestinationWalkDest(dest)
+    if ( player.brain.loc.h + 2 > -player.currNum) and (player.brain.loc.h - 2 < -player.currNum):
+        print -player.currNum
         player.brain.nav.stand()
         player.executeMove(SweetMoves.POINT)
-        return player.goNow('waitForNum')
+        return player.goLater('resetRobot')
+
     return player.stay()
+
 @superState('gameControllerResponder')
 def waitForNum(player):
-    
     if ( player.currNum != player.brain.nowifi_angle ):
         player.currNum = player.brain.nowifi_angle
         print "NO WIFI ANGLE CHANGED TO ", player.currNum
@@ -73,3 +75,18 @@ def waitForNum(player):
     return player.stay()
 
 #DONT FORGET TO MAKE SURE INITIALIZED PLAYER.LAST NUM IS FINE
+
+@superState('gameControllerResponder')
+def resetRobot(player):
+    if player.firstFrame():
+        dest = RelRobotLocation(0,0,player.currNum)        
+        player.brain.nav.destinationWalkTo(dest, speeds.SPEED_SEVEN)
+    else:
+        print player.brain.loc.h
+        dest = RelRobotLocation(0,0,player.currNum)        
+        player.brain.nav.updateDestinationWalkDest(dest)
+    if( player.brain.loc.h + 2 > player.currNum) and (player.brain.loc.h - 2 < player.currNum):
+        player.brain.nav.stand()
+        return player.goNow('waitForNum')
+
+    return player.stay()

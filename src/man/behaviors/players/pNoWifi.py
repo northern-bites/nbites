@@ -3,7 +3,7 @@ from . import FallControllerStates
 from . import RoleSwitchingStates
 from . import CommMonitorStates
 from . import GameControllerStates
-from . import NoWifiChallengeStates
+from . import NoWifiStates
 
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
@@ -13,7 +13,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 		self.addStates(RoleSwitchingStates)
 		self.addStates(CommMonitorStates)
 		self.addStates(GameControllerStates)
-		self.addStates(NoWifiChallengeStates)
+		self.addStates(NoWifiStates)
 		self.setName('pNoWifi')
 		self.currentState = 'fallController' # initial state
 
@@ -22,6 +22,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 		self.role = brain.playerNumber
 		self.returningFromPenalty = False
 		self.commMode = -1
-		self.currNum = -1112
+		self.currNum = 0
 
 
