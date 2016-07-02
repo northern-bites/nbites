@@ -385,7 +385,7 @@ class Brain(object):
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 3:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 4:
