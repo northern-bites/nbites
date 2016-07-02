@@ -129,8 +129,6 @@ namespace nbsound {
             buffer = new T[channels * frames];
             needs_delete = true;
 
-            _offset_ = 0;
-
             init_channels();
         }
 

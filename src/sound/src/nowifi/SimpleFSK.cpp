@@ -225,11 +225,11 @@ namespace nowifi {
         frame_offset = frame_start % SIMPLE_FSK_WINDOW_SIZE;
 
         NBL_WARN("frame offset is %d samples.", frame_offset)
-
+        int ret;
         switch (max_i) {
             case 0:
                 /* need to run detection on these two frames... */
-                int ret = do_parse(f1, f2, conf);
+                ret = do_parse(f1, f2, conf);
                 if (ret < 0) {
                     NBL_WARN("got signal start frame in do_search()")
                 } else {
@@ -240,38 +240,20 @@ namespace nowifi {
 
             case 1:
                 if ( magnitudes[0] > magnitudes[2] ) {
-                    f = magnitudes[0] /
-                    (magnitudes[0] + magnitudes[1]);
-                    NBL_INFO("case 1 low: fraction %lf", f)
-                    frame_start = (1 - f) * SIMPLE_FSK_WINDOW_SIZE;
+                    /* need to run detection on these two frames... */
+                    ret = do_parse(f1, f2, conf);
+                    if (ret < 0) {
+                        NBL_WARN("got signal start frame in do_search()")
+                    } else {
+                        data.push_back(ret);
+                    }
 
-                } else {
-                    f = magnitudes[2] /
-                    (magnitudes[1] + magnitudes[2]);
-                    NBL_INFO("case 1 hgh: fraction %lf", f)
-                    frame_start = (1 + f) * SIMPLE_FSK_WINDOW_SIZE;
                 }
-
-                break;
-
-            case 2:
-                f = magnitudes[1] /
-                ( magnitudes[1] + magnitudes[2] );
-                NBL_INFO("case 2: fraction %lf", f)
-                frame_start = (2 - f) * SIMPLE_FSK_WINDOW_SIZE;
 
                 break;
                 
             default:
                 break;
-        }
-
-        /* need to run detection on these two frames... */
-        int ret = do_parse(*start, *end, conf);
-        if (ret < 0) {
-            NBL_WARN("got signal start frame in do_search()")
-        } else {
-            data.push_back(ret);
         }
     }
 

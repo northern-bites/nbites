@@ -232,7 +232,7 @@ NBL_ADD_TEST_TO(sfsk_parse2, fsk) {
         }
     }
 
-    std::string data("t");
+    std::string data("test");
 
     SimpleFSKSendr test;
     test.send(data);
