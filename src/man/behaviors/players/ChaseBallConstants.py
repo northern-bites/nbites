@@ -1,7 +1,7 @@
 from ..navigator import BrunswickSpeeds as speeds
 
 # Ball on and off frame thresholds
-BALL_ON_THRESH = 1 # Lol lowered from 2 to 1 in germany 2 # Lowered this from 4 to 2 in germany
+BALL_ON_THRESH = 1 # Lowered this from 4 to 1 in Germany 2016
 BALL_OFF_THRESH = 20
 BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 
