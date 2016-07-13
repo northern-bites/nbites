@@ -907,7 +907,7 @@ LEFT_SHORT_STRAIGHT_KICK = (
 
 RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
 
-# NEW KICK GERMANY 2016 BELLA MARCUS NIKKI
+# More stable but when we used this in game it didn't go as far :(
 NEW_BAD_LEFT_SHORT_STRAIGHT_KICK = (
     #stand for a bit
     ((90.,10.,-90.,-10.),
