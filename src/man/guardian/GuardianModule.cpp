@@ -444,13 +444,15 @@ void GuardianModule::checkBatteryLevels()
                       << " (was "<< oldLevel <<")"<< std::endl;
 
             std::string batteryLevelString = "Battery charge is now at" + std::to_string(newBatteryCharge) + "percent";
-
             man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
 
             if (newLevel <= EMPTY_BATTERY_VALUE)
             {
 
                 man::tts::say(IN_SCRIMMAGE, "Battery charge is critically low");
+
+                std::string batteryLevelString = "Battery charge is now at" + std::to_string(newBatteryCharge) + "percent";
+                man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
 
                 std::cout << "Guardian:: Battery charge is critically "
                           << "low!! PLUG ME IN!!!!!!!!!" << std::endl;
@@ -460,6 +462,9 @@ void GuardianModule::checkBatteryLevels()
             {
 
                 man::tts::say(IN_SCRIMMAGE, "Battery charge is low");
+
+                std::string batteryLevelString = "Battery charge is now at" + std::to_string(newBatteryCharge) + "percent";
+                man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
 
                 playFile(energy_wav);
             }
