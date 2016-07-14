@@ -443,6 +443,8 @@ void GuardianModule::checkBatteryLevels()
                       << 100.0f * newBatteryCharge
                       << " (was "<< oldLevel <<")"<< std::endl;
 
+            std:cout << "\nSUP----------------------------------------- \nSUP \nSUP \nSUP \nSUP \nSUP"
+
             std::string batteryLevelString = "Battery charge is now at" + std::to_string(newBatteryCharge) + "percent";
             man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
 
