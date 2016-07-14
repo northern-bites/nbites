@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <google/protobuf/descriptor.h>
+#include <string>
 
 #include "SoundPaths.h"
 #include "Profiler.h"
@@ -442,14 +443,24 @@ void GuardianModule::checkBatteryLevels()
                       << 100.0f * newBatteryCharge
                       << " (was "<< oldLevel <<")"<< std::endl;
 
+            std::string batteryLevelString = "Battery charge is now at" + std::to_string(newBatteryCharge) + "percent";
+
+            man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
+
             if (newLevel <= EMPTY_BATTERY_VALUE)
             {
+
+                man::tts::say(IN_SCRIMMAGE, "Battery charge is critically low");
+
                 std::cout << "Guardian:: Battery charge is critically "
                           << "low!! PLUG ME IN!!!!!!!!!" << std::endl;
                 playFile(energy_wav);
             }
             else if(newLevel <= LOW_BATTERY_VALUE)
             {
+
+                man::tts::say(IN_SCRIMMAGE, "Battery charge is low");
+
                 playFile(energy_wav);
             }
             lastBatteryCharge = newBatteryCharge;
