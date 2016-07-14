@@ -437,7 +437,7 @@ void GuardianModule::checkBatteryLevels()
         const float newLevel = floorf(newBatteryCharge*100.0f);
         const float oldLevel = floorf(lastBatteryCharge*100.0f);
         if(oldLevel != newLevel && oldLevel > newLevel &&
-           oldLevel - newLevel >= 10.0f)
+           oldLevel - newLevel >= 1.0f)
         {
             std::cout << "Guardian:: Battery charge is now at "
                       << 100.0f * newBatteryCharge
