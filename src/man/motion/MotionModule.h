@@ -14,7 +14,7 @@
 #include "MotionConstants.h"
 
 // Motion providers
-// #include "unswalk/UNSWalkProvider.h"
+#include "unswalk/UNSWalkProvider.h"
 #include "ScriptedProvider.h"
 #include "NullBodyProvider.h"
 #include "HeadProvider.h"

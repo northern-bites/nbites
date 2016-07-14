@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Eigen/Eigen>
+#include <Eigen/Eigen> // TODO Bella 2016 trying to figure this out
 #include <iostream>
 
 typedef Eigen::Vector2i Point;

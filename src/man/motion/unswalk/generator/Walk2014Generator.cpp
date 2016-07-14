@@ -39,7 +39,7 @@ const float MM_PER_M  = 1000.0;                            // number of millimet
 const float CROUCH_STAND_PERIOD = 0.5;                     // time in seconds to crouch
 const float COM_OFFSET = 0.01;                             // center of mass offset in x direction in meters
 // const float FORWARD_CHANGE = 0.2;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
-// TODO nikki changed this..
+// TODO hack nikki changed this..
 const float FORWARD_CHANGE = 0.08;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
 const float STAND_HIP_HEIGHT = 0.248;                      // for tall power saving stand
 const float KNEE_PITCH_RANGE = UNSWDEG2RAD(60);                // the knee pitch range from standing to crouching
