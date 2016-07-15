@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Eigen/Eigen> // TODO Bella 2016 trying to figure this out
+#include <../../vision/Eigen/Eigen> // TODO Bella 2016 trying to figure this out
 #include <iostream>
 
 typedef Eigen::Vector2i Point;
@@ -26,23 +26,25 @@ namespace boost {
    }
 }
 
-inline std::ostream& operator<<(std::ostream& os, const Point& point) {
-   int x = point[0];
-   int y = point[1];
-   
-   os.write((char*) &x, sizeof(int));
-   os.write((char*) &y, sizeof(int));
-   return os;
-}
+// bella trying to include eigen from vision instead
 
-inline std::istream& operator>>(std::istream& is, Point& point) {
-   int x, y;
+// inline std::ostream& operator<<(std::ostream& os, const Point& point) {
+//    int x = point[0];
+//    int y = point[1];
    
-   is.read((char*) &x, sizeof(int));
-   is.read((char*) &y, sizeof(int));
+//    os.write((char*) &x, sizeof(int));
+//    os.write((char*) &y, sizeof(int));
+//    return os;
+// }
+
+// inline std::istream& operator>>(std::istream& is, Point& point) {
+//    int x, y;
    
-   point[0] = x;
-   point[1] = y;
+//    is.read((char*) &x, sizeof(int));
+//    is.read((char*) &y, sizeof(int));
    
-   return is;
-}
+//    point[0] = x;
+//    point[1] = y;
+   
+//    return is;
+// }
