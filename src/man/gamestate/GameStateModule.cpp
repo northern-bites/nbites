@@ -399,7 +399,7 @@ namespace man{
                                 NBL_WARN("\n:::: WHISTLE OVERRIDE ::::\n\n");
                                 man::tts::say(IN_SCRIMMAGE, "whistle heard!");
                                 next = STATE_PLAYING;
-                                // latest_data.set_whistle_override(true);
+                                latest_data.set_whistle_override(true);
                             }
                         } break;
                             
@@ -422,7 +422,7 @@ namespace man{
 
                             if (heard) {
                                 next = STATE_PLAYING;
-                                // latest_data.set_whistle_override(true);
+                                latest_data.set_whistle_override(true);
                             }
 
                         } break;
