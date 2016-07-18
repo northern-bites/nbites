@@ -1,0 +1,10 @@
+class_<BehaviourSharedData>("BehaviourSharedData")
+    .def_readonly("goalieAttacking", &BehaviourSharedData::goalieAttacking)
+    .def_readonly("timeToReachBall", &BehaviourSharedData::timeToReachBall)
+    .def_readonly("timeToReachUpfielder", &BehaviourSharedData::timeToReachUpfielder)
+    .def_readonly("timeToReachMidfielder", &BehaviourSharedData::timeToReachMidfielder)
+    .def_readonly("timeToReachDefender", &BehaviourSharedData::timeToReachDefender)
+    .def_readonly("currentRole", &BehaviourSharedData::currentRole)
+    .def_readonly("doingBallLineUp", &BehaviourSharedData::doingBallLineUp)
+    .def_readonly("isInReadyMode", &BehaviourSharedData::isInReadyMode)
+    .def_readonly("readyPositionAllocation", &BehaviourSharedData::readyPositionAllocation);

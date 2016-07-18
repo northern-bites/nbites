@@ -1,6 +1,8 @@
 project( man )
 cmake_minimum_required( VERSION 2.8.3 )
 
+message(STATUS "Using compiler ${CMAKE_CXX_COMPILER} to compile man.")
+
 # Make sure we can find the shared files
 set( SHARE_DIR "${NBITES_DIR}/src/share" )
 # So that we can use find_package commands
@@ -80,6 +82,7 @@ include_directories( ${SHARE_DIR}/portals )
 add_subdirectory( ${SHARE_DIR}/logshare ${CMAKE_CURRENT_BINARY_DIR}/logshare/ )
 # Make logshare available to everything
 include_directories( ${SHARE_DIR}/logshare )
+include_directories( logging )
 
 # Also messages
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
@@ -95,7 +98,8 @@ endif()
 # Actual subdirectories
 include_directories( support )
 add_subdirectory( support )
-include_directories( motion/bhwalk ) # @todo hack?
+#include_directories( motion/bhwalk ) # @todo hack?
+include_directories( motion/unswalk )
 
 # Actual modules
 add_subdirectory( arms )
@@ -103,14 +107,14 @@ add_subdirectory( audio )
 add_subdirectory( balltrack )
 add_subdirectory( behaviors )
 add_subdirectory( comm )
-add_subdirectory( control )
 add_subdirectory( gamestate )
 add_subdirectory( guardian )
 add_subdirectory( image )
 add_subdirectory( jointenactor )
 #add_subdirectory( led )
 add_subdirectory( localization )
-add_subdirectory( log )
+add_subdirectory( logging )
+add_subdirectory( logmodule )
 add_subdirectory( motion )
 add_subdirectory( obstacle )
 add_subdirectory( sensors )
@@ -135,16 +139,16 @@ target_link_libraries(
   audio
   balltrack
   behaviors
-  bhwalk
+  #bhwalk
   comm
-  control
   gamestate
   guardian
   image
   jointenactor
   #led
   localization
-  log
+  logmodule
+  logging
   messages
   motion
   obstacle
@@ -154,6 +158,7 @@ target_link_libraries(
   sharedball
   naiveball
   support
+  unswalk
   vision
 )
 
@@ -167,3 +172,21 @@ file( GLOB configFiles
 
 install( FILES ${configFiles}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/Config )
+
+file ( GLOB loggingFiles "../share/logshare/LOGGING_CONSTANTS.json" )
+
+install ( FILES ${loggingFiles} DESTINATION ${CMAKE_INSTALL_PREFIX}/Config )
+
+file ( GLOB unswPositionFiles "motion/unswalk/pos/*" )
+
+install ( FILES ${unswPositionFiles} DESTINATION ${CMAKE_INSTALL_PREFIX}/Config/pos )
+
+
+
+
+
+
+
+
+
+

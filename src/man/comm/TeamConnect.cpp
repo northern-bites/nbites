@@ -39,7 +39,7 @@ void TeamConnect::setUpSocket()
     socket->setBroadcast(true);
 
     printf("TeamConnect::setUpSocket() using port %i\n", SPL_BROADCAST_PORT);
-    socket->setTarget("255.255.255.255", SPL_BROADCAST_PORT);
+    socket->setTarget(IP_TARGET, SPL_BROADCAST_PORT);
     socket->bind("", SPL_BROADCAST_PORT); // listen for anything on our port
 }
 
@@ -80,7 +80,7 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     
     splMessage.pose[0] = (model.my_x()-CENTER_FIELD_X)*CM_TO_MM;
     splMessage.pose[1] = (model.my_y()-CENTER_FIELD_Y)*CM_TO_MM;
-    splMessage.pose[2] = model.my_h();
+    splMessage.pose[2] = model.my_h()*TO_RAD;
 
     splMessage.walkingTo[0] = (model.walking_to_x()-CENTER_FIELD_X)*CM_TO_MM;
     splMessage.walkingTo[1] = (model.walking_to_y()-CENTER_FIELD_Y)*CM_TO_MM;
@@ -338,7 +338,7 @@ void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* m
         {
             continue;
         }
-        else //if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
+        else if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
         {
             portals::Message<messages::WorldModel> msg(0);
             msg.get()->set_active(false);

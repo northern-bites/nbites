@@ -11,7 +11,7 @@
 
 #include "DebugConfig.h"
 
-using nblog::SExpr;
+using nbl::SExpr;
 
 using namespace boost::python;
 using namespace man::behaviors;
@@ -328,9 +328,9 @@ void get_config_params() {
         scope().attr("LEFT_FORWARD_DEFENSE") = false;
         scope().attr("RIGHT_FORWARD_DEFENSE") = false;
         // max speed when chasing the ball
-        scope().attr("MAX_SPEED") = 0.8f;
+        scope().attr("MAX_SPEED") = 0.4f;
         // min speed when chasing the ball
-        scope().attr("MIN_SPEED") = 0.5f;
+        scope().attr("MIN_SPEED") = 0.1f;
     }
 }
 

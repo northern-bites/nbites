@@ -4,6 +4,7 @@ from ..headTracker.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
                                       FIXED_PITCH_SLOW_GOALIE_PAN)
 #from vision import certainty
 from ..navigator import Navigator as nav
+from ..navigator import BrunswickSpeeds as speeds
 from ..util import *
 #import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
@@ -26,10 +27,12 @@ def walkToGoal(player):
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.repeatWideSnapPan()
         player.returningFromPenalty = False
-        player.brain.nav.goTo(RobotLocation(FIELD_WHITE_LEFT_SIDELINE_X,
-                                       CENTER_FIELD_Y, 0.0))
+        dest = constants.HOME_POSITION
+        player.brain.nav.goTo(dest, speed = speeds.SPEED_SEVEN,
+                                    precision = nav.GENERAL_AREA,
+                                    fast = True)
 
     return Transition.getNextState(player, walkToGoal)
 
@@ -60,7 +63,9 @@ def checkSafePlacement(player):
             checkSafePlacement.lastLook = constants.RIGHT
     elif checkSafePlacement.turnCount >= 2:
         player.brain.tracker.lookToAngle(0)
+        return player.goLater('watchWithLineChecks')
     if player.brain.tracker.isStopped():
+        print("setting is looking to false")
         checkSafePlacement.looking = False
 
     # if player.counter > 50:
@@ -88,23 +93,24 @@ def clearBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
+        # Moved kick transition to transitions
     if player.brain.ball.distance < constants.POSITION_FOR_KICK_DIST:
         # print "Now positioning for kick"
         return player.goNow('positionForGoalieKick')
     elif player.brain.ball.distance < constants.SLOW_DOWN_DIST:
         # print "Slowing down"
-        player.brain.nav.chaseBall(nav.MEDIUM_SPEED, fast = True)
+        player.brain.nav.chaseBall(speeds.SPEED_FIVE, fast = True)
     else:
         # print "approaching ball"
-        player.brain.nav.chaseBall(nav.FAST_SPEED, fast = True)
+        player.brain.nav.chaseBall(speeds.SPEED_SEVEN, fast = True)
 
     # if player.counter % 2 == 0:
     #     nball = player.brain.naiveBall
     #     ball = player.brain.ball
-    #     print "================================="
-    #     print("yintercept:", nball.yintercept)
-    #     print("Ball dist:", ball.distance)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
+    # #     print "================================="
+    # #     print("yintercept:", nball.yintercept)
+    # #     print("Ball dist:", ball.distance)
+    # #     print("ball.vis.frames_on", ball.vis.frames_on)
     #     print("nb xvel:", nball.x_vel)
     #     print("ball mov vel:", ball.mov_vel_x)
 
@@ -123,10 +129,11 @@ def positionForGoalieKick(player):
                                     ball.rel_y - player.kick.setupY,
                                     0)
         print("Kickpose:", positionForGoalieKick.kickPose.relX, positionForGoalieKick.kickPose.relY)
-        positionForGoalieKick.speed = nav.GRADUAL_SPEED
+        positionForGoalieKick.speed = speeds.SPEED_FIVE
 
         player.brain.nav.goTo(positionForGoalieKick.kickPose,
                                             speed = positionForGoalieKick.speed,
+                                            fast = True,
                                             precision = nav.CLOSE_ENOUGH)
     ball = player.brain.ball
     positionForGoalieKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
@@ -170,7 +177,7 @@ def repositionAfterWhiff(player):
                                                          0.0)
         player.brain.nav.goTo(repositionAfterWhiff.ballDest,
                               nav.CLOSE_ENOUGH,
-                              nav.GRADUAL_SPEED)
+                              speeds.SPEED_THREE)
 
     # if it took more than 5 seconds, forget it
     if player.counter > 350:

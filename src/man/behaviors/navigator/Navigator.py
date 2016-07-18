@@ -1,6 +1,7 @@
 from ..util import FSA
 from . import NavStates
 from . import NavConstants as constants
+from . import BrunswickSpeeds as speeds
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation, RelLocation, RelRobotLocation
@@ -13,7 +14,7 @@ import PMotion_proto
 FULL_SPEED = 1.0
 HASTY_SPEED = 0.9
 FAST_SPEED = 0.8
-QUICK_SPEED = 0.7
+QUICK_SPEED = 0.85 #0.7
 BRISK_SPEED = 0.6
 MEDIUM_SPEED = 0.5
 GRADUAL_SPEED = 0.4
@@ -98,7 +99,7 @@ class Navigator(FSA.FSA):
         NavStates.kickEngine.kickType = kickType
         self.switchTo('kickEngine')
 
-    def chaseBall(self, speed = FAST_SPEED, fast = False):
+    def chaseBall(self, speed = speeds.SPEED_EIGHT, fast = False):
         """
         Calls goTo on ball, which should be a RobotLocation.
 
@@ -108,8 +109,8 @@ class Navigator(FSA.FSA):
 
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
-    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
-             avoidObstacles = False, adaptive = False, fast = False, pb = False):
+    def goTo(self, dest, precision = GENERAL_AREA, speed = speeds.SPEED_EIGHT,
+             avoidObstacles = False, adaptive = False, fast = False, pb = False, useLoc = True):
         """
         General go to method.
         Ideal for going to a field position, or for going to a relative location
@@ -169,6 +170,11 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.adaptive = adaptive
         NavStates.goToPosition.fast = fast
         NavStates.goToPosition.pb = pb
+        NavStates.goToPosition.useLoc = useLoc
+
+        # print speed
+
+        # print speed
 
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
@@ -184,7 +190,7 @@ class Navigator(FSA.FSA):
         if fast:
             NavStates.goToPosition.fast = fast
 
-    def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, kick = None):
+    def destinationWalkTo(self, walkToDest, speed = speeds.SPEED_EIGHT, kick = None):
         """
         Walks to a RelRobotLocation via B-Human destination walking.
         Doesn't avoid obstacles!
@@ -200,7 +206,6 @@ class Navigator(FSA.FSA):
         NavStates.destinationWalkingTo.destQueue.clear()
 
         NavStates.destinationWalkingTo.destQueue.append(walkToDest)
-        
         self.requestVelocity = speed
         NavStates.destinationWalkingTo.speed = self.velocity
 
@@ -217,7 +222,7 @@ class Navigator(FSA.FSA):
 
         NavStates.destinationWalkingTo.destQueue.append(dest)
 
-    def walkTo(self, walkToDest, speed = FULL_SPEED):
+    def walkTo(self, walkToDest, speed = speeds.SPEED_EIGHT):
         """
         Walks to a RelRobotLocation while checking odometry to see if
         we reached the destination.
@@ -262,12 +267,16 @@ class Navigator(FSA.FSA):
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
+    def walkInPlace(self):
+        self.switchTo('walkInPlace')
+
     def stand(self):
         """
         Make the robot stand. Standing should be the default action when we're not
         walking/executing a sweet move.
         """
         self.destination = None
+        # print("I'm in stand!")
 
         self.switchTo('stand')
 

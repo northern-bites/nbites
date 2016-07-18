@@ -2,8 +2,10 @@
 #include "Edge.h"
 #include "HighResTimer.h"
 #include "NBMath.h"
-#include "../control/control.h"
-#include "../log/logging.h"
+
+#include "nblogio.h"
+#include "Control.hpp"
+#include "Logging.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -13,6 +15,8 @@
 #include "Profiler.h"
 #include "DebugConfig.h"
 //#include "PostDetector.h"
+
+#include "VisionCalibration.hpp"
 
 namespace man {
 namespace vision {
@@ -27,21 +31,25 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
-      blackStar_(false)
+      blackStar_(false),
+      colorParamsMonitor( calibration::colorParamsPath().c_str(), false),
+      camOffsetsMonitor( calibration::cameraOffsetsPath().c_str(), false)
 {
-    std:: string colorPath, calibrationPath;
-    #ifdef OFFLINE
-        colorPath =  calibrationPath = std::string(getenv("NBITES_DIR"));
-        colorPath += "/src/man/config/colorParams.txt";
-        calibrationPath += "/src/man/config/calibrationParams.txt";
-    #else
-        colorPath = "/home/nao/nbites/Config/colorParams.txt";
-        calibrationPath = "/home/nao/nbites/Config/calibrationParams.txt";
-    #endif
+    size_t dot_local_pos = robotName.find(".local");
 
-    // Get SExpr from string
-    nblog::SExpr* colors = nblog::SExpr::read(getStringFromTxtFile(colorPath));
-    calibrationLisp = nblog::SExpr::read(getStringFromTxtFile(calibrationPath));
+    if (dot_local_pos != std::string::npos) {
+        name = robotName.substr(0, dot_local_pos);
+    } else {
+        name = robotName;
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        colorParams[i] = NULL;
+        calibrationParams[i] = NULL;
+    }
+
+    reloadColorParams();
+    reloadCameraOffsets();
 
     // Set module pointers for top then bottom images
     // NOTE Constructed on heap because some of the objects below do
@@ -50,13 +58,13 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
     //      constructors in the case of C-style arrays, limitation theoretically
     //      removed in C++11.
     for (int i = 0; i < 2; i++) {
-        colorParams[i] = getColorsFromLisp(colors, i);
+//        getColorsFromLisp(colors, i);
+
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
         rejectedEdges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
-        calibrationParams[i] = new CalibrationParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
@@ -100,6 +108,9 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
+#ifdef OFFLINE
+		ballDetector[i]->setDebugImage(debugImage[i]);
+#endif
     }
 #ifdef OFFLINE
 	// Here is an example of how to get access to the debug space. In this case the
@@ -108,8 +119,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 #endif
 
     // Retreive calibration params for the robot name specified in the constructor
-    setCalibrationParams(robotName);
-
     robotImageObstacle = new RobotObstacle(wd / 4, ht / 4);
 }
 
@@ -147,6 +156,20 @@ void VisionModule::run_()
     bottomIn.latch();
     jointsIn.latch();
     inertsIn.latch();
+
+#ifndef OFFLINE
+
+    if ( colorParamsMonitor.update() ) {
+        NBL_WARN("VisionModule RELOADING COLOR PARAMETERS!");
+        reloadColorParams();
+    }
+
+    if (    camOffsetsMonitor.update() ) {
+        NBL_WARN("VisionModule RELOADING CAMERA OFFSETS!");
+        reloadCameraOffsets();
+    }
+
+#endif
 
     // Setup
     std::vector<const messages::YUVImage*> images { &topIn.message(),
@@ -212,7 +235,7 @@ void VisionModule::run_()
 
         // Offset to hackily adjust tilt for high-azimuth error
         double azOffset = 0;
-        if (name != "ringo")
+        if (name != "blt")
             azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
 
         // Calculate kinematics and adjust homography
@@ -224,9 +247,8 @@ void VisionModule::run_()
             homography[i]->roll(calibrationParams[i]->getRoll());
 
             homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
-#ifndef OFFLINE
+
             homography[i]->azimuth(kinematics[i]->azimuth());
-#endif
         }
 
         times[i][1] = timer.end();
@@ -244,7 +266,7 @@ void VisionModule::run_()
 		if (!i) {
 			// field needs the color images
 			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
-							 frontEnd[0]->orangeImage());
+							 frontEnd[0]->orangeImage(), yImage);
 			GeoLine horizon = homography[0]->horizon(image->width() / 2);
 			double x1, x2, y1, y2;
 			horizon.endPoints(x1, y1, x2, y2);
@@ -260,7 +282,19 @@ void VisionModule::run_()
 
         // Run edge detection
         PROF_ENTER2(P_EDGE_TOP, P_EDGE_BOT, i==0)
+
+#ifdef OFFLINE
+        if (blackStar_) {
+//            printf("\nUSING NULL IMAGE FOR EDGE DETECTION THROWOUTS\n\n");
+            ImageLiteU8 nullImage{};
+            edgeDetector[i]->edgeDetect(nullImage, *(edges[i]));
+        } else {
+            edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
+        }
+#else
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
+#endif
+
         PROF_EXIT2(P_EDGE_TOP, P_EDGE_BOT, i==0)
         times[i][4] = timer.end();
 
@@ -299,7 +333,11 @@ void VisionModule::run_()
         times[i][10] = timer.end();
 
         PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
-        ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+			//ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+		ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
+                                   frontEnd[i]->orangeImage(), yImage, edgeDetector[i]);
+		ballDetected |= ballDetector[i]->findBall(whiteImage,
+                                                  kinematics[i]->wz0(), *(edges[i]));
         PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
         times[i][11] = timer.end();
 
@@ -474,28 +512,33 @@ void VisionModule::outportalVisionField()
     vb->set_on(ballOn);
     vb->set_frames_on(ballOnCount);
     vb->set_frames_off(ballOffCount);
-    vb->set_intopcam(top);
+    vb->set_in_top_cam(top);
     vb->set_wz0(homography[!top]->wz0());
 
     if (ballOn)
     {
         vb->set_distance(best.dist);
 
-        vb->set_radius(best.blob.firstPrincipalLength());
+        vb->set_radius(best.radius);
+
+		if (best.y_rel == 0) {
+			std::cout << "***\n***\n***\nDisasterous Y-REL in BALL!!!" << std::endl;
+			best.y_rel = 0.1;
+		}
         double bearing = atan(best.x_rel / best.y_rel);
         vb->set_bearing(bearing);
         vb->set_bearing_deg(bearing * TO_DEG);
 
-        double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
+        double angle_x = (best.imgWidth/2 - best.centerX) /
             (best.imgWidth) * HORIZ_FOV_DEG;
-        double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
+        double angle_y = (best.imgHeight/2 - best.centerY) /
             (best.imgHeight) * VERT_FOV_DEG;
         vb->set_angle_x_deg(angle_x);
         vb->set_angle_y_deg(angle_y);
 
         vb->set_confidence(best.confidence());
-        vb->set_x(static_cast<int>(best.blob.centerX()));
-        vb->set_y(static_cast<int>(best.blob.centerY()));
+        vb->set_x(static_cast<int>(best.centerX));
+        vb->set_y(static_cast<int>(best.centerY));
     }
 
     visionField.set_horizon_dist(field->horizonDist());
@@ -524,139 +567,79 @@ void VisionModule::updateObstacleBox()
     //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
 }
 
+void VisionModule::reloadColorParams() {
+    std::string serializedColors;
+    nbl::io::readFileToString(serializedColors, calibration::colorParamsPath());
+    for (int i = 0; i < 2; ++i) {
+        setColorParams(calibration::getSavedColors(i==0, serializedColors, &latestUsedColorParams[i]), i==0);
+    }
+}
+
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
-{ 
-    delete colorParams[!topCamera];
+{
+    NBL_WARN("VisionModule: using colors for camera[%d] = {%s}",
+             !topCamera, latestUsedColorParams[!topCamera].serialize().c_str() );
+
+    if (colorParams[!topCamera]) delete colorParams[!topCamera];
     colorParams[!topCamera] = colors;
 }
 
-const std::string VisionModule::getStringFromTxtFile(std::string path) 
+void VisionModule::reloadCameraOffsets() {
+    std::string serializedOffsets;
+    nbl::io::readFileToString(serializedOffsets, calibration::cameraOffsetsPath());
+    for (int i = 0; i < 2; ++i) {
+        setCalibrationParams(calibration::getSavedOffsets( name, i==0, serializedOffsets) , i==0);
+    }
+}
+
+void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
 {
-    std::ifstream textFile;
-    textFile.open(path);
+    NBL_WARN("VisionModule: using offsets for camera[%d] = {%lf, %lf}",
+             !topCamera, params->getRoll(), params->getTilt());
 
-    // Get size of file
-    textFile.seekg (0, textFile.end);
-    long size = (long)textFile.tellg();
-    textFile.seekg(0);
-
-    // Read file into buffer and convert to string
-    char* buff = new char[size];
-    textFile.read(buff, size);
-    std::string sexpText(buff);
-
-    textFile.close();
-    return (const std::string)sexpText;
+    if (calibrationParams[!topCamera]) delete calibrationParams[!topCamera];
+    calibrationParams[!topCamera] = params;
 }
 
 #ifdef OFFLINE
-	void VisionModule::setDebugDrawingParameters(nblog::SExpr* params) {
-		std::cout << "In debug drawing parameters" << params->print() << std::endl;
+	void VisionModule::setDebugDrawingParameters(nbl::SExpr* params) {
+		//std::cout << "In debug drawing parameters" << params->print() << std::endl;
 		int cameraHorizon = params->get(1)->find("CameraHorizon")->get(1)->valueAsInt();
 		int fieldHorizon = params->get(1)->find("FieldHorizon")->get(1)->valueAsInt();
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
 		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
 		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
+		nbl::SExpr *spot = params->get(1)->find("ShowSpotSizes");
+		int debugSpots = 0;
+		if (spot != NULL) {
+			debugSpots = spot->get(1)->valueAsInt();
+		}
+		int filterDark = params->get(1)->find("FilterDark")->get(1)->valueAsInt();
+		int greenDark = params->get(1)->find("GreenDark")->get(1)->valueAsInt();
+		int filterBrite = params->get(1)->find("FilterBrite")->get(1)->valueAsInt();
+		int greenBrite = params->get(1)->find("GreenBrite")->get(1)->valueAsInt();
 		field->setDrawCameraHorizon(cameraHorizon);
 		field->setDrawFieldHorizon(fieldHorizon);
 		field->setDebugHorizon(debugHorizon);
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		ballDetector[0]->setDebugSpots(debugSpots);
+		ballDetector[1]->setDebugSpots(debugSpots);
+		ballDetector[0]->setDebugFilterDark(filterDark);
+		ballDetector[1]->setDebugFilterDark(filterDark);
+		ballDetector[0]->setDebugGreenDark(greenDark);
+		ballDetector[1]->setDebugGreenDark(greenDark);
+		ballDetector[0]->setDebugFilterBrite(filterBrite);
+		ballDetector[1]->setDebugFilterBrite(filterBrite);
+		ballDetector[0]->setDebugGreenBrite(greenBrite);
+		ballDetector[1]->setDebugGreenBrite(greenBrite);
 		debugImage[0]->reset();
 		debugImage[1]->reset();
+		//std::cout << "out" << std::endl;
 	}
 #endif
 
-/*
- Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
-  load the three compoenets of a Colors struct, white, green, and orange,
-  from the 18 values for either the top or bottom image. 
-*/
-Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) 
-{
-    Colors* ret = new man::vision::Colors;
-    nblog::SExpr* params;
-
-    if (camera == 0) {
-        params = colors->get(1)->find("Top")->get(1);
-    } else if (camera == 1) {
-        params = colors->get(1)->find("Bottom")->get(1);
-    } else {
-        params = colors->get(1);
-    }
-
-    colors = params->get(0)->get(1);
-
-    ret->white. load(std::stof(colors->get(0)->get(1)->serialize()),
-                     std::stof(colors->get(1)->get(1)->serialize()),
-                     std::stof(colors->get(2)->get(1)->serialize()),
-                     std::stof(colors->get(3)->get(1)->serialize()),
-                     std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize()));
-
-    colors = params->get(1)->get(1);
-
-    ret->green. load(std::stof(colors->get(0)->get(1)->serialize()),
-                     std::stof(colors->get(1)->get(1)->serialize()),
-                     std::stof(colors->get(2)->get(1)->serialize()),
-                     std::stof(colors->get(3)->get(1)->serialize()),
-                     std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize()));
-
-    colors = params->get(2)->get(1);
-
-    ret->orange.load(std::stof(colors->get(0)->get(1)->serialize()),
-                     std::stof(colors->get(1)->get(1)->serialize()),
-                     std::stof(colors->get(2)->get(1)->serialize()),
-                     std::stof(colors->get(3)->get(1)->serialize()),
-                     std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize()));
-
-    return ret;
-}
-
-void VisionModule::setCalibrationParams(std::string robotName) 
-{
-    setCalibrationParams(0, robotName);
-    setCalibrationParams(1, robotName);
-}
-
-void VisionModule::setCalibrationParams(int camera, std::string robotName) 
-{
-    if (std::string::npos != robotName.find(".local")) {
-        robotName.resize(robotName.find("."));
-        //Much love for the edge cases.
-        if (robotName == "she-hulk")
-            robotName = "shehulk";
-    }
-
-    // Set local private variable
-    name = robotName;
-
-    if (robotName == "") {
-        return;
-    }
-
-    nblog::SExpr* robot = calibrationLisp->get(1)->find(robotName);
-
-    if (robot != NULL) {
-        std::string cam = camera == 0 ? "TOP" : "BOT";
-        double roll =  robot->find(cam)->get(1)->valueAsDouble();
-        double tilt = robot->find(cam)->get(2)->valueAsDouble();
-        delete calibrationParams[camera];
-        calibrationParams[camera] = new CalibrationParams(roll, tilt);
-
-        std::cerr << "Found and set calibration params for " << robotName;
-        std::cerr << "Roll: " << roll << " Tilt: " << tilt << std::endl;
-    }
-}
-
-void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
-{
-    delete calibrationParams[!topCamera];
-    calibrationParams[!topCamera] = params;
-}
 
 #ifdef USE_LOGGING
 void VisionModule::logImage(int i) 
@@ -684,11 +667,23 @@ void VisionModule::logImage(int i)
             return;
     }
 
-    if (control::flags[control::tripoint]) {
+    if (control::check(control::flags::tripoint)) {
+        if (control::check(control::flags::tripoint_bottom_only) && (i==0)) {
+            //logging bottom
+            return;
+        }
+
         ++image_index;
+
+        nbl::logptr theLog = nbl::Log::explicitLog(
+                                                   std::vector<nbl::Block>{},
+                                                   json::Object{},
+                                                   "tripoint", time(NULL));
         
         messages::YUVImage image;
         std::string image_from;
+        clock_t clockWhen = clock();
+
         if (!i) {
             image = topIn.message();
             image_from = "camera_TOP";
@@ -696,84 +691,22 @@ void VisionModule::logImage(int i)
             image = bottomIn.message();
             image_from = "camera_BOT";
         }
-        
-        long im_size = (image.width() * image.height() * 1);
-        int im_width = image.width() / 2;
-        int im_height= image.height();
-        
+
+        theLog->addBlockFromImage(image, image_from, image_index, clockWhen);
+
         messages::JointAngles ja_pb = jointsIn.message();
         messages::InertialState is_pb = inertsIn.message();
-        
-        std::string ja_buf;
-        std::string is_buf;
-        std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
-        ja_pb.SerializeToString(&ja_buf);
-        is_pb.SerializeToString(&is_buf);
-        
-        im_buf.append(is_buf);
-        im_buf.append(ja_buf);
-        
-        std::vector<nblog::SExpr> contents;
-        
-        nblog::SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
-        imageinfo.append(nblog::SExpr("width", im_width)   );
-        imageinfo.append(nblog::SExpr("height", im_height) );
-        imageinfo.append(nblog::SExpr("encoding", "[Y8(U8/V8)]"));
-        contents.push_back(imageinfo);
-        
-        nblog::SExpr inerts("InertialState", "tripoint", clock(), image_index, is_buf.length());
-        inerts.append(nblog::SExpr("acc_x", is_pb.acc_x()));
-        inerts.append(nblog::SExpr("acc_y", is_pb.acc_y()));
-        inerts.append(nblog::SExpr("acc_z", is_pb.acc_z()));
-        
-        inerts.append(nblog::SExpr("gyr_x", is_pb.gyr_x()));
-        inerts.append(nblog::SExpr("gyr_y", is_pb.gyr_y()));
-        
-        inerts.append(nblog::SExpr("angle_x", is_pb.angle_x()));
-        inerts.append(nblog::SExpr("angle_y", is_pb.angle_y()));
-        contents.push_back(inerts);
-        
-        nblog::SExpr joints("JointAngles", "tripoint", clock(), image_index, ja_buf.length());
-        joints.append(nblog::SExpr("head_yaw", ja_pb.head_yaw()));
-        joints.append(nblog::SExpr("head_pitch", ja_pb.head_pitch()));
 
-        joints.append(nblog::SExpr("l_shoulder_pitch", ja_pb.l_shoulder_pitch()));
-        joints.append(nblog::SExpr("l_shoulder_roll", ja_pb.l_shoulder_roll()));
-        joints.append(nblog::SExpr("l_elbow_yaw", ja_pb.l_elbow_yaw()));
-        joints.append(nblog::SExpr("l_elbow_roll", ja_pb.l_elbow_roll()));
-        joints.append(nblog::SExpr("l_wrist_yaw", ja_pb.l_wrist_yaw()));
-        joints.append(nblog::SExpr("l_hand", ja_pb.l_hand()));
+        theLog->addBlockFromProtobuf(is_pb, image_from, image_index, clockWhen);
+        theLog->addBlockFromProtobuf(ja_pb, image_from, image_index, clockWhen);
 
-        joints.append(nblog::SExpr("r_shoulder_pitch", ja_pb.r_shoulder_pitch()));
-        joints.append(nblog::SExpr("r_shoulder_roll", ja_pb.r_shoulder_roll()));
-        joints.append(nblog::SExpr("r_elbow_yaw", ja_pb.r_elbow_yaw()));
-        joints.append(nblog::SExpr("r_elbow_roll", ja_pb.r_elbow_roll()));
-        joints.append(nblog::SExpr("r_wrist_yaw", ja_pb.r_wrist_yaw()));
-        joints.append(nblog::SExpr("r_hand", ja_pb.r_hand()));
+        json::Object camOffsets;
+        camOffsets["d_roll"] = json::Number( calibrationParams[i]->getRoll() );
+        camOffsets["d_tilt"] = json::Number( calibrationParams[i]->getTilt() );
+        theLog->topLevelDictionary["OriginalCameraOffsets"] = camOffsets;
+        theLog->topLevelDictionary["OriginalColorParams"] = latestUsedColorParams[i];
 
-        joints.append(nblog::SExpr("l_hip_yaw_pitch", ja_pb.l_hip_yaw_pitch()));
-        joints.append(nblog::SExpr("r_hip_yaw_pitch", ja_pb.r_hip_yaw_pitch()));
-
-        joints.append(nblog::SExpr("l_hip_roll", ja_pb.l_hip_roll()));
-        joints.append(nblog::SExpr("l_hip_pitch", ja_pb.l_hip_pitch()));
-        joints.append(nblog::SExpr("l_knee_pitch", ja_pb.l_knee_pitch()));
-        joints.append(nblog::SExpr("l_ankle_pitch", ja_pb.l_ankle_pitch()));
-        joints.append(nblog::SExpr("l_ankle_roll", ja_pb.l_ankle_roll()));
-
-        joints.append(nblog::SExpr("r_hip_roll", ja_pb.r_hip_roll() ));
-        joints.append(nblog::SExpr("r_hip_pitch", ja_pb.r_hip_pitch() ));
-        joints.append(nblog::SExpr("r_knee_pitch", ja_pb.r_knee_pitch() ));
-        joints.append(nblog::SExpr("r_ankle_pitch", ja_pb.r_ankle_pitch() ));
-        joints.append(nblog::SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
-        contents.push_back(joints);
-
-        nblog::SExpr cal("CalibrationParams", "tripoint", clock(), image_index, 0);
-        cal.append(nblog::SExpr(image_from, calibrationParams[i]->getRoll(), calibrationParams[i]->getTilt()));
-        if (blackStar)
-            cal.append(nblog::SExpr("BlackStar"));
-        contents.push_back(cal);
-
-        nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
+        nbl::NBLog(theLog);
     }
 }
 #endif

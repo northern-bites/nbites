@@ -79,6 +79,7 @@ class Brain(object):
         # New vision system...
         self.visionLines = None
         self.visionCorners = None
+        self.visionCircle = None
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
@@ -108,10 +109,31 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
+        self.whistleHeard = False
+        self.whistlePenalty = False
+
+        self.pickedUpInSet = False
+        self.penaltyCount = 0
+
+        self.buttonPenaltyPlacement = False;
+
         # CHINA HACK(s)
         self.penalizedHack = False
         self.penalizedEdgeClose = 0
         self.penalizedCount = 0
+
+        # US OPEN 16 HACK(z)
+        self.ballMem = []
+        self.ballMemIndx = 0
+        self.BALL_MEM_SIZE = 15
+        self.ballMemRatio = 0.0
+        for i in range(self.BALL_MEM_SIZE):
+            self.ballMem.append(0)
+
+        # New defender positioning
+        self.defendingStateTime = 0 #Number of frames.
+        self.staggeredPositioning = False
+        self.defenderPositioning = 0
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -192,8 +214,27 @@ class Brain(object):
         # Set myWorldModel for Comm
         self.updateComm()
 
+        if self.interface.gameState.penalty_is_placement:
+            self.buttonPenaltyPlacement = True
+
+        self.whistleHeard = self.interface.gameState.whistle_override
+
         # Flush the output
         sys.stdout.flush()
+
+        # US OPEN :(
+        if self.ball.vis.on:
+            self.ballMem[self.ballMemIndx] = 1
+        else:
+            self.ballMem[self.ballMemIndx] = 0
+        self.ballMemIndx = (self.ballMemIndx + 1) % self.BALL_MEM_SIZE
+        count = 0
+        for i in range(self.BALL_MEM_SIZE):
+            count += self.ballMem[i]
+
+        self.ballMemRatio = (count / self.BALL_MEM_SIZE) 
+
+
 
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
@@ -244,6 +285,8 @@ class Brain(object):
     def updateVision(self):
         self.visionLines = self.interface.vision.line
         self.visionCorners = self.interface.vision.corner
+        self.visionCircle = self.interface.vision.circle
+        # print str(self.visionCircle.on)
         self.vision = self.interface.vision
         
         # if self.counter % 50 == 0:
@@ -331,26 +374,55 @@ class Brain(object):
               blue goalbox constants always match up with our goal.
         """
         # Does this matter for the goalie? It really shouldn't...
+        #walk out** so it should matter
         if self.playerNumber == 1:
             self.resetLocTo(Constants.MIDFIELD_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 2:
-            self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 3:
-            self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 4:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_CC_NEAREST_POINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 5:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_CC_NEAREST_POINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
+
+
+
+
+
+
+
+        # OLD WALK OUT POSITIONS
+        # if self.playerNumber == 1:
+        #     self.resetLocTo(Constants.MIDFIELD_X,
+        #                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+        #                     Constants.HEADING_UP)
+        # elif self.playerNumber == 2:
+        #     self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
+        #                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+        #                     Constants.HEADING_DOWN)
+        # elif self.playerNumber == 3:
+        #     self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
+        #                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+        #                     Constants.HEADING_UP)
+        # elif self.playerNumber == 4:
+        #     self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+        #                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+        #                     Constants.HEADING_DOWN)
+        # elif self.playerNumber == 5:
+        #     self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+        #                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+        #                     Constants.HEADING_UP)
 
 
     #@todo: HACK HACK HACK Mexico 2012 to make sure we still re-converge properly even if

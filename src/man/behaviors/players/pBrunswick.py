@@ -75,3 +75,5 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # 1 -- one field player is offline
         # 2 -- more than one field player is offline
         self.commMode = 0
+
+

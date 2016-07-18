@@ -1,0 +1,76 @@
+# Logging constants, keys, and configuration.
+# Comments can be declared in this file with '#' and end at newline.
+# First top-level value must be JSON object.  Later values ignored.
+# Unused keys are ignored.  This file is not modified programmatically.
+
+#This file should be at:
+#offline    ${NBITES_DIR}/src/share/logging/LOGGING_CONSTANTS.json
+#online     /home/nao/nbites/Config/LOGGING_CONSTANTS.json
+# **** if it is not, logging *will* crash ****
+
+{
+    #log classes (used for view mapping among other things)
+    "LogClass_Null" : "NullClass",
+    "LogClass_Flags" : "_Flags_",
+    "LogClass_Tripoint" : "tripoint",
+    "LogClass_YUVImage" : "YUVImage",
+
+    "LogClass_EdgeImage" : "EdgeImage",
+
+    "LogClass_String" : "String",
+
+    #block types
+    "YUVImageType_DEFAULT" : "YUVImage422",
+    "YUVImageType_Y16" : "YImage16",
+    "YUVImageType_Y8" : "YImage8",
+
+    "SexprType_DEFAULT" : "Sexpr",
+    "JsonType_DEFAULT" : "Json",
+    "LogType_DEFAULT"   : "_LOG_",  #blocks as Logs!
+
+    "LogClass_RPC_Call" : "RPC_Call",
+    "LogClass_RPC_Return" : "RPC_Return",
+
+    #toplevel keys for RPC
+    "RPC_NAME" : "RPC_NAME",
+    "RPC_KEY" : "RPC_KEY",
+
+    #ports
+    "ROBOT_PORT" : 30000,
+    "CROSS_PORT" : 30001,
+
+    #network stuff
+    "REMOTE_HOST_TIMEOUT" : 5000000,    #microseconds, aka us, aka 1/1000000 seconds
+                                        #currently 5 seconds.
+
+    #file prefix path on robot
+    "ROBOT_LOG_PATH_PREFIX" : "/home/nao/nbites/log/",
+
+    "ONLINE_CAMERA_OFFSET_PATH" : "/home/nao/nbites/Config/cameraOffsets.json",
+    "ONLINE_COLOR_PARAMS_PATH" : "/home/nao/nbites/Config/colorParams.json",
+
+    "OFFLINE_CAMERA_OFFSET_SUFFIX" : "/src/man/config/cameraOffsets.json",
+    "OFFLINE_COLOR_PARAMS_SUFFIX" : "/src/man/config/colorParams.json",
+
+    #keys for attributes in the log
+        # (also functions as version)
+    "LOG_TOPLEVEL_MAGIC_KEY" : "#_NBITES_JSON_LOG_VERSION_",
+
+    "LOG_TOPLEVEL_BLOCKS" : "BLOCKS",
+    "LOG_TOPLEVEL_CREATED_WHEN" : "CREATED_WHEN",
+    "LOG_TOPLEVEL_LOGCLASS" : "CLASS",
+    "LOG_TOPLEVEL_HOST_TYPE" : "HOST_TYPE",    #e.g., v4, v5, computer
+    "LOG_TOPLEVEL_HOST_NAME" : "HOST_NAME",
+    "LOG_TOPLEVEL_HOST_ADDR" : "HOST_ADDR",
+
+    "LOG_BLOCK_TYPE" : "TYPE",
+    "LOG_BLOCK_WHERE_FROM" : "WHERE_FROM",
+    "LOG_BLOCK_WHEN_MADE" : "WHEN_MADE",
+    "LOG_BLOCK_IMAGE_INDEX" : "IMAGE_INDEX",
+    "LOG_BLOCK_NUM_BYTES" : "NUM_BYTES",
+
+    "LOG_BLOCK_IMAGE_WIDTH_PIXELS" : "WIDTH_PIXELS",
+    "LOG_BLOCK_IMAGE_HEIGHT_PIXELS" : "HEIGHT_PIXELS"
+
+    # legacy keywords should be final and so are hard-coded (see SExprLog.java) #
+}

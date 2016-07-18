@@ -307,6 +307,14 @@ public:
 
   void clear();
 
+  void merge(LineFit b)
+  {
+      sumW += b.sumW;
+      sumX += b.sumX;
+      sumY += b.sumY;
+  }
+
+
   double area() const { return sumW; }
 
   double centerX() const { return sumX / sumW;}
@@ -393,6 +401,9 @@ public:
 
   // Amount to add to an address to move +1 in y, in units of pixel size
   int pitch() const { return _pitch; }
+
+  // Check whether width & height of the image are legal, i.e. > 0
+  bool hasProperDimensions() const { return _wd > 0 && _ht > 0; }
 
   // Default construct zero size image
   ImageLiteBase() { _wd = _ht = 0; }

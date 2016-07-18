@@ -40,6 +40,9 @@ void ColorParams::load(float darkU0, float darkV0, float lightU0, float lightV0,
   darkV0  -= 0.5f * fuzzyV;
   lightU0 -= 0.5f * fuzzyU;
   lightV0 -= 0.5f * fuzzyV;
+
+//    printf("IN FRONTEND.CPP darkU0: %f\n", darkU0);
+
   int du0 = fix(darkU0       , UVZero, false  );
   int dv0 = fix(darkV0       , UVZero, invertV);
   int lu0 = fix(lightU0      , UVZero, false  );
@@ -119,8 +122,8 @@ uint32_t
       *py++ = (short)y;
       *pw++ = colors->white .scoreMax(y, abs(u - UVZero) + UVZero, abs(v - UVZero) + UVZero);
       *pg++ = colors->green .scoreMax(y, u, v);
-      *po++ = colors->orange.scoreMax(y, u, v ^ UVMask);
-
+      //*po++ = colors->orange.scoreMax(y, u, v ^ UVMask); //making orange into black for experimentation
+      *po++ = colors->orange.scoreMax(y, abs(u - UVZero) + UVZero, abs(v - UVZero) + UVZero);
       if (colorTable)
         *pc++ = colorTable[(u >> (UVBits - 7) << 14) + (v >> (UVBits - 7) << 7) + (y >> (YBits - 7))];
     }
@@ -160,13 +163,14 @@ void ImageFrontEnd::run(const YuvLite& src, const Colors* colors, uint8_t* color
     dstAllocated = size;
   }
 
-  if (fast())
+  if (fast()) {
     _time = man::vision::_acquire_image(src.pixelAddr(), dstBase.pitch(),
                                         dstBase.height(), src.pitch(),
                                         colors, dstImages, colorTable);
-  else
+  } else {
     _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), 
                         src.pitch(), colors, dstImages, colorTable);
+  }
 }
 
 }

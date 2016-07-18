@@ -220,9 +220,9 @@ bool VisionSystem::update(ParticleSet& particles,
                         }
 
                         // Inject if reconstucted location is on field
-                        // ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
-                        // if (reconstructed.onField())
-                        //     injections.push_back(reconstructed);
+                        ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
+                        if (reconstructed.onField())
+                            injections.push_back(reconstructed);
                     }
                 }
 

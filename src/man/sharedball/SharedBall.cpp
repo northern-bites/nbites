@@ -46,16 +46,20 @@ void SharedBallModule::run_()
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
     {
-        worldModelIn[i].latch();
-        worldMessages[i] = worldModelIn[i].message();
-        if (worldMessages[i].ball_on())
-        {
-            numRobotsOn++;
-        }
-
         // resets ball estimates for each robot
         ballX[i] = -1.f;
         ballY[i] = -1.f;
+
+        worldModelIn[i].latch();
+        worldMessages[i] = worldModelIn[i].message();
+
+        if (i == my_num-1) {
+            visionIn.latch();
+            myBall = visionIn.message().ball();
+            if (myBall.on()) { numRobotsOn++; }
+            continue;
+        }
+        if (worldMessages[i].ball_on()) { numRobotsOn++; }
     }
 
     // when player number is 6, we are running from the tool
@@ -65,16 +69,14 @@ void SharedBallModule::run_()
         myX = locIn.message().x();
         myY = locIn.message().y();
         myH = locIn.message().h();
-        ballIn.latch();
-        myBall = ballIn.message();
     } else {
         myX = 10;
         myY = 10;
         myH = 0;
     }
 
-
-    if (numRobotsOn)
+    // If at least one robot sees the ball and it is not only me
+    if (numRobotsOn && !(numRobotsOn==1 && myBall.on()))
     {
         ballOn = true;
         chooseRobots();

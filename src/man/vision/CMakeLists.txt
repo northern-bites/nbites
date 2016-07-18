@@ -15,8 +15,11 @@ SET( VISION_SRCS
   Homography.cpp
   Hough.cpp
   Vision.cpp
+  Spots.cpp
   BallDetector.cpp
   RobotObstacle.cpp
+  Ransac.cpp
+  VisionCalibration.cpp
   )
 
 IF (UNIX AND NOT APPLE)
@@ -26,6 +29,7 @@ IF (UNIX AND NOT APPLE)
     AsmHough.s
     Gradient.s
     RunLength.s
+    SpotFilter.s
     )
   LIST( APPEND VISION_SRCS ${ASM_SRCS})
   SET_PROPERTY(SOURCE ${ASM_SRCS} PROPERTY LANGUAGE C)
@@ -46,4 +50,6 @@ TARGET_LINK_LIBRARIES(
   portals
   support
   messages
+  logshare
+  logging
   )

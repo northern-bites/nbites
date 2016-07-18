@@ -15,7 +15,6 @@ import controller.action.ui.penalty.ServiceHL;
 import controller.action.ui.penalty.Substitute;
 import data.AdvancedData;
 import data.AdvancedData.PenaltyQueueData;
-import data.HL;
 import data.PlayerInfo;
 import data.Rules;
 import data.SPL;
@@ -58,11 +57,7 @@ public class Robot extends GCAction
         if (player.penalty == PlayerInfo.PENALTY_SUBSTITUTE && !isCoach(data)) {
             ArrayList<PenaltyQueueData> playerInfoList = data.penaltyQueueForSubPlayers.get(side);
             if (playerInfoList.isEmpty()) {
-                if (Rules.league instanceof HL) {
-                    player.penalty = PlayerInfo.PENALTY_NONE;
-                } else {
-                    player.penalty = PlayerInfo.PENALTY_SPL_REQUEST_FOR_PICKUP;
-                }
+                player.penalty = Rules.league.substitutePenalty;
                 data.whenPenalized[side][number] = data.getTime();
             } else {
                 PenaltyQueueData playerInfo = playerInfoList.get(0);
@@ -80,10 +75,10 @@ public class Robot extends GCAction
             EventHandler.getInstance().lastUIEvent.performOn(data, player, side, number);
         }
         else if (player.penalty != PlayerInfo.PENALTY_NONE) {
+            player.penalty = PlayerInfo.PENALTY_NONE;
             Log.state(data, ("Unpenalised ")+
                     Rules.league.teamColorName[data.team[side].teamColor]
                     + " " + (number+1));
-            player.penalty = PlayerInfo.PENALTY_NONE;
         }
     }
     
@@ -99,7 +94,7 @@ public class Robot extends GCAction
         return !data.ejected[side][number]
                 && ((!(EventHandler.getInstance().lastUIEvent instanceof Penalty) || EventHandler.getInstance().lastUIEvent instanceof MotionInSet)
                 && data.team[side].player[number].penalty != PlayerInfo.PENALTY_NONE
-                && (data.getRemainingPenaltyTime(side, number) == 0 || Rules.league instanceof HL)
+                && (Rules.league.allowEarlyPenaltyRemoval || data.getRemainingPenaltyTime(side, number) == 0)
                 && (data.team[side].player[number].penalty != PlayerInfo.PENALTY_SUBSTITUTE || data.getNumberOfRobotsInPlay(side) < Rules.league.robotsPlaying)
                 && !isCoach(data)
                 || EventHandler.getInstance().lastUIEvent instanceof PickUpHL

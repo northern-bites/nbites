@@ -1,0 +1,13 @@
+This directory contains publically viewable types that are useful
+across multiple modules.
+
+What should these types contain ?
+ * No dynamic memory allocation
+        this will cause problems if two threads try to access
+        the data simultaneously
+ * Only public:'ly viewable data definitions
+ * A serialisation method
+
+Conversly, these types should not add internal data that would only
+clutter the already huge amount of publically viewable information
+ ie. The Blackboard
