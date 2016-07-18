@@ -138,6 +138,33 @@ class HeadTrackingHelper(object):
 
         return newSnapPanHeadMove
 
+    def goalieShortRangePan(self):
+
+        GOALIE_SNAP_PAN_SHORT_PAN_TIME = 0.8
+        GOALIE_SNAP_PAN_LONG_PAN_TIME = 1
+        GOALIE_SNAP_PAN_WAIT_TIME = 0.5
+        # GOALIE_SNAP_PAN_LONG_WAIT_TIME = 0.5
+
+        numberOfIntermediatePans = 5
+
+        newGoalieSnapPanHeadMove = ()
+
+        newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+        newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+        for i in range(0, numberOfIntermediatePans-1):
+            newGoalieSnapPanHeadMove += ((( 45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+            newGoalieSnapPanHeadMove += ((( 45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+            newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+            newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+        newGoalieSnapPanHeadMove += ((( 75.0, 25), GOALIE_SNAP_PAN_LONG_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+        newGoalieSnapPanHeadMove += ((( 75.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+        newGoalieSnapPanHeadMove += (((-75.0, 25), GOALIE_SNAP_PAN_LONG_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+        newGoalieSnapPanHeadMove += (((-75.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+
+        return newGoalieSnapPanHeadMove
+
     # Should be generalized.
     def convertKickPan(self, headMove, invert):
         """

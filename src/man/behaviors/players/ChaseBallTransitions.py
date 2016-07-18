@@ -12,8 +12,8 @@ def shouldChaseBall(player):
     We see the ball. So go get it.
     """
     ball = player.brain.ball
-    return (ball.vis.frames_on > constants.BALL_ON_THRESH or
-     player.brain.ballMemRatio > constants.BALL_MEM_THRESH)
+    return (ball.vis.frames_on >= constants.BALL_ON_THRESH or
+     player.brain.ballMemRatio >= constants.BALL_MEM_THRESH)
 
 def shouldReturnHome(player):
     """
@@ -227,8 +227,13 @@ def shouldNotDribble(player):
             # If we're in our own half, kick
             player.brain.loc.x < NogginConstants.CENTER_FIELD_X or
 
-            # If we're between their cross and halfway between their cross and the half, kick.
-            (player.brain.loc.x > ((NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X + NogginConstants.CENTER_FIELD_X) / 2) and
-             player.brain.loc.x < NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)) 
+            # If we're between their goal box and halfway between their goal box and the half, kick.
+            (player.brain.loc.x > ((NogginConstants.YELLOW_GOALBOX_LEFT_X + NogginConstants.CENTER_FIELD_X) / 2) and
+             player.brain.loc.x < NogginConstants.YELLOW_GOALBOX_LEFT_X)) 
 
             # Basically we only dribble if we're really close to their goal or close to the half on their side
+
+def inGoalBox(player):
+    return (player.brain.loc.x > NogginConstants.YELLOW_GOALBOX_LEFT_X and
+            player.brain.loc.y > NogginConstants.YELLOW_GOALBOX_BOTTOM_Y and
+            player.brain.loc.y < NogginConstants.YELLOW_GOALBOX_TOP_Y)

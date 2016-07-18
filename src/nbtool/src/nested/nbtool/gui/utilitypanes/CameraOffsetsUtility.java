@@ -38,6 +38,7 @@ import nbtool.nio.RobotConnection;
 import nbtool.util.Debug;
 import nbtool.util.Robots;
 import nbtool.util.SharedConstants;
+import nbtool.util.Utility;
 
 public class CameraOffsetsUtility extends UtilityParent {
 
@@ -287,6 +288,12 @@ public class CameraOffsetsUtility extends UtilityParent {
         			continue;
         		}
 
+        		if (!r.offset.verify()) {
+        			ToolMessage.displayWarn("cannot save offsets for %s, not successful",
+        					r.name);
+        			continue;
+        		}
+
         		Debug.info("replacing offsets for: %s %s", r.name, r.getCamera());
 
         		if (!offsets.containsKey(r.name)) {
@@ -349,14 +356,37 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 		            String written = updateSet(offsets);
 
+		            if (!offsets.verify()) {
+		            	Debug.error("invalid offsets! %s\n", offsets.serialize().print());
+		            	ToolMessage.displayError("cannot write offsets! "
+		            			+ "One or more values must be invalid, check stdout");
+
+		            	Debug.error("written: %s", written);
+		            	Debug.error("serialized: %s", offsets.serialize().serialize());
+
+		            	return;
+		            }
+
 		            try {
-						Files.write(CameraOffset.getPath(),
-								offsets.serialize().print().getBytes(StandardCharsets.UTF_8));
+		            	String string = offsets.serialize().print();
+		            	byte[] data = string.getBytes(StandardCharsets.US_ASCII);
+
+		            	if (!Utility.isPureAscii(string)) {
+		            		Debug.error("invalid bytes! %s\n", new String(data) );
+			            	throw new RuntimeException("fix this!");
+		            	}
+
+		            	if (!Utility.isPureAscii2(string)) {
+		            		Debug.error("invalid bytes! %s\n", new String(data) );
+			            	throw new RuntimeException("fix this!");
+		            	}
+
+						Files.write(CameraOffset.getPath(), data);
 			            ToolMessage.displayWarn("camera offsets written: %s", written);
 
 					} catch (IOException e1) {
 						e1.printStackTrace();
-						ToolMessage.displayError("could not write camera offsets.");
+						ToolMessage.displayError("!!!!!!!!!!!!!! could not write camera offsets.!!!!!!!!!!!!!!!");
 					}
 				}
 

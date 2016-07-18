@@ -140,11 +140,13 @@ def afterKick(player):
 
     elif player.kickedOut:
         player.kickedOut = False
+        afterKick.numTimes = 0
         return player.goNow('spinSearch')
 
+    # James little wth is this ????????? jeezus
     if player.counter < 300:
         print "going to chaseAfterBall"
-        afterKick.numTimes = 0
+        # afterKick.numTimes = 0
         return player.goNow('chaseAfterBall')
 
 
@@ -181,14 +183,21 @@ def chaseAfterBall(player):
 
     if player.firstFrame():
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
+        dest = RelRobotLocation(150, 0, 0)
+        # player.brain.nav.goTo(dest, precision = nav.PLAYBOOK,
+        #                   speed = speeds.SPEED_SEVEN, avoidObstacles = True,
+        #                   fast = True, pb = False) // Maybe try something like this
         player.brain.nav.destinationWalkTo(RelRobotLocation(player.brain.ball.x, player.brain.ball.y, 0))
+        # print("     CHASEAFTERBALL I'm dest walking to:", player.brain.ball.x, player.brain.ball.y)
         return player.stay()
 
     if transitions.shouldChaseBall(player):
         print "I can see the ball!"
+        afterKick.numTimes = 0
         return player.goNow('approachBall')
     if shared.walkingOffField(player):
         print "I'm walking off the field!"
+        afterKick.numTimes = 0
         return player.goNow('spinSearch')
     if shared.navAtPosition(player) or player.counter > 100:
         return player.goNow('lookAroundForBall')
@@ -198,11 +207,14 @@ def chaseAfterBall(player):
 @ifSwitchNow(transitions.shouldChaseBall, 'approachBall')
 def lookAroundForBall(player):
     if player.firstFrame():
-        player.brain.nav.walk(0.1, 0, 0.05)
+        # print(      "LOOKING AROUND FOR BALL")
+        player.brain.nav.walk(0.1, 0, 0.1)
+        # player.brain.nav.walkInPlace()
         player.brain.tracker.repeatHeadMove(HeadMoves.FAST_TWO_INTERVAL)
         return player.stay()
     if transitions.shouldChaseBall(player):
         print "I can see the ball!"
+        afterKick.numTimes = 0
         return player.goNow('approachBall')
     if player.counter > 50:
         return player.goNow('afterKick')

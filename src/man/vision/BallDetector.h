@@ -90,7 +90,7 @@ namespace man {
 			~BallDetector();
 
 			void setDebugImage(DebugImage * di);
-            void edgeSanityCheck(int x, int y, int radius);
+            bool edgeSanityCheck(int x, int y, int radius);
             void sanityChecks(int bx, int by, int radius);
             void makeEdgeList(EdgeList & edges);
 
@@ -125,7 +125,9 @@ namespace man {
 			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
+			bool checkGradientAroundSpot(int r);
 			bool checkDiagonalCircle(Spot spot);
+			bool checkBallHasNoGreenAndSomeWhite(int r);
 
             bool filterBlackSpots(Spot currentBlob);
             bool filterWhiteBlob(Spot spot, intPairVector & blackSpots,
@@ -191,6 +193,7 @@ namespace man {
 			ImageLiteU8 whiteImage, greenImage, blackImage;
 			ImageLiteU16 yImage;
 			EdgeDetector * edgeDetector;
+			EdgeList * edgeList;
 
 			Ball _best;
 
@@ -215,9 +218,9 @@ namespace man {
 #else
 			static const bool debugBall = false;
 			static const bool debugSpots = false;
-			static const int filterThresholdDark = 144;
-			static const int greenThresholdDark = 60;
-			static const int filterThresholdBrite = 144;
+			static const int filterThresholdDark = 104;
+			static const int greenThresholdDark = 12;
+			static const int filterThresholdBrite = 130;
 			static const int greenThresholdBrite = 80;
 #endif
 		};

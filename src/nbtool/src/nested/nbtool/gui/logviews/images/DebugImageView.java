@@ -42,6 +42,7 @@ import nbtool.images.DebugImage;
 import nbtool.images.EdgeImage;
 import nbtool.images.Y8Image;
 import nbtool.images.Y8ThreshImage;
+import nbtool.images.Y16Image;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.util.Debug;
@@ -81,7 +82,7 @@ public class DebugImageView extends VisionView implements
      * */
 
     // Images that we can view in this view using the combo box
-    String[] imageViews = { "Original", "Green", "Black", "White", "Edge", "Thresh", "Learn" };
+    String[] imageViews = { "Original", "Green", "Y", "White", "Edge", "Thresh", "Learn" };
     JComboBox<String> viewList;
 
     JSlider greenThreshold;
@@ -151,10 +152,10 @@ public class DebugImageView extends VisionView implements
 				displayParams[i] = 0;
 			}
 			// ideally these would actually be read from NBCROSS
-			filterThresholdDark = 140;
-			greenThresholdDark = 60;
-			filterThresholdBrite = 150;
-			greenThresholdBrite = 120;
+			filterThresholdDark = 104;
+			greenThresholdDark = 12;
+			filterThresholdBrite = 130;
+			greenThresholdBrite = 80;
 			displayParams[6] = filterThresholdDark;
 			displayParams[7] = greenThresholdDark;
 			displayParams[8] = filterThresholdBrite;
@@ -305,7 +306,7 @@ public class DebugImageView extends VisionView implements
 		}
 		// if we don't have an black image we're in trouble
 		if (displayImages[BLACK_IMAGE] == null) {
-			System.out.println("No black image");
+			System.out.println("No Y image");
 			return;
 		}
         //Graphics2D graph = black.createGraphics();
@@ -436,7 +437,7 @@ public class DebugImageView extends VisionView implements
 			currentBottom = GREEN_IMAGE;
 		} else if (viewName == "White") {
 			currentBottom = WHITE_IMAGE;
-		} else if (viewName == "Black") {
+		} else if (viewName == "Y") {
 			currentBottom = BLACK_IMAGE;
 		} else if (viewName == "Edge") {
 			currentBottom = EDGE_IMAGE;
@@ -678,42 +679,20 @@ public class DebugImageView extends VisionView implements
 		int maxY = 0;
 		int maxU = 0;
 		int maxV = 0;
-		for (int col = 0; col < width; col++) {
-			for (int row = 0; row < height; row++) {
-				int gr = (green8.data[row * width + col]) & 0xFF;
-				if (gr > max) {
-					boolean first = (col & 1) == 0;
-					int cbase = (col & ~1);
-					int i = (row * displayw * 2) + (cbase * 2);
-
-					byte[] data = originalImageBytes();
-					maxY = data[first ? i : i + 2] & 0xff;
-					maxU = data[i + 1] & 0xff;
-					maxV = data[i + 3] & 0xff;
-				}
-			}
-		}
 
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
 				int gr = (green8.data[row * width + col]) & 0xFF;
 				int wh = (white8.data[row * width + col]) & 0xFF;
-				int bl = (black8.data[row * width + col]) & 0xFF;
 
-				if (gr < 100 && wh < 100 && bl < 100) {
-					g.setColor(new Color(186,85,211));
-				} else if (gr > 100 && wh > 100) {
-					g.setColor(new Color(255,218,185));
-				} else if (bl > 100 && gr > 100) {
-					g.setColor(new Color(139,69,19));
-				} else if (gr > wh && gr > bl) {
-					g.setColor(new Color(0,128,0));
-				} else if (wh > gr && wh > bl) {
-					g.setColor(Color.WHITE);
+				if (gr < 100 && wh < 100) {
+					g.setColor(Color.GRAY);
+				} else if (gr > wh) {
+					g.setColor(Color.GREEN);
 				} else {
-					g.setColor(Color.BLACK);
+					g.setColor(Color.WHITE);
 				}
-				g.fillRect(col*2, row*2+displayh+30, 2, 2);
+				g.fillRect(col, row+displayh+30, 1, 1);
 			}
 		}
     }
@@ -734,13 +713,14 @@ public class DebugImageView extends VisionView implements
 		}
 
 		if (this.getWhiteBlock() != null) {
-			Y8Image white8 = new Y8Image(width, height, this.getWhiteBlock().data);
+			System.out.println("here");
+			white8 = new Y8Image(width, height, this.getWhiteBlock().data);
 			displayImages[WHITE_IMAGE] = white8.toBufferedImage();
 		}
 
-		if (this.getOrangeBlock() != null) {
-			Y8Image orange8 = new Y8Image(width, height, this.getOrangeBlock().data);
-			displayImages[BLACK_IMAGE] = orange8.toBufferedImage();
+		if (this.getYBlock() != null) {
+            Y16Image yImg = new Y16Image(width, height, this.getYBlock().data);
+            displayImages[BLACK_IMAGE] = yImg.toBufferedImage();
 		}
 
 		if (this.getEdgeBlock() != null) {
