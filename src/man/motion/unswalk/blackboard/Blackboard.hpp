@@ -12,7 +12,7 @@
 #include <deque>
 
 #include "perception/behaviour/ReadySkillPositionAllocation.hpp"
-#include "gamecontroller/GameType.h"
+// #include "gamecontroller/GameType.h"
 #include "generator/PendulumModel.hpp"
 #include "utils/body.hpp"
 #include "utils/boostSerializationVariablesMap.hpp"
@@ -22,7 +22,7 @@
 #include "perception/localisation/LocalisationDefs.hpp"
 #include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
 #include "perception/kinematics/Pose.hpp"
-#include "gamecontroller/RoboCupGameControlData.hpp"
+// #include "gamecontroller/RoboCupGameControlData.hpp"
 #include "utils/Logger.hpp"
 #include "transmitter/TransmitterDefs.hpp"
 #include "types/BehaviourRequest.hpp"
@@ -246,17 +246,17 @@ struct PerceptionBlackboard {
    uint32_t total;
 };
 
-struct GameControllerBlackboard {
-   explicit GameControllerBlackboard();
-   void readOptions(const boost::program_options::variables_map& config);
-   bool connect;
-   bool connected;
-   RoboCupGameControlData data;
-   TeamInfo our_team;
-   bool team_red;
-   int player_number;
-   GameType game_type;
-};
+// struct GameControllerBlackboard {
+//    explicit GameControllerBlackboard();
+//    void readOptions(const boost::program_options::variables_map& config);
+//    bool connect;
+//    bool connected;
+//    RoboCupGameControlData data;
+//    TeamInfo our_team;
+//    bool team_red;
+//    int player_number;
+//    GameType game_type;
+// };
 
 
 struct MotionBlackboard {
