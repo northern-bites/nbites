@@ -89,6 +89,7 @@ private:
     void initialState();
     void advanceState();
     void printJointAngles();
+    void sayBatteryLevel();
     void switchTeams();
     void switchKickOff();
 
