@@ -1,8 +1,11 @@
 package nbtool.gui.utilitypanes;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -319,6 +322,7 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 			ColorCalibrationTab tab;
 
 			ImageDisplay imageDisplay;
+			ImageDisplay imageDisplayNorm;
 
 			Log dropped = null;
 			int dropped_width, dropped_height;
@@ -352,7 +356,11 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 				Debug.print("undoing!");
 				ignoreChangeEvents = true;
 
-				Change latest = undoStack.remove(undoStack.size() - 1);
+				int index = Math.max(undoStack.size() - 10, 0);
+				Change latest = undoStack.get(index);
+
+				undoStack.removeAll(undoStack.subList(index, undoStack.size()));
+
 				latest.group.slider.setValue(latest.previousValue);
 				latest.group.spinner.setValue(latest.previousValue);
 
@@ -439,6 +447,12 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 						.asNumber().asInt();
 				dropped_height = dropped.blocks.get(0).dict.get(SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS())
 							.asNumber().asInt();
+
+
+				if (imageDisplayNorm != null)
+					imageDisplayNorm.setImage(dropped.blocks.get(0).parseAsYUVImage().toBufferedImage());
+				else debug.error("{%s} null image display for normal pic!", title());
+
 				visionCall();
 			}
 
@@ -547,35 +561,34 @@ public class ColorCalibrationUtility extends UtilityProvider<ColorParam.Set, Col
 					g.slider.setMaximum(255);
 				}
 
-				imageDisplay = new ImageDisplay();
-				tab.imageTabs.add("result", imageDisplay);
+				Dimension ratio = new Dimension(320,240);
+
+				imageDisplay = new ImageDisplay(ratio);
+				tab.imageSplitPane.setLeftComponent(imageDisplay);
+
+				imageDisplayNorm = new ImageDisplay(ratio);
+				tab.imageSplitPane.setRightComponent(imageDisplayNorm);
+
+				tab.imageSplitPane.setResizeWeight(0.5);
+				tab.imageSplitPane.setEnabled(false);
+				tab.imageSplitPane.setBackground(Color.BLACK);
+				tab.imageSplitPane.setForeground(Color.BLACK);
+
+				tab.imageSplitPane.setDividerLocation(0.5);
+
+				tab.imageSplitPane.addComponentListener(new ComponentAdapter(){
+					@Override
+					public void componentResized(ComponentEvent e) {
+						tab.imageSplitPane.setDividerLocation(.5d);
+					}
+
+					@Override
+					public void componentMoved(ComponentEvent e) {
+						tab.imageSplitPane.setDividerLocation(.5d);
+					}
+				});
 
 				LogDND.makeComponentTarget(tab, top ? topCameraTarget : botCameraTarget);
-
-//				LogDND.makeComponentTarget(tab, new LogDNDTarget(){
-//				@Override
-//				public void takeLogsFromDrop(Log[] log) {
-//						if (log.length > 0) {
-//							Log attempt = log[0];
-//
-//							if (!attempt.logClass.equals("tripoint")) {
-//								ToolMessage.displayError("must use tripoint log for ColorCalibration, not %s!",
-//										attempt.logClass);
-//								return;
-//							}
-//
-//							String reqFrom = top ? "camera_TOP" : "camera_BOT";
-//
-//							if (!attempt.blocks.get(0).whereFrom.equals(reqFrom)) {
-//								ToolMessage.displayError("tab {%s} must have log from: %s",
-//										title(), reqFrom);
-//								return;
-//							}
-//
-//							useLog(log[0]);
-//						}
-//				}
-//				});
 
 				debug.info("leaving constructor");
 			}

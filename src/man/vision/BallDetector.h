@@ -22,6 +22,9 @@ namespace man {
 		const double HORIZ_FOV_DEG = 60.97;
 		const double HORIZ_FOV_RAD = HORIZ_FOV_DEG * M_PI / 180;
 
+		const int BOT_RESTRICTION_BUF = 15;
+		const int TOP_RESTRICTION_BUF = 10;
+
 #define BLACK 1
 #define BLUE 7
 #define MAROON 8
@@ -79,6 +82,7 @@ namespace man {
 
 		typedef std::vector<std::pair<int, int>> intPairVector;
 		typedef std::vector<Spot> spotVector;
+		typedef std::pair<double, double> imagePoint;
 
 		class BallDetector {
 		public:
@@ -86,15 +90,20 @@ namespace man {
 			~BallDetector();
 
 			void setDebugImage(DebugImage * di);
-            void edgeSanityCheck(int x, int y, int radius);
+            bool edgeSanityCheck(int x, int y, int radius);
             void sanityChecks(int bx, int by, int radius);
             void makeEdgeList(EdgeList & edges);
 
             int scanX(int startX, int startY, int direction, int stop);
             int scanY(int startX, int startY, int direction, int stop);
+
+            int projectedBallRadius(imagePoint p);
+            imagePoint findPointsCentroid(intPairVector & v);
+            bool pointsEquidistantFromCentroid(intPairVector & v, int projectedBallRadius);
             
             int getAzimuthColumnRestrictions(double az);
             int getAzimuthRowRestrictions(double az);
+            void adjustWindow(int &startCol, int & endCol, int & endRow);
 
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
@@ -112,9 +121,13 @@ namespace man {
                                 	spotVector & actualWhiteSpots, double cameraHeight,
                                 	int bottomQuarer);
 
+			bool whiteBelowSpot(Spot spot);
+			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
+			bool checkGradientAroundSpot(int r);
 			bool checkDiagonalCircle(Spot spot);
+			bool checkBallHasNoGreenAndSomeWhite(int r);
 
             bool filterBlackSpots(Spot currentBlob);
             bool filterWhiteBlob(Spot spot, intPairVector & blackSpots,
@@ -146,6 +159,10 @@ namespace man {
 			bool isWhite();
 			bool isBlack();
 
+
+            void billToImageCoordinates(double bx, double by, double & ix, double & iy);
+            void imageToBillCoordinates(double ix, double iy, double & bx, double & by);
+
 			Ball& best() { return _best; }
 
 			// For tool
@@ -154,6 +171,7 @@ namespace man {
 			const std::vector<Spot>& getWhiteSpots() { return debugWhiteSpots; }
 			const std::vector<Spot>& getBlackSpots() { return debugBlackSpots; }
 			void setDebugBall(bool debug) {debugBall = debug;}
+			void setDebugSpots(bool debug) {debugSpots = debug; }
 			void setDebugFilterDark(int fd) { filterThresholdDark = fd; }
 			void setDebugGreenDark(int gd) { greenThresholdDark = gd; }
 			void setDebugFilterBrite(int fb) { filterThresholdBrite = fb; }
@@ -175,6 +193,7 @@ namespace man {
 			ImageLiteU8 whiteImage, greenImage, blackImage;
 			ImageLiteU16 yImage;
 			EdgeDetector * edgeDetector;
+			EdgeList * edgeList;
 
 			Ball _best;
 
@@ -191,16 +210,18 @@ namespace man {
 			std::vector<Ball> candidates;
 #ifdef OFFLINE
 			bool debugBall;
+			bool debugSpots;
 			int filterThresholdDark;
 			int greenThresholdDark;
 			int filterThresholdBrite;
 			int greenThresholdBrite;
 #else
 			static const bool debugBall = false;
-			static const int filterThresholdDark = 144;
-			static const int greenThresholdDark = 60;
-			static const int filterThresholdBrite = 144;
-			static const int greenThresholdBrite = 120;
+			static const bool debugSpots = false;
+			static const int filterThresholdDark = 104;
+			static const int greenThresholdDark = 12;
+			static const int filterThresholdBrite = 130;
+			static const int greenThresholdBrite = 80;
 #endif
 		};
 

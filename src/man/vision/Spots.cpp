@@ -43,9 +43,6 @@ SpotDetector::~SpotDetector()
 bool SpotDetector::alloc(const ImageLiteBase& src)
 {
   if(!src.hasProperDimensions()) {
-    delete[] innerColumns;
-    delete[] outerColumns;
-    delete[] filteredImageMemory;
     _spots.clear();
     return false;
   }

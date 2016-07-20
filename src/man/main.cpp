@@ -1,22 +1,32 @@
-/**
- * Specified in http://www.aldebaran-robotics.com/documentation/dev/cpp/tutos/create_module.html#how-to-create-a-local-module
- **/
 
 #include "Man.h"
 #include "SharedData.h"
-
-//#include "TextToSpeech.h"
-
+#include "whistle.hpp"
 
 #include <sys/file.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <errno.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 int lockFD = 0;
 man::Man* instance;
+
+pid_t whistlePID = 0;
 const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-// const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
 
 void cleanup() {
+
+    printf("::::::::::::::::::: MAN cleanup code executing! :::::::::::::::::::\n");
+
+    if (whistlePID > 0) {
+        kill(whistlePID, SIGTERM);
+    }
+
+    // Give man a chance to clean up behind it
+    // I.e. close camera driver gracefully
     instance->preClose();
     flock(lockFD, LOCK_UN);
 
@@ -26,18 +36,13 @@ void cleanup() {
     fclose(stdout);
 
     if (instance) delete instance;
+    printf("::::::::::::::::::: MAN cleanup code finished! :::::::::::::::::::\n");
 }
 
 void handler(int signal)
 {
-    if (signal == SIGTERM)
-    {
-
-        // Give man a chance to clean up behind it
-        // I.e. close camera driver gracefully
-        cleanup();
-        exit(0);
-    }
+    cleanup();
+    exit(0);
 }
 
 void error_signal_handler(int signal) {
@@ -57,7 +62,7 @@ void error_signal_handler(int signal) {
 
     // cleanup();
 
-    exit(-1);
+    abort();
 }
 
 // Deal with lock file. To ensure that we only have ONE instance of man
@@ -80,10 +85,14 @@ void establishLock()
 
 int main() {
     signal(SIGTERM, handler);
+    signal(SIGINT, handler);
 
     establishLock();
 
     signal(SIGSEGV, error_signal_handler);
+
+    printf("forking for whistle...\n");
+    whistlePID = whistle::start_whistle_process();
 
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     
@@ -93,8 +102,8 @@ int main() {
     fprintf(stderr, "Man re-opening stderr...\n");
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
-//    freopen(MAN_LOG_PATH, "w", stdout);
-     freopen(MAN_LOG_PATH, "wa", stdout);
+    freopen(MAN_LOG_PATH, "w", stdout);
+
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     
@@ -109,6 +118,11 @@ int main() {
         // (Diagram threads are daemon threads, and man will exit if they're the
         // only ones left)
         sleep(10);
+
+        int status;
+        // clear zombie mans
+        while ((waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0);
     }
+
     return 1;
 }

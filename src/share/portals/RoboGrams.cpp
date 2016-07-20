@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <iostream>
 
+#include <stdexcept>
+
 // **********************
 // *                    *
 // *  Printf To String  *
@@ -87,6 +89,10 @@ int MessagePoolBase::alloc()
   {
       std::cout << "WARNING: A message pool has exceeded its max size."
                 << std::endl;
+
+//      describe("[unknown pool]");
+//
+//      throw std::runtime_error("MESSAGE POOL EXCEEDED MAX SIZE!");
   }
   int i;
   {

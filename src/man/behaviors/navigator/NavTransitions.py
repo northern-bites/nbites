@@ -10,6 +10,12 @@ from ..util import Transition
 
 DEBUG = True
 
+def destWithinPrecision(dest, x, y, h):
+    if isinstance(dest, RelRobotLocation):
+        return (fabs(dest.relX) <= x and fabs(dest.relY) <= y and fabs(dest.relH) <= h) 
+    else:
+        return False
+
 def atDestination(nav):
     """
     Returns true if we're close enough to nav's current destination;
@@ -19,9 +25,10 @@ def atDestination(nav):
     relDest = helper.getRelativeDestination(nav.brain.loc, states.goToPosition.dest)
     my = nav.brain.loc
     (x, y, h) = states.goToPosition.precision
-    # print("In atdest, precision = ", str(states.goToPosition.precision))
 
-    return relDest.within((x, y, h))
+    return destWithinPrecision(relDest, x, y, h)
+
+    # return relDest.within((x, y, h))
 
 # we can't see or sonar obstacles behind us so ignore those
 def obstacleAhead(direction):
@@ -105,6 +112,7 @@ def getDirection(h):
         return states.dodge.DDirects[6]
 
 def notAtLocPosition(nav):
+    return False # Honestly this is so bad
     if not states.goToPosition.useLoc: 
         return False
     return not atDestination(nav)

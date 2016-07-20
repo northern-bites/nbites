@@ -174,6 +174,8 @@ class Navigator(FSA.FSA):
 
         # print speed
 
+        # print speed
+
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
 
@@ -264,6 +266,9 @@ class Navigator(FSA.FSA):
 
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
+
+    def walkInPlace(self):
+        self.switchTo('walkInPlace')
 
     def stand(self):
         """

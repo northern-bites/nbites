@@ -5,7 +5,9 @@
 
 #include "Common.h"
 
-#define IP_TARGET "255.255.255.255"
+#define IP_TARGET "255.255.255.255" // Bowdoin
+// #define IP_TARGET "10.0.255.255" // Germany 2016
+
 //#define SPL_BROADCAST_PORT (10000 + TEAM_NUMBER)
 extern int SPL_BROADCAST_PORT;
 #define UDP_BUF_SIZE 1024

@@ -82,8 +82,6 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses(
     PROF_ENTER(P_SCRIPTED);
 
     if (currCommandEmpty())
-        std::cout << "Command empty\n";
-    if (currCommandEmpty())
 	setNextBodyCommand(sensorAngles);
 
     // Go through the chains and enqueue the next

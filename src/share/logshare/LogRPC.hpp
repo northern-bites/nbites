@@ -63,8 +63,8 @@ namespace nbl {
 //Does most of the work of declaring a RPC function derivative, leaves class definition open.
 //Arguments after vaAllowed are required log classes, and must be single-constructor equivalent to std::string.
 #define RPC_FUNCTION_DECLARE(name, vaAllowed, ...)   \
-    class RPCFunction ## name : public nbl::rpc::RPCFunctionBase {    \
-        public:     RPCFunction ## name() :                             \
+    class RPCFunction_ ## name : public nbl::rpc::RPCFunctionBase {    \
+        public:     RPCFunction_ ## name() :                             \
                             nbl::rpc::RPCFunctionBase( #name , vaAllowed, { __VA_ARGS__ } ) \
                             { initializeFunction(); }                                          \
                     void defineCall(const std::vector<nbl::logptr>& arguments);
@@ -77,11 +77,11 @@ namespace nbl {
 
 //Helper macro for defining RPCFunction::defineCall()
 #define RPC_FUNCTION_DEFINE(name)   \
-    void RPCFunction ## name ::defineCall
+    void RPCFunction_ ## name ::defineCall
 
 //Helper macro for create smart pointer instance of derivative RPCFunction
 #define RPC_FUNCTION_INSTANTIATE(name)   \
-          (new RPCFunction ## name ())
+          (new RPCFunction_ ## name ())
 //        (std::make_shared< RPCFunction ## name >())
 
 #define RPC_MAKE_FUNCTION_GROUP(name)   \

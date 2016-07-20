@@ -50,6 +50,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.inPosition = CENTER_POSITION
         self.inGoalbox = True
+        self.lastYIntercept = 0.0
 
         #HACK FOR PENALTY GOALIE IN WATSON2016
         self.lastPenDiveSide = RIGHT
@@ -133,15 +134,24 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveRight,
 
+            
+            Transition.CountTransition(GoalieTransitions.shouldClearNotMovingBall,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.EXTREME_PRECISION)
+            : VisualGoalieStates.clearBall,
+
+
+
+            # TODO RECOMMENT !!!!!!!! SO IMPORTANT SO IMPORTATN
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION + 5)
             : VisualGoalieStates.clearBall,
 
-            Transition.CountTransition(GoalieTransitions.adjustPosition,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : GoalieStates.shiftPosition,
+            # Transition.CountTransition(GoalieTransitions.adjustPosition,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : GoalieStates.shiftPosition,
 
 
             }
@@ -162,7 +172,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         VisualGoalieStates.clearBall.transitions = {
             Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
+                                       Transition.OK_PRECISION)
             : GoalieStates.returnUsingLoc,
 
             Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
@@ -175,10 +185,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.OK_PRECISION)
             : GoalieStates.returnUsingLoc,
 
-            # Transition.CountTransition(GoalieTransitions.shouldSquat,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : GoalieStates.saveCenter,
+            Transition.CountTransition(GoalieTransitions.saveWhileMoving,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.saveCenter,
 
             }
 
@@ -427,7 +437,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.checkSafePlacement,
 
             Transition.CountTransition(GoalieTransitions.ballWithinLocClearingDist,
-                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.clearBall
 
@@ -436,15 +446,15 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         GoalieStates.spinToRecover.transitions = {
-            Transition.CountTransition(GoalieTransitions.seeGoalbox,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.lineCheckReposition,
-
-            # Transition.CountTransition(GoalieTransitions.shouldClearBall,
+            # Transition.CountTransition(GoalieTransitions.seeGoalbox,
             #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION + 5)
-            # : VisualGoalieStates.clearBall,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.lineCheckReposition,
+
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION + 10)
+            : VisualGoalieStates.clearBall,
 
             # Transition.CountTransition(GoalieTransitions.facingBackward,
             #                            Transition.OCCASIONALLY,

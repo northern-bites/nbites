@@ -42,6 +42,7 @@ import nbtool.images.DebugImage;
 import nbtool.images.EdgeImage;
 import nbtool.images.Y8Image;
 import nbtool.images.Y8ThreshImage;
+import nbtool.images.Y16Image;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.util.Debug;
@@ -81,14 +82,14 @@ public class DebugImageView extends VisionView implements
      * */
 
     // Images that we can view in this view using the combo box
-    String[] imageViews = { "Original", "Green", "Black", "White", "Edge", "Thresh", "Learn" };
+    String[] imageViews = { "Original", "Green", "Y", "White", "Edge", "Thresh", "Learn" };
     JComboBox<String> viewList;
 
     JSlider greenThreshold;
     ChangeListener sliderListener;
     static int thresh = 128;
 
-    static final int NUMBER_OF_PARAMS = 9; // update as new params are added
+    static final int NUMBER_OF_PARAMS = 10; // update as new params are added
     static int displayParams[] = new int[NUMBER_OF_PARAMS];
 	int filterThresholdDark;
 	int greenThresholdDark;
@@ -151,14 +152,14 @@ public class DebugImageView extends VisionView implements
 				displayParams[i] = 0;
 			}
 			// ideally these would actually be read from NBCROSS
-			filterThresholdDark = 140;
-			greenThresholdDark = 60;
-			filterThresholdBrite = 150;
-			greenThresholdBrite = 120;
-			displayParams[5] = filterThresholdDark;
-			displayParams[6] = greenThresholdDark;
-			displayParams[7] = filterThresholdBrite;
-			displayParams[8] = greenThresholdBrite;
+			filterThresholdDark = 104;
+			greenThresholdDark = 12;
+			filterThresholdBrite = 130;
+			greenThresholdBrite = 80;
+			displayParams[6] = filterThresholdDark;
+			displayParams[7] = greenThresholdDark;
+			displayParams[8] = filterThresholdBrite;
+			displayParams[9] = greenThresholdBrite;
 
 			firstLoad = false;
 			currentBottom = ORIGINAL;
@@ -200,10 +201,11 @@ public class DebugImageView extends VisionView implements
 										SExpr.newKeyValue("DebugHorizon", displayParams[2]),
 										SExpr.newKeyValue("DebugField", displayParams[3]),
 										SExpr.newKeyValue("DebugBall", displayParams[4]),
-										SExpr.newKeyValue("FilterDark", displayParams[5]),
-										SExpr.newKeyValue("GreenDark", displayParams[6]),
-										SExpr.newKeyValue("FilterBrite", displayParams[7]),
-										SExpr.newKeyValue("GreenBrite", displayParams[8]));
+										SExpr.newKeyValue("ShowSpotSizes", displayParams[5]),
+										SExpr.newKeyValue("FilterDark", displayParams[6]),
+										SExpr.newKeyValue("GreenDark", displayParams[7]),
+										SExpr.newKeyValue("FilterBrite", displayParams[8]),
+										SExpr.newKeyValue("GreenBrite", displayParams[9]));
 
 
         // Look for existing Params atom in current this.log description
@@ -304,7 +306,7 @@ public class DebugImageView extends VisionView implements
 		}
 		// if we don't have an black image we're in trouble
 		if (displayImages[BLACK_IMAGE] == null) {
-			System.out.println("No black image");
+			System.out.println("No Y image");
 			return;
 		}
         //Graphics2D graph = black.createGraphics();
@@ -435,7 +437,7 @@ public class DebugImageView extends VisionView implements
 			currentBottom = GREEN_IMAGE;
 		} else if (viewName == "White") {
 			currentBottom = WHITE_IMAGE;
-		} else if (viewName == "Black") {
+		} else if (viewName == "Y") {
 			currentBottom = BLACK_IMAGE;
 		} else if (viewName == "Edge") {
 			currentBottom = EDGE_IMAGE;
@@ -536,6 +538,7 @@ public class DebugImageView extends VisionView implements
 		JCheckBox debugFieldEdge;
 		JCheckBox debugBall;
 		JCheckBox showFieldLines;
+		JCheckBox showSpotSizes;
 		boolean displayFieldLines;
 		boolean drawAllBalls;
 		DebugImageView parent;
@@ -553,6 +556,7 @@ public class DebugImageView extends VisionView implements
 			debugFieldEdge = new JCheckBox("Debug Field Edge");
 			debugBall = new JCheckBox("Debug Ball");
 			showFieldLines = new JCheckBox("Hide Field Lines");
+			showSpotSizes = new JCheckBox("Show Spot Sizes");
 
 			// add their listeners
 			showCameraHorizon.addItemListener(this);
@@ -561,6 +565,7 @@ public class DebugImageView extends VisionView implements
 			debugFieldEdge.addItemListener(this);
 			debugBall.addItemListener(this);
 			showFieldLines.addItemListener(this);
+			showSpotSizes.addItemListener(this);
 
 			// put them into one panel
 			checkBoxPanel = new JPanel();
@@ -571,6 +576,7 @@ public class DebugImageView extends VisionView implements
 			checkBoxPanel.add(debugFieldEdge);
 			checkBoxPanel.add(debugBall);
 			checkBoxPanel.add(showFieldLines);
+			checkBoxPanel.add(showSpotSizes);
 
 			// default all checkboxes to false
 			showCameraHorizon.setSelected(false);
@@ -579,15 +585,16 @@ public class DebugImageView extends VisionView implements
 			debugFieldEdge.setSelected(false);
 			debugBall.setSelected(false);
 			showFieldLines.setSelected(false);
+			showSpotSizes.setSelected(false);
 
 			SpinnerModel filterDarkModel = new
-				SpinnerNumberModel(parent.displayParams[5], 0, 512, 4);
+				SpinnerNumberModel(parent.displayParams[6], 0, 512, 4);
 			SpinnerModel greenDarkModel = new
-				SpinnerNumberModel(parent.displayParams[6], 0, 255, 4);
+				SpinnerNumberModel(parent.displayParams[7], 0, 255, 4);
 			SpinnerModel filterBriteModel = new
-				SpinnerNumberModel(parent.displayParams[7], 0, 512, 4);
+				SpinnerNumberModel(parent.displayParams[8], 0, 512, 4);
 			SpinnerModel greenBriteModel = new
-				SpinnerNumberModel(parent.displayParams[8], 0, 255, 4);
+				SpinnerNumberModel(parent.displayParams[9], 0, 255, 4);
 			paramPanel = new JPanel();
 			paramPanel.setLayout(new GridLayout(0, 2));
 			filterDark = addLabeledSpinner(paramPanel, "filterThresholdDark",
@@ -620,10 +627,10 @@ public class DebugImageView extends VisionView implements
 		}
 
 		public void stateChanged(ChangeEvent e) {
-			parent.displayParams[5] = ((Integer)filterDark.getValue()).intValue();
-			parent.displayParams[6] = ((Integer)greenDark.getValue()).intValue();
-			parent.displayParams[7] = ((Integer)filterBrite.getValue()).intValue();
-			parent.displayParams[8] = ((Integer)greenBrite.getValue()).intValue();
+			parent.displayParams[6] = ((Integer)filterDark.getValue()).intValue();
+			parent.displayParams[7] = ((Integer)greenDark.getValue()).intValue();
+			parent.displayParams[8] = ((Integer)filterBrite.getValue()).intValue();
+			parent.displayParams[9] = ((Integer)greenBrite.getValue()).intValue();
 			parent.adjustParams();
 			parent.repaint();
 		}
@@ -649,6 +656,8 @@ public class DebugImageView extends VisionView implements
 			} else if (source == showFieldLines) {
 				index = -1;
 				displayFieldLines = !displayFieldLines;
+			} else if (source == showSpotSizes) {
+				index = 5;
 			}
 			// flip the value of the parameter checked
 			if (index >= 0) {
@@ -670,42 +679,20 @@ public class DebugImageView extends VisionView implements
 		int maxY = 0;
 		int maxU = 0;
 		int maxV = 0;
-		for (int col = 0; col < width; col++) {
-			for (int row = 0; row < height; row++) {
-				int gr = (green8.data[row * width + col]) & 0xFF;
-				if (gr > max) {
-					boolean first = (col & 1) == 0;
-					int cbase = (col & ~1);
-					int i = (row * displayw * 2) + (cbase * 2);
-
-					byte[] data = originalImageBytes();
-					maxY = data[first ? i : i + 2] & 0xff;
-					maxU = data[i + 1] & 0xff;
-					maxV = data[i + 3] & 0xff;
-				}
-			}
-		}
 
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
 				int gr = (green8.data[row * width + col]) & 0xFF;
 				int wh = (white8.data[row * width + col]) & 0xFF;
-				int bl = (black8.data[row * width + col]) & 0xFF;
 
-				if (gr < 100 && wh < 100 && bl < 100) {
-					g.setColor(new Color(186,85,211));
-				} else if (gr > 100 && wh > 100) {
-					g.setColor(new Color(255,218,185));
-				} else if (bl > 100 && gr > 100) {
-					g.setColor(new Color(139,69,19));
-				} else if (gr > wh && gr > bl) {
-					g.setColor(new Color(0,128,0));
-				} else if (wh > gr && wh > bl) {
-					g.setColor(Color.WHITE);
+				if (gr < 100 && wh < 100) {
+					g.setColor(Color.GRAY);
+				} else if (gr > wh) {
+					g.setColor(Color.GREEN);
 				} else {
-					g.setColor(Color.BLACK);
+					g.setColor(Color.WHITE);
 				}
-				g.fillRect(col*2, row*2+displayh+30, 2, 2);
+				g.fillRect(col, row+displayh+30, 1, 1);
 			}
 		}
     }
@@ -726,13 +713,14 @@ public class DebugImageView extends VisionView implements
 		}
 
 		if (this.getWhiteBlock() != null) {
-			Y8Image white8 = new Y8Image(width, height, this.getWhiteBlock().data);
+			System.out.println("here");
+			white8 = new Y8Image(width, height, this.getWhiteBlock().data);
 			displayImages[WHITE_IMAGE] = white8.toBufferedImage();
 		}
 
-		if (this.getOrangeBlock() != null) {
-			Y8Image orange8 = new Y8Image(width, height, this.getOrangeBlock().data);
-			displayImages[BLACK_IMAGE] = orange8.toBufferedImage();
+		if (this.getYBlock() != null) {
+            Y16Image yImg = new Y16Image(width, height, this.getYBlock().data);
+            displayImages[BLACK_IMAGE] = yImg.toBufferedImage();
 		}
 
 		if (this.getEdgeBlock() != null) {

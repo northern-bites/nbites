@@ -1,37 +1,67 @@
 #pragma once
 
 #include "PMotion.pb.h"
+#include "../logshare/utilities-pp.hpp"
 
 namespace Kinematics {
 /// Joint Name constants ///
-enum JointName {
-    HEAD_YAW = 0,
-    HEAD_PITCH,
-    // LARM,
-    L_SHOULDER_PITCH,
-    L_SHOULDER_ROLL,
-    L_ELBOW_YAW,
-    L_ELBOW_ROLL,
-    // LLEG,
-    L_HIP_YAW_PITCH,
-    L_HIP_ROLL,
-    L_HIP_PITCH,
-    L_KNEE_PITCH,
-    L_ANKLE_PITCH,
-    L_ANKLE_ROLL,
-    // RLEG,
-    R_HIP_YAW_PITCH,
-    R_HIP_ROLL,
-    R_HIP_PITCH,
-    R_KNEE_PITCH,
-    R_ANKLE_PITCH,
-    R_ANKLE_ROLL,
-    // RARM,
-    R_SHOULDER_PITCH,
-    R_SHOULDER_ROLL,
-    R_ELBOW_YAW,
-    R_ELBOW_ROLL
-};
+
+NBL_MAKE_ENUM_FULL(JointName,
+                   HEAD_YAW,
+                   HEAD_PITCH,
+                   L_SHOULDER_PITCH,
+                   L_SHOULDER_ROLL,
+                   L_ELBOW_YAW,
+                   L_ELBOW_ROLL,
+                   L_HIP_YAW_PITCH,
+                   L_HIP_ROLL,
+                   L_HIP_PITCH,
+                   L_KNEE_PITCH,
+                   L_ANKLE_PITCH,
+                   L_ANKLE_ROLL,
+                   R_HIP_YAW_PITCH,
+                   R_HIP_ROLL,
+                   R_HIP_PITCH,
+                   R_KNEE_PITCH,
+                   R_ANKLE_PITCH,
+                   R_ANKLE_ROLL,
+                   R_SHOULDER_PITCH,
+                   R_SHOULDER_ROLL,
+                   R_ELBOW_YAW,
+                   R_ELBOW_ROLL );
+
+static inline const char * stringForJoint(JointName joint) {
+    return JointNameStrings[joint];
+}
+
+//enum JointName {
+//    HEAD_YAW = 0,
+//    HEAD_PITCH,
+//    // LARM,
+//    L_SHOULDER_PITCH,
+//    L_SHOULDER_ROLL,
+//    L_ELBOW_YAW,
+//    L_ELBOW_ROLL,
+//    // LLEG,
+//    L_HIP_YAW_PITCH,
+//    L_HIP_ROLL,
+//    L_HIP_PITCH,
+//    L_KNEE_PITCH,
+//    L_ANKLE_PITCH,
+//    L_ANKLE_ROLL,
+//    // RLEG,
+//    R_HIP_YAW_PITCH,
+//    R_HIP_ROLL,
+//    R_HIP_PITCH,
+//    R_KNEE_PITCH,
+//    R_ANKLE_PITCH,
+//    R_ANKLE_ROLL,
+//    // RARM,
+//    R_SHOULDER_PITCH,
+//    R_SHOULDER_ROLL,
+//    R_ELBOW_YAW,
+//    R_ELBOW_ROLL
+//};
 
 /**
  * @brief Converts a JointAngles message to a vector of 
@@ -66,7 +96,6 @@ static std::vector<float> toJointAngles(const messages::JointAngles& ja)
     result[R_SHOULDER_ROLL] = ja.r_shoulder_roll();
     result[R_ELBOW_YAW] = ja.r_elbow_yaw();
     result[R_ELBOW_ROLL] = ja.r_elbow_roll();
-
     return result;
 }
 }

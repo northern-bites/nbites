@@ -12,8 +12,8 @@ def shouldChaseBall(player):
     We see the ball. So go get it.
     """
     ball = player.brain.ball
-    return (ball.vis.frames_on > constants.BALL_ON_THRESH or
-     player.brain.ballMemRatio > constants.BALL_MEM_THRESH)
+    return (ball.vis.frames_on >= constants.BALL_ON_THRESH or
+     player.brain.ballMemRatio >= constants.BALL_MEM_THRESH)
 
 def shouldReturnHome(player):
     """
@@ -90,7 +90,7 @@ def shouldRedecideKick(player):
     """
     We've been in position for kick too long
     """
-    return player.counter > 200
+    return player.counter > 400
 
 def ballInPosition(player, kickPose):
     """
@@ -205,6 +205,9 @@ def spunOnce(player):
     """
     return player.stateTime > constants.SPUN_ONCE_TIME_THRESH
 
+def didOnePan(player):
+    return player.stateTime > 8 # Should use constant for one snap pan
+
 def shouldWalkFindBall(player):
     """
     If we've been spinFindBall-ing too long we should walk
@@ -213,8 +216,24 @@ def shouldWalkFindBall(player):
 
 def shouldChangeKickingStrategy(player):
     """
-    It is the end of the game and we are loosing. Time to kick more aggresively!
+    It is the end of the game and we are losing. Time to kick more aggresively!
     """
     return (player.brain.game.have_remote_gc and 
             player.brain.game.secs_remaining <= 30 and
             player.brain.theirScore > player.brain.ourScore)
+
+def shouldNotDribble(player):
+    return (player.brain.game.secs_remaining <= 30 or
+            # If we're in our own half, kick
+            player.brain.loc.x < NogginConstants.CENTER_FIELD_X or
+
+            # If we're between their goal box and halfway between their goal box and the half, kick.
+            (player.brain.loc.x > ((NogginConstants.YELLOW_GOALBOX_LEFT_X + NogginConstants.CENTER_FIELD_X) / 2) and
+             player.brain.loc.x < NogginConstants.YELLOW_GOALBOX_LEFT_X)) 
+
+            # Basically we only dribble if we're really close to their goal or close to the half on their side
+
+def inGoalBox(player):
+    return (player.brain.loc.x > NogginConstants.YELLOW_GOALBOX_LEFT_X and
+            player.brain.loc.y > NogginConstants.YELLOW_GOALBOX_BOTTOM_Y and
+            player.brain.loc.y < NogginConstants.YELLOW_GOALBOX_TOP_Y)

@@ -5,15 +5,18 @@ import nbtool.data.json.Json.JsonValueType;
 import nbtool.util.Debug;
 
 public class JsonString implements JsonValue {
-	
+
+	private static final Debug.DebugSettings debug = Debug.createSettings(Debug.WARN);
+
 	/* WARNING: value DOES NOT equal the string returned by serialize() and friends. */
 	public String value;
 	public String value() { return value; }
-	
+
 	@Override
 	public String toString() {return value;}
-	
+
 	public JsonString(String v) {
+//		if (v == null) throw new RuntimeException("null pointer");
 		this.value = v;
 	}
 
@@ -42,8 +45,10 @@ public class JsonString implements JsonValue {
 				}
 			} else break;
 		}
-		
-		return builder.toString();
+
+		String ret = builder.toString();
+		debug.info("%s -> %s", value, ret);
+		return ret;
 	}
 
 	@Override
@@ -65,47 +70,52 @@ public class JsonString implements JsonValue {
 	public <T extends JsonValue> T cast() {
 		return (T) this;
 	}
-	
+
+	@Override
 	public JsonArray asArray() {
 		return this.<JsonArray>cast();
 	}
-	
+
+	@Override
 	public JsonBoolean asBoolean() {
 		return this.<JsonBoolean>cast();
 	}
-	
+
+	@Override
 	public JsonNumber asNumber() {
 		return this.<JsonNumber>cast();
 	}
-	
+
+	@Override
 	public JsonObject asObject() {
 		return this.<JsonObject>cast();
 	}
-	
+
+	@Override
 	public JsonString asString() {
 		return this.<JsonString>cast();
 	}
-	
+
 	/* end mirrored section
 	 * ******************************/
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if (other == null)
 			return false;
-		
+
 		if (other instanceof String) {
 			return value.equals(other);
 		}
-		
+
 		if (other instanceof JsonString) {
 			String ov = ((JsonString) other).value;
 			return value.equals(ov);
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return value.hashCode();
@@ -120,8 +130,8 @@ public class JsonString implements JsonValue {
 	public boolean congruent(JsonValue other) {
 		if (other == null || other.type() != this.type())
 			return false;
-		
+
 		return other.asString().value.equals(this.value);
 	}
-	
+
 }

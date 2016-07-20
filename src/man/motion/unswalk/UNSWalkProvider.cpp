@@ -293,7 +293,6 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
             // }
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK_IN_PLACE) {
-			std::cout << "Walking in place! " << std::endl;
 			request->body.forward = 00.0; //command->x_percent ;
 			request->body.left = 00.0; //command->y_percent ;
 			request->body.turn = 0.0; //UNSWDEG2RAD(90.0); //command->theta_percent ;
@@ -311,7 +310,9 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 		// TODO handle kick
 	}
 	request->body.speed = 0.0f;
-	adjustIMU(sensorInertials);
+	if (!standby) {
+		adjustIMU(sensorInertials);
+	}
 
 
 	// Testing kick

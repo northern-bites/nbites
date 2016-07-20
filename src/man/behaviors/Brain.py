@@ -109,6 +109,14 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
+        self.whistleHeard = False
+        self.whistlePenalty = False
+
+        self.pickedUpInSet = False
+        self.penaltyCount = 0
+
+        self.buttonPenaltyPlacement = False;
+
         # CHINA HACK(s)
         self.penalizedHack = False
         self.penalizedEdgeClose = 0
@@ -121,6 +129,11 @@ class Brain(object):
         self.ballMemRatio = 0.0
         for i in range(self.BALL_MEM_SIZE):
             self.ballMem.append(0)
+
+        # New defender positioning
+        self.defendingStateTime = 0 #Number of frames.
+        self.staggeredPositioning = False
+        self.defenderPositioning = 0
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -200,6 +213,11 @@ class Brain(object):
 
         # Set myWorldModel for Comm
         self.updateComm()
+
+        if self.interface.gameState.penalty_is_placement:
+            self.buttonPenaltyPlacement = True
+
+        self.whistleHeard = self.interface.gameState.whistle_override
 
         # Flush the output
         sys.stdout.flush()
@@ -362,11 +380,11 @@ class Brain(object):
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 2:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 3:
-            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 4:

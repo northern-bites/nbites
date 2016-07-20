@@ -32,6 +32,11 @@ def tracking(tracker):
     if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH
+            and tracker.brain.playerNumber == 1):
+            return tracker.goLater('goalieTracking')
+            
+        if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
             return tracker.goLater('gamePlayingSnapPan')
 
@@ -279,7 +284,7 @@ def gamePlayingSnapPan(tracker):
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
 
-        tracker.helper.startingPan(HeadMoves.WIDE_SNAP_PAN)
+        tracker.helper.startingPan(HeadMoves.WIDE_SNAP_PAN) 
         # tracker.lookToAngleWithTime(-75, 0.75)
         # tracker.lookToAngleWithTime(-75,1)
         # tracker.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
@@ -293,6 +298,7 @@ def gamePlayingSnapPan(tracker):
 
     if (isinstance(tracker.target, Vision.messages.FilteredBall) and
         tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+        # print("HEADTRACKER SAW BALL!!")
         return tracker.goLater('tracking')
 
     return tracker.stay()
@@ -315,13 +321,16 @@ def goalieSnapPan(tracker):
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
 
-        tracker.helper.startingPan(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+        tracker.helper.executeHeadMove(tracker.helper.goalieShortRangePan())
+
+        # tracker.helper.startingPan(HeadMoves.GOALIE_WIDE_SNAP_PAN)
         # tracker.lookToAngleWithTime(-75, 0.75)
         # tracker.lookToAngleWithTime(-75,1)
         # tracker.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
     if not tracker.brain.motion.head_is_active or tracker.isStopped():
-        tracker.helper.executeHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+        # tracker.helper.executeHeadMove(HeadMoves.GOALIE_WIDE_SNAP_PAN)
+        tracker.helper.executeHeadMove(tracker.helper.goalieShortRangePan())
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
         if tracker.target.on:
@@ -329,7 +338,7 @@ def goalieSnapPan(tracker):
 
     if (isinstance(tracker.target, Vision.messages.FilteredBall) and
         tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
-        return tracker.goLater('tracking')
+        return tracker.goLater('goalieTracking')
 
     return tracker.stay()
 
