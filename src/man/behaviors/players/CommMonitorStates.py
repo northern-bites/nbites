@@ -33,7 +33,7 @@ def commMonitor(player):
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = False # HACK switched this off for testing; TODO back on for Germany!
+        player.roleSwitching = False
         player.commMode = 0
 
     elif not player.brain.game.have_remote_gc and player.commMode != 2 and transitions.awfulComm(player):
@@ -81,5 +81,5 @@ def commMonitor(player):
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = False # HACK TODO turn this back on for Germany
+        player.roleSwitching = False
         player.commMode = 0

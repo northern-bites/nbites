@@ -117,6 +117,8 @@ public class Block {
 		return new Y8Image(pair.a, pair.b, this.data);
 	}
 
+
+
 	public Message parseAsProtobufOfClass(Class<? extends Message> pclass) {
 		if (pclass == null) {
 			throw new BlockParseException(this.type, String.format("protobuf<null>") );
