@@ -46,7 +46,7 @@ GuardianModule::GuardianModule()
       feetOnGroundOutput(base()),
       fallStatusOutput(base()),
       audioOutput(base()),
-      lastBatteryCharge(1.0),
+      lastBatteryCharge(1.01),
       chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
@@ -433,8 +433,15 @@ void GuardianModule::checkBatteryLevels()
         return;
     }
 
+    if (lastBatteryCharge == float(1.01)) {
+        sayBatteryLevel(true);
+        lastBatteryCharge = newBatteryCharge;
+        return;
+    }
+
     if(newBatteryCharge != lastBatteryCharge)
     {
+
         //covert to a % scale
         const float newLevel = floorf(newBatteryCharge*100.0f);
         const float oldLevel = floorf(lastBatteryCharge*100.0f);
@@ -443,21 +450,9 @@ void GuardianModule::checkBatteryLevels()
         {
             if (oldLevel != newLevel && oldLevel > newLevel && oldLevel - newLevel >= 3.0f)
             {
-
-                std::string batteryLevelString = "Battery at " + std::to_string(int(newLevel)) + " percent";
-                man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
-
-                std::cout << "Guardian:: Battery charge is now at "
-                          << newLevel << " (was "<< oldLevel <<")"<< std::endl;
-
-                man::tts::say(IN_SCRIMMAGE, "Battery charge is critically low.");
-                std::cout << "Guardian:: Battery charge is critically "
-                          << "low!! PLUG ME IN!!!!!!!!!" << std::endl;
-
+                sayBatteryLevel();
                 lastBatteryCharge = newBatteryCharge;
-
                 // playFile(energy_wav);
-
             }
         }
         else if(newLevel <= LOW_BATTERY_VALUE)
@@ -465,31 +460,15 @@ void GuardianModule::checkBatteryLevels()
             if (oldLevel != newLevel && oldLevel > newLevel && oldLevel - newLevel >= 10.0f)
             {
 
-                std::string batteryLevelString = "Battery at " + std::to_string(int(newLevel)) + " percent";
-                man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
-
-                std::cout << "Guardian:: Battery charge is now at "
-                          << newLevel << " (was "<< oldLevel <<")"<< std::endl;
-
-                man::tts::say(IN_SCRIMMAGE, "Battery charge is low.");
-                std::cout << "Guardian:: Battery charge is low" << std::endl;
-
+                sayBatteryLevel();
                 lastBatteryCharge = newBatteryCharge;
-
                 // playFile(energy_wav);                
-
             }
         }
         else if (oldLevel != newLevel && oldLevel > newLevel && oldLevel - newLevel >= 15.0f)
         {
-            std::cout << "Guardian:: Battery charge is now at "
-                      << newLevel << " (was "<< oldLevel <<")"<< std::endl;
-
-            std::string batteryLevelString = "Battery at " + std::to_string(int(newLevel)) + " percent";
-            man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
-
+            sayBatteryLevel();
             lastBatteryCharge = newBatteryCharge;
-
         }
 
     }
@@ -804,12 +783,37 @@ void GuardianModule::printJointAngles()
     lastPrint = !lastPrint;
 }
 
-void GuardianModule::sayBatteryLevel()
+void GuardianModule::sayBatteryLevel(bool startUp)
 {
     std::cout << "Guardian::sayBatteryLevel()" << std::endl;
+
+    static const float LOW_BATTERY_VALUE = 30.0f;
+    static const float EMPTY_BATTERY_VALUE = 10.0f;
     const float newBatteryCharge = batteryInput.message().charge();
-    std::string batteryLevelString = "Battery at " + std::to_string(int(newBatteryCharge * 100.0f)) + " percent";
+    const float newLevel = floorf(newBatteryCharge*100.0f);
+    const float oldLevel = floorf(lastBatteryCharge*100.0f);
+
+    std::string batteryLevelString = "Battery at " + std::to_string(int(newLevel)) + " percent";
     man::tts::say(IN_SCRIMMAGE, batteryLevelString.c_str());
+
+    if (!startUp)
+    {
+        std::cout << "Guardian:: Battery charge is now at "
+                  << newLevel << " (was "<< oldLevel <<")"<< std::endl;
+    }
+
+    if (newLevel <= EMPTY_BATTERY_VALUE)
+    {
+        man::tts::say(IN_SCRIMMAGE, "Battery charge is critically low.");
+        std::cout << "Guardian:: Battery charge is critically "
+                  << "low!! PLUG ME IN!!!!!!!!!" << std::endl;
+    }
+
+    else if (newLevel <= LOW_BATTERY_VALUE)
+    {
+        man::tts::say(IN_SCRIMMAGE, "Battery charge is low.");
+        std::cout << "Guardian:: Battery charge is low" << std::endl;
+    }
 }
 
 void GuardianModule::switchTeams()
