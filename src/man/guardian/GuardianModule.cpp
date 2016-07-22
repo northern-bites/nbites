@@ -680,10 +680,10 @@ bool GuardianModule::executeChestClickAction(int nClicks)
         initialState();
         break;
     case 5:
-        printJointAngles();
+        sayBatteryLevel();
         break;
     case 6:
-        sayBatteryLevel();
+        printJointAngles();
         break;
     case 7:
         break;
