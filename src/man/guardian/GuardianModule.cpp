@@ -448,7 +448,13 @@ void GuardianModule::checkBatteryLevels()
 
         if (newLevel <= EMPTY_BATTERY_VALUE)
         {
-            if (oldLevel != newLevel && oldLevel > newLevel && oldLevel - newLevel >= 3.0f)
+
+            if (newLevel == EMPTY_BATTERY_VALUE) {
+                sayBatteryLevel();
+                lastBatteryCharge = newBatteryCharge;
+            }
+
+            else if (oldLevel != newLevel && oldLevel > newLevel && oldLevel - newLevel >= 3.0f)
             {
                 sayBatteryLevel();
                 lastBatteryCharge = newBatteryCharge;
@@ -457,7 +463,13 @@ void GuardianModule::checkBatteryLevels()
         }
         else if(newLevel <= LOW_BATTERY_VALUE)
         {
-            if (oldLevel != newLevel && oldLevel > newLevel && oldLevel - newLevel >= 10.0f)
+
+            if (newLevel == LOW_BATTERY_VALUE) {
+                sayBatteryLevel();
+                lastBatteryCharge = newBatteryCharge;
+            }
+
+            else if (oldLevel != newLevel && oldLevel > newLevel && oldLevel - newLevel >= 10.0f)
             {
 
                 sayBatteryLevel();
