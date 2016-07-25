@@ -37,6 +37,7 @@ def gameInitial(player):
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
         player.stand()
+        player.zeroHeads()
     # Remember last stiffness.
     player.lastStiffStatus = player.brain.interface.stiffStatus.on
 
