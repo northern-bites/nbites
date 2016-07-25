@@ -10,6 +10,10 @@
 #include "BehaviorsModule.h"
 #include "PyObjects.h"
 
+
+#include "TextToSpeech.h"
+
+
 using namespace boost::python;
 
 extern "C" void initLedCommand_proto();
@@ -162,10 +166,12 @@ void BehaviorsModule::getBrainInstance ()
 
     if (brain_instance == NULL) {
         std::cout << "Error accessing Brain" << std::endl;
-        if (PyErr_Occurred())
+        if (PyErr_Occurred()) {
+  			man::tts::say(IN_SCRIMMAGE, "python crash");
             PyErr_Print();
-        else
+        } else {
             std::cout << "  No error available" << std::endl;
+        }
     }
 
     // Successfully reloaded
