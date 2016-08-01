@@ -196,9 +196,9 @@ bool BallDetector::filterBlackSpots(Spot currentSpot)
     }
     int midY = *(yImage.pixelAddr(currentSpot.ix() + width / 2,
                                   -currentSpot.iy() + height / 2)) / 4;
-	if (topCamera && topY < height / 3) {
-		//return false;
-	}
+	// if (topCamera && topY < height / 3) {
+	//     return false;
+	// }
     // spots in robots are often actually bright, just surrounded by brighter
     if (midY > MIN_CENTER_Y) {
 		if (debugBall) {
@@ -358,9 +358,6 @@ int BallDetector::getAzimuthColumnRestrictions(double az) {
 
 int BallDetector::getAzimuthRowRestrictions(double az) {
     float percentOfImage;
-    //percentOfImage = -0.356*az*az - 0.025*az + 1.044; //lower
-    //percentOfImage = -0.396*az*az - 0.015*az + 1.144; //upper
-    //percentOfImage = -0.376*az*az - 0.015*az + 1.084;   //average
     percentOfImage = -0.376*az*az - 0.015*az + 1.104; //little higher than average
 
     int val = percentOfImage * height;
