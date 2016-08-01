@@ -340,6 +340,17 @@ void BallDetector::initializeSpotterSettings(SpotDetector &s, bool darkSpot,
 
 }
 
+/* Row/Column Restrictions Based on Azimuth
+
+The following two functions help us window an image in a way
+that lets us ignore processing parts of the chest and shoulders.
+
+This not only lets us reduce the size of the processed image, but
+also eliminates false positives seen in the chest and shoulders.
+
+Equations used by the functions were derived by manually classifying
+images and then interpolating the values with degree 2.
+ */
 int BallDetector::getAzimuthColumnRestrictions(double az) {
     float percentOfImage;
 
@@ -1508,7 +1519,6 @@ bool BallDetector::isGreen() {
     return false;
 }
 
-
 int BallDetector::getWhite() {
 	return *(whiteImage.pixelAddr(currentX, currentY));
 }
@@ -1542,7 +1552,6 @@ void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
 
 void BallDetector::billToImageCoordinates(double bx, double by, 
                                           double & ix, double & iy){
-
     ix = bx + width/2;
     iy = -1*by + height/2;
 }
