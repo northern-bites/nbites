@@ -5,11 +5,10 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 
-OLDPACKAGES="libboost1.48-dev libboost-python1.48-dev"
-
-PACKAGES="build-essential cmake git-core \
+OLDPACKAGES="libboost1.48-dev libboost-python1.48-dev libboost-all-dev openjdk-7-jre \
+openjdk-7-jdk build-essential cmake git-core \
 emacs cmake-curses-gui ccache aptitude \
-qt4-dev-tools python-pyparsing libeigen3-dev ant openjdk-7-jre openjdk-7-jdk libboost-all-dev"
+qt4-dev-tools python-pyparsing libeigen3-dev ant"
 
 BITS=`uname -m`
 
@@ -24,15 +23,15 @@ fi
 
 VERSION=`lsb_release -a 2>/dev/null | grep 'Release:' | grep -o '[0-9]\+.[0-9]\+'`
 
-if [[ $VERSION != '12.04' && $VERSION != '14.04' ]]; then
+if [[ $VERSION != '12.04' && $VERSION != '14.04' && $VERSION != '16.04' ]]; then
 
     echo ""
-    echo "That version is NOT SUPPORTED."
+    echo "This version of linux is not SUPPORTED."
     echo "Some packages will not be the right version or may not exist."
     echo "--------------------------------------------------------------"
     echo "If you are very sure of what you are doing, you may continue and"
     echo "configure broken packages manually."
-    echo "Otherwise, please switch to Ubuntu 14.04 or 12.04."
+    echo "Otherwise, please switch to Ubuntu 16.04, 14.04 or 12.04."
     echo ""
     echo "Abort? (y/n)"
     read ABORT
