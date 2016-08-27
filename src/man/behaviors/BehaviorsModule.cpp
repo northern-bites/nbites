@@ -106,6 +106,7 @@ void BehaviorsModule::initializePython()
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
+    	man::tts::say(IN_SCRIMMAGE, "python crash");
         PyErr_Print();
     }
 }
@@ -123,11 +124,14 @@ bool BehaviorsModule::import_modules ()
     if (brain_module == NULL) {
         // error, couldn't import noggin.Brain
         std::cout << "Error importing noggin.Brain module" << std::endl;
-        if (PyErr_Occurred())
+        if (PyErr_Occurred()) {
+        	std::cout<< "YAYYYY TEST TEST TEST"<<std::endl;
+        	man::tts::say(IN_SCRIMMAGE, "python crash");
             PyErr_Print();
-        else
+        } else {
             std::cout << "  No Python exception information available"
                       << std::endl;
+        }
         return false;
     }
 
@@ -202,6 +206,7 @@ void BehaviorsModule::run_ ()
             // report error
             std::cout << "Error occurred in Brain.run() method" << std::endl;
             if (PyErr_Occurred()) {
+            	man::tts::say(IN_SCRIMMAGE, "python crash");
                 PyErr_Print();
             } else {
                 std::cout << "  No Python exception information available"
@@ -331,11 +336,13 @@ void BehaviorsModule::modifySysPath ()
     PyObject *sys_module = PyImport_ImportModule("sys");
     if (sys_module == NULL) {
         std::cout << "** Error importing sys module: **" << std::endl;
-        if (PyErr_Occurred())
+        if (PyErr_Occurred()) {
+        	man::tts::say(IN_SCRIMMAGE, "python crash");
             PyErr_Print();
-        else
+        } else {
             std::cout << "** No Python exception information available **"
                       << std::endl;
+        }
     }
     else
     {
