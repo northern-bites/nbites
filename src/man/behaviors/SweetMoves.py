@@ -67,7 +67,7 @@ INITIAL_POS = (((90.4, 9.6, 0.2, -2.4),
 
 
 #Keyframe that moves can called from an unbalanced position to slowly return the joints to a stable, standing position.
-INITIAL_POS_KEYFRAME  ((90.4, 9.6, 0.2, -2.4),
+INITIAL_POS_KEYFRAME = ((90.4, 9.6, 0.2, -2.4),
                         (0.0, 0.1, -27.9, 50.1, -25.0, 0.0),
                         (0.0, -0.1, -28.7, 49.9, -25.0, 0.2),
                         (90.3, -9.3, -0.3, 2.7),
