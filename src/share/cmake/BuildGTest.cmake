@@ -3,7 +3,7 @@
 # Only update gtest if the user is missing it.
 # Make three processes because apparently commands are NOT executed sequentially.
 if( NOT EXISTS ${NBITES_DIR}/lib/gtest-1.6.0 )
-  execute_process( COMMAND wget http://googletest.googlecode.com/files/gtest-1.6.0.zip
+  execute_process( COMMAND wget https://github.com/google/googletest/archive/release-1.6.0.tar.gz
     WORKING_DIRECTORY ${NBITES_DIR}/lib
     )
   execute_process( COMMAND unzip -q gtest-1.6.0.zip
