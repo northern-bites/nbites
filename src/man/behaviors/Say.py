@@ -13,7 +13,7 @@ class Say:
 	# declaring it here and in src/share/include/TextToSpeech.h. We should
 	# find a way to consolidate these declarations since they're basically
 	# copies of each other.
-	when = IN_SCRIMMAGE
+	when = IN_DEBUG
 
 def say(upTo, sayThis):
 	"""

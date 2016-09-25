@@ -3,18 +3,20 @@ from ..navigator import Navigator
 from ..navigator import BrunswickSpeeds as speeds
 from objects import RobotLocation, RelRobotLocation
 from ..util import *
-from .. import Say
+from ..Say import *
 
 @superState('gameControllerResponder')
 def gameInitial(player):
-    say("Line Walk, Game Initial")
     if player.firstFrame():
+        say(Say.IN_DEBUG, "Put me in front of a line and switch me to game ready!")
         player.gainsOn()
         player.brain.nav.stand()
     return player.stay()
 
 @superState('gameControllerResponder')
 def gameReady(player):
+    if player.firstFrame():
+        print(player.brain.interface.vision.FieldLine)
     return player.stay()
 
 @superState('gameControllerResponder')
