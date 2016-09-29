@@ -982,6 +982,7 @@ void MotionModule::sendMotionCommand(const StepCommand::ptr command)
 
 void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
 {
+    std::cout << "SendMotionCommand was called with a DestinationCommand pointer" << std::endl;
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }
@@ -1004,6 +1005,7 @@ void MotionModule::sendMotionCommand(const WalkInPlaceCommand::ptr command)
  */
 void MotionModule::sendMotionCommand(messages::DestinationWalk command)
 {
+    std::cout << "SendMotionCommand was called with a DestinationWalk object" << std::endl;
     // Message is coming from behaviors in centimeters and degrees
     // StepCommands take millimeters and radians so convert!
     float relX = command.rel_x() * CM_TO_MM;
@@ -1039,11 +1041,14 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
  */
 void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 {
+    std::cout << "SendMotionCommand sent with an OdometryWalk object" << std::endl;
     // Message is coming from behaviors in centimeters and degrees
     // StepCommands take millimeters and radians so convert!
     float relX = command.rel_x() * CM_TO_MM;
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
+
+    std::cout << "relX: " << relX << "; relY: " << relY << "; relH: " << relH << std::endl;
 
     float gain; 
     if(command.gain() > 0.f)

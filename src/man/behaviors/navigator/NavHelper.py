@@ -156,6 +156,8 @@ def setOdometryDestination(nav, dest, gain = 1.0):
     command.odometry_dest.rel_y = dest.relY
     command.odometry_dest.rel_h = dest.relH
 
+    print(command.odometry_dest.rel_x)
+
     command.odometry_dest.gain = gain
 
     # Mark this message for sending

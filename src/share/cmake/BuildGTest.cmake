@@ -6,10 +6,15 @@ if( NOT EXISTS ${NBITES_DIR}/lib/gtest-1.6.0 )
   execute_process( COMMAND wget https://github.com/google/googletest/archive/release-1.6.0.zip
     WORKING_DIRECTORY ${NBITES_DIR}/lib
     )
+  execute_process( COMMAND echo "Done wgetting" )
   execute_process( COMMAND mv ${NBITES_DIR}/lib/release-1.6.0.zip ${NBITES_DIR}/lib/gtest-1.6.0.zip )
+  execute_process( COMMAND echo "Done moving" )
+  execute_process( COMMAND rm -rf ${NBITES_DIR}/lib/googletest-release-1.6.0/ )
+  execute_process( COMMAND ls ${NBITES_DIR}/lib )
   execute_process( COMMAND unzip -q gtest-1.6.0.zip
     WORKING_DIRECTORY ${NBITES_DIR}/lib
     )
+  execute_process( COMMAND mv ${NBITES_DIR}/lib/googletest-release-1.6.0 ${NBITES_DIR}/lib/gtest-1.6.0 )
   execute_process( COMMAND rm gtest-1.6.0.zip
     WORKING_DIRECTORY ${NBITES_DIR}/lib
     )

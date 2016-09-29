@@ -50,6 +50,8 @@ class Brain(object):
         self.playerNumber = playerNum
         self.teamNumber = teamNum
 
+        self.lineDistance = 0
+
         self.counter = 0
         self.time = time.time()
 

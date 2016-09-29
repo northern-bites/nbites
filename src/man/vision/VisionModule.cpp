@@ -306,7 +306,6 @@ void VisionModule::run_()
 
         // Find world coordinates for hough lines
         houghLines[i]->mapToField(*(homography[i]), *field);
-        std::cout << "houghLines count: " << houghLines[i]->size() << std::endl;
         times[i][6] = timer.end();
 
         // Find world coordinates for rejected edges

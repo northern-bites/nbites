@@ -85,7 +85,7 @@ def goToPosition(nav):
         dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
         # print("Distance: ", dist)
         if dist < 30:
-            # print("I'm close enough ! I should not go fast anymore")
+            print("I'm close enough ! I should not go fast anymore")
             goToPosition.fast = False
             goToPosition.speeds = (0.1, 0.1, 0.1)
 
@@ -182,7 +182,7 @@ def goToPosition(nav):
     # if navTrans.shouldDodge(nav):
     #     return nav.goNow('dodge')
         
-    return Transition.getNextState(nav, goToPosition)
+    return nav.goNow("goToPosition")
 
 goToPosition.speed = "speed gain from 0 to 1"
 goToPosition.dest = "destination, can be any type of location"
@@ -314,19 +314,21 @@ def walkingTo(nav):
     if nav.counter < 5:
         return nav.stay()
 
+    print(len(walkingTo.destQueue))
+
     walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
                          nav.brain.interface.odometry.y,
                          nav.brain.interface.odometry.h)
 
     # TODO why check standing?
-    if nav.brain.interface.motionStatus.standing:
+    # if nav.brain.interface.motionStatus.standing:
 
-        if len(walkingTo.destQueue) > 0:
-            dest = walkingTo.destQueue.popleft()
-            # dest.relH = 0
-            helper.setOdometryDestination(nav, dest, walkingTo.speed)
-            # helper.setDestination(nav, dest, walkingTo.speed)
-            print ("MY dest: ", dest.relX, dest.relY, dest.relH)
+    if len(walkingTo.destQueue) > 0:
+        dest = walkingTo.destQueue.popleft()
+        # dest.relH = 0
+        helper.setOdometryDestination(nav, dest, walkingTo.speed)
+        # helper.setDestination(nav, dest, walkingTo.speed)
+        print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
     if locationsMatch(nav.destination, walkingTo.currentOdo):
         print("I think i'm there!")
