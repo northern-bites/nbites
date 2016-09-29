@@ -11,7 +11,8 @@ endif( OFFLINE )
 # http://stackoverflow.com/questions/9689183/cmake-googletest
 ExternalProject_Add(
     protobuf_libs
-    URL http://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
+    GIT_REPOSITORY http://github.com/northern-bites/protobuf.git
+    GIT_TAG 2.5.0-nbites
     SOURCE_DIR ${CMAKE_BINARY_DIR}/protobufsrc
     CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/protobufsrc/configure -prefix=${PROTO_INSTALL} --with-pic
     INSTALL_DIR ${PROTO_INSTALL}
