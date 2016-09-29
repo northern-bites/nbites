@@ -306,6 +306,7 @@ void VisionModule::run_()
 
         // Find world coordinates for hough lines
         houghLines[i]->mapToField(*(homography[i]), *field);
+        std::cout << "houghLines count: " << houghLines[i]->size() << std::endl;
         times[i][6] = timer.end();
 
         // Find world coordinates for rejected edges
@@ -405,6 +406,7 @@ void VisionModule::run_()
 
 void VisionModule::outportalVisionField()
 {
+    // std::cout << fieldLines[0]->size() << std::endl;
     // Mark repeat lines (already found in bottom camera) in top camera
     for (int i = 0; i < fieldLines[0]->size(); i++) {
         for (int j = 0; j < fieldLines[1]->size(); j++) {

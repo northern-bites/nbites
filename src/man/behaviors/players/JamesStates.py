@@ -16,7 +16,7 @@ def gameInitial(player):
 @superState('gameControllerResponder')
 def gameReady(player):
     if player.firstFrame():
-        print(player.brain.interface.vision.FieldLine)
+        print(player.brain.interface.vision)
     return player.stay()
 
 @superState('gameControllerResponder')
