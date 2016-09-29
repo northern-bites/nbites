@@ -1,4 +1,4 @@
-Northern Bites nbites Repository
+Northern Bites nbites Repository [![Stories in Ready](http://githubkanban.herokuapp.com/huboard/northern-bites/nbites.png)](http://huboard.com/northern-bites/nbites/board)
 ================================
 
 Welcome to the home for the Bowdoin College Northern Bites repository. Here is where we house our offline tools and our real-time autonomous robot soccer playing system.
