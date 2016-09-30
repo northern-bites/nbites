@@ -34,8 +34,16 @@ def gameSet(player):
         distance = player.brain.lineDistance
         print(distance)
         player.brain.interface.motionRequest.reset_odometry = True
-        player.brain.nav.goTo(RelRobotLocation(player.brain.lineDistance, 0, 0))
-    # print(player.brain.interface.motionStatus)
+    player.brain.lineDistance = player.brain.visionLines(0).inner.r
+    print player.brain.lineDistance
+    if player.brain.lineDistance < 8:
+        player.brain.nav.walk(0, 0, 0)
+        # say(Say.IN_DEBUG, "I'm very close!")
+        player.brain.stopWalking = True
+    elif player.brain.lineDistance < 30 and player.brain.stopWalking == False:
+        player.brain.nav.walk(0.1, 0, 0)
+    elif player.brain.lineDistance > 20 and player.brain.stopWalking == False:
+        player.brain.nav.walk(0.3, 0, 0)
     return player.stay()
 
 @superState('gameControllerResponder')

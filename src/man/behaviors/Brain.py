@@ -51,6 +51,7 @@ class Brain(object):
         self.teamNumber = teamNum
 
         self.lineDistance = 0
+        self.stopWalking = False
 
         self.counter = 0
         self.time = time.time()
