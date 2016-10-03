@@ -50,7 +50,7 @@ def commMonitor(player):
         RoleConstants.setRoleConstants(player, player.role)
         player.roleSwitching = False
         player.commMode = 2
-    
+
     elif not player.brain.game.have_remote_gc and player.commMode != 1 and transitions.mediocreComm(player):
 
         if player.firstFrame():
@@ -60,7 +60,7 @@ def commMonitor(player):
     
         if player.commMode == 2: 
             RoleConstants.roleConfiguration = player.prevRoleConfig
-    
+
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
