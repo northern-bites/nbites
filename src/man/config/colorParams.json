@@ -4,17 +4,17 @@
       "green" :
         {
           "uAtY0" :
-            97,
+            92,
           "uAtY255" :
-            167,
+            174,
           "vAtY0" :
-            0,
+            84,
           "vAtY255" :
-            247,
+            241,
           "u_fuzzy_range" :
             127,
           "v_fuzzy_range" :
-            142
+            138
         },
       "white" :
         {
