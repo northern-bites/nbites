@@ -5,7 +5,13 @@ from ..navigator import Navigator
 from ..navigator import BrunswickSpeeds as speeds
 from objects import RelRobotLocation, Location
 import PMotion_proto
+from noggin_constants import LineID
+import noggin_constants as Constants
 import math
+
+globalR = 0.0
+globalT = 0.0
+
 #import vision
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -21,7 +27,7 @@ def gameReady(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.runfallController = False
-    return player.goNow('walkToLine')
+    return player.goNow('walkToLine1')
     
 @superState('gameControllerResponder')
 def gameSet(player):
@@ -60,19 +66,39 @@ def fallen(player):
     return player.stay()
 
 
-def walkToLine(player):
+def walkToLine1(player):
     #player.brain.tracker.repeatWideSnapPan()
     lines = player.brain.visionLines
-    x = 0
-    y = 0
-    if player.brain.vision.line_size() > 0:
-        print "I SEE A LINE"
-        r = lines(0).inner.r
-        t = lines(0).inner.t
-        x = r*cos(t)
-        y = r*sin(t)
-        print "x=" + x + "  y= " +  y
-        player.brain.nav.walk(x,y,0)
-    
-        #print "NO LINES"
+    if player.brain.vision.line_size() > 1:
+        print "Number of lines:"
+        print player.brain.vision.line_size()
+        indexOfClosestLine = 0
+        #for i in range(0,player.brain.vision.line_size()):
+            #if lines(i).inner.r < lines(indexOfClosestLine).inner.r:
+                #indexOfClosestLine = i
+        r = lines(indexOfClosestLine).inner.r
+        t = lines(indexOfClosestLine).inner.t
+        x = r * math.cos(t)
+        y = r * math.sin(t)
+        #dist = math.sqrt(int(x)^2 + int(y)^2)
+        print "outside while"
+        print r
+        while r > 10:
+            print "inside while"
+            print r
+            #if dist > 1:
+                #player.brain.nav.walk(.75,0,0)
+            #else:
+            player.brain.nav.walk(.5,0,0)
+            return player.stay()
+            #print "x=" + x + "  y= " +  y
+        player.brain.nav.stand()
+        if r <= 10:
+            return player.goNow('doneWalking')
+    return player.stay()
+
+
+
+
+def doneWalking(player): 
     return player.stay()

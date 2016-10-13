@@ -8,6 +8,8 @@ from . import RoleSwitchingStates
 from . import CommMonitorStates
 from . import GameControllerStates
 from . import JEthanStates
+from ..util import Transition
+import noggin_constants as NogginConstants
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
