@@ -1,3 +1,5 @@
+#code adapted from KickerStates, WalkToBallStates and GoalieTransitions
+
 from ..headTracker import HeadMoves
 from .. import SweetMoves
 from ..util import *
@@ -31,11 +33,41 @@ def gamePenalized(player):
 
 @superState('gameControllerResponder')
 def lineWalk(player):
-    if player.firstFrame():
-        # player.brain.nav.callKickEngine(PMotion_proto.messages.Kick.M_Left_Chip_Shot)
-        player.executeMove(SweetMoves.CUTE_KICK_LEFT)
+    #ball = player.brain.ball #get ball info from Brain
+    
+    lines = player.brain.visionLines #get line info from Brain
 
-    return player.stay()
+        if player.brain.vision.line_size() == 0: #if no lines in frame
+            print "My brain sees no lines right now"
+            dest = RelRobotLocation(10, 0, 0)  #Create a destination directly in front of the robot
+            player.brain.nav.goTo(dest)  #walk there, i.e. walk forward
+            return player.stay()  #Keep walking to line
+        
+        """elif(lines(0).vis.dist < 30):  #if the ball is close
+            print "saw a line, stopping"
+            return player.goNow('gameSet') #stop"""
+
+        else:    #otherwise, the line is visible but not too close
+            print "see line, going towards it"
+            player.brain.nav.goTo(lines(0).loc)  #go to the line location
+            return player.stay()   #keep going towards it
+
+"""
+        if(not ball.vis.on):  #if the ball is not in frame
+            print "no ball"
+            dest = RelRobotLocation(10, 0, 0)  #Create a destination directly in front of the robot
+            player.brain.nav.goTo(dest)  #walk there, i.e. walk forward
+            return player.stay()  #Keep walking to ball
+
+        elif(ball.vis.dist < 30):  #if the ball is close
+            print "saw the ball, stopping"
+            return player.goNow('gameSet') #stop
+
+        else:    #otherwise, the ball is visible but not too close
+            print "see ball, going towards it"
+            player.brain.nav.goTo(ball.loc)  #go to the ball's location
+            return player.stay()   #keep going towards it
+"""
 
 @superState('gameControllerResponder')
 def fallen(player):
