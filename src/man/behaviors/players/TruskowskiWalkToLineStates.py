@@ -72,23 +72,24 @@ def walkToFieldLine(player):
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
 
-    elif player.counter == 1:
+    else:
         for i in range(0, player.brain.vision.line_size()):
-            print "saw a line"
+            print "saw a line at " + str(player.brain.visionLines(i).inner.r)
             #check to see if the robot has arrived at the line
             if(player.brain.visionLines(i).inner.r < 20):
                 print "arrived at a line"
-                return player.goto('playerStand')
-            
-        print "walking forward"
+                return player.goNow('playerStand')
+
         player.brain.nav.walk(0.1, 0, 0) #move straight ahead        
 
+    '''
     elif player.counter > 30 and player.brain.interface.motionStatus.standing:
         player.brain.nav.stand()
-    
+    '''
+
     return player.stay()
 
 def playerStand(player):
     print "player stopped at field line (hopefully)"
     player.brain.nav.stand()
-    
+    return player.stay()
