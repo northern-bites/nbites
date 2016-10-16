@@ -41,9 +41,7 @@ def walkToLine(player):
     r = lines(0).inner.r
 
     # walk forward until the robot is 5cm from the line
-    while r > 5:
-        player.brain.nav.walk(0.3, 0, 0)
-        r = lines(0).inner.r
+    player.brain.nav.walk(0.3, 0, 0)
 
     # stop
     return player.stay()
