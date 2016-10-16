@@ -37,24 +37,15 @@ def walkToLine(player):
     # get the array of field lines
     lines = player.brain.visionLines
 
-    # the minimum distance between the robot and one of
-    # the field lines
-    minDist = 1000
+    # get the first field line in the field lines array
+    r = lines(0).inner.r
 
-    # the angle of the field line relative to the robot
-    minTheta = 0
+    # walk forward until the robot is 5cm from the line
+    while (r > 10):
+        player.brain.nav.walk(5, 0, 0)
+        r = lines(0).inner.r
 
-    # cycle through the list of field lines and get the
-    # one with the least distance (smallest r-value)
-    for i in range(0, player.brain.vision.line_size()):
-        r = lines(i).inner.r
-        if r < minDist:
-            minDist = r
-            minTheta = lines(i).inner.t
-
-    # walk toward the field line but stop 10cm short
-    player.brain.nav.walk(r-10, 0, 0)
-
+    # stop
     return player.stay()
 
 @superState('gameControllerResponder')
