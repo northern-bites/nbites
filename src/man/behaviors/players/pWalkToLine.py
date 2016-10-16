@@ -9,9 +9,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(FallControllerStates)
+        self.addStates(RoleSwitchingStates)
         self.addStates(CommMonitorStates)
         self.addStates(GameControllerStates)
-        self.addStates(RoleSwitchingStates)
         self.addStates(WalkToLineStates)
 
         self.setName('pWalkToLine')
