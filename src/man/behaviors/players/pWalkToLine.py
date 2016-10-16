@@ -18,6 +18,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentState = 'fallController'
 
         self.brain.fallController.enabled = True
-        self.RoleSwitching = False
+        self.roleSwitching = False
         self.role = brain.playerNumber
         self.commMode = -1
