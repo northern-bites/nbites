@@ -25,14 +25,6 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
-    return player.goNow('walkToLine')
-
-@superState('gameControllerResponder')
-def gamePenalized(player):
-    return player.stay()
-
-@superState('gameControllerResponder')
-def walkToLine(player):
 
     # get the array of field lines
     lines = player.brain.visionLines
@@ -41,11 +33,15 @@ def walkToLine(player):
     r = lines(0).inner.r
 
     # walk forward until the robot is 5cm from the line
-    while (r > 10):
-        player.brain.nav.walk(5, 0, 0)
+    while r > 10:
+        player.brain.nav.walkTo(RelRobotLocation(5, 0, 0))
         r = lines(0).inner.r
 
     # stop
+    return player.stay()
+
+@superState('gameControllerResponder')
+def gamePenalized(player):
     return player.stay()
 
 @superState('gameControllerResponder')
