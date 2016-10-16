@@ -1,6 +1,6 @@
-#code adapted from KickerStates, WalkToBallStates and GoalieTransitions
-
 from ..headTracker import HeadMoves
+#import noggin_constants as field
+from objects import RelRobotLocation
 from .. import SweetMoves
 from ..util import *
 import PMotion_proto
@@ -16,7 +16,23 @@ def gameInitial(player):
 @superState('gameControllerResponder')
 def gameReady(player):
     if player.firstFrame():
-        player.brain.nav.stand()
+
+        print  player.brain.vision.line_size() #print out number of lines
+    
+    if  player.brain.vision.line_size() > 0: #if there are lines in frame
+         #find distance to line
+        dist = player.brain.visionLines(0).inner.r
+        
+        if(dist > 10): #if not at line yet
+            player.brain.nav.walk(.2,0,0) #walk forward
+            dist = player.brain.visionLines(0).inner.r #update distance
+            print dist
+            return player.stay() #Keep walking to line
+
+        else: #if the line is close
+            print "close to line, stopping"
+            player.brain.nav.stop()
+            return player.goNow('gameSet') #MAKE A NEW FUNCTION THAT JUST DOES PLAYER.STAY
     return player.stay()
 
 @superState('gameControllerResponder')
@@ -25,49 +41,11 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
-    return player.goNow('lineWalk')
+    return player.stay()
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
     return player.stay()
-
-@superState('gameControllerResponder')
-def lineWalk(player):
-    #ball = player.brain.ball #get ball info from Brain
-    
-    lines = player.brain.visionLines #get line info from Brain
-
-        if player.brain.vision.line_size() == 0: #if no lines in frame
-            print "My brain sees no lines right now"
-            dest = RelRobotLocation(10, 0, 0)  #Create a destination directly in front of the robot
-            player.brain.nav.goTo(dest)  #walk there, i.e. walk forward
-            return player.stay()  #Keep walking to line
-        
-        """elif(lines(0).vis.dist < 30):  #if the ball is close
-            print "saw a line, stopping"
-            return player.goNow('gameSet') #stop"""
-
-        else:    #otherwise, the line is visible but not too close
-            print "see line, going towards it"
-            player.brain.nav.goTo(lines(0).loc)  #go to the line location
-            return player.stay()   #keep going towards it
-
-"""
-        if(not ball.vis.on):  #if the ball is not in frame
-            print "no ball"
-            dest = RelRobotLocation(10, 0, 0)  #Create a destination directly in front of the robot
-            player.brain.nav.goTo(dest)  #walk there, i.e. walk forward
-            return player.stay()  #Keep walking to ball
-
-        elif(ball.vis.dist < 30):  #if the ball is close
-            print "saw the ball, stopping"
-            return player.goNow('gameSet') #stop
-
-        else:    #otherwise, the ball is visible but not too close
-            print "see ball, going towards it"
-            player.brain.nav.goTo(ball.loc)  #go to the ball's location
-            return player.stay()   #keep going towards it
-"""
 
 @superState('gameControllerResponder')
 def fallen(player):
