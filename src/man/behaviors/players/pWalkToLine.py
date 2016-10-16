@@ -8,7 +8,6 @@ from . import WalkToLineStates
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
-        self.addStates(SoccerFSA)
         self.addStates(FallControllerStates)
         self.addStates(CommMonitorStates)
         self.addStates(GameControllerStates)

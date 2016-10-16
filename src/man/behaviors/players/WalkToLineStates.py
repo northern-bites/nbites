@@ -1,40 +1,62 @@
-import vision
-import man.motion.HeadMoves as HeadMoves
-from objects import RelRobotLocation
+from ..headTracker import HeadMoves
+from ..navigator import Navigator
+from objects import RobotLocation, RelRobotLocation
+from ..util import *
+import PMotion_proto
+import Vision_proto
 
-# Currently, this is just a copy of the example walkToBall behavior given
-# on the Wiki. Obviously, this will need to implement the walkToLine behavior.
+@superState('gameControllerResponder')
+def gameInitial(player):
+    if player.firstFrame():
+        player.gainsOn()
+        player.brain.nav.stand()
+        player.runfallController = False
+    return player.stay()
 
-def gameSet(player):
+@superState('gameControllerResponder')
+def gameReady(player):
     if player.firstFrame():
         player.brain.nav.stand()
+    return player.stay()
+
+@superState('gameControllerResponder')
+def gameSet(player):
+    return player.stay()
+
+@superState('gameControllerResponder')
+def gamePlaying(player):
+    return player.goNow('walkToLine')
+
+@superState('gameControllerResponder')
+def gamePenalized(player):
+    return player.stay()
+
+@superState('gameControllerResponder')
+def walkToLine(player):
+
+    # get the array of field lines
+    lines = player.brain.visionLines
+
+    # the minimum distance between the robot and one of
+    # the field lines
+    minDist = 1000
+
+    # the angle of the field line relative to the robot
+    minTheta = 0
+
+    # cycle through the list of field lines and get the
+    # one with the least distance (smallest r-value)
+    for i in range(0, player.brain.vision.line_size()):
+        r = lines(i).inner.r
+        if r < minDist:
+            minDist = r
+            minTheta = lines(i).inner.t
+
+    # walk toward the field line but stop 10cm short
+    player.brain.nav.walk(r-10, 0, 0)
 
     return player.stay()
 
-def gamePlaying(player):
-    player.firstFrame():
-    player.gainsOn()
-    player.brain.nav.stand()
-    player.brain.tracker.lookToAngleFixedPitch(0)
-
-    while (not player.brain.motion.calibrated()):
-        return player.stay()
-
-    return player.goNow('walkToBall')
-
-def walkToBall(player):
-    ball = player.brain.ball
-
-    if (not ball.vis.on):
-        print "no ball"
-        dest = RelRobotLocation(10, 0, 0)
-        player.brain.nav.goTo(dest)
-        return player.stay()
-
-    elif (ball.vis.dest < 30):
-        print "saw the ball, stopping"
-        return player.goNow('gameSet')
-    else:
-        print "see ball, going towards it"
-        player.brain.nav.goTo(ball.loc)
-        return player.stay()
+@superState('gameControllerResponder')
+def fallen(player):
+    return player.stay()
