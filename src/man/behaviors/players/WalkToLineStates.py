@@ -3,7 +3,6 @@ from ..navigator import Navigator
 from objects import RobotLocation, RelRobotLocation
 from ..util import *
 import PMotion_proto
-import Vision_proto
 
 @superState('gameControllerResponder')
 def gameInitial(player):
