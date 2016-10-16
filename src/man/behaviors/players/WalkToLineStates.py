@@ -25,7 +25,16 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
+    return player.goNow('walkToLine')
 
+
+@superState('gameControllerResponder')
+def gamePenalized(player):
+    return player.stay()
+
+@superState('gameControllerResponder')
+def walkToLine(player):
+    
     # get the array of field lines
     lines = player.brain.visionLines
 
@@ -38,10 +47,6 @@ def gamePlaying(player):
         r = lines(0).inner.r
 
     # stop
-    return player.stay()
-
-@superState('gameControllerResponder')
-def gamePenalized(player):
     return player.stay()
 
 @superState('gameControllerResponder')
