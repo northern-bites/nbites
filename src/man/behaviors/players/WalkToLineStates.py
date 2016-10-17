@@ -4,30 +4,42 @@ from ..navigator import BrunswickSpeeds as speeds
 from objects import RobotLocation, RelRobotLocation
 from ..util import *
 
+@superState('gameControllerResponder')
 def gameInitial(player):
 	if player.firstFrame():
-		print "initial"
 		player.gainsOn()
 		player.brain.nav.stand()
 	return player.stay()
 
+@superState('gameControllerResponder')
 def gameReady(player):
-	return player.stay()
-
-def gameSet(player):
-	return player.stay()
-
-def gamePlaying(player):
 	if player.firstFrame():
-		print "playing"
-	line = player.brain.visionlines(0) #first line
-	dest = line.inner.r #distance from line
+		print("in game ready")
+	return player.stay()
 
-	while dest != 0:
-		player.brain.nav.walk(10,0,0) #walk speed towards line
-		line = player.brain.visionLines(0)
-		dest - line.inner.r
+@superState('gameControllerResponder')
+def gameSet(player):
+	if player.firstFrame():
+		print("in game set") 
+	return player.stay()
 
-	player.brain.nav.stand()
+@superState('gameControllerResponder')
+def gamePlaying(player):
+	print player.brain.vision
+	#dest = player.brain.visionLines(0).inner.r #first line distance
+
+	#player.brain.nav.walk(7,0,0) #walk speed towards line
+	
+	#if dest < 10: #if we've gotten sufficiently close to the line we stop
+	#	player.brain.nav.stand()
 		
+	return player.stay()
+
+@superState('gameControllerResponder')
+def gamePenalized(player):
+	return player.stay()
+
+@superState('gameControllerResponder')
+def fallen(player):
+	player.inKickingState = False
 	return player.stay()
