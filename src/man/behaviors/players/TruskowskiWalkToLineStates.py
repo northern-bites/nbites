@@ -80,7 +80,7 @@ def walkToFieldLine(player):
                 print "arrived at a line"
                 return player.goNow('playerStand')
 
-        player.brain.nav.walk(0.1, 0, 0) #move straight ahead        
+        player.brain.nav.walk(0.5, 0, 0) #move straight ahead        
 
     '''
     elif player.counter > 30 and player.brain.interface.motionStatus.standing:
@@ -90,6 +90,5 @@ def walkToFieldLine(player):
     return player.stay()
 
 def playerStand(player):
-    print "player stopped at field line (hopefully)"
     player.brain.nav.stand()
     return player.stay()
