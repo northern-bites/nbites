@@ -31,6 +31,7 @@ def gamePlaying(player):
 	
 	if dest < 10: #if we've gotten sufficiently close to the line we stop
 		player.brain.nav.stand()
+		return player.stop()
 		
 	return player.stay()
 
