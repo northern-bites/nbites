@@ -26,13 +26,16 @@ def gameSet(player):
 @superState('gameControllerResponder')
 def gamePlaying(player):
 	dest = player.brain.visionLines(0).inner.r #first line distance
-
-	player.brain.nav.walk(7,0,0) #walk speed towards line
+	player.brain.nav.walk(0.5,0,0) #walk speed towards line
 	
-	if dest < 10: #if we've gotten sufficiently close to the line we stop
-		player.brain.nav.stand()
-		return player.stop()
-		
+	if dest < 10 and dest > 0.5: #if we've gotten sufficiently close to the line we stop
+		return player.goNow('endWalk')	
+
+			
+	return player.stay()
+
+def endWalk(player):
+	player.brain.nav.stand()
 	return player.stay()
 
 @superState('gameControllerResponder')
