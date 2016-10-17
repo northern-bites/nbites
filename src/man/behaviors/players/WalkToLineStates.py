@@ -40,15 +40,15 @@ def walkToLine(player):
     # the purposes of this assignment)
     line_dist = lines(0).inner.r
 
-    # if the distance to the line is greater than 20cm, continue walking
-    if line_dist > 20:
-        player.brain.nav.walk(0.3, 0, 0)
+    # if the distance to the line is greater than 10cm, continue walking
+    if line_dist > 10:
+        player.brain.nav.walk(0.2, 0, 0)
 
     # if the distance to the line is less than or equal to 20cm, stop
     else:
         return player.goNow('stop')
 
-    # stay in this state until within 20cm of line
+    # stay in this state until within 10cm of line
     return player.stay()
 
 @superState('gameControllerResponder')
