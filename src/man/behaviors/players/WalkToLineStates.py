@@ -26,24 +26,26 @@ def gameSet(player):
 def gamePlaying(player):
     return player.goNow('walkToLine')
 
-
 @superState('gameControllerResponder')
 def gamePenalized(player):
     return player.stay()
 
 @superState('gameControllerResponder')
 def walkToLine(player):
-    
-    # get the array of field lines
+        
     lines = player.brain.visionLines
+    line_dist = lines(0).inner.r
 
-    # get the first field line in the field lines array
-    r = lines(0).inner.r
+    if line_dist > 20:
+        player.brain.nav.walk(0.3, 0, 0)
+    else:
+        player.brain.nav.stop()
+        player.goNow('stop')
 
-    # walk forward until the robot is 5cm from the line
-    player.brain.nav.walk(0.3, 0, 0)
+    return player.stay()
 
-    # stop
+@superState('gameControllerResponder')
+def stop(player):
     return player.stay()
 
 @superState('gameControllerResponder')
