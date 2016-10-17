@@ -33,19 +33,28 @@ def gamePenalized(player):
 @superState('gameControllerResponder')
 def walkToLine(player):
         
+    # get the array of field lines
     lines = player.brain.visionLines
+
+    # get the first line in the array (I'm told that this is sufficient for
+    # the purposes of this assignment)
     line_dist = lines(0).inner.r
 
+    # if the distance to the line is greater than 20cm, continue walking
     if line_dist > 20:
         player.brain.nav.walk(0.3, 0, 0)
-    else:
-        player.brain.nav.stop()
-        player.goNow('stop')
 
+    # if the distance to the line is less than or equal to 20cm, stop
+    else:
+        return player.goNow('stop')
+
+    # stay in this state until within 20cm of line
     return player.stay()
 
 @superState('gameControllerResponder')
+# stops the robot
 def stop(player):
+    player.brain.nav.stop()
     return player.stay()
 
 @superState('gameControllerResponder')
