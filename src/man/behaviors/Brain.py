@@ -35,6 +35,8 @@ class Brain(object):
         self.counter = 0
         self.time = time.time()
 
+        self.interface = interface.interface
+
         print "Brain initialized"
 
 ##
@@ -70,24 +72,27 @@ class Brain(object):
         # Update Environment
         self.time = time.time()
         self.counter += 1
+
+        if self.counter % 10 == 0:
+            print(self.interface.vision)
         
         # Update objects
-        self.updateVisionObjects()
-        self.updateObstacles()
-        self.updateMotion()
-        self.updateLoc()
-        self.getCommUpdate()
+        # self.updateVisionObjects()
+        # self.updateObstacles()
+        # self.updateMotion()
+        # self.updateLoc()
+        # self.getCommUpdate()
 
         # for new vision stuff
-        self.updateVision()
+        # self.updateVision()
 
         # Set myWorldModel for Comm
-        self.updateComm()
+        # self.updateComm()
 
         # Flush the output
         sys.stdout.flush()
 
-        print("Counter: ", self.counter)
+        # print("Counter: ", self.counter)
 
 
 
@@ -149,10 +154,10 @@ class Brain(object):
         """
         self.ball = self.interface.filteredBall
         self.sharedBall = self.interface.sharedBall
-        if (self.player.gameState == 'gameReady'
-            or self.player.gameState == 'gameSet'):
-            self.ball.x = Constants.CENTER_FIELD_X
-            self.ball.y = Constants.CENTER_FIELD_Y
+        # if (self.player.gameState == 'gameReady'
+        #     or self.player.gameState == 'gameSet'):
+        #     self.ball.x = Constants.CENTER_FIELD_X
+        #     self.ball.y = Constants.CENTER_FIELD_Y
         self.naiveBall = self.interface.naiveBall
 
     def updateObstacles(self):
@@ -184,11 +189,11 @@ class Brain(object):
         """
         Make Loc info a RobotLocation.
         """
-        self.loc = RobotLocation(self.interface.loc.x,
-                                 self.interface.loc.y,
-                                 self.interface.loc.h * (180. / math.pi))
-        self.locUncert = self.interface.loc.uncert
-        self.lost = self.interface.loc.lost
+        # self.loc = RobotLocation(self.interface.loc.x,
+        #                          self.interface.loc.y,
+        #                          self.interface.loc.h * (180. / math.pi))
+        # self.locUncert = self.interface.loc.uncert
+        # self.lost = self.interface.loc.lost
 
     def resetLocTo(self, x, y, h):
         """
