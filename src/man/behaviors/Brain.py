@@ -2,6 +2,8 @@ import time
 import sys
 import math
 
+from Leds import Leds
+
 # Redirect standard error to standard out
 _stderr = sys.stderr
 sys.stderr = sys.stdout
@@ -37,7 +39,9 @@ class Brain(object):
 
         self.interface = interface.interface
 
-        print "Brain initialized"
+        self.leds = Leds(self)
+
+        print "Brain initialized: player " + str(self.playerNumber) + " and team " + str(self.teamNumber)
 
 ##
 ##--------------CONTROL METHODS---------------##
@@ -73,8 +77,13 @@ class Brain(object):
         self.time = time.time()
         self.counter += 1
 
+        if self.counter == 30:
+            self.leds.executeLeds(self.leds.chestBlue)
+
         if self.counter % 10 == 0:
             print(self.interface.vision)
+
+
         
         # Update objects
         # self.updateVisionObjects()
@@ -95,7 +104,7 @@ class Brain(object):
         # print("Counter: ", self.counter)
 
 
-
+    '''
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
         output = self.interface.myWorldModel
@@ -203,3 +212,4 @@ class Brain(object):
         self.interface.resetLocRequest.y = y
         self.interface.resetLocRequest.h = h * (math.pi / 180.)
         self.interface.resetLocRequest.timestamp = int(self.time * 1000)
+'''
