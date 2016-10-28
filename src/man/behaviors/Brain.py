@@ -2,7 +2,7 @@ import time
 import sys
 import math
 
-from Leds import Leds
+from Leds import *
 
 # Redirect standard error to standard out
 _stderr = sys.stderr
@@ -39,7 +39,7 @@ class Brain(object):
 
         self.interface = interface.interface
 
-        self.leds = Leds(self)
+        self.leds = Leds.Leds(self)
 
         print "Brain initialized: player " + str(self.playerNumber) + " and team " + str(self.teamNumber)
 
@@ -77,11 +77,10 @@ class Brain(object):
         self.time = time.time()
         self.counter += 1
 
-        if self.counter == 30:
-            self.leds.executeLeds(self.leds.chestBlue)
+        self.leds.executeLeds(self.leds.chestBlue)
 
-        if self.counter % 10 == 0:
-            print(self.interface.vision)
+        # if self.counter % 10 == 0:
+        #     print(self.interface.vision)
 
 
         
