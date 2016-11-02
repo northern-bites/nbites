@@ -1,4 +1,4 @@
-class Leds(object):
+class Leds():
 	LED_OFF = 0
 	LED_ON  = 1
 
@@ -31,12 +31,15 @@ class Leds(object):
 	LEFT_FOOT_LED,
 	RIGHT_FOOT_LED) = range(NUM_LED_GROUPS)
 
+	# chestBlue = [(CHEST_LED, 0xFF00FF, 0.0)]
+
 	def __init__(self, brain):
-		print "initialized leds obj"
+		print("initialized leds obj")
 		self.brain = brain
-		self.chestBlue = ((CHEST_LED, 0xFF00FF, 0.0),)
+		self.chestBlue = [(CHEST_LED, 0xFF00FF, 0.0)]
 
 	def executeLeds(self, listOfLeds):
+		print("got to executeLeds")
 		for ledTuple in listOfLeds:
 			if len(ledTuple) != 3:
 				print "invalid led command " + str(ledTuple)

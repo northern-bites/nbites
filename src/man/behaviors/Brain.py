@@ -39,7 +39,7 @@ class Brain(object):
 
         self.interface = interface.interface
 
-        self.leds = Leds.Leds(self)
+        self.leds = Leds(self)
 
         print "Brain initialized: player " + str(self.playerNumber) + " and team " + str(self.teamNumber)
 
