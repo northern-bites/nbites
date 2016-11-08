@@ -542,7 +542,6 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
   std::cout << "Edge List has size " << var << std::endl;
 
   this->_on = true;
-  std::cout << "On: " << _on << std::endl;
   _ccx = 100;
   _ccy = 100;
 }
