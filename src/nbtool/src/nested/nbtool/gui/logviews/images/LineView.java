@@ -102,6 +102,8 @@ public class LineView extends VisionView implements ColorCalibrationListener {
 
     @Override
 	public void paintComponent(Graphics g) {
+        g.setColor(new Color(200, 221, 242));
+        g.fillRect(0, 0, 2000, 1000);
         if (edgeImage != null) {
             g.drawImage(originalImage, 0, 0, displayw, displayh, null);
             g.drawImage(edgeImage, 0, displayh + buffer, displayw, displayh, null);
@@ -368,6 +370,7 @@ public class LineView extends VisionView implements ColorCalibrationListener {
 
         ccPoints = new Vector<Double>();
         ccdBlock = this.getCCDBlock();
+        debug.info("About to enter the CCD block");
         if (ccdBlock != null) {
         	int numPoints = ccdBlock.data.length / (2 * 8);
             debug.info("%d center circle potential centers expected.", numPoints - 1);

@@ -316,7 +316,7 @@ void VisionModule::run_()
 
         // Detect center circle on top
         PROF_ENTER2(P_CIRCLE_TOP, P_CIRCLE_BOT, i==0)
-        if (!i) centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]), *field);
+        centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]), *field);
         PROF_EXIT2(P_CIRCLE_TOP, P_CIRCLE_BOT, i==0)
         times[i][8] = timer.end();
 
@@ -476,8 +476,11 @@ void VisionModule::outportalVisionField()
     }
 
     // (3) Outportal Center Circle
-    messages::CenterCircle* cc = visionField.mutable_circle(); 
+    messages::CenterCircle* cc = visionField.mutable_circle();
+    std::cout << "Center Circle Detection Stuff:" << std::endl << "On: " << centerCircleDetector[0]->on() << std::endl << "wz0: " << homography[0]->wz0() << std::endl;
+    std::cout << "X: " << centerCircleDetector[0]->x() << std::endl << "Y: " << centerCircleDetector[0]->y() << std::endl;
     cc->set_on(centerCircleDetector[0]->on());
+    // cc->set_on(true);
     cc->set_wz0(homography[0]->wz0());
 
     // Rotate to post vision relative robot coordinate system

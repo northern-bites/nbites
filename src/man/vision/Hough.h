@@ -303,7 +303,7 @@ public:
   double y() { return _ccy; }
   bool on() { return _on; }
 
-  void on(bool on) { _on = on; }
+  void on(bool on) { _on = on; std::cout << "WTF" << std::endl; }
   void adjustCC(double x, double y);
 
 #ifdef OFFLINE

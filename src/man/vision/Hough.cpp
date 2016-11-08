@@ -516,7 +516,7 @@ bool CornerDetector::ccw(double ax, double ay,
 // *******************
 CenterCircleDetector::CenterCircleDetector() 
 {
-  _on = false;
+  _on = true;
   set();
 }
 
@@ -529,125 +529,135 @@ void CenterCircleDetector::set()
   minVotesInMaxBin = 0.23;                  // Conservative clustering theshold
   fieldTestDistance = 200;
 
+
 }
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 {
-  on(findPotentialsAndCluster(edges, _ccx, _ccy));  // Excluding onField test. Needs debugging.
-  return (on());
+  AngleBinsIterator<Edge> abi(edges);
+  int var = 0;
+  for (Edge* e = *abi; e; e = *++abi) {
+    var++;
+  }
+  std::cout << "Edge List has size " << var << std::endl;
+
+  this->_on = true;
+  std::cout << "On: " << _on << std::endl;
+  _ccx = 100;
+  _ccy = 100;
 }
 
-// Get potential cc centers and clean edge list
+// // Get potential cc centers and clean edge list
 bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0, double& y0)
 {
-#ifdef OFFLINE
-  _potentials.clear();
-//  std::cout << "POTENTIAL SIZE: " << _potentials.size() << std::endl;
-#endif
-  std::vector<Point> vec;
-  Point p1, p2;
-  int count = 0;
-  int xOffset = binCount * binWidth / 2;
-
-  int bcSq = binCount * binCount;
-  
-  // Fill set of little bins
-  int bins[bcSq]; 
-  
-  std::fill(bins, bins + bcSq, 0);
-
-  AngleBinsIterator<Edge> abi(edges);
-  for (Edge* e = *abi; e; e = *++abi) {
-    double distance = e->field().x() * e->field().x() + e->field().y() * e->field().y();
-    if (e->field().y() >= 0 && distance < maxEdgeDistanceSquared) {
-      count += 2;
-      p1 = Point(e->field().x() + ccr*sin(e->field().t()), e->field().y() - ccr*cos(e->field().t()));
-      p2 = Point(e->field().x() - ccr*sin(e->field().t()), e->field().y() + ccr*cos(e->field().t()));
-
-#ifdef OFFLINE
-      _potentials.push_back(p1);
-      _potentials.push_back(p2);
-#endif
-    
-      // Add first potential point to one bin if it is within the grid
-      int xbin = roundDown((int)p1.first + xOffset) / binWidth;
-      int ybin = roundDown((int)p1.second) / binWidth;
-      if (xbin < binCount - 1 && ybin < binCount - 1)
-        bins[xbin + binCount * ybin] += 1;
-
-      // Add second potential point to one bin if within grid
-      xbin = roundDown((int)p2.first + xOffset) / binWidth;
-      ybin = ((int)p2.second) / binWidth;
-      if (xbin < binCount - 1 && ybin < binCount - 1)
-        bins[xbin + binCount * ybin] += 1;
-
-    }
-  }
-
-  if (count < minPotentials) {
 // #ifdef OFFLINE
-//     std::cerr << std::endl << "Not enough potentials for center circle: " << (double)count << " potentials" << std::endl;
-// #endif   
-    return false;
-  }
+//   // _potentials.clear();
+//  std::cout << "POTENTIAL SIZE: " << _potentials.size() << std::endl;
+// #endif
+//   std::vector<Point> vec;
+//   Point p1, p2;
+//   int count = 0;
+//   int xOffset = binCount * binWidth / 2;
 
-  // Tally bins
-  int winBin, votes = 0;
+//   int bcSq = binCount * binCount;
+  
+//   // Fill set of little bins
+//   int bins[bcSq]; 
+  
+//   std::fill(bins, bins + bcSq, 0);
 
-  for (int i = 0; i < binCount - 1; i++) {
-    for (int j = 0; j < binCount - 1; j++) {
-      int neighboorTally = bins[i +  j   *binCount] + bins[i+1 +  j   *binCount] +
-                           bins[i + (j+1)*binCount] + bins[i+1 + (j+1)*binCount];
+//   AngleBinsIterator<Edge> abi(edges);
+//   for (Edge* e = *abi; e; e = *++abi) {
+//     double distance = e->field().x() * e->field().x() + e->field().y() * e->field().y();
+//     if (e->field().y() >= 0 && distance < maxEdgeDistanceSquared) {
+//       count += 2;
+//       p1 = Point(e->field().x() + ccr*sin(e->field().t()), e->field().y() - ccr*cos(e->field().t()));
+//       p2 = Point(e->field().x() - ccr*sin(e->field().t()), e->field().y() + ccr*cos(e->field().t()));
 
-      // Look at neighbooring bins for overlapping effect
-      if (neighboorTally > votes) {
-        votes = neighboorTally;
-        winBin = i + j*binCount;
-      }
-    }
-  }
-
-  if (votes > minVotesInMaxBin * count) {
-    x0 = (winBin % binCount + 1) * binWidth - xOffset;
-    y0 = (winBin / binCount + 1) * binWidth; 
+// #ifdef OFFLINE
+//       _potentials.push_back(p1);
+//       _potentials.push_back(p2);
+// #endif
     
-#ifdef OFFLINE
-    _potentials.push_back(Point(x0, y0));
-    std::cerr << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
-      (double)votes * 100/count << "\% of the " << count << " potentials in most populated bin" << std::endl;
-#endif
-    return true;
-  } else {
-#ifdef OFFLINE
-    _potentials.push_back(Point(0.0, 0.0));
-#endif
-  return false;
-  }
+//       // Add first potential point to one bin if it is within the grid
+//       int xbin = roundDown((int)p1.first + xOffset) / binWidth;
+//       int ybin = roundDown((int)p1.second) / binWidth;
+//       if (xbin < binCount - 1 && ybin < binCount - 1)
+//         bins[xbin + binCount * ybin] += 1;
 
-}
+//       // Add second potential point to one bin if within grid
+//       xbin = roundDown((int)p2.first + xOffset) / binWidth;
+//       ybin = ((int)p2.second) / binWidth;
+//       if (xbin < binCount - 1 && ybin < binCount - 1)
+//         bins[xbin + binCount * ybin] += 1;
 
-// TODO: debug and enable
-// Project 2 points from CC and check if they are on the field
-bool CenterCircleDetector::onField(Field& field)
-{
-  double y;
-  if (field.onField(_ccx + fieldTestDistance, y) && _ccy + fieldTestDistance < y &&
-          field.onField(_ccx - fieldTestDistance, y) && _ccy + fieldTestDistance < y) {
-    return true;
-  } else {
-#ifdef OFFLINE
-    std::cerr << "FAILING ON FIELD TEST\n";
-#endif
-    return false; 
-  }
+//     }
+//   }
+
+//   if (count < minPotentials) {
+// // #ifdef OFFLINE
+// //     std::cerr << std::endl << "Not enough potentials for center circle: " << (double)count << " potentials" << std::endl;
+// // #endif   
+//     return false;
+//   }
+
+//   // Tally bins
+//   int winBin, votes = 0;
+
+//   for (int i = 0; i < binCount - 1; i++) {
+//     for (int j = 0; j < binCount - 1; j++) {
+//       int neighboorTally = bins[i +  j   *binCount] + bins[i+1 +  j   *binCount] +
+//                            bins[i + (j+1)*binCount] + bins[i+1 + (j+1)*binCount];
+
+//       // Look at neighbooring bins for overlapping effect
+//       if (neighboorTally > votes) {
+//         votes = neighboorTally;
+//         winBin = i + j*binCount;
+//       }
+//     }
+//   }
+
+//   if (votes > minVotesInMaxBin * count) {
+//     x0 = (winBin % binCount + 1) * binWidth - xOffset;
+//     y0 = (winBin / binCount + 1) * binWidth; 
+    
+// #ifdef OFFLINE
+//     _potentials.push_back(Point(x0, y0));
+//     std::cerr << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
+//       (double)votes * 100/count << "\% of the " << count << " potentials in most populated bin" << std::endl;
+// #endif
+//     return true;
+//   } else {
+// #ifdef OFFLINE
+//     _potentials.push_back(Point(0.0, 0.0));
+// #endif
+//   return false;
+//   }
+
+// }
+
+// // TODO: debug and enable
+// // Project 2 points from CC and check if they are on the field
+// bool CenterCircleDetector::onField(Field& field)
+// {
+//   double y;
+//   if (field.onField(_ccx + fieldTestDistance, y) && _ccy + fieldTestDistance < y &&
+//           field.onField(_ccx - fieldTestDistance, y) && _ccy + fieldTestDistance < y) {
+//     return true;
+//   } else {
+// #ifdef OFFLINE
+//     std::cerr << "FAILING ON FIELD TEST\n";
+// #endif
+//     return false; 
+//   }
  
 }
 
 void CenterCircleDetector::adjustCC(double x, double y)
 {
-  _ccx += x;
-  _ccy += y;
-  _potentials.push_back(Point(_ccx, _ccy));
+//   _ccx += x;
+//   _ccy += y;
+//   _potentials.push_back(Point(_ccx, _ccy));
 }
 
 
@@ -746,6 +756,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
   // Run corner detector
   cornerDetector.findCorners(*this);
   
+  /**
   // Look for field line close to the center circle
   if (circleDetector.on()) {
     double minDist = 1000;
@@ -799,6 +810,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
       circleDetector.on(false);
     }
   }
+  **/
 
   // If there is only one line, stop here 
   if (size() < 2)
