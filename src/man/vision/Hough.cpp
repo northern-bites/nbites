@@ -516,7 +516,7 @@ bool CornerDetector::ccw(double ax, double ay,
 // *******************
 CenterCircleDetector::CenterCircleDetector() 
 {
-  _on = true;
+  _on = false;
   set();
 }
 
@@ -524,7 +524,7 @@ void CenterCircleDetector::set()
 {
   // Set parameters
   minPotentials = 850;
-  maxEdgeDistanceSquared = 500 * 500;       // Good practicle distance = 5m
+  maxEdgeDistanceSquared = 500 * 500;       // Good practical distance = 5m
   ccr = CENTER_CIRCLE_RADIUS;               // 75 cm
   minVotesInMaxBin = 0.23;                  // Conservative clustering theshold
   fieldTestDistance = 200;
@@ -539,16 +539,22 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
   for (Edge* e = *abi; e; e = *++abi) {
     var++;
   }
+
   std::cout << "Edge List has size " << var << std::endl;
 
-  this->_on = true;
+  AngleBinsIterator<Edge> abi2(edges);
+  for (Edge* e = *abi2; e; e = *++abi2) {
+    std::cout << "x: " << e->x() << "\ty: " << e->y() << "\tm: " << e->mag() << "\t|\tang: " << e->radians() <<  std::endl;
+  }
+
+  _on = true;
   _ccx = 100;
   _ccy = 100;
 }
 
 // // Get potential cc centers and clean edge list
-bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0, double& y0)
-{
+// bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0, double& y0)
+// {
 // #ifdef OFFLINE
 //   // _potentials.clear();
 //  std::cout << "POTENTIAL SIZE: " << _potentials.size() << std::endl;
@@ -650,13 +656,13 @@ bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0,
 //     return false; 
 //   }
  
-}
+// }
 
 void CenterCircleDetector::adjustCC(double x, double y)
 {
-//   _ccx += x;
-//   _ccy += y;
-//   _potentials.push_back(Point(_ccx, _ccy));
+  _ccx += x;
+  _ccy += y;
+  _potentials.push_back(Point(_ccx, _ccy));
 }
 
 
@@ -744,7 +750,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
 
   // If there are no field lines, no classification possible
   if (size() < 1) {
-    circleDetector.on(false);
+    // circleDetector.on(false);
     return;
   }
 

@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import com.google.protobuf.Message;
+import messages.*;
+
 import nbtool.data.calibration.ColorParam;
 import nbtool.data.calibration.ColorParam.Set;
 import nbtool.data.log.Block;
@@ -79,6 +82,8 @@ public class LineView extends VisionView implements ColorCalibrationListener {
 
         fxc = displayw + buffer + fieldw/2;
         fyc = fieldh;
+
+
 
         originalImage = this.getOriginal().toBufferedImage();
 
@@ -263,10 +268,24 @@ public class LineView extends VisionView implements ColorCalibrationListener {
                 CenterCircleDetectors guess. Also comment out resizing and set startSize to 1 for
                 proper scale.
             */
+           
+           /**
+            * 11-8-2016:
+            * This seems to be a method for extracting CC data from the log, assuming it's a block in the log. It's
+            * filled with ccdBlock which is a block that hopefully already exists in the log. This means that the
+            * vision system should already have detected the center circle and included it in the log when the log
+            * was created. This makes center circle detection very difficult to test and iterate on, since the log was
+            * created a while ago and I want to continuously change the algorithm that gives the tool a center circle.
+            * I might have to send the cc data over to the tool in a different way.
+            */
             System.out.printf("%d potential center circle centers received\n", ccPoints.size());
 
             // Center Circle Potential Points
             g.setColor(Color.black);
+            for (int i = 0; i < ccPoints.size(); i++) {
+                System.out.println(ccPoints.get(i));
+            }
+
             for (int i = 0; i < ccPoints.size() - 2; i += 2)
                 g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
 

@@ -191,6 +191,7 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 	}
 
 	protected final Block getCCDBlock() {
+		System.out.println(latestVisionLog == null);
 		return latestVisionLog == null ? null : latestVisionLog.find("ccdBuffer");
 	}
 
