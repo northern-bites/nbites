@@ -537,15 +537,26 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
   AngleBinsIterator<Edge> abi(edges);
   int var = 0;
   for (Edge* e = *abi; e; e = *++abi) {
+    // if (e->mag() > 50)
+    // {
+    //   std::cout << "REMOVED";
+    //   edges.remove(e);
+    //   continue;
+    // }
+    std::cout << "x: " << e->x() << "\ty: " << e->y() << "\tm: " << e->mag() << "\t|\tang: " << e->radians() <<  std::endl;
     var++;
   }
 
   std::cout << "Edge List has size " << var << std::endl;
 
-  AngleBinsIterator<Edge> abi2(edges);
-  for (Edge* e = *abi2; e; e = *++abi2) {
-    std::cout << "x: " << e->x() << "\ty: " << e->y() << "\tm: " << e->mag() << "\t|\tang: " << e->radians() <<  std::endl;
-  }
+  // AngleBinsIterator<Edge> abi2(edges);
+  // for (Edge* e = *abi2; e; e = *++abi2) {
+  //   if (e->mag() < 50)
+  //   {
+  //     edges.remove(e);
+  //     continue;
+  //   }
+  // }
 
   _on = true;
   _ccx = 100;

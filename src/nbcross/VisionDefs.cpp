@@ -220,14 +220,15 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     //  EDGES
     //-------------------
 
-    man::vision::EdgeList* edgeList = module.getEdges(topCamera);
+    // man::vision::EdgeList* edgeList = module.getEdges(topCamera);
 
     // Uncomment to display rejected edges used in center detection
-    // man::vision::EdgeList* edgeList = module.getRejectedEdges(topCamera);
+    man::vision::EdgeList* edgeList = module.getRejectedEdges(topCamera);
 
     std::string edgeBuf;
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
+        
         uint32_t x = htonl(e->x() + (width / 8));
         edgeBuf.append((const char*) &x, sizeof(uint32_t));
         uint32_t y = htonl(-e->y() + (height / 4));

@@ -111,6 +111,7 @@ public:
   const T* binList(int angle) const { return bins[angle & 0xFF];}
 
   void remove(T* ae);
+  void totallyFake();
 
   int count() const { return poolSize - freeCount; }
 };
@@ -250,6 +251,7 @@ public:
 
   const Edge* next() const { return (const Edge*)AngleElement::next(); }
   Edge* next() { return (Edge*)AngleElement::next(); }
+  Edge* next(Edge* e) { return (Edge*)AngleElement::next(); }
 
   HoughLine* memberOf() const { return _memberOf; }
   void memberOf(HoughLine* hl) { _memberOf = hl; }
