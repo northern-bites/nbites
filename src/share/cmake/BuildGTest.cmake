@@ -1,14 +1,23 @@
 # Download and build all of the GTEST crap
 
 # Only update gtest if the user is missing it.
-# Make three processes because apparently commands are NOT executed sequentially.
+# Make seperate processes because apparently commands are NOT executed sequentially.
 if( NOT EXISTS ${NBITES_DIR}/lib/gtest-1.6.0 )
-  execute_process( COMMAND wget https://github.com/google/googletest/archive/release-1.6.0.tar.gz
+  # Download gtest from Github
+  execute_process( COMMAND wget https://github.com/google/googletest/archive/release-1.6.0.zip
     WORKING_DIRECTORY ${NBITES_DIR}/lib
     )
+  # Rename the file to what our build process expects
+  execute_process( COMMAND mv ${NBITES_DIR}/lib/release-1.6.0.zip ${NBITES_DIR}/lib/gtest-1.6.0.zip )
+  # Remove the directory if it already exists so we don't get overwriting problems
+  execute_process( COMMAND rm -rf ${NBITES_DIR}/lib/googletest-release-1.6.0/ )
+  # Unzip the zip file
   execute_process( COMMAND unzip -q gtest-1.6.0.zip
     WORKING_DIRECTORY ${NBITES_DIR}/lib
     )
+  # Rename the folder that now exists
+  execute_process( COMMAND mv ${NBITES_DIR}/lib/googletest-release-1.6.0 ${NBITES_DIR}/lib/gtest-1.6.0 )
+  # Delete the zip file
   execute_process( COMMAND rm gtest-1.6.0.zip
     WORKING_DIRECTORY ${NBITES_DIR}/lib
     )
