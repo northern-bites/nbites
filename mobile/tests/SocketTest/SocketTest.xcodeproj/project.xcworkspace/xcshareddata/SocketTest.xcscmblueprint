@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "BEB2FB2021EAAA26DBB8F6BA76BA6961AB073E31",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "7E62EF89B7DD0654339F97F0AC6C0EB85A55A06A" : 9223372036854775807,
+    "BEB2FB2021EAAA26DBB8F6BA76BA6961AB073E31" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "77631255-4575-43AC-8CCB-C63BC4D73DD8",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "7E62EF89B7DD0654339F97F0AC6C0EB85A55A06A" : "..\/..\/Robotics\/nbites",
+    "BEB2FB2021EAAA26DBB8F6BA76BA6961AB073E31" : "Final\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "SocketTest",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "tests\/SocketTest\/SocketTest.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fsasieta\/nbites.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "7E62EF89B7DD0654339F97F0AC6C0EB85A55A06A"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "school_ident:philipkoch\/coco-mobile-final.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "BEB2FB2021EAAA26DBB8F6BA76BA6961AB073E31"
+    }
+  ]
+}
