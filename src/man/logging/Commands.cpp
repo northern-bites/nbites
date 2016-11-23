@@ -65,6 +65,12 @@ namespace control {
             nbl::io::writeStringToFile(arguments[0]->blocks[0].data, path);
         }
 
+    CONTROL_FUNCTION(nbControlFunction, false, nbl::SharedConstants::LogClass_Null())
+    (const std::vector<nbl::logptr> &arguments) {
+        NBL_ASSERT(arguments.size() == 1)
+
+        NBL_WARN("nbControlFunction(): %s", arguments[0]->topLevelDictionary.print().c_str())
+    }
 }
 
 #if !defined(NBL_STANDALONE) && !defined(__APPLE__)
