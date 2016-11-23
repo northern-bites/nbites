@@ -27,7 +27,7 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
-    return player.goNow('waitForNum')
+    return player.goNow('controller')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -38,22 +38,46 @@ def fallen(player):
     player.inKickingState = False
     return player.stay()
 
+
 @superState('gameControllerResponder')
-def walkForward(player):
+def controller(player):
+	if player.lastNum != player.currNum:
+		if player.commandToDo == 1:
+			player.lastNum = player.currNum
+			return player.goNow('walkInDirection')
+		else if player.commandToDo == 2:
+			player.lastNum = player.currNum
+			return player.goNow('kick')
+		else if player.commandToDo == 3:
+			player.lastNum = player.currNum
+			return player.goNow('turnHead')
+	return player.stay()
+
+@superState('gameControllerResponder')
+def walkInDirection(player):
     if player.firstFrame():
-        player.brain.interface.motionReques.reset_odometry = True
+        player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
     elif player.counter == 1:
-        player.setWalk(0,player.currNum,0)
-
+        player.setWalk(player.xDirection,player.yDirection,player.headingDirection)
     elif player.counter == 2:
         player.brain.nav.stand()
         player.lastNum = currNum
-        return player.goNow('waitForNewInstruction')
+        return player.goNow('controller')
     return player.stay()
+
 @superState('gameControllerResponder')
-def waitForNum(player):
-    currNum = 15
-    if (player.lastNum != currNum):
-        return player.goNow('walkForward')
-    return player.stay()
+def kick(player):
+    if player.firstFrame():
+    	player.brain.nav.stand()
+        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
+        player.brain.nav.stand()
+    return player.goNow('controller')
+
+@superState('gameControllerResponder')
+def turnHead(player):
+	if player.firstFrame(): 
+		player.brain.nav.stand()
+		player.brain.tracker.lookToAngle(player.headAngle)
+		player.brain.nav.stand()
+	return player.goNow('controller')
