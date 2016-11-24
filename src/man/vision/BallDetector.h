@@ -34,11 +34,11 @@ namespace man {
 #define RED 3
 #define ORANGE 4
 
-		class Ball {
-		public:
+class Ball {
+	public:
 
-                        // custom constructor
-			Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
+             // custom constructor
+	Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
 				 int imgWidth_, bool tc,
 				 double cx, double cy, double conf);
 
@@ -120,17 +120,20 @@ namespace man {
 		typedef std::pair<double, double> imagePoint;
 
                 // BallDetector class definition
-		class BallDetector {
-		public:
-                        // constructor and destructor
-			BallDetector(FieldHomography* homography_, Field* field_, bool topCamera);
-			~BallDetector();
+class BallDetector {
+	public:
+                // constructor and destructor
+		BallDetector(FieldHomography* homography_, Field* field_, bool topCamera);
+		~BallDetector();
 
-                        // To investigate: DebugImage class
-			void setDebugImage(DebugImage * di);
+                // To investigate: DebugImage class
+		void setDebugImage(DebugImage * di);
        
-            // what are sanity checks for?
+            // these attempt to filter real balls from things that just
+            // *look* like balls
             bool edgeSanityCheck(int x, int y, int radius);
+
+            // this doesn't seem to be used anywhere...
             void sanityChecks(int bx, int by, int radius);
 
             // presumably, all edges in image
