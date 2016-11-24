@@ -79,16 +79,16 @@ class MenuViewController: UITableViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        var destinationvc = segue.destination
-        
-        if let navCon = destinationvc as? UINavigationController {
-            destinationvc = navCon.visibleViewController ?? destinationvc
-        }
-        if let graphvc = destinationvc as? GraphViewController {
-            graphvc.program = brain.program
-            graphvc.navigationItem.title = brain.turnStringListIntoString
-            
-        }
+//        var destinationvc = segue.destination
+//        
+//        if let navCon = destinationvc as? UINavigationController {
+//            destinationvc = navCon.visibleViewController ?? destinationvc
+//        }
+//        if let graphvc = destinationvc as? GraphViewController {
+//            graphvc.program = brain.program
+//            graphvc.navigationItem.title = brain.turnStringListIntoString
+//            
+//        }
     }
     
 }
