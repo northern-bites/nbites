@@ -175,6 +175,11 @@ class BallDetector {
                                 	int bottomQuarer);
 
 			bool whiteBelowSpot(Spot spot);
+                        
+                        // @TODO: IMPLEMENT THIS FUNCTION (you will
+                        //        need to add parameters)
+                        bool blackBelowBall(void);
+
 			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
