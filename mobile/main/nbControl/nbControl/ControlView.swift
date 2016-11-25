@@ -15,7 +15,6 @@ class ControlView: BezierPathsView, UIDynamicAnimatorDelegate{
     private var snapBehaviour:UISnapBehavior!
     private var circleCenter: CGPoint!
 
-    
     var realGravity = false
     private let circleSize = 10
     

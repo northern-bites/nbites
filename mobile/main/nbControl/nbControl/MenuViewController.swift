@@ -15,8 +15,6 @@ class MenuViewController: UITableViewController {
     var sections = ["Online", "Offline"]
     var online = ["Batman", "Shehulk", "Elektra"]
     var offline = ["BLT","Wasp", "Buzz"]
-
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
