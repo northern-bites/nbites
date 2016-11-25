@@ -71,11 +71,6 @@ class MenuViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // check index path
-        someAction()
-    }
-    
-    func someAction() {
-        self.performSegue(withIdentifier: "moveToView", sender: self)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

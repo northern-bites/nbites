@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		077BF1871DE8996B00754D79 /* Test.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 077BF1861DE8996B00754D79 /* Test.storyboard */; };
 		EA0DA4E71DDAA66400E7E0B4 /* info@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4E61DDAA66400E7E0B4 /* info@3x.png */; };
 		EA0DA4EA1DDAA6F900E7E0B4 /* info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4E81DDAA6F900E7E0B4 /* info@2x.png */; };
 		EA0DA4EB1DDAA6F900E7E0B4 /* info@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4E91DDAA6F900E7E0B4 /* info@1x.png */; };
@@ -53,6 +54,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		077BF1861DE8996B00754D79 /* Test.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Test.storyboard; sourceTree = "<group>"; };
 		EA0DA4E61DDAA66400E7E0B4 /* info@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info@3x.png"; sourceTree = "<group>"; };
 		EA0DA4E81DDAA6F900E7E0B4 /* info@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info@2x.png"; sourceTree = "<group>"; };
 		EA0DA4E91DDAA6F900E7E0B4 /* info@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info@1x.png"; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 				EA6D4BD41DE217CB004B66DF /* Hardware */,
 				EA6D4BD31DE217BA004B66DF /* Control */,
 				EAE1BDC81DCA40E20073C431 /* Main.storyboard */,
+				077BF1861DE8996B00754D79 /* Test.storyboard */,
 				EAE1BDD01DCA40E20073C431 /* LaunchScreen.storyboard */,
 				EAE1BDD31DCA40E20073C431 /* Info.plist */,
 				EAE1BDCB1DCA40E20073C431 /* nbControl.xcdatamodeld */,
@@ -336,6 +339,7 @@
 				EA0DA4E71DDAA66400E7E0B4 /* info@3x.png in Resources */,
 				EA0DA4EA1DDAA6F900E7E0B4 /* info@2x.png in Resources */,
 				EA0DA4F01DDAA75000E7E0B4 /* joystick@2x.png in Resources */,
+				077BF1871DE8996B00754D79 /* Test.storyboard in Resources */,
 				EA0DA4EB1DDAA6F900E7E0B4 /* info@1x.png in Resources */,
 				EAE1BDCF1DCA40E20073C431 /* Assets.xcassets in Resources */,
 				EA1C554B1DDBCD9300706BCA /* nao_sitting.jpg in Resources */,
