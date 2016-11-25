@@ -17,10 +17,6 @@ class InfoTableViewController: UITableViewController {
     var battery_rows = ["Battery Level", "Battery Number"]
     var player_rows = ["Player","Game State","Playing State"]
     
-    
-    
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Uncomment the following line to preserve selection between presentations
