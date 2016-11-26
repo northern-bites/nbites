@@ -42,7 +42,7 @@ class ControlViewController: UIViewController,UIPopoverPresentationControllerDel
             newPoint = CGPoint(x:translation.x, y: translation.y)
             //newPoint = CGPoint(x: mainCenter!.x + translation.x, y: mainCenter!.y + translation.y)
         case .ended:
-            print("Translation: [\(newPoint.x),\(newPoint.y)]")
+//            print("Translation: [\(newPoint.x),\(newPoint.y)]")
             let currentPlace = CGPoint(x: controlView.currentPosition.x - target.bounds.midX, y: controlView.currentPosition.y - target.bounds.midY )
             controlBrain.sendNewWalk(currPosition: currentPlace,transition: newPoint)
         default: break
