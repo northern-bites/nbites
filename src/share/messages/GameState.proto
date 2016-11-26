@@ -20,6 +20,8 @@ message GameState
     optional bool whistle_override = 10;
     optional bool penalty_is_placement = 11;
 
+    optional RobotCommand robotCommand = 12;
+
     repeated TeamInfo team = 9;
 }
 
@@ -37,4 +39,23 @@ message RobotInfo
 {
     optional uint32 penalty = 1;
     optional uint32 secs_left = 2;
+}
+
+message RobotCommand
+{
+    optional bool adjustHead = 1;
+    optional float adjustedHeadZ = 2;
+    optional float adjustedHeadY = 3;
+
+    optional bool walkCommand = 4;
+    optional bool walkStop = 5;
+    optional float walkHeading = 6;
+    optional float walkX = 7;
+    optional float walkY = 8;
+
+    optional bool doSweetMove = 9;
+    optional int32 sweetMoveID = 10;
+
+    optional bool logInfo = 11;
+    optional bool logImage = 12;
 }
