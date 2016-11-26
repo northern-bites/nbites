@@ -33,3 +33,5 @@ _tempFiles
 .nbtemp/*
 /src/nbtool/gui-forms/nbproject/private/
 /src/sound/scripts/
+src/nbtool/gui-forms/build
+util/scripts/change_field.sh
