@@ -12,16 +12,42 @@ import UIKit
 
 class ControlViewController: UIViewController,UIPopoverPresentationControllerDelegate {
 
+    var mainCenter: CGPoint! = CGPoint(x: 0.0, y: 0.0)
+    var newPoint: CGPoint = CGPoint(x: 0.0, y: 0.0)
+
+    var controlBrain = ControlBrain()
     
     @IBOutlet var controlView: ControlView! {
         didSet {
-           //controlView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(addDrop(_:))))
-            controlView.addGestureRecognizer(UIPanGestureRecognizer(target: controlView, action: #selector(controlView.grabDrop(_:))))
+            controlView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(doPanGestureFunctions(_:))))
             controlView.addGestureRecognizer(UILongPressGestureRecognizer(target: controlView, action:  #selector(controlView.removeSnap(_:))))
             controlView.realGravity = true
+            mainCenter = controlView.circleCenter
         }
     }
     
+    func doPanGestureFunctions(_ sender: UIPanGestureRecognizer) {
+        controlView.grabDrop(sender)
+        setNewDistance(gesture: sender)
+    }
+    
+    func setNewDistance(gesture: UIPanGestureRecognizer) {
+        let target = gesture.view!
+        
+        switch gesture.state {
+        case .began:
+            break
+        case .changed:
+            let translation = gesture.translation(in: controlView)
+            newPoint = CGPoint(x:translation.x, y: translation.y)
+            //newPoint = CGPoint(x: mainCenter!.x + translation.x, y: mainCenter!.y + translation.y)
+        case .ended:
+            print("Translation: [\(newPoint.x),\(newPoint.y)]")
+            let currentPlace = CGPoint(x: controlView.currentPosition.x - target.bounds.midX, y: controlView.currentPosition.y - target.bounds.midY )
+            controlBrain.sendNewWalk(currPosition: currentPlace,transition: newPoint)
+        default: break
+        }
+    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         controlView.animating = true
@@ -32,42 +58,7 @@ class ControlViewController: UIViewController,UIPopoverPresentationControllerDel
         controlView.animating = false
     }
     
-    @IBAction func barPopover(_ sender: AnyObject) {
-        //self.performSegueWithIdentifier("performPopover", sender: self)
-        let popoverVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "sbPopup") as! MenuViewController
-        
-        self.addChildViewController(popoverVC)
-        popoverVC.view.frame = self.view.frame
-        self.view.addSubview(popoverVC.view)
-        popoverVC.didMove(toParentViewController: self)
-        
-        
-    }
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        
-        var destinationvc = segue.destination
-        
-        if let navCon = destinationvc as? UINavigationController {
-            destinationvc = navCon.visibleViewController ?? destinationvc
-        }
-        
-        if segue.identifier == "performMenu" {
-            print("beep")
-            if let popvc = destinationvc as? MenuViewController {
-                let controller = popvc.popoverPresentationController
-                if controller != nil {
-                    controller?.delegate = self
-                }
-            }
-            
-        }
-    }
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        return .none
-    }
     
-
     
 }
 
@@ -170,9 +161,3 @@ class ControlViewController: UIViewController,UIPopoverPresentationControllerDel
 //            }
 //        }
 //
-//    
-//    
-//    
-//    
-//    
-//}

@@ -12,8 +12,14 @@ import CoreMotion
 
 class ControlView: BezierPathsView, UIDynamicAnimatorDelegate{
     
+    var currentPosition: CGPoint {
+        get {
+            return currentPos!
+        }
+    }
+    private var currentPos: CGPoint?
     private var snapBehaviour:UISnapBehavior!
-    private var circleCenter: CGPoint!
+    var circleCenter: CGPoint! = CGPoint(x:0.0, y:0.0)
 
     var realGravity = false
     private let circleSize = 10
@@ -121,8 +127,7 @@ class ControlView: BezierPathsView, UIDynamicAnimatorDelegate{
             snapBehaviour = UISnapBehavior(item: lastDropped!, snapTo: circleCenter)
             snapBehaviour.damping = 5
             animator.addBehavior(snapBehaviour)
-
-            
+            currentPos = lastDropped?.frame.mid
         default: break
         }
     }

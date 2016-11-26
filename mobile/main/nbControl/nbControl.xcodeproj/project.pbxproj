@@ -27,6 +27,7 @@
 		EA1C554B1DDBCD9300706BCA /* nao_sitting.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */; };
 		EA1C554F1DDBCE3A00706BCA /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = EA1C554E1DDBCE3A00706BCA /* logo.png */; };
 		EA6D4BD11DE21788004B66DF /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6D4BD01DE21788004B66DF /* MenuViewController.swift */; };
+		EA87345A1DE9F2240026A593 /* ControlBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8734591DE9F2240026A593 /* ControlBrain.swift */; };
 		EABAC8581DE0C00300EAB3C3 /* HardwareTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABAC8571DE0C00300EAB3C3 /* HardwareTableViewController.swift */; };
 		EABC61E61DDE715F00133C43 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC61E51DDE715F00133C43 /* ControlView.swift */; };
 		EABC61E81DDE724700133C43 /* GravityBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC61E71DDE724700133C43 /* GravityBehavior.swift */; };
@@ -90,6 +91,7 @@
 		EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = nao_sitting.jpg; sourceTree = "<group>"; };
 		EA1C554E1DDBCE3A00706BCA /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		EA6D4BD01DE21788004B66DF /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
+		EA8734591DE9F2240026A593 /* ControlBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlBrain.swift; sourceTree = "<group>"; };
 		EABAC8571DE0C00300EAB3C3 /* HardwareTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HardwareTableViewController.swift; sourceTree = "<group>"; };
 		EABC61E51DDE715F00133C43 /* ControlView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
 		EABC61E71DDE724700133C43 /* GravityBehavior.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GravityBehavior.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				EAD207FC1DCAB49C0013A967 /* ControlViewController.swift */,
+				EA8734591DE9F2240026A593 /* ControlBrain.swift */,
 				EABC61E51DDE715F00133C43 /* ControlView.swift */,
 				EABC61EB1DDE774900133C43 /* UIKit_Extensions.swift */,
 				EABC61E71DDE724700133C43 /* GravityBehavior.swift */,
@@ -438,6 +441,7 @@
 				074AD0521DE9E327000A8E8A /* RobotConnection.mm in Sources */,
 				074AD0541DE9E327000A8E8A /* Log.cpp in Sources */,
 				074AD0571DE9E327000A8E8A /* SExpr.cpp in Sources */,
+				EA87345A1DE9F2240026A593 /* ControlBrain.swift in Sources */,
 				EA6D4BD11DE21788004B66DF /* MenuViewController.swift in Sources */,
 				EABC61EC1DDE774900133C43 /* UIKit_Extensions.swift in Sources */,
 				074AD0561DE9E327000A8E8A /* nblogio.cpp in Sources */,

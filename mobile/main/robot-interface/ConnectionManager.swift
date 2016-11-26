@@ -23,6 +23,7 @@ protocol RobotManagerProtocol {
     func send(_ aCommand: RobotCommandStruct)
 
     //set dispatchIncomingLog log callback
+    //escaping makes the arguments closures
     func setIncomingHandler(callback: @escaping ((Log, String)->Void) )
     func setStatusHandler(callback: @escaping ((Bool, String)->Void) )
 }
