@@ -53,18 +53,26 @@ class ControlView: BezierPathsView, UIDynamicAnimatorDelegate{
         static let MiddleBarrier = "MiddleBarrier"
         static let Attachment = "Attachment"
     }
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        addController()
+    }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         let barrierSize = dropSize
         let barrierOrigin = CGPoint(x: bounds.midX-barrierSize.width/2, y: bounds.midY - barrierSize.height/2)
         let path = UIBezierPath(ovalIn: CGRect(origin: barrierOrigin, size: barrierSize))
+
         dropBehavior.addBarrier(path: path, named: PathNames.MiddleBarrier)
         bezierPaths[PathNames.MiddleBarrier] = path
-        addController()
+//        addController()
     }
     
     func addController() {
+        print("addController()")
         let drop = UIView(frame: CGRect(x: self.center.x - CGFloat(30), y: self.center.y - CGFloat(30), width: 60.0, height: 60.0))
         drop.layer.cornerRadius = 30.0
         drop.backgroundColor = UIColor.blue

@@ -37,6 +37,23 @@ namespace control {
         void consumeLog(nbl::logptr ptrTo);
         void printFunctions();
     };
+
+    struct RobotCommandStruct {
+        bool adjustHead;
+        float adjustedHeadZ,adjustedHeadY;
+
+        bool walkCommand, walkStop;
+        float walkHeading,walkX,walkY;
+
+        bool doSweetMove;
+        int sweetMoveID;
+
+        bool logInfo,logImage;
+    };
+    
+    extern struct RobotCommandStruct latestCommand;
 }
+
+
 
 #endif /* Control_hpp */

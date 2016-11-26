@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		074AD0511DE9E327000A8E8A /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074AD03F1DE9E327000A8E8A /* ConnectionManager.swift */; };
+		074AD0521DE9E327000A8E8A /* RobotConnection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0411DE9E327000A8E8A /* RobotConnection.mm */; };
+		074AD0531DE9E327000A8E8A /* json.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0431DE9E327000A8E8A /* json.cpp */; };
+		074AD0541DE9E327000A8E8A /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0451DE9E327000A8E8A /* Log.cpp */; };
+		074AD0551DE9E327000A8E8A /* LogRPC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0471DE9E327000A8E8A /* LogRPC.cpp */; };
+		074AD0561DE9E327000A8E8A /* nblogio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0491DE9E327000A8E8A /* nblogio.cpp */; };
+		074AD0571DE9E327000A8E8A /* SExpr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD04B1DE9E327000A8E8A /* SExpr.cpp */; };
+		074AD0581DE9E327000A8E8A /* utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD04F1DE9E327000A8E8A /* utilities.cpp */; };
 		077BF1871DE8996B00754D79 /* Main2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 077BF1861DE8996B00754D79 /* Main2.storyboard */; };
 		EA0DA4E71DDAA66400E7E0B4 /* info@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4E61DDAA66400E7E0B4 /* info@3x.png */; };
 		EA0DA4EA1DDAA6F900E7E0B4 /* info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4E81DDAA6F900E7E0B4 /* info@2x.png */; };
@@ -52,6 +60,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		074AD03E1DE9E326000A8E8A /* nbControl-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "nbControl-Bridging-Header.h"; sourceTree = "<group>"; };
+		074AD03F1DE9E327000A8E8A /* ConnectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ConnectionManager.swift; path = "../../robot-interface/ConnectionManager.swift"; sourceTree = "<group>"; };
+		074AD0401DE9E327000A8E8A /* RobotConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RobotConnection.h; path = "../../robot-interface/RobotConnection.h"; sourceTree = "<group>"; };
+		074AD0411DE9E327000A8E8A /* RobotConnection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RobotConnection.mm; path = "../../robot-interface/RobotConnection.mm"; sourceTree = "<group>"; };
+		074AD0431DE9E327000A8E8A /* json.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json.cpp; sourceTree = "<group>"; };
+		074AD0441DE9E327000A8E8A /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = json.hpp; sourceTree = "<group>"; };
+		074AD0451DE9E327000A8E8A /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
+		074AD0461DE9E327000A8E8A /* Log.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Log.hpp; sourceTree = "<group>"; };
+		074AD0471DE9E327000A8E8A /* LogRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LogRPC.cpp; sourceTree = "<group>"; };
+		074AD0481DE9E327000A8E8A /* LogRPC.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LogRPC.hpp; sourceTree = "<group>"; };
+		074AD0491DE9E327000A8E8A /* nblogio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nblogio.cpp; sourceTree = "<group>"; };
+		074AD04A1DE9E327000A8E8A /* nblogio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nblogio.h; sourceTree = "<group>"; };
+		074AD04B1DE9E327000A8E8A /* SExpr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SExpr.cpp; sourceTree = "<group>"; };
+		074AD04C1DE9E327000A8E8A /* SExpr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SExpr.h; sourceTree = "<group>"; };
+		074AD04D1DE9E327000A8E8A /* utilities-pp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "utilities-pp.hpp"; sourceTree = "<group>"; };
+		074AD04E1DE9E327000A8E8A /* utilities-test.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "utilities-test.hpp"; sourceTree = "<group>"; };
+		074AD04F1DE9E327000A8E8A /* utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cpp; sourceTree = "<group>"; };
+		074AD0501DE9E327000A8E8A /* utilities.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = utilities.hpp; sourceTree = "<group>"; };
 		077BF1861DE8996B00754D79 /* Main2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main2.storyboard; sourceTree = "<group>"; };
 		EA0DA4E61DDAA66400E7E0B4 /* info@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info@3x.png"; sourceTree = "<group>"; };
 		EA0DA4E81DDAA6F900E7E0B4 /* info@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info@2x.png"; sourceTree = "<group>"; };
@@ -110,6 +136,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		074AD03D1DE9E2F1000A8E8A /* interface */ = {
+			isa = PBXGroup;
+			children = (
+				074AD03F1DE9E327000A8E8A /* ConnectionManager.swift */,
+				074AD0401DE9E327000A8E8A /* RobotConnection.h */,
+				074AD0411DE9E327000A8E8A /* RobotConnection.mm */,
+				074AD0421DE9E327000A8E8A /* share */,
+				074AD03E1DE9E326000A8E8A /* nbControl-Bridging-Header.h */,
+			);
+			name = interface;
+			sourceTree = "<group>";
+		};
+		074AD0421DE9E327000A8E8A /* share */ = {
+			isa = PBXGroup;
+			children = (
+				074AD0431DE9E327000A8E8A /* json.cpp */,
+				074AD0441DE9E327000A8E8A /* json.hpp */,
+				074AD0451DE9E327000A8E8A /* Log.cpp */,
+				074AD0461DE9E327000A8E8A /* Log.hpp */,
+				074AD0471DE9E327000A8E8A /* LogRPC.cpp */,
+				074AD0481DE9E327000A8E8A /* LogRPC.hpp */,
+				074AD0491DE9E327000A8E8A /* nblogio.cpp */,
+				074AD04A1DE9E327000A8E8A /* nblogio.h */,
+				074AD04B1DE9E327000A8E8A /* SExpr.cpp */,
+				074AD04C1DE9E327000A8E8A /* SExpr.h */,
+				074AD04D1DE9E327000A8E8A /* utilities-pp.hpp */,
+				074AD04E1DE9E327000A8E8A /* utilities-test.hpp */,
+				074AD04F1DE9E327000A8E8A /* utilities.cpp */,
+				074AD0501DE9E327000A8E8A /* utilities.hpp */,
+			);
+			name = share;
+			path = "../../robot-interface/share";
+			sourceTree = "<group>";
+		};
 		EA0DA4E51DDAA56100E7E0B4 /* icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -190,6 +250,7 @@
 				EA0DA4E51DDAA56100E7E0B4 /* icons */,
 				EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */,
 				EA6D4BD01DE21788004B66DF /* MenuViewController.swift */,
+				074AD03D1DE9E2F1000A8E8A /* interface */,
 				EA6D4BD21DE2179F004B66DF /* Info */,
 				EA6D4BD41DE217CB004B66DF /* Hardware */,
 				EA6D4BD31DE217BA004B66DF /* Control */,
@@ -288,6 +349,7 @@
 					EAE1BDC01DCA40E20073C431 = {
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = U9MDJNE498;
+						LastSwiftMigration = 0810;
 						ProvisioningStyle = Automatic;
 					};
 					EAE1BDD71DCA40E20073C431 = {
@@ -364,13 +426,21 @@
 			files = (
 				EABC61E61DDE715F00133C43 /* ControlView.swift in Sources */,
 				EAE1BDCD1DCA40E20073C431 /* nbControl.xcdatamodeld in Sources */,
+				074AD0511DE9E327000A8E8A /* ConnectionManager.swift in Sources */,
 				EABAC8581DE0C00300EAB3C3 /* HardwareTableViewController.swift in Sources */,
 				EABC61E81DDE724700133C43 /* GravityBehavior.swift in Sources */,
 				EAD207FD1DCAB49C0013A967 /* ControlViewController.swift in Sources */,
 				EAE1BDC51DCA40E20073C431 /* AppDelegate.swift in Sources */,
 				EA0DA4F51DDAAD6E00E7E0B4 /* InfoTableViewController.swift in Sources */,
+				074AD0531DE9E327000A8E8A /* json.cpp in Sources */,
+				074AD0551DE9E327000A8E8A /* LogRPC.cpp in Sources */,
+				074AD0581DE9E327000A8E8A /* utilities.cpp in Sources */,
+				074AD0521DE9E327000A8E8A /* RobotConnection.mm in Sources */,
+				074AD0541DE9E327000A8E8A /* Log.cpp in Sources */,
+				074AD0571DE9E327000A8E8A /* SExpr.cpp in Sources */,
 				EA6D4BD11DE21788004B66DF /* MenuViewController.swift in Sources */,
 				EABC61EC1DDE774900133C43 /* UIKit_Extensions.swift in Sources */,
+				074AD0561DE9E327000A8E8A /* nblogio.cpp in Sources */,
 				EABC61EA1DDE728000133C43 /* BezierPathsView.swift in Sources */,
 				EABC872E1DD1250300347577 /* InfoBrain.swift in Sources */,
 				EA1071141DDBF19500C3FE08 /* HardwareBrain.swift in Sources */,
@@ -517,11 +587,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = U9MDJNE498;
 				INFOPLIST_FILE = nbControl/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = CoryAlini.nbControl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "nbControl/nbControl-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -530,11 +603,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = U9MDJNE498;
 				INFOPLIST_FILE = nbControl/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = CoryAlini.nbControl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "nbControl/nbControl-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
