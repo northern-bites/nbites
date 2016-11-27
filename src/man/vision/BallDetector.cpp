@@ -23,7 +23,8 @@ BallDetector::BallDetector(FieldHomography* homography_,
 // Destructor
 BallDetector::~BallDetector() { }
 
-// Don't know what this does
+// The DebugImage class allows you to draw on images in the tool.
+// See Vision.h for the implementation.
 void BallDetector::setDebugImage(DebugImage * di) {
     debugDraw =  *di;
 }
@@ -624,7 +625,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
 
-                    if (debugBall) { debugDraw.drawPoint(ix,iy,MAROON); }
+                    if (debugBall) { debugDraw.drawPoint(ix,iy,BLUE); }
                     
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
@@ -689,7 +690,9 @@ bool BallDetector::findCorrelatedBlackSpots
     				if (debugBall) { std::cout<<"[BALL INFO] Distance OK"<<std::endl; }
                     double ix = 0, iy = 0;
                     billToImageCoordinates(ballSpotX, ballSpotY, ix, iy);
-                    if (debugBall) { debugDraw.drawPoint(ix,iy,BLUE); }
+                    if (debugBall) { 
+                      debugDraw.drawPoint(ix,iy,MAROON); 
+}
 
                     if(greenAroundBallFromCentroid(std::make_pair(ix, iy))) {
                         Spot ballSpot;
@@ -1091,7 +1094,7 @@ bool BallDetector::checkBallHasNoGreenAndSomeWhite(int r) {
 
 bool BallDetector::checkGradientAroundSpot(int r) {
     int gradCheckOffset = 7;
-    int gradCheckPixelCount = 10;;
+    int gradCheckPixelCount = 10;
     int left = _best.centerX - r - gradCheckOffset;
     int right = _best.centerX + r + gradCheckOffset;
     int bottom = _best.centerY + r + gradCheckOffset;
@@ -1112,19 +1115,27 @@ bool BallDetector::checkGradientAroundSpot(int r) {
    if it is a field line.
  */
 bool BallDetector::whiteBelowSpot(Spot spot) {
-	int THRESHOLD = 110;
+
+    // the green threshold
+    int THRESHOLD = 110;
+
     // convert back to raw coordinates
     int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
-	int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
+    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
     int midX = spot.ix() + width / 2;
-	int spotHeight = bottomY - topY + 2;
+    int spotHeight = bottomY - topY + 2;
 
-	// The biggest thing is there should be no white and at least
-	// some green below the spot
-	getColor(midX, bottomY);
-	int j;
-	for (j = bottomY; j < height && !(getGreen() > THRESHOLD) &&
-			 j - bottomY < spotHeight; j++) {
+    // The biggest thing is there should be no white and at least
+    // some green below the spot
+    getColor(midX, bottomY);
+    int j;
+
+    
+    // if there shouldn't be any white, then why aren't we checking for
+    // white? Also: If there should be at least *some* green, why do we
+    // care whether the green value exceeds the threshold?
+    for (j = bottomY; j < height && !(getGreen() > THRESHOLD) &&
+         	      j - bottomY < spotHeight; j++) {
 		getColor(midX, j);
 	}
 	if (j - bottomY > spotHeight) {
@@ -1149,17 +1160,38 @@ bool BallDetector::blackBelowBall(void) {
 } // end blackBelowBall
 
 bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
+
+    // the minimum value for green
     int THRESHOLD = 110;
+
+    // counters for the pixels to be checked for greenness
     int topCheckedPixels = 0, botCheckedPixels = 0;
+
+    // the total green values of the top and bottom pixels checked
+    // for greenness
     int topGreenSum = 0, botGreenSum = 0;
 
+    // Bill (field?) coordinates -- why are these 0?
     double bx = 0, by = 0;
+
+    // convert image coordinates to field coordinates. Note: an image
+    // point is just a pair object from the standard C++ library.
+    // "first" and "second" just refer to the first and second members
+    // of the pair (i.e. the x- and y- image coordinates).
     imageToBillCoordinates(p.first, p.second, bx, by);
+
+    // get the radius of the ball
     int r = projectedBallRadius(std::make_pair(bx, by));
 
+    // get the y-coordinate of the top of the ball
     int topY = std::round(p.second - r - 1);
+
+    // get the y-coordinate of the bottom of the ball
     int bottomY = std::round(p.second + r + 1);
 
+    // What this is doing: Starting from the top pixel on the ball, this
+    // for-loop gets the green value of each pixel directly above and
+    // within a radius's length of the top pixel on the ball.
     getColor(p.first, topY);
     for(int i = 0; i < r && (topY - i) >= 0; i++) {
         topGreenSum += getGreen();
@@ -1167,6 +1199,9 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
         getColor(p.first, topY - i);
     }
 
+    // This for-loop does a very similar thing to the one above, except
+    // that it gets the green value of all the pixels directly below
+    // and within a radius's length of the bottom-most pixel on the ball.
     getColor(p.first, bottomY);
     for(int i = 0; i < r && (bottomY + i <= width); i++) {
         botGreenSum += getGreen();
@@ -1174,6 +1209,8 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
         getColor(p.first, bottomY + i);
     }
 
+    // draws litte red and blue dots to mark the end of the range of
+    // pixels checked above and below the ball
     if(debugBall) {
         debugDraw.drawDot(p.first, bottomY, RED);
         debugDraw.drawDot(p.first, bottomY + botCheckedPixels, RED);
@@ -1181,52 +1218,21 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
         debugDraw.drawDot(p.first, topY - topCheckedPixels, BLUE); //wont draw if too close to top
     }
 
+    // the average green value for the top and bottom checked pixels
     int topGreenAvg = 0, botGreenAvg = 0;
+
+    // if we checked more than 0 pixels on the top or on the bottom,
+    // set the average green value for the top or bottom points accordingly
     ((topCheckedPixels > 0) ? topGreenAvg = topGreenSum / topCheckedPixels : topGreenAvg = 0);
     ((botCheckedPixels > 0) ? botGreenAvg = botGreenSum / botCheckedPixels : botGreenAvg = 0);
 
-    // if(topGreenAvg < THRESHOLD && botGreenAvg < THRESHOLD) {
-    //     if(debugBall) { 
-    //         std::cout<<"[BALL INFO] Green Test Failed. Top. Avg: " << topGreenAvg <<
-    //                    ", Bot. Avg: "<<botGreenAvg<<std::endl; 
-    //     }
-    //     return 0; 
-    // }
-    // if(topGreenAvg >= THRESHOLD || botGreenAvg >= THRESHOLD) {
-    //     if(debugBall) { 
-    //         std::cout<<"[BALL INFO] Green Test Passed - Top & Bottom\n"; 
-    //         for(int i = 0; i < topCheckedPixels; i++) {
-    //             debugDraw.drawDot(p.first, topY - i, GREEN);
-    //         }
-    //         for(int i = 0; i < botCheckedPixels; i++) {
-    //             debugDraw.drawDot(p.first, bottomY + i, GREEN);
-    //         }
-    //     }
-    //     return 1; 
-    // }
-    // if(topGreenAvg >= THRESHOLD) { 
-    //     if(debugBall) { 
-    //         std::cout<<"[BALL INFO] Green Test Passed - Top\n"; 
-    //         for(int i = 0; i < topCheckedPixels; i++) {
-    //             debugDraw.drawDot(p.first, topY - i, GREEN);
-    //         }
-    //     }
-    //     return 2; 
-    // }
-    // if(botGreenAvg >= THRESHOLD) { 
-    //     if(debugBall) { 
-    //         std::cout<<"[BALL INFO] Green Test Passed - Bot\n";
-    //         for(int i = 0; i < botCheckedPixels; i++) {
-    //             debugDraw.drawDot(p.first, bottomY + i, GREEN);
-    //         }
-    //     }
-    //     return 3; 
-    // }
-    // return -1;    
-
+    // Note: only *one* of the averages needs to meet the green threshold
+    // in order for the centroid to pass the test. This makes sense.
     if(topGreenAvg >= THRESHOLD || botGreenAvg >= THRESHOLD) {
         if(debugBall) { 
             std::cout<<"[BALL INFO] Green Test Passed\n"; 
+
+            // mark each point that was checked for greenness
             for(int i = 0; i < topCheckedPixels; i++) {
                 debugDraw.drawDot(p.first, topY - i, GREEN);
             }
@@ -1235,6 +1241,8 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
             }
         }
         return true;
+    
+      // test failed
     } else {
         if(debugBall) { 
             std::cout<<"[BALL INFO] Green Test Failed. Top. Avg: " << topGreenAvg <<
@@ -1253,7 +1261,7 @@ bool BallDetector::whiteNoBlack(Spot spot) {
     int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
     int midX = spot.ix() + width / 2;
     int midY = -spot.iy() + height / 2;
-	int spotHeight = bottomY - topY + 2;
+    int spotHeight = bottomY - topY + 2;
 
 	// don't take any chances at edges
 	int extra = spot.innerDiam / 4;

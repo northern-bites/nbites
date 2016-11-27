@@ -116,7 +116,7 @@ class Ball {
                 // a vector of spots
 		typedef std::vector<Spot> spotVector;
 
-                // a point in the image (in pixels?)
+                // a point in the image 
 		typedef std::pair<double, double> imagePoint;
 
                 // BallDetector class definition
@@ -126,7 +126,7 @@ class BallDetector {
 		BallDetector(FieldHomography* homography_, Field* field_, bool topCamera);
 		~BallDetector();
 
-                // To investigate: DebugImage class
+                // lets you draw stuff in the tool
 		void setDebugImage(DebugImage * di);
        
             // these attempt to filter real balls from things that just
@@ -255,7 +255,8 @@ class BallDetector {
 			int width;
 			int height;
      
-                        // current x- and y-coordinates of what?
+                        // current x- and y-coordinates of the pixel
+                        // being checked (there are a lot of checks)
 			int currentX, currentY;
             std::vector<Edge> goodEdges;
 
