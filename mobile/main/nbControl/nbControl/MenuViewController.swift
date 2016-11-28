@@ -12,9 +12,34 @@ var robot: String?
 
 class MenuViewController: UITableViewController {
     
-    var sections = ["Online", "Offline"]
-    var online = ["Batman", "Shehulk", "Elektra"]
-    var offline = ["BLT","Wasp", "Buzz"]
+//    struct RobotName {
+//        static let shehulk = 23
+//        static let batman = 22
+//        static let buzz = 21
+//        static let wasp = 20
+//        static let elektra = 19
+//        static let blt = 18
+//        static let zoe = 17
+//        static let mal = 16
+//        static let vera = 15
+//        static let kaylee = 14
+//        static let inara = 13
+//        static let simon = 12
+//        static let jayne = 11
+//        static let river = 10
+//        static let wash = 9
+//    }
+
+    let sections = ["Online", "Offline"]
+    
+    let baseIPaddress = "139.140.192."
+    
+    var listOfV5Robots = ["shehulk": "23","batman":"22","buzz":"21","wasp":"20","elektra":"19","blt":"18"]
+    
+    var listOfV4Robots = ["zoe":17, "mal":16, "vera":15, "kaylee":14, "inara":13, "simon":12, "jayne":11, "river":10, "wash":9]
+    
+    var online: String?
+    var offline: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,8 +71,7 @@ class MenuViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "LabelCell", for: indexPath)
-    
-        
+
         if(indexPath.section == 0) {
             cell.textLabel?.text = "\(online[indexPath.row]):"
         } else {
@@ -71,17 +95,20 @@ class MenuViewController: UITableViewController {
         // check index path
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        var destinationvc = segue.destination
-//        
-//        if let navCon = destinationvc as? UINavigationController {
-//            destinationvc = navCon.visibleViewController ?? destinationvc
-//        }
-//        if let graphvc = destinationvc as? GraphViewController {
-//            graphvc.program = brain.program
-//            graphvc.navigationItem.title = brain.turnStringListIntoString
-//            
-//        }
+    
+    private func connectToRobots() {
+        for (robotName, id) in listOfV5Robots {
+            let ipaddress = baseIPaddress + id
+            let currConnection = RobotManagerProtocol.currentAddress(ipaddress as! RobotManagerProtocol)
+            if (currConnection != nil) {
+                online?.append(robotName)
+            } else {
+                offline?.append(robotName)
+            }
+        }
+        
+        
+        
     }
     
 }
