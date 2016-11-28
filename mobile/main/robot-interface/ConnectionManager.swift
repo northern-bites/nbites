@@ -81,17 +81,14 @@ class RobotManager: RobotManagerProtocol {
                 connectionQueue.async {
                     self.runLoop(address)
                 }
-
                 return true
             } else {
                 return false
             }
         } else {
-
             connectionQueue.async {
                 self.runLoop(address)
             }
-
             return true
         }
     }

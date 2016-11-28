@@ -26,17 +26,8 @@ class ControlBrain {
     
     //BOOL walkCommand, walkStop;
     //float walkHeading,walkX,walkY;
+    let walkingThreshold: Float = 100.0
     
-    var circleCenter: CGPoint = CGPoint(x: 0.0, y: 0.0)
-    var center: CGPoint {
-        get {
-            return circleCenter
-        }
-        set {
-            circleCenter = newValue
-        }
-    }
-
     private func hypot(_ vec:CGPoint) -> Float {
         return sqrtf(Float(vec.x * vec.x) + Float(vec.y * vec.y))
     }
@@ -46,13 +37,23 @@ class ControlBrain {
     }
     
     func sendNewWalk(currPosition: CGPoint, transition:CGPoint) {
-
+        var robot = RobotCommandStruct.init()
+        robot.walkCommand = true
         let distance = hypot(currPosition)
         let angle:Float = theta(currPosition) + Float(M_PI)
 
         print(
             String(format: "dist = %.2f theta = %.2f\n", distance, angle)
         )
+        
+        robot.walkHeading = angle
+        if (distance < walkingThreshold) {
+            robot.walkY = 0.0
+        } else {
+            robot.walkY = distance
+        }
+    }
+}
 
 //        print("Curr position: [\(currPosition.x),\(currPosition.y)]")
 //        print("\(currPosition.x),\(currPosition.y) -> \(transition.x),\(transition.y)")
@@ -74,10 +75,6 @@ class ControlBrain {
 //            robot.walkHeading = Float(heading)
 //            print("Heading: \(robot.walkHeading)) ")
 //        }
-    }
-    
-    
-}
 
 
 
