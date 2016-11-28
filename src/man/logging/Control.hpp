@@ -49,6 +49,8 @@ namespace control {
         int sweetMoveID;
 
         bool logInfo,logImage;
+
+        int64_t commandIndex;
     };
     
     extern struct RobotCommandStruct latestCommand;

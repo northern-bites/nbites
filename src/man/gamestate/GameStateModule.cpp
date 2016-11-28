@@ -77,6 +77,10 @@ namespace man{
                 flag_setPenalized(control::check(control::flags::state_penalty_override));
             }
 #endif
+
+            /* update latest_data robotCommand fields... */
+            nbControlHandler();
+
             portals::Message<messages::GameState> output(&latest_data);
             gameStateOutput.setMessage(output);
 
@@ -433,6 +437,27 @@ namespace man{
                     }
                 } break;
             }
+        }
+
+        void nbControlHandler() {
+            // need to get mutable copy!!!
+            latest_data.robotCommand.set_adjustHead( control::latestCommand.adjustHead );
+            latest_data.robotCommand.set_adjustedHeadZ( control::latestCommand.adjustedHeadZ );
+            latest_data.robotCommand.set_adjustedHeadY( control::latestCommand.adjustedHeadY );
+
+            latest_data.robotCommand.set_walkCommand( control::latestCommand.walkCommand );
+            latest_data.robotCommand.set_walkStop( control::latestCommand.walkStop );
+            latest_data.robotCommand.set_walkHeading( control::latestCommand.walkHeading );
+            latest_data.robotCommand.set_walkX( control::latestCommand.walkX );
+            latest_data.robotCommand.set_walkY( control::latestCommand.walkY );
+
+            latest_data.robotCommand.set_doSweetMove( control::latestCommand.doSweetMove );
+            latest_data.robotCommand.set_sweetMoveID( control::latestCommand.sweetMoveID );
+
+            latest_data.robotCommand.set_logInfo( control::latestCommand.logInfo );
+            latest_data.robotCommand.set_logImage( control::latestCommand.logImage );
+
+            latest_data.robotCommand.set_commandIndex( control::latestCommand.commandIndex );
         }
 }
 }

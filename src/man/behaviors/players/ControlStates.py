@@ -59,10 +59,9 @@ def walkInDirection(player):
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
     elif player.counter == 1:
-        player.setWalk(player.xDirection,player.yDirection,player.headingDirection)
+        player.setWalk(0,player.yDirection,player.headingDirection)
     elif player.counter == 2:
         player.brain.nav.stand()
-        player.lastNum = currNum
         return player.goNow('controller')
     return player.stay()
 

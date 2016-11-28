@@ -65,7 +65,7 @@ namespace control {
             nbl::io::writeStringToFile(arguments[0]->blocks[0].data, path);
         }
 
-    struct RobotCommandStruct latestCommand;
+    struct RobotCommandStruct latestCommand = {0};
 
     CONTROL_FUNCTION(nbControlFunction, false, nbl::SharedConstants::LogClass_Null())
     (const std::vector<nbl::logptr> &arguments) {
@@ -91,6 +91,8 @@ namespace control {
 
         latestCommand.logInfo = arg.topLevelDictionary["logInfo"].asBoolean().value();
         latestCommand.logImage = arg.topLevelDictionary["logImage"].asBoolean().value();
+
+        ++latestCommand.commandIndex;
         NBL_INFO("latestCommand update >end<")
     }
 }
