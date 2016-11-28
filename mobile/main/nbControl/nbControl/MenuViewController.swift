@@ -29,20 +29,24 @@ class MenuViewController: UITableViewController {
 //        static let river = 10
 //        static let wash = 9
 //    }
-
     let sections = ["Online", "Offline"]
     
     let baseIPaddress = "139.140.192."
     
     var listOfV5Robots = ["shehulk": "23","batman":"22","buzz":"21","wasp":"20","elektra":"19","blt":"18"]
     
-    var listOfV4Robots = ["zoe":17, "mal":16, "vera":15, "kaylee":14, "inara":13, "simon":12, "jayne":11, "river":10, "wash":9]
+    var listOfV4Robots = ["zoe":"17", "mal":"16", "vera":"15", "kaylee":"14", "inara":"13", "simon":"12", "jayne":"11", "river":"10", "wash":"9"]
     
-    var online: String?
-    var offline: String?
+    var online: [String] = []
+    var offline: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        findConnectedRobots()
+        
+//        self.refreshControl.addTarget(self, action: #selector(handleRefresh(_:)), for: UIControlEvents.valueChanged)
+
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -50,15 +54,10 @@ class MenuViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return sections.count
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -81,7 +80,6 @@ class MenuViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        //tableView.backgroundColor = UIColor.black
         
         guard view is UITableViewHeaderFooterView else { return }
         }
@@ -95,21 +93,47 @@ class MenuViewController: UITableViewController {
         // check index path
     }
     
-    
-    private func connectToRobots() {
-        for (robotName, id) in listOfV5Robots {
-            let ipaddress = baseIPaddress + id
-            let currConnection = RobotManagerProtocol.currentAddress(ipaddress as! RobotManagerProtocol)
-            if (currConnection != nil) {
-                online?.append(robotName)
-            } else {
-                offline?.append(robotName)
-            }
-        }
-        
-        
-        
+    private func handleRefresh(refreshControl: UIRefreshControl) {
+        findConnectedRobots()
+        self.tableView.reloadData() 
+        refreshControl.endRefreshing()
     }
+//    private func findConnectedRobots() {
+//        for (robotName, id) in listOfV5Robots {
+//            let ipaddress = baseIPaddress + id
+//            let _ = robotManager.connectTo(ipaddress, disconnect: true)
+//            if (robotManager.currentAddress() != nil) {
+//                online.append(robotName)
+//                robotManager.disconnect()
+//            } else {
+//                offline.append(robotName)
+//            }
+//            
+//        }
+//        for (robotName, id) in listOfV4Robots {
+//            
+//            let ipaddress = baseIPaddress + id
+//            let test = robotManager.connectTo(ipaddress, disconnect: true)
+//            if (robotManager.currentAddress() != nil) {
+//                online.append(robotName)
+//                robotManager.disconnect()
+//            } else {
+//                offline.append(robotName)
+//            }
+//            if robotName == "mal" {
+//                print(ipaddress)
+//                print (test)
+//                print(robotManager.currentAddress())
+//            }
+//            if robotName == "vera" {
+//                print("vera \(test)")
+//            
+//            }
+//        }
+//        print(online)
+//    }
+    
+
     
 }
 
