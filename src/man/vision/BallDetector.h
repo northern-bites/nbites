@@ -178,7 +178,7 @@ class BallDetector {
                         
                         // @TODO: IMPLEMENT THIS FUNCTION (you will
                         //        need to add parameters)
-                        bool blackBelowBall(void);
+                        bool blackBelowBall(imagePoint p);
 
 			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);

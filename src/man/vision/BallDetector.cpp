@@ -1145,7 +1145,11 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
 }
 
 /********************************************************************
- * Inputs:
+ * Inputs:      I'm thinking that this function, like the following
+ *              one, should take an imagePoint as an argument and
+ *              then, maybe to begin with, just look for black below
+ *              the ball in the same way greenAroundBallFromCentroid
+                checks for green.
  *
  * Outputs:     a boolean indicating whether there is black (a shadow)
  *              below the ball
@@ -1153,7 +1157,47 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
  *              ball (this is a kind of sanity check).
  * @TODO: IMPLEMENT.
  ********************************************************************/
-bool BallDetector::blackBelowBall(void) {
+bool BallDetector::blackBelowBall(imagePoint p) {
+
+    // need some black threshold (just going off of the isBlack
+    // function, this seems like it should be 68). Need to think
+    // about how we're going to handle the scenario where the ball
+    // is on a field line. Should investigate whether there's a
+    // function that checks for this, and then maybe this function
+    // would execute only in the cases where the ball is *NOT* on
+    // a field line?
+    int THRESHOLD /* = ? */;
+
+    // a counter for the number of pixels that have been checked
+    // question: how many of these should we check?
+    int checkedPixels = 0;
+
+    // a sum for the black values (whatever that means) of all
+    // of the checked pixels
+    int blackSum = 0;
+
+    // field coordinates of the image point
+    double bx = 0, by = 0;
+
+    // convert the imagePoints x- and y-values to field coordinates
+    imageToBillCoordinates(p.first, p.second, bx, by);
+
+    // get the radius of the ball
+    int r = projectedBallRadius(std::make_pair(bx, by));
+
+    // get the y-coordinate of the bottom of the ball
+    int bottomY = std::round(p.second + r + 1);
+
+    // if this were greenAroundBallFromCentroid, we would start
+    // iterating through the r pixels directly below the ball
+    // and getting the green values of each one. Interestingly,
+    // there is an isBlack() function, but no getBlack() function.
+    // There is also a getWhite() function. Need to investigate this.
+
+    // once we had summed the black values, we would average them
+    // over all the checked pixels and then see whether they passed
+    // the threshold specified above. Maybe this is not the best way
+    // to do things.
 
 	return false;
 
@@ -1171,7 +1215,7 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
     // for greenness
     int topGreenSum = 0, botGreenSum = 0;
 
-    // Bill (field?) coordinates -- why are these 0?
+    // Bill (field?) coordinates?
     double bx = 0, by = 0;
 
     // convert image coordinates to field coordinates. Note: an image
@@ -1189,7 +1233,7 @@ bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
     // get the y-coordinate of the bottom of the ball
     int bottomY = std::round(p.second + r + 1);
 
-    // What this is doing: Starting from the top pixel on the ball, this
+    // Starting from the top pixel on the ball, this
     // for-loop gets the green value of each pixel directly above and
     // within a radius's length of the top pixel on the ball.
     getColor(p.first, topY);
