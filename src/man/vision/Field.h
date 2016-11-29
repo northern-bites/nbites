@@ -101,6 +101,8 @@ public:
 		return static_cast<int>(std::floor(x + 0.5f) );
 	}
 
+	FieldHomography * getFieldHomography() {return homography;}
+
 #ifdef OFFLINE
 	void setDebugHorizon(bool debug) {debugHorizon = debug;}
 	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}

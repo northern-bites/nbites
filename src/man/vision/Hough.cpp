@@ -534,17 +534,18 @@ void CenterCircleDetector::set()
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 {
+  edges.mapToField(field.getFieldHomography());
   AngleBinsIterator<Edge> abi(edges);
   int var = 0;
   for (Edge* e = *abi; e; e = *++abi) {
-    // if (e->mag() > 50)
+    e->set((int)(e->field().x()), (int)(e->field().y()), e->mag());
+    // if (e->y() > 0)
     // {
-    //   std::cout << "REMOVED";
-    //   edges.remove(e);
-    //   continue;
+    //   // std::cout << "REMOVED: y was " << e->y() << std::endl;
+    //   // e->set(0, 0, e->mag());
     // }
-    std::cout << "x: " << e->x() << "\ty: " << e->y() << "\tm: " << e->mag() << "\t|\tang: " << e->radians() <<  std::endl;
-    var++;
+    std::cout << "x: " << e->x() << "\ty: " << e->y() << "\tm: " << e->mag() << "\t|\tang: " << e->radians() << "\thoriz: " << field.horizonAt(e->x())<<  std::endl;
+    // var++;
   }
 
   std::cout << "Edge List has size " << var << std::endl;

@@ -110,8 +110,8 @@ public:
   T* binList(int angle) { return bins[angle & 0xFF];}
   const T* binList(int angle) const { return bins[angle & 0xFF];}
 
+
   void remove(T* ae);
-  void totallyFake();
 
   int count() const { return poolSize - freeCount; }
 };
@@ -128,8 +128,12 @@ void AngleBins<T>::reset()
 template <class T>
 void AngleBins<T>::remove(T* ae)
 {
+  // get a pointer to the first thing in angle
   T* p = bins[ae->angle()];
+
   T* q = 0;
+
+  // while this angle bin exists and it doesn't e
   while (p && p != ae)
   {
     q = p;

@@ -74,6 +74,10 @@ public class EdgeImage extends ImageParent {
 				int mag = dis.readInt();
 				int ang = dis.readInt();
 
+				if (x < 0 || x > width || y < 0 || y > height) {
+					continue;
+				}
+
 				Color base = angleMap[ang];
 				ret.setRGB(x, y, base.getRGB());
 			}
