@@ -94,22 +94,22 @@ class MenuViewController: UITableViewController {
     }
     
     private func handleRefresh(refreshControl: UIRefreshControl) {
-        findConnectedRobots()
+        //findConnectedRobots()
         self.tableView.reloadData() 
         refreshControl.endRefreshing()
     }
-//    private func findConnectedRobots() {
-//        for (robotName, id) in listOfV5Robots {
-//            let ipaddress = baseIPaddress + id
-//            let _ = robotManager.connectTo(ipaddress, disconnect: true)
-//            if (robotManager.currentAddress() != nil) {
-//                online.append(robotName)
+    private func findConnectedRobots() {
+        for (robotName, id) in listOfV5Robots {
+            //let ipaddress = baseIPaddress + id
+            //let _ = robotManager.connectTo(ipaddress, disconnect: true)
+            //if (robotManager.currentAddress() != nil) {
+                online.append(robotName)
 //                robotManager.disconnect()
 //            } else {
 //                offline.append(robotName)
 //            }
-//            
-//        }
+            
+        }
 //        for (robotName, id) in listOfV4Robots {
 //            
 //            let ipaddress = baseIPaddress + id
@@ -131,7 +131,7 @@ class MenuViewController: UITableViewController {
 //            }
 //        }
 //        print(online)
-//    }
+    }
     
 
     
