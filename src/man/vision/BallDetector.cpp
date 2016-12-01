@@ -1145,63 +1145,61 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
 }
 
 /********************************************************************
- * Inputs:      I'm thinking that this function, like the following
- *              one, should take an imagePoint as an argument and
- *              then, maybe to begin with, just look for black below
- *              the ball in the same way greenAroundBallFromCentroid
-                checks for green.
+ * Inputs:      
  *
- * Outputs:     a boolean indicating whether there is black (a shadow)
- *              below the ball
- * Description: determines whether there is a shadow underneath the
- *              ball (this is a kind of sanity check).
- * @TODO: IMPLEMENT.
+ * Outputs:     a boolean indicating whether the pixels in the top
+ *              half of the ball are brighter on average than those
+ *              in the bottom half
+ * Description: 
  ********************************************************************/
-bool BallDetector::blackBelowBall(imagePoint p) {
+bool BallDetector::topOfBallBrighterThanBottom(Spot spot) {
 
-    // need some black threshold (just going off of the isBlack
-    // function, this seems like it should be 68). Need to think
-    // about how we're going to handle the scenario where the ball
-    // is on a field line. Should investigate whether there's a
-    // function that checks for this, and then maybe this function
-    // would execute only in the cases where the ball is *NOT* on
-    // a field line?
-    int THRESHOLD /* = ? */;
+    // convert to raw coordinates
+    int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
+    int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
+    int midX = spot.ix() + width / 2;
 
-    // a counter for the number of pixels that have been checked
-    // question: how many of these should we check?
-    int checkedPixels = 0;
+    int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
+    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
+    int midY = -spot.iy() + height / 2;
 
-    // a sum for the black values (whatever that means) of all
-    // of the checked pixels
-    int blackSum = 0;
+    // counters for the number of top and bottom pixels checked
+    int topPixels = 0;
+    int bottomPixels = 0;
 
-    // field coordinates of the image point
-    double bx = 0, by = 0;
+    // two sums: one for the y values of the pixels in the top
+    // half of the spot, and another for the y values of the
+    // pixels in the bottom half
+    int topYValueTotal = 0;
+    int bottomYValueTotal = 0;
 
-    // convert the imagePoints x- and y-values to field coordinates
-    imageToBillCoordinates(p.first, p.second, bx, by);
+    // These for-loops should be able to be combined into one,
+    // but I want to get this working first
 
-    // get the radius of the ball
-    int r = projectedBallRadius(std::make_pair(bx, by));
+    // sum the top pixels
+    for (int i=midY + 1; i<=topY; i++) {
+      for (int j=leftX; j<=rightX; j++, topPixels++) {
 
-    // get the y-coordinate of the bottom of the ball
-    int bottomY = std::round(p.second + r + 1);
+        topYValueTotal += *(yImage.pixelAddr(i,j));
+      }
+    }
 
-    // if this were greenAroundBallFromCentroid, we would start
-    // iterating through the r pixels directly below the ball
-    // and getting the green values of each one. Interestingly,
-    // there is an isBlack() function, but no getBlack() function.
-    // There is also a getWhite() function. Need to investigate this.
+    // sum the bottom pixels
+    for (int i=bottomY; i<midY; i++) {
+      for (int j=leftX; j<=rightX; j++, bottomPixels++) {
 
-    // once we had summed the black values, we would average them
-    // over all the checked pixels and then see whether they passed
-    // the threshold specified above. Maybe this is not the best way
-    // to do things.
+        bottomYValueTotal += *(yImage.pixelAddr(i,j)); 
+      }
+    }
 
-	return false;
+    // calculate the average brightness of pixels in the top
+    // and bottom halves
+    float topYValueAvg = topYValueTotal / topPixels;
+    float bottomYValueAvg = bottomYValueTotal / bottomPixels; 
 
-} // end blackBelowBall
+    return topYValueAvg > bottomYValueAvg;
+
+} // end topOfBallBrighterThanBottom
 
 bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
 
