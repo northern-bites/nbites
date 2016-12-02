@@ -159,26 +159,21 @@ class BallDetector {
 								float altInnerDiam, bool topCamera, int filterThreshold, 
 								int greenThreshold, float filterGain);
 
-            /////////////////// IMPORTANT ////////////////////
             void processDarkSpots(SpotList & darkSpots, intPairVector & blackSpots, 
             						intPairVector & badBlackSpots, spotVector & actualBlackSpots);
-            /////////////////////////////////////////////////
 
             bool processWhiteSpots(SpotList & whiteSpots, intPairVector & blackSpots,
             						intPairVector & badBlackSpots, spotVector & actualWhiteSpots,
             						double cameraHeight, bool & foundBall);
 
-            ////////////////// IMPORTANT ////////////////////
             bool processBlobs(Connectivity & blobber, intPairVector & blackSpots,
                                		bool & foundBall, intPairVector & badBlackSpots,
                                 	spotVector & actualWhiteSpots, double cameraHeight,
                                 	int bottomQuarer);
 
 			bool whiteBelowSpot(Spot spot);
-                        
-                        // TODO: IMPLEMENT THIS FUNCTION
-                        bool topOfBallBrighterThanBottom(Spot spot);
-
+                        bool topOfBallBrighterThanBottom(Spot spot); // WILL + MARCUS
+                        float getAvgBrightness(Spot spot);           // WILL + MARCUS
 			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
@@ -196,7 +191,6 @@ class BallDetector {
             bool findCorrelatedBlackSpots(intPairVector & blackBlobs,spotVector & actualBlobs,
                                           	double cameraHeight, bool & foundBall);
 
-            // how close is close?
             bool blobsAreClose(std::pair<int,int> first,
                                std::pair<int,int> second);
 

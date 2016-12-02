@@ -61,6 +61,10 @@ void BallDetector::processDarkSpots(SpotList & darkSpots, intPairVector & blackS
                                         // add this spot to the list of black spots
 					blackSpots.push_back(std::make_pair(midX, midY));
 
+                                        float avgBrightness = getAvgBrightness((*i));
+                                        printf("Dark spot at (%d, %d) has an average brightness of %f\n",
+                                                midX, midY, avgBrightness);
+
                                         // what is the difference between 'blackSpots'
                                         // and 'actualBlackSpots' ?
 					actualBlackSpots.push_back((*i));
@@ -100,9 +104,10 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots,
         if (filterWhiteSpot((*i), blackSpots, badBlackSpots)) {
             actualWhiteSpots.push_back((*i));
                 if(debugBall) {
+                    bool topBrighter = topOfBallBrighterThanBottom((*i));
+                    std::cout<<"Top brighter? " << topBrighter << std::endl;
                     std::cout<<"filterWhiteSpot returned true\n";
-                    debugDraw.drawPoint((*i).ix() + width / 2,
-										-(*i).iy() + height / 2, RED);
+                    debugDraw.drawPoint((*i).ix() + width / 2, -(*i).iy() + height / 2, RED);
                 }
             makeBall((*i), cameraHeight, 0.75, foundBall, false);
 #ifdef OFFLINE
@@ -1145,12 +1150,16 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
 }
 
 /********************************************************************
- * Inputs:      
+ * Inputs:      the white spot to check
  *
  * Outputs:     a boolean indicating whether the pixels in the top
  *              half of the ball are brighter on average than those
  *              in the bottom half
- * Description: 
+ *
+ * Description: compares the average brightness of pixels in the
+ *              top half of the ball to that of pixels in the bottom
+ *              half. Returns true if the pixels in the top half are
+ *              brighter.
  ********************************************************************/
 bool BallDetector::topOfBallBrighterThanBottom(Spot spot) {
 
@@ -1159,9 +1168,13 @@ bool BallDetector::topOfBallBrighterThanBottom(Spot spot) {
     int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
     int midX = spot.ix() + width / 2;
 
+    printf("X: [%d, %d, %d]\n", leftX, rightX, midX);
+
     int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
     int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
     int midY = -spot.iy() + height / 2;
+
+    printf("Y: [%d, %d, %d]\n", bottomY, topY, midY);
 
     // counters for the number of top and bottom pixels checked
     int topPixels = 0;
@@ -1177,20 +1190,24 @@ bool BallDetector::topOfBallBrighterThanBottom(Spot spot) {
     // but I want to get this working first
 
     // sum the top pixels
-    for (int i=midY + 1; i<=topY; i++) {
+    for (int i=topY; i<midY; i++) {
       for (int j=leftX; j<=rightX; j++, topPixels++) {
 
         topYValueTotal += *(yImage.pixelAddr(i,j));
       }
     }
 
+    std::cout << "Number of top pixels: " << topPixels << std::endl;
+
     // sum the bottom pixels
-    for (int i=bottomY; i<midY; i++) {
+    for (int i=midY + 1; i<=bottomY; i++) {
       for (int j=leftX; j<=rightX; j++, bottomPixels++) {
 
         bottomYValueTotal += *(yImage.pixelAddr(i,j)); 
       }
     }
+
+    std::cout << "Number of bottom pixels: " << bottomPixels << std::endl;
 
     // calculate the average brightness of pixels in the top
     // and bottom halves
@@ -1200,6 +1217,32 @@ bool BallDetector::topOfBallBrighterThanBottom(Spot spot) {
     return topYValueAvg > bottomYValueAvg;
 
 } // end topOfBallBrighterThanBottom
+
+
+float BallDetector::getAvgBrightness(Spot spot) {
+
+    // convert to raw coordinates
+    int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
+    int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
+    int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
+    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
+
+    int numPixels = 0;   // the number of pixels checked
+    int yValueTotal = 0; // the sum of the brightness values of
+                         // the pixels
+
+    for (int i=topY; i<=bottomY; i++) {
+      for (int j=leftX; j<=rightX; j++, numPixels++) {
+
+        yValueTotal += *(yImage.pixelAddr(i,j)); 
+
+      }
+    }
+
+    return yValueTotal / numPixels;
+
+} // end getAvgBrightness
+
 
 bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {
 
