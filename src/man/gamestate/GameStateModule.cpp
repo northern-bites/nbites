@@ -440,24 +440,25 @@ namespace man{
         }
 
         void nbControlHandler() {
-            // need to get mutable copy!!!
-            latest_data.robotCommand.set_adjustHead( control::latestCommand.adjustHead );
-            latest_data.robotCommand.set_adjustedHeadZ( control::latestCommand.adjustedHeadZ );
-            latest_data.robotCommand.set_adjustedHeadY( control::latestCommand.adjustedHeadY );
+            messages::RobotCommand* cmnd = latest_data.mutable_robotCommand();
 
-            latest_data.robotCommand.set_walkCommand( control::latestCommand.walkCommand );
-            latest_data.robotCommand.set_walkStop( control::latestCommand.walkStop );
-            latest_data.robotCommand.set_walkHeading( control::latestCommand.walkHeading );
-            latest_data.robotCommand.set_walkX( control::latestCommand.walkX );
-            latest_data.robotCommand.set_walkY( control::latestCommand.walkY );
+            cmnd->set_adjustHead( control::latestCommand.adjustHead );
+            cmnd->set_adjustedHeadZ( control::latestCommand.adjustedHeadZ );
+            cmnd->set_adjustedHeadY( control::latestCommand.adjustedHeadY );
 
-            latest_data.robotCommand.set_doSweetMove( control::latestCommand.doSweetMove );
-            latest_data.robotCommand.set_sweetMoveID( control::latestCommand.sweetMoveID );
+            cmnd->set_walkCommand( control::latestCommand.walkCommand );
+            cmnd->set_walkStop( control::latestCommand.walkStop );
+            cmnd->set_walkHeading( control::latestCommand.walkHeading );
+            cmnd->set_walkX( control::latestCommand.walkX );
+            cmnd->set_walkY( control::latestCommand.walkY );
 
-            latest_data.robotCommand.set_logInfo( control::latestCommand.logInfo );
-            latest_data.robotCommand.set_logImage( control::latestCommand.logImage );
+            cmnd->set_doSweetMove( control::latestCommand.doSweetMove );
+            cmnd->set_sweetMoveID( control::latestCommand.sweetMoveID );
 
-            latest_data.robotCommand.set_commandIndex( control::latestCommand.commandIndex );
+            cmnd->set_logInfo( control::latestCommand.logInfo );
+            cmnd->set_logImage( control::latestCommand.logImage );
+
+            cmnd->set_commandIndex( control::latestCommand.commandIndex );
         }
 }
 }
