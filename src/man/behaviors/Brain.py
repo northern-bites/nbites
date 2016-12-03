@@ -51,6 +51,7 @@ class Brain(object):
         self.teamNumber = teamNum
 
         self.counter = 0
+        self.frameCounter = 0
         self.time = time.time()
 
         # Initalize the leds and game controller
@@ -186,6 +187,7 @@ class Brain(object):
 
         # Update Environment
         self.time = time.time()
+        self.frameCounter += 1
         
         # Update objects
         self.updateVisionObjects()

@@ -26,8 +26,8 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
-    if player.firstFrame:
-    if player.brain.counter%30 == 0:
+
+    if player.brain.frameCounter % 30 == 0:
 
         #say(Say.IN_DEBUG, "Put me in front of a ball and switch me to game ready!")
 
@@ -48,7 +48,6 @@ def gamePlaying(player):
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
-    counter = 0
     return player.stay()
 
 @superState('gameControllerResponder')
