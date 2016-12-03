@@ -41,28 +41,45 @@ def fallen(player):
 
 @superState('gameControllerResponder')
 def controller(player):
-	if player.lastNum != player.currNum:
-		if player.commandToDo == 1:
-			player.lastNum = player.currNum
-			return player.goNow('walkInDirection')
-		else if player.commandToDo == 2:
-			player.lastNum = player.currNum
-			return player.goNow('kick')
-		else if player.commandToDo == 3:
-			player.lastNum = player.currNum
-			return player.goNow('turnHead')
-	return player.stay()
+    command = player.brain.interface.gameState.robotCommand
+
+    if command.commandIndex != player.latestCommandIndex
+        print "nbControl detecting new command: " + command.commandIndex
+        player.latestCommandIndex = command.commandIndex
+
+        if command.walkCommand
+            print "interpreting walk command"
+            return player.goNow('walkInDirection')
+
+    return player.stay()
+
+#	if player.lastNum != player.currNum:
+#		if player.commandToDo == 1:
+#			player.lastNum = player.currNum
+#
+#		else if player.commandToDo == 2:
+#			player.lastNum = player.currNum
+#			return player.goNow('kick')
+#		else if player.commandToDo == 3:
+#			player.lastNum = player.currNum
+#			return player.goNow('turnHead')
+#	return player.stay()
 
 @superState('gameControllerResponder')
 def walkInDirection(player):
+    command = player.brain.interface.gameState.robotCommand
+
     if player.firstFrame():
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
-    elif player.counter == 1:
-        player.setWalk(0,player.yDirection,player.headingDirection)
-    elif player.counter == 2:
+    elif !command.walkStop:
+        print "walking..."
+        player.setWalk(command.walkX,command.walkY,command.walkHeading)
+    elif command.walkStop:
+        print "stopping walk..."
         player.brain.nav.stand()
         return player.goNow('controller')
+
     return player.stay()
 
 @superState('gameControllerResponder')
