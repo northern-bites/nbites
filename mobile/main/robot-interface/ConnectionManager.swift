@@ -26,6 +26,8 @@ protocol RobotManagerProtocol {
     //escaping makes the arguments closures
     func setIncomingHandler(callback: @escaping ((Log, String)->Void) )
     func setStatusHandler(callback: @escaping ((Bool, String)->Void) )
+
+    func determineOnlineHosts(hosts: [String], callback: @escaping (Void)->([String]))
 }
 
 class RobotManager: RobotManagerProtocol {
@@ -128,6 +130,19 @@ class RobotManager: RobotManagerProtocol {
             if let handler = self.incomingLogHandler {
                 handler(log, addr)
             }
+        }
+    }
+
+    open func determineOnlineHosts(hosts: [String], callback: @escaping (Void)->([String])) {
+        DispatchQueue.global().async {
+
+            var online = [String]()
+            var offline = [String]()
+
+            for host in hosts {
+
+            }
+
         }
     }
 }

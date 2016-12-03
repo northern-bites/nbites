@@ -60,4 +60,6 @@ struct RobotCommandStruct {
 
 +(int) timeoutInMicroseconds;
 
++(BOOL) canConnectTo: (NSString *) host;
+
 @end
