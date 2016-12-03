@@ -1,0 +1,12 @@
+Will Gantt
+12/3/16
+
+
+Some questions and answers.
+
+
+1. What is the difference between a dark spot and a black spot?
+2. What is the difference between the blackSpots and actualBlackSpots
+   arrays?
+3. Does the ball have a single white spot associated with it?
+

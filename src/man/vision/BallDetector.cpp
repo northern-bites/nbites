@@ -105,7 +105,6 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots,
             actualWhiteSpots.push_back((*i));
                 if(debugBall) {
                     bool topBrighter = topOfBallBrighterThanBottom((*i));
-                    std::cout<<"Top brighter? " << topBrighter << std::endl;
                     std::cout<<"filterWhiteSpot returned true\n";
                     debugDraw.drawPoint((*i).ix() + width / 2, -(*i).iy() + height / 2, RED);
                 }
@@ -1190,20 +1189,20 @@ bool BallDetector::topOfBallBrighterThanBottom(Spot spot) {
     // but I want to get this working first
 
     // sum the top pixels
-    for (int i=topY; i<midY; i++) {
-      for (int j=leftX; j<=rightX; j++, topPixels++) {
+    for (int y=topY; y<midY; y++) {
+      for (int x=leftX; x<=rightX; x++, topPixels++) {
 
-        topYValueTotal += *(yImage.pixelAddr(i,j));
+        topYValueTotal += *(yImage.pixelAddr(x,y));
       }
     }
 
     std::cout << "Number of top pixels: " << topPixels << std::endl;
 
     // sum the bottom pixels
-    for (int i=midY + 1; i<=bottomY; i++) {
-      for (int j=leftX; j<=rightX; j++, bottomPixels++) {
+    for (int y=midY + 1; y<=bottomY; y++) {
+      for (int x=leftX; x<=rightX; x++, bottomPixels++) {
 
-        bottomYValueTotal += *(yImage.pixelAddr(i,j)); 
+        bottomYValueTotal += *(yImage.pixelAddr(x,y)); 
       }
     }
 
@@ -1231,10 +1230,10 @@ float BallDetector::getAvgBrightness(Spot spot) {
     int yValueTotal = 0; // the sum of the brightness values of
                          // the pixels
 
-    for (int i=topY; i<=bottomY; i++) {
-      for (int j=leftX; j<=rightX; j++, numPixels++) {
+    for (int y=topY; y<=bottomY; y++) {
+      for (int x=leftX; x<=rightX; x++, numPixels++) {
 
-        yValueTotal += *(yImage.pixelAddr(i,j)); 
+        yValueTotal += *(yImage.pixelAddr(x,y)) / 4; 
 
       }
     }
