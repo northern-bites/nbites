@@ -43,11 +43,11 @@ def fallen(player):
 def controller(player):
     command = player.brain.interface.gameState.robotCommand
 
-    if command.commandIndex != player.latestCommandIndex
+    if command.commandIndex != player.latestCommandIndex:
         print "nbControl detecting new command: " + command.commandIndex
         player.latestCommandIndex = command.commandIndex
 
-        if command.walkCommand
+        if command.walkCommand:
             print "interpreting walk command"
             return player.goNow('walkInDirection')
 
