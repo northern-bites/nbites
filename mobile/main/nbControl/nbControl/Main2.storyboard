@@ -37,6 +37,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Robot Menu" id="m8R-Tu-lIF"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="BQP-4R-uX8">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
                 </tableViewController>
@@ -47,7 +48,7 @@
         <!--Navigation Controller-->
         <scene sceneID="uAT-N1-UcY">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="dvI-sx-mYR" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" hidesBarsOnTap="YES" id="dvI-sx-mYR" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="mGP-3j-Kv7">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -177,7 +178,7 @@
         <!--Tab Bar Controller-->
         <scene sceneID="ibF-xT-GKh">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="8NX-ch-Uv6" sceneMemberID="viewController">
+                <tabBarController id="8NX-ch-Uv6" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" id="zzS-Fc-TZy">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>

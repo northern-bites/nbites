@@ -37,7 +37,8 @@ class ControlBrain {
     }
     
     func sendNewWalk(currPosition: CGPoint, transition:CGPoint) {
-        var robot = RobotCommandStruct.init()
+        var robot = blankRobotCommand()
+
         robot.walkCommand = true
         let distance = hypot(currPosition)
         let angle:Float = theta(currPosition) + Float(M_PI)
@@ -48,9 +49,17 @@ class ControlBrain {
         
         robot.walkHeading = angle
         if (distance < walkingThreshold) {
-            robot.walkY = 0.0
+            print("stopping walk")
+            robot.walkStop = true
         } else {
+            print("walk active")
+            robot.walkStop = false
             robot.walkY = distance
+            robot.walkHeading = angle
+        }
+
+        if (robotManager.currentAddress() != nil) {
+            robotManager.send(robot)
         }
     }
 }
