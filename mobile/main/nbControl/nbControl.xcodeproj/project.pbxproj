@@ -34,6 +34,8 @@
 		EABC61EA1DDE728000133C43 /* BezierPathsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC61E91DDE728000133C43 /* BezierPathsView.swift */; };
 		EABC61EC1DDE774900133C43 /* UIKit_Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC61EB1DDE774900133C43 /* UIKit_Extensions.swift */; };
 		EABC872E1DD1250300347577 /* InfoBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC872D1DD1250300347577 /* InfoBrain.swift */; };
+		EAC934F21DF48E95002358B8 /* SweetMovesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC934F01DF48E95002358B8 /* SweetMovesViewController.swift */; };
+		EAC934F31DF48E95002358B8 /* SweetMovesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC934F11DF48E95002358B8 /* SweetMovesCollectionViewCell.swift */; };
 		EAD207FD1DCAB49C0013A967 /* ControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD207FC1DCAB49C0013A967 /* ControlViewController.swift */; };
 		EAE1BDC51DCA40E20073C431 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */; };
 		EAE1BDCD1DCA40E20073C431 /* nbControl.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE1BDCB1DCA40E20073C431 /* nbControl.xcdatamodeld */; };
@@ -98,6 +100,8 @@
 		EABC61E91DDE728000133C43 /* BezierPathsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BezierPathsView.swift; sourceTree = "<group>"; };
 		EABC61EB1DDE774900133C43 /* UIKit_Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIKit_Extensions.swift; sourceTree = "<group>"; };
 		EABC872D1DD1250300347577 /* InfoBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoBrain.swift; sourceTree = "<group>"; };
+		EAC934F01DF48E95002358B8 /* SweetMovesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SweetMovesViewController.swift; sourceTree = "<group>"; };
+		EAC934F11DF48E95002358B8 /* SweetMovesCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SweetMovesCollectionViewCell.swift; sourceTree = "<group>"; };
 		EAD207FC1DCAB49C0013A967 /* ControlViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlViewController.swift; sourceTree = "<group>"; };
 		EAE1BDC11DCA40E20073C431 /* nbControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nbControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -225,6 +229,15 @@
 			name = Hardware;
 			sourceTree = "<group>";
 		};
+		EAC934F41DF48E98002358B8 /* SweetMoves */ = {
+			isa = PBXGroup;
+			children = (
+				EAC934F01DF48E95002358B8 /* SweetMovesViewController.swift */,
+				EAC934F11DF48E95002358B8 /* SweetMovesCollectionViewCell.swift */,
+			);
+			name = SweetMoves;
+			sourceTree = "<group>";
+		};
 		EAE1BDB81DCA40E20073C431 = {
 			isa = PBXGroup;
 			children = (
@@ -253,6 +266,7 @@
 				EA0DA4E51DDAA56100E7E0B4 /* icons */,
 				EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */,
 				EA6D4BD01DE21788004B66DF /* MenuViewController.swift */,
+				EAC934F41DF48E98002358B8 /* SweetMoves */,
 				074AD03D1DE9E2F1000A8E8A /* interface */,
 				EA6D4BD21DE2179F004B66DF /* Info */,
 				EA6D4BD41DE217CB004B66DF /* Hardware */,
@@ -427,7 +441,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC934F21DF48E95002358B8 /* SweetMovesViewController.swift in Sources */,
 				EABC61E61DDE715F00133C43 /* ControlView.swift in Sources */,
+				EAC934F31DF48E95002358B8 /* SweetMovesCollectionViewCell.swift in Sources */,
 				EAE1BDCD1DCA40E20073C431 /* nbControl.xcdatamodeld in Sources */,
 				074AD0511DE9E327000A8E8A /* ConnectionManager.swift in Sources */,
 				EABAC8581DE0C00300EAB3C3 /* HardwareTableViewController.swift in Sources */,
