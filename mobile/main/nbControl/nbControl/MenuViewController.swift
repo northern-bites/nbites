@@ -33,7 +33,8 @@ class MenuViewController: UITableViewController {
     
     let baseIPaddress = "139.140.192."
     
-    var listOfV5Robots = ["shehulk": "23","batman":"22","buzz":"21","wasp":"20","elektra":"19","blt":"18"]
+    var listOfV5Robots = ["shehulk": "23","batman":"22","buzz":"21","wasp":"20","elektra":"19","blt":"18",
+                          "localhost":"0"] //for testing
     
     var listOfV4Robots = ["zoe":"17", "mal":"16", "vera":"15", "kaylee":"14", "inara":"13", "simon":"12", "jayne":"11", "river":"10", "wash":"9"]
     
@@ -43,9 +44,17 @@ class MenuViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        findConnectedRobots()
-        
-//        self.refreshControl.addTarget(self, action: #selector(handleRefresh(_:)), for: UIControlEvents.valueChanged)
+        findAndReloadRobots(nil)
+
+        let refresher = UIRefreshControl()
+
+        refresher.addTarget(self, action: #selector(refreshRobots(_:)), for: .valueChanged)
+
+        if #available(iOS 10.0, *) {
+            tableView.refreshControl = refresher
+        } else {
+            tableView.backgroundView = refresher
+        }
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -80,17 +89,34 @@ class MenuViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        
         guard view is UITableViewHeaderFooterView else { return }
-        }
-    
-    
+        
+    }
+
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return sections[section]
     }
 
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        if (indexPath.section == 0) {
+            return indexPath
+        } else {
+            return nil
+        }
+    }
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // check index path
+
+        assert(indexPath.section == 0)
+
+        if (indexPath.row < online.count) {
+            let host = online[indexPath.row]
+            print("MenuViewController: connecting to \(host)")
+            _ = robotManager.connectTo(host, disconnect: true)
+        } else {
+            print("ERROR indexPath.row \(indexPath.row) >= online.count \(online.count)")
+        }
     }
     
     private func handleRefresh(refreshControl: UIRefreshControl) {
@@ -98,42 +124,34 @@ class MenuViewController: UITableViewController {
         self.tableView.reloadData() 
         refreshControl.endRefreshing()
     }
-    private func findConnectedRobots() {
-        for (robotName, id) in listOfV5Robots {
-            //let ipaddress = baseIPaddress + id
-            //let _ = robotManager.connectTo(ipaddress, disconnect: true)
-            //if (robotManager.currentAddress() != nil) {
-                online.append(robotName)
-//                robotManager.disconnect()
-//            } else {
-//                offline.append(robotName)
-//            }
-            
-        }
-//        for (robotName, id) in listOfV4Robots {
-//            
-//            let ipaddress = baseIPaddress + id
-//            let test = robotManager.connectTo(ipaddress, disconnect: true)
-//            if (robotManager.currentAddress() != nil) {
-//                online.append(robotName)
-//                robotManager.disconnect()
-//            } else {
-//                offline.append(robotName)
-//            }
-//            if robotName == "mal" {
-//                print(ipaddress)
-//                print (test)
-//                print(robotManager.currentAddress())
-//            }
-//            if robotName == "vera" {
-//                print("vera \(test)")
-//            
-//            }
-//        }
-//        print(online)
-    }
-    
 
+    @objc private func refreshRobots(_ refreshControl: UIRefreshControl) {
+        print("refreshRobots()!")
+        findAndReloadRobots(refreshControl)
+    }
+
+    private func findAndReloadRobots(_ refreshControl: UIRefreshControl?) {
+        print("findAndReloadRobots()!")
+
+        var allRobots = [String]()
+        allRobots.append(contentsOf: listOfV4Robots.keys)
+        allRobots.append(contentsOf: listOfV5Robots.keys)
+
+        robotManager.determineOnlineHosts(hosts: allRobots) {
+            (onlineHosts:[String], offlineHosts:[String])->Void in
+
+            print("findAndReloadRobots callback() online:\(onlineHosts) offline:\(offlineHosts.count)")
+
+            self.online = onlineHosts
+            self.offline = offlineHosts
+
+            self.tableView.reloadData()
+
+            if let refresher = refreshControl {
+                refresher.endRefreshing()
+            }
+        }
+    }
     
 }
 

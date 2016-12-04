@@ -20,8 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
         splitViewController.delegate = self
 
-        print("connection status: \(robotManager.currentAddress())")
-
         return true
     }
 

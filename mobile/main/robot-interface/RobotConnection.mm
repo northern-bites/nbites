@@ -106,6 +106,9 @@
                                      nbl::SharedConstants::LogClass_Null(), 0);
 
         const char * addr = [address cStringUsingEncoding: NSASCIIStringEncoding];
+        if (!addr) {
+            NSLog(@"ERROR: could not encode host string!");
+        }
 
         if ( nbl::io::connect_to(socket, nbl::SharedConstants::ROBOT_PORT(), addr) ) {
             NSLog(@"could not connect to '%@'!",
@@ -182,6 +185,24 @@
 
 +(int) timeoutInMicroseconds {
     return nbl::SharedConstants::REMOTE_HOST_TIMEOUT();
+}
+
++(BOOL) canConnectTo: (NSString *) host {
+
+    const char * addr = [host cStringUsingEncoding: NSASCIIStringEncoding];
+    if (!addr) {
+        NSLog(@"ERROR: could not encode host string!");
+    }
+
+    BOOL ret = false;
+    nbl::io::client_socket_t clisock;
+    if (nbl::io::connect_to(clisock, nbl::SharedConstants::ROBOT_PORT(), addr) == nbl::io::SUCCESS) {
+        ret = true;
+        shutdown(clisock, SHUT_RDWR);   // try to shutdown the socket in case something is being written.
+        close(clisock);
+    }
+
+    return ret;
 }
 
 @end

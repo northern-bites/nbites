@@ -94,6 +94,19 @@ namespace control {
 
         ++latestCommand.commandIndex;
         NBL_INFO("latestCommand update >end<")
+
+        if (latestCommand.logInfo) {
+            nbl::logptr infoRet = nbl::Log::explicitLog({}, {}, "nbControlInfo");
+            //Robot
+            //Battery %
+            //Player
+            //Game state
+            //Playing state
+
+            RETURN(infoRet);
+        }
+
+        // if (latestCommand.logImage) have Vision or Transcriber log one image (and swap the flag back after)
     }
 }
 

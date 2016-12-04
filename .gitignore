@@ -35,3 +35,4 @@ _tempFiles
 /src/sound/scripts/
 src/nbtool/gui-forms/build
 util/scripts/change_field.sh
+mobile/main/nbControl/nbControl.xcodeproj/project.xcworkspace/xcuserdata/*

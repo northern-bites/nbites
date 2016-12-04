@@ -22,3 +22,5 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 		self.role = brain.playerNumber
 		self.returningFromPenalty = False
 		self.commMode = -1
+
+        self.latestCommandIndex = 0
