@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		074AD0511DE9E327000A8E8A /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074AD03F1DE9E327000A8E8A /* ConnectionManager.swift */; };
+		074AD0521DE9E327000A8E8A /* RobotConnection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0411DE9E327000A8E8A /* RobotConnection.mm */; };
+		074AD0531DE9E327000A8E8A /* json.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0431DE9E327000A8E8A /* json.cpp */; };
+		074AD0541DE9E327000A8E8A /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0451DE9E327000A8E8A /* Log.cpp */; };
+		074AD0551DE9E327000A8E8A /* LogRPC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0471DE9E327000A8E8A /* LogRPC.cpp */; };
+		074AD0561DE9E327000A8E8A /* nblogio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD0491DE9E327000A8E8A /* nblogio.cpp */; };
+		074AD0571DE9E327000A8E8A /* SExpr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD04B1DE9E327000A8E8A /* SExpr.cpp */; };
+		074AD0581DE9E327000A8E8A /* utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 074AD04F1DE9E327000A8E8A /* utilities.cpp */; };
+		077BF1871DE8996B00754D79 /* Main2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 077BF1861DE8996B00754D79 /* Main2.storyboard */; };
 		EA0DA4E71DDAA66400E7E0B4 /* info@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4E61DDAA66400E7E0B4 /* info@3x.png */; };
 		EA0DA4EA1DDAA6F900E7E0B4 /* info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4E81DDAA6F900E7E0B4 /* info@2x.png */; };
 		EA0DA4EB1DDAA6F900E7E0B4 /* info@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4E91DDAA6F900E7E0B4 /* info@1x.png */; };
@@ -18,7 +27,7 @@
 		EA1C554B1DDBCD9300706BCA /* nao_sitting.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */; };
 		EA1C554F1DDBCE3A00706BCA /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = EA1C554E1DDBCE3A00706BCA /* logo.png */; };
 		EA6D4BD11DE21788004B66DF /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6D4BD01DE21788004B66DF /* MenuViewController.swift */; };
-		EAB295B81DE21A1C00C73B4D /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB295B71DE21A1C00C73B4D /* MenuView.swift */; };
+		EA87345A1DE9F2240026A593 /* ControlBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8734591DE9F2240026A593 /* ControlBrain.swift */; };
 		EABAC8581DE0C00300EAB3C3 /* HardwareTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABAC8571DE0C00300EAB3C3 /* HardwareTableViewController.swift */; };
 		EABC61E61DDE715F00133C43 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC61E51DDE715F00133C43 /* ControlView.swift */; };
 		EABC61E81DDE724700133C43 /* GravityBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC61E71DDE724700133C43 /* GravityBehavior.swift */; };
@@ -27,7 +36,6 @@
 		EABC872E1DD1250300347577 /* InfoBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC872D1DD1250300347577 /* InfoBrain.swift */; };
 		EAD207FD1DCAB49C0013A967 /* ControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD207FC1DCAB49C0013A967 /* ControlViewController.swift */; };
 		EAE1BDC51DCA40E20073C431 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */; };
-		EAE1BDCA1DCA40E20073C431 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAE1BDC81DCA40E20073C431 /* Main.storyboard */; };
 		EAE1BDCD1DCA40E20073C431 /* nbControl.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE1BDCB1DCA40E20073C431 /* nbControl.xcdatamodeld */; };
 		EAE1BDCF1DCA40E20073C431 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EAE1BDCE1DCA40E20073C431 /* Assets.xcassets */; };
 		EAE1BDD21DCA40E20073C431 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAE1BDD01DCA40E20073C431 /* LaunchScreen.storyboard */; };
@@ -53,6 +61,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		074AD03E1DE9E326000A8E8A /* nbControl-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "nbControl-Bridging-Header.h"; sourceTree = "<group>"; };
+		074AD03F1DE9E327000A8E8A /* ConnectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ConnectionManager.swift; path = "../../robot-interface/ConnectionManager.swift"; sourceTree = "<group>"; };
+		074AD0401DE9E327000A8E8A /* RobotConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RobotConnection.h; path = "../../robot-interface/RobotConnection.h"; sourceTree = "<group>"; };
+		074AD0411DE9E327000A8E8A /* RobotConnection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RobotConnection.mm; path = "../../robot-interface/RobotConnection.mm"; sourceTree = "<group>"; };
+		074AD0431DE9E327000A8E8A /* json.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json.cpp; sourceTree = "<group>"; };
+		074AD0441DE9E327000A8E8A /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = json.hpp; sourceTree = "<group>"; };
+		074AD0451DE9E327000A8E8A /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
+		074AD0461DE9E327000A8E8A /* Log.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Log.hpp; sourceTree = "<group>"; };
+		074AD0471DE9E327000A8E8A /* LogRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LogRPC.cpp; sourceTree = "<group>"; };
+		074AD0481DE9E327000A8E8A /* LogRPC.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LogRPC.hpp; sourceTree = "<group>"; };
+		074AD0491DE9E327000A8E8A /* nblogio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nblogio.cpp; sourceTree = "<group>"; };
+		074AD04A1DE9E327000A8E8A /* nblogio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nblogio.h; sourceTree = "<group>"; };
+		074AD04B1DE9E327000A8E8A /* SExpr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SExpr.cpp; sourceTree = "<group>"; };
+		074AD04C1DE9E327000A8E8A /* SExpr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SExpr.h; sourceTree = "<group>"; };
+		074AD04D1DE9E327000A8E8A /* utilities-pp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "utilities-pp.hpp"; sourceTree = "<group>"; };
+		074AD04E1DE9E327000A8E8A /* utilities-test.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "utilities-test.hpp"; sourceTree = "<group>"; };
+		074AD04F1DE9E327000A8E8A /* utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cpp; sourceTree = "<group>"; };
+		074AD0501DE9E327000A8E8A /* utilities.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = utilities.hpp; sourceTree = "<group>"; };
+		077BF1861DE8996B00754D79 /* Main2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main2.storyboard; sourceTree = "<group>"; };
 		EA0DA4E61DDAA66400E7E0B4 /* info@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info@3x.png"; sourceTree = "<group>"; };
 		EA0DA4E81DDAA6F900E7E0B4 /* info@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info@2x.png"; sourceTree = "<group>"; };
 		EA0DA4E91DDAA6F900E7E0B4 /* info@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info@1x.png"; sourceTree = "<group>"; };
@@ -64,7 +91,7 @@
 		EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = nao_sitting.jpg; sourceTree = "<group>"; };
 		EA1C554E1DDBCE3A00706BCA /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		EA6D4BD01DE21788004B66DF /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
-		EAB295B71DE21A1C00C73B4D /* MenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		EA8734591DE9F2240026A593 /* ControlBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlBrain.swift; sourceTree = "<group>"; };
 		EABAC8571DE0C00300EAB3C3 /* HardwareTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HardwareTableViewController.swift; sourceTree = "<group>"; };
 		EABC61E51DDE715F00133C43 /* ControlView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
 		EABC61E71DDE724700133C43 /* GravityBehavior.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GravityBehavior.swift; sourceTree = "<group>"; };
@@ -74,7 +101,6 @@
 		EAD207FC1DCAB49C0013A967 /* ControlViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlViewController.swift; sourceTree = "<group>"; };
 		EAE1BDC11DCA40E20073C431 /* nbControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nbControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		EAE1BDC91DCA40E20073C431 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EAE1BDCC1DCA40E20073C431 /* nbControl.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = nbControl.xcdatamodel; sourceTree = "<group>"; };
 		EAE1BDCE1DCA40E20073C431 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EAE1BDD11DCA40E20073C431 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -112,6 +138,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		074AD03D1DE9E2F1000A8E8A /* interface */ = {
+			isa = PBXGroup;
+			children = (
+				074AD03F1DE9E327000A8E8A /* ConnectionManager.swift */,
+				074AD0401DE9E327000A8E8A /* RobotConnection.h */,
+				074AD0411DE9E327000A8E8A /* RobotConnection.mm */,
+				074AD0421DE9E327000A8E8A /* share */,
+				074AD03E1DE9E326000A8E8A /* nbControl-Bridging-Header.h */,
+			);
+			name = interface;
+			sourceTree = "<group>";
+		};
+		074AD0421DE9E327000A8E8A /* share */ = {
+			isa = PBXGroup;
+			children = (
+				074AD0431DE9E327000A8E8A /* json.cpp */,
+				074AD0441DE9E327000A8E8A /* json.hpp */,
+				074AD0451DE9E327000A8E8A /* Log.cpp */,
+				074AD0461DE9E327000A8E8A /* Log.hpp */,
+				074AD0471DE9E327000A8E8A /* LogRPC.cpp */,
+				074AD0481DE9E327000A8E8A /* LogRPC.hpp */,
+				074AD0491DE9E327000A8E8A /* nblogio.cpp */,
+				074AD04A1DE9E327000A8E8A /* nblogio.h */,
+				074AD04B1DE9E327000A8E8A /* SExpr.cpp */,
+				074AD04C1DE9E327000A8E8A /* SExpr.h */,
+				074AD04D1DE9E327000A8E8A /* utilities-pp.hpp */,
+				074AD04E1DE9E327000A8E8A /* utilities-test.hpp */,
+				074AD04F1DE9E327000A8E8A /* utilities.cpp */,
+				074AD0501DE9E327000A8E8A /* utilities.hpp */,
+			);
+			name = share;
+			path = "../../robot-interface/share";
+			sourceTree = "<group>";
+		};
 		EA0DA4E51DDAA56100E7E0B4 /* icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -147,6 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				EAD207FC1DCAB49C0013A967 /* ControlViewController.swift */,
+				EA8734591DE9F2240026A593 /* ControlBrain.swift */,
 				EABC61E51DDE715F00133C43 /* ControlView.swift */,
 				EABC61EB1DDE774900133C43 /* UIKit_Extensions.swift */,
 				EABC61E71DDE724700133C43 /* GravityBehavior.swift */,
@@ -192,11 +253,11 @@
 				EA0DA4E51DDAA56100E7E0B4 /* icons */,
 				EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */,
 				EA6D4BD01DE21788004B66DF /* MenuViewController.swift */,
-				EAB295B71DE21A1C00C73B4D /* MenuView.swift */,
+				074AD03D1DE9E2F1000A8E8A /* interface */,
 				EA6D4BD21DE2179F004B66DF /* Info */,
 				EA6D4BD41DE217CB004B66DF /* Hardware */,
 				EA6D4BD31DE217BA004B66DF /* Control */,
-				EAE1BDC81DCA40E20073C431 /* Main.storyboard */,
+				077BF1861DE8996B00754D79 /* Main2.storyboard */,
 				EAE1BDD01DCA40E20073C431 /* LaunchScreen.storyboard */,
 				EAE1BDD31DCA40E20073C431 /* Info.plist */,
 				EAE1BDCB1DCA40E20073C431 /* nbControl.xcdatamodeld */,
@@ -291,6 +352,7 @@
 					EAE1BDC01DCA40E20073C431 = {
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = U9MDJNE498;
+						LastSwiftMigration = 0810;
 						ProvisioningStyle = Automatic;
 					};
 					EAE1BDD71DCA40E20073C431 = {
@@ -336,11 +398,11 @@
 				EA0DA4E71DDAA66400E7E0B4 /* info@3x.png in Resources */,
 				EA0DA4EA1DDAA6F900E7E0B4 /* info@2x.png in Resources */,
 				EA0DA4F01DDAA75000E7E0B4 /* joystick@2x.png in Resources */,
+				077BF1871DE8996B00754D79 /* Main2.storyboard in Resources */,
 				EA0DA4EB1DDAA6F900E7E0B4 /* info@1x.png in Resources */,
 				EAE1BDCF1DCA40E20073C431 /* Assets.xcassets in Resources */,
 				EA1C554B1DDBCD9300706BCA /* nao_sitting.jpg in Resources */,
 				EA0DA4F11DDAA75000E7E0B4 /* joystick@3x.png in Resources */,
-				EAE1BDCA1DCA40E20073C431 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,14 +429,22 @@
 			files = (
 				EABC61E61DDE715F00133C43 /* ControlView.swift in Sources */,
 				EAE1BDCD1DCA40E20073C431 /* nbControl.xcdatamodeld in Sources */,
+				074AD0511DE9E327000A8E8A /* ConnectionManager.swift in Sources */,
 				EABAC8581DE0C00300EAB3C3 /* HardwareTableViewController.swift in Sources */,
 				EABC61E81DDE724700133C43 /* GravityBehavior.swift in Sources */,
 				EAD207FD1DCAB49C0013A967 /* ControlViewController.swift in Sources */,
 				EAE1BDC51DCA40E20073C431 /* AppDelegate.swift in Sources */,
 				EA0DA4F51DDAAD6E00E7E0B4 /* InfoTableViewController.swift in Sources */,
-				EAB295B81DE21A1C00C73B4D /* MenuView.swift in Sources */,
+				074AD0531DE9E327000A8E8A /* json.cpp in Sources */,
+				074AD0551DE9E327000A8E8A /* LogRPC.cpp in Sources */,
+				074AD0581DE9E327000A8E8A /* utilities.cpp in Sources */,
+				074AD0521DE9E327000A8E8A /* RobotConnection.mm in Sources */,
+				074AD0541DE9E327000A8E8A /* Log.cpp in Sources */,
+				074AD0571DE9E327000A8E8A /* SExpr.cpp in Sources */,
+				EA87345A1DE9F2240026A593 /* ControlBrain.swift in Sources */,
 				EA6D4BD11DE21788004B66DF /* MenuViewController.swift in Sources */,
 				EABC61EC1DDE774900133C43 /* UIKit_Extensions.swift in Sources */,
+				074AD0561DE9E327000A8E8A /* nblogio.cpp in Sources */,
 				EABC61EA1DDE728000133C43 /* BezierPathsView.swift in Sources */,
 				EABC872E1DD1250300347577 /* InfoBrain.swift in Sources */,
 				EA1071141DDBF19500C3FE08 /* HardwareBrain.swift in Sources */,
@@ -413,14 +483,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		EAE1BDC81DCA40E20073C431 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				EAE1BDC91DCA40E20073C431 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		EAE1BDD01DCA40E20073C431 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -529,11 +591,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = U9MDJNE498;
 				INFOPLIST_FILE = nbControl/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = CoryAlini.nbControl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "nbControl/nbControl-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -542,11 +607,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = U9MDJNE498;
 				INFOPLIST_FILE = nbControl/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = CoryAlini.nbControl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "nbControl/nbControl-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

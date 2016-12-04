@@ -65,11 +65,48 @@ namespace control {
             nbl::io::writeStringToFile(arguments[0]->blocks[0].data, path);
         }
 
+    struct RobotCommandStruct latestCommand = {0};
+
     CONTROL_FUNCTION(nbControlFunction, false, nbl::SharedConstants::LogClass_Null())
     (const std::vector<nbl::logptr> &arguments) {
         NBL_ASSERT(arguments.size() == 1)
 
         NBL_WARN("nbControlFunction(): %s", arguments[0]->topLevelDictionary.print().c_str())
+
+        nbl::Log& arg = *arguments[0];
+
+        NBL_INFO("latestCommand update >start<")
+        latestCommand.adjustHead = arg.topLevelDictionary["adjustHead"].asBoolean().value();
+        latestCommand.adjustedHeadZ = arg.topLevelDictionary["adjustedHeadZ"].asNumber().asFloat();
+        latestCommand.adjustedHeadY = arg.topLevelDictionary["adjustedHeadY"].asNumber().asFloat();
+
+        latestCommand.walkCommand = arg.topLevelDictionary["walkCommand"].asBoolean().value();
+        latestCommand.walkStop = arg.topLevelDictionary["walkStop"].asBoolean().value();
+        latestCommand.walkHeading = arg.topLevelDictionary["walkHeading"].asNumber().asFloat();
+        latestCommand.walkX = arg.topLevelDictionary["walkX"].asNumber().asFloat();
+        latestCommand.walkY = arg.topLevelDictionary["walkY"].asNumber().asFloat();
+
+        latestCommand.doSweetMove = arg.topLevelDictionary["doSweetMove"].asBoolean().value();
+        latestCommand.sweetMoveID = arg.topLevelDictionary["sweetMoveID"].asNumber().asInt();
+
+        latestCommand.logInfo = arg.topLevelDictionary["logInfo"].asBoolean().value();
+        latestCommand.logImage = arg.topLevelDictionary["logImage"].asBoolean().value();
+
+        ++latestCommand.commandIndex;
+        NBL_INFO("latestCommand update >end<")
+
+        if (latestCommand.logInfo) {
+            nbl::logptr infoRet = nbl::Log::explicitLog({}, {}, "nbControlInfo");
+            //Robot
+            //Battery %
+            //Player
+            //Game state
+            //Playing state
+
+            RETURN(infoRet);
+        }
+
+        // if (latestCommand.logImage) have Vision or Transcriber log one image (and swap the flag back after)
     }
 }
 

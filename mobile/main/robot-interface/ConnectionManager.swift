@@ -9,6 +9,10 @@ import UIKit
 
 let robotManager:RobotManagerProtocol = RobotManager()
 
+func blankRobotCommand() -> RobotCommandStruct {
+    return RobotCommandStruct(adjustHead: false, adjustedHeadZ: 0, adjustedHeadY: 0, walkCommand: false, walkStop: false, walkHeading: 0, walkX: 0, walkY: 0, doSweetMove: false, sweetMoveID: 0, logInfo: false, logImage: false)
+}
+
 protocol RobotManagerProtocol {
     //address of current robot if connected, nil if not connected
     func currentAddress() -> String?
@@ -23,8 +27,12 @@ protocol RobotManagerProtocol {
     func send(_ aCommand: RobotCommandStruct)
 
     //set dispatchIncomingLog log callback
+    //escaping makes the arguments closures
     func setIncomingHandler(callback: @escaping ((Log, String)->Void) )
     func setStatusHandler(callback: @escaping ((Bool, String)->Void) )
+
+    /* does pinging on async thread, callback is called on main thread with args (online,offline) */
+    func determineOnlineHosts(hosts: [String], callback: @escaping ([String],[String])->(Void))
 }
 
 class RobotManager: RobotManagerProtocol {
@@ -80,17 +88,14 @@ class RobotManager: RobotManagerProtocol {
                 connectionQueue.async {
                     self.runLoop(address)
                 }
-
                 return true
             } else {
                 return false
             }
         } else {
-
             connectionQueue.async {
                 self.runLoop(address)
             }
-
             return true
         }
     }
@@ -129,6 +134,30 @@ class RobotManager: RobotManagerProtocol {
         DispatchQueue.main.async {
             if let handler = self.incomingLogHandler {
                 handler(log, addr)
+            }
+        }
+    }
+
+    open func determineOnlineHosts(hosts: [String], callback: @escaping ([String],[String])->(Void)) {
+        DispatchQueue.global().async {
+
+            var online = [String]()
+            var offline = [String]()
+
+            for host in hosts {
+                print("testing \(host)")
+
+                if (RobotConnection.canConnect(to: host)) {
+                    online.append(host)
+                } else {
+                    offline.append(host)
+                }
+            }
+
+            offline.append(contentsOf: hosts)
+
+            DispatchQueue.main.async {
+                callback(online, offline)
             }
         }
     }
