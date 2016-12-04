@@ -67,6 +67,7 @@ private:
     typedef int game_state_t;
 
     void whistleHandler(game_state_t lastState, game_state_t& nextState);
+    void nbControlHandler();
 };
 
 }

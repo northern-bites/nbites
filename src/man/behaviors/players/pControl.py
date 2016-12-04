@@ -14,7 +14,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 		self.addStates(CommMonitorStates)
 		self.addStates(GameControllerStates)
 		self.addStates(ControlStates)
-		self.setName('pControl ')
+		self.setName('pControl')
 		self.currentState = 'fallController' # initial state
 
 		self.brain.fallController.enabled = False 

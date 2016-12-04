@@ -58,4 +58,6 @@ message RobotCommand
 
     optional bool logInfo = 11;
     optional bool logImage = 12;
+
+    optional sint64 commandIndex = 13;
 }
