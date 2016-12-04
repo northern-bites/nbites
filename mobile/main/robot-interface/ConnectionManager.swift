@@ -154,7 +154,7 @@ class RobotManager: RobotManagerProtocol {
                 }
             }
 
-            offline.append(contentsOf: hosts)
+//            offline.append(contentsOf: hosts)
 
             DispatchQueue.main.async {
                 callback(online, offline)

@@ -41,13 +41,13 @@ def fallen(player):
 
 @superState('gameControllerResponder')
 def controller(player):
-    command = player.brain.interface.gameState.robotCommand
+    command = player.brain.interface.gameState.robot_command
 
-    if command.commandIndex != player.latestCommandIndex:
-        print "nbControl detecting new command: " + command.commandIndex
-        player.latestCommandIndex = command.commandIndex
+    if command.command_index != player.latestCommandIndex:
+        print "nbControl detecting new command: " + command.command_index
+        player.latestCommandIndex = command.command_index
 
-        if command.walkCommand:
+        if command.walk_command:
             print "interpreting walk command"
             return player.goNow('walkInDirection')
 
@@ -67,15 +67,15 @@ def controller(player):
 
 @superState('gameControllerResponder')
 def walkInDirection(player):
-    command = player.brain.interface.gameState.robotCommand
+    command = player.brain.interface.gameState.robot_command
 
     if player.firstFrame():
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
-    elif !command.walkStop:
+    elif !command.walk_stop:
         print "walking..."
-        player.setWalk(command.walkX,command.walkY,command.walkHeading)
-    elif command.walkStop:
+        player.setWalk(command.walk_x,command.walk_y,command.walk_heading)
+    elif command.walk_stop:
         print "stopping walk..."
         player.brain.nav.stand()
         return player.goNow('controller')

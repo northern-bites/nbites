@@ -440,25 +440,25 @@ namespace man{
         }
 
         void GameStateModule::nbControlHandler() {
-            messages::RobotCommand* cmnd = latest_data.mutable_robotcommand();
+            messages::RobotCommand* cmnd = latest_data.mutable_robot_command();
 
-            cmnd->set_adjusthead( control::latestCommand.adjustHead );
-            cmnd->set_adjustedheadz( control::latestCommand.adjustedHeadZ );
-            cmnd->set_adjustedheady( control::latestCommand.adjustedHeadY );
+            cmnd->set_adjust_head( control::latestCommand.adjustHead );
+            cmnd->set_adjusted_head_z( control::latestCommand.adjustedHeadZ );
+            cmnd->set_adjusted_head_y( control::latestCommand.adjustedHeadY );
 
-            cmnd->set_walkcommand( control::latestCommand.walkCommand );
-            cmnd->set_walkstop( control::latestCommand.walkStop );
-            cmnd->set_walkheading( control::latestCommand.walkHeading );
-            cmnd->set_walkx( control::latestCommand.walkX );
-            cmnd->set_walky( control::latestCommand.walkY );
+            cmnd->set_walk_command( control::latestCommand.walkCommand );
+            cmnd->set_walk_stop( control::latestCommand.walkStop );
+            cmnd->set_walk_heading( control::latestCommand.walkHeading );
+            cmnd->set_walk_x( control::latestCommand.walkX );
+            cmnd->set_walk_y( control::latestCommand.walkY );
 
-            cmnd->set_dosweetmove( control::latestCommand.doSweetMove );
-            cmnd->set_sweetmoveid( control::latestCommand.sweetMoveID );
+            cmnd->set_do_sweetmove( control::latestCommand.doSweetMove );
+            cmnd->set_sweetmove_id( control::latestCommand.sweetMoveID );
 
-            cmnd->set_loginfo( control::latestCommand.logInfo );
-            cmnd->set_logimage( control::latestCommand.logImage );
+            cmnd->set_log_info( control::latestCommand.logInfo );
+            cmnd->set_log_image( control::latestCommand.logImage );
 
-            cmnd->set_commandindex( control::latestCommand.commandIndex );
+            cmnd->set_command_index( control::latestCommand.commandIndex );
         }
 }
 }
