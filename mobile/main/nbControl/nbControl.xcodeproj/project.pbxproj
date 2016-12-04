@@ -41,6 +41,8 @@
 		EAE1BDD21DCA40E20073C431 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAE1BDD01DCA40E20073C431 /* LaunchScreen.storyboard */; };
 		EAE1BDDD1DCA40E20073C431 /* nbControlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE1BDDC1DCA40E20073C431 /* nbControlTests.swift */; };
 		EAE1BDE81DCA40E20073C431 /* nbControlUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE1BDE71DCA40E20073C431 /* nbControlUITests.swift */; };
+		EAF40FE71DF49D6F0027571A /* SweetMovesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF40FE51DF49D6F0027571A /* SweetMovesViewController.swift */; };
+		EAF40FE81DF49D6F0027571A /* SweetMovesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF40FE61DF49D6F0027571A /* SweetMovesCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +113,8 @@
 		EAE1BDE31DCA40E20073C431 /* nbControlUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nbControlUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAE1BDE71DCA40E20073C431 /* nbControlUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nbControlUITests.swift; sourceTree = "<group>"; };
 		EAE1BDE91DCA40E20073C431 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EAF40FE51DF49D6F0027571A /* SweetMovesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SweetMovesViewController.swift; sourceTree = "<group>"; };
+		EAF40FE61DF49D6F0027571A /* SweetMovesCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SweetMovesCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -254,6 +258,7 @@
 				EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */,
 				EA6D4BD01DE21788004B66DF /* MenuViewController.swift */,
 				074AD03D1DE9E2F1000A8E8A /* interface */,
+				EAF40FE91DF49D730027571A /* SweetMoves */,
 				EA6D4BD21DE2179F004B66DF /* Info */,
 				EA6D4BD41DE217CB004B66DF /* Hardware */,
 				EA6D4BD31DE217BA004B66DF /* Control */,
@@ -281,6 +286,15 @@
 				EAE1BDE91DCA40E20073C431 /* Info.plist */,
 			);
 			path = nbControlUITests;
+			sourceTree = "<group>";
+		};
+		EAF40FE91DF49D730027571A /* SweetMoves */ = {
+			isa = PBXGroup;
+			children = (
+				EAF40FE51DF49D6F0027571A /* SweetMovesViewController.swift */,
+				EAF40FE61DF49D6F0027571A /* SweetMovesCollectionViewCell.swift */,
+			);
+			name = SweetMoves;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -427,7 +441,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAF40FE71DF49D6F0027571A /* SweetMovesViewController.swift in Sources */,
 				EABC61E61DDE715F00133C43 /* ControlView.swift in Sources */,
+				EAF40FE81DF49D6F0027571A /* SweetMovesCollectionViewCell.swift in Sources */,
 				EAE1BDCD1DCA40E20073C431 /* nbControl.xcdatamodeld in Sources */,
 				074AD0511DE9E327000A8E8A /* ConnectionManager.swift in Sources */,
 				EABAC8581DE0C00300EAB3C3 /* HardwareTableViewController.swift in Sources */,
