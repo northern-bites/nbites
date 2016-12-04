@@ -1,0 +1,20 @@
+Will Gantt
+12/4/16
+
+Hey Marcus. So here are the changes that I've made since we met on Friday:
+
+  1. Changed getAvgBrightness function so that it returns the median
+     brightness of a black spot instead of the mean (I have also renamed
+     the function to "getMedianBrightness").
+  2. Implemented a variation of topOfBallBrighterThanBottomMean, called
+     "topofBallBrighterThanBottomMedian," which, as its name suggests,
+     compares the medians of the brightnesses of the pixels in the top
+     and bottom halves of the ball instead of the means.
+
+I believe I mentioned that it would probably be a good idea to call the
+"topOfBall..." functions only on the best ball found. Currently, I think
+the code is checking all white spots that pass the filter. Fixing this
+should just be matter of changing a couple of lines. Anyway, that would
+be something to do. I also think we should get more logs and start
+collecting data. Do you know MATLAB by chance? Or Excel? Or some other
+software that would let us graph stuff?
