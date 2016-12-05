@@ -534,21 +534,53 @@ void CenterCircleDetector::set()
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 {
+#ifdef OFFLINE
+  _potentials.clear();
+ std::cout << "POTENTIAL SIZE: " << _potentials.size() << std::endl;
+#endif
+
+  std::vector<PointI> points;
+  RANSACCircle result = RANSACCircle();
+  unsigned int ransacSeed = 1;
+
   edges.mapToField(field.getFieldHomography());
   AngleBinsIterator<Edge> abi(edges);
+  
   int var = 0;
+  
   for (Edge* e = *abi; e; e = *++abi) {
-    e->set((int)(e->field().x()), (int)(e->field().y()), e->mag());
+    #ifdef OFFLINE
+      _potentials.push_back(Point(e->field().x(), e->field().y()*2));
+    #endif
+    
+    points.push_back(PointI(e->field().x(), e->field().y()*2));
+
+    // e->set((int)(e->field().x()), (int)(e->field().y()), e->mag());
     // if (e->y() > 0)
     // {
-    //   // std::cout << "REMOVED: y was " << e->y() << std::endl;
-    //   // e->set(0, 0, e->mag());
+    //   std::cout << "REMOVED: y was " << e->y() << std::endl;
+    //   if(var % 2 == 0 && var < 160) {
+    //     e->set(var, var, e->mag());
+    //   }
     // }
-    std::cout << "x: " << e->x() << "\ty: " << e->y() << "\tm: " << e->mag() << "\t|\tang: " << e->radians() << "\thoriz: " << field.horizonAt(e->x())<<  std::endl;
-    // var++;
+    std::cout << var << " - x: " << e->x() << " (" << (int)(e->field().x()) << ")\ty: " << e->y() << " (" << (int)(e->field().y()) << ")\tm: " << e->mag() << "\t|\tang: " << e->radians() << "\thoriz: " << field.horizonAt(e->x())<<  std::endl;
+    var++;
   }
 
-  std::cout << "Edge List has size " << var << std::endl;
+  std::vector<bool> cons (false, points.size());
+  std::vector<bool> cons_buf_1 (false, points.size());
+  std::vector<bool> cons_buf_2 (true, points.size());
+  std::vector<bool> cons_buf[] = {cons_buf_1, cons_buf_2};
+
+  std::cout << "cons_buf[0][0]: " << (*cons_buf)[0] << std::endl;
+
+  bool circleFound = RANSAC::findCircleOfRadius3P(points, 190, 20, NULL, result, 50, 1.2, points.size(), cons_buf, &ransacSeed);
+  std::cout << "Circle found: " << circleFound << std::endl;
+
+  free(&cons);
+  free(&cons_buf);
+  free(&cons_buf_1);
+  free(&cons_buf_2);
 
   // AngleBinsIterator<Edge> abi2(edges);
   // for (Edge* e = *abi2; e; e = *++abi2) {

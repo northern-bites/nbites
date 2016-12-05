@@ -248,6 +248,10 @@ bool RANSAC::findCircleOfRadius3P(
          ++ radius_fails;
 
       }
+
+      // works
+      std::cout << "p1: " << p1 << "; p2: " << p2 << "; p3: " << p3 << std::endl;
+
       if (radius_fails == 20) {
          return false;
       }
@@ -261,17 +265,23 @@ bool RANSAC::findCircleOfRadius3P(
          this_concensus = &cons_buf[0];
       }
 
+      std::cout << "this_concensus: " << this_concensus << std::endl;
+      std::cout << "this_concensus[0] = " << (*this_concensus)[0];
+
       for (j = 0; j < 4; ++ j) {
          pos_var[j] = neg_var[j] = 0;
       }
 
       unsigned int n_concensus_points = 0;
-      for (j = 0; j != points.size(); ++ j) {
+      for (j = 0; j != points.size(); ++j) {
+         std::cout << j << std::endl;
          const PointF &p = points[j].cast<float>();
          const PointF &d = c.centre - p;
          /* TODO(carl) look into integer version of this */
          float dist = d.norm() - c.radius;
          float dist2 = dist * dist;
+
+         std::cout << dist2 << ", " << e2 << std::endl;
 
          if (dist2 < e2) {
             int quadrant = 0;
@@ -289,6 +299,8 @@ bool RANSAC::findCircleOfRadius3P(
                }
             }
 
+            std::cout << quadrant << std::endl;
+
             if (dist > 0) {
                pos_var[quadrant] += dist2;
             } else {
@@ -300,6 +312,8 @@ bool RANSAC::findCircleOfRadius3P(
          } else {
             (*this_concensus)[j] = false;
          }
+
+         std::cout << "this_concensus[" << j << "] = " << (*this_concensus)[j] << std::endl;
       }
 
       const float k = 0.2;

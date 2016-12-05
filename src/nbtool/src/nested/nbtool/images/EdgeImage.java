@@ -74,7 +74,10 @@ public class EdgeImage extends ImageParent {
 				int mag = dis.readInt();
 				int ang = dis.readInt();
 
+				System.out.println("X: " + x + "; y: " + y);
+
 				if (x < 0 || x > width || y < 0 || y > height) {
+					System.out.println("X: " + x + "; y: " + y + ": SKIPPED");
 					continue;
 				}
 
