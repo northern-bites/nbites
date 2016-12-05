@@ -113,6 +113,7 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots,
             actualWhiteSpots.push_back((*i));
                 if(debugBall) {
                     bool topBrighter = topOfBallBrighterThanBottomMedian((*i));
+                    bool topRectBrigher = aboveBallRectangleBrighterThanBelowBallRectangle((*i));
                     std::cout<<"filterWhiteSpot returned true\n";
                     debugDraw.drawPoint((*i).ix() + width / 2, -(*i).iy() + height / 2, RED);
                 }
@@ -1245,6 +1246,9 @@ bool BallDetector::topOfBallBrighterThanBottomMedian(Spot spot) {
  *              half. Returns true if the pixels in the top half are
  *              brighter.
  ********************************************************************/
+
+//TODO: Implement that the difference needs to be above a certain threshold.
+ //Could also have function return integer difference.
 bool BallDetector::topOfBallBrighterThanBottomMean(Spot spot) {
 
     // convert to raw coordinates
@@ -1338,6 +1342,74 @@ float BallDetector::getMedianBrightness(Spot spot) {
     return yValues[yValues.size() / 2];
 
 } // end getMedianBrightness
+
+/********************************************************************
+ * Inputs:      the white spot to check
+ *
+ * Outputs:     a boolean indicating whether the rectangular area
+ *              above the ball is brighter than the rectangular area
+ *              below the ball.
+ *
+ * Description: This function uses the assumption that there will
+ *              most likely be a shawdow below a ball, and thus that
+                the area below the ball will be darker than the area
+                above the ball. This function compares the median
+                brightness of the two areas, and returns a bool
+                indicating whether the median brightness of the above
+                area is greater than the median brightness of the
+                below area.
+ ********************************************************************/
+
+//This function should only be called if the ball is not on a field line.
+bool BallDetector::aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot) {
+
+    int leftX = spot.ix() + width / 2 - spot.outerDiam / 4;
+    int rightX = spot.ix() + width / 2 + spot.outerDiam / 4;
+
+    //Top Rect
+    int topRectBottomY = -spot.iy() + height / 2 - spot.outerDiam / 4;
+    int topRectTopY = -spot.iy() + height / 2 - (spot.outerDiam + spot.innerDiam) / 4;
+
+    //Bottom Rect
+    int bottomRectTopY = -spot.iy() + height / 2 + spot.outerDiam / 4;
+    int bottomRectBottomY = -spot.iy() + height / 2 + (spot.outerDiam + spot.innerDiam) / 4;
+
+    std::vector<int> topYvalues;
+    std::vector<int> bottomYvalues;
+
+    for (int x=leftX; x<=rightX; x++) {
+      for (int y=topRectBottomY; y<=topRectTopY; y++) {
+
+        if (debugBall)
+          debugDraw.drawDot(x,y,WHITE);
+        topYvalues.push_back(*(yImage.pixelAddr(x,y)));
+
+      }
+    }
+
+    for (int x=leftX; x<=rightX; x++) {
+      for (int y=bottomRectBottomY; y<=bottomRectTopY; y++) {
+
+        if (debugBall)
+          debugDraw.drawDot(x,y,WHITE);
+        bottomYvalues.push_back(*(yImage.pixelAddr(x,y)));
+
+      }
+    }
+
+    // sort both vectors
+    std::sort(topYvalues.begin(), topYvalues.end());
+    std::sort(bottomYvalues.begin(), bottomYvalues.end());
+
+    float topMedian = topYvalues[topYvalues.size() / 2] / 4;
+    float bottomMedian = bottomYvalues[bottomYvalues.size() / 2] / 4;
+
+    printf("Top area above ball has median brightness %f\n", topMedian);
+    printf("Bottom area below ball has median brightness %f\n", bottomMedian);
+
+    return topMedian > bottomMedian;
+
+}
 
 
 bool BallDetector::greenAroundBallFromCentroid(imagePoint p) {

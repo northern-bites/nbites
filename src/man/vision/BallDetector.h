@@ -175,6 +175,7 @@ class BallDetector {
                         bool topOfBallBrighterThanBottomMean(Spot spot);    // WILL + MARCUS
                         bool topOfBallBrighterThanBottomMedian(Spot spot);  // WILL + MARCUS
                         float getMedianBrightness(Spot spot);               // WILL + MARCUS
+                        bool aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot); //WILL + MARCUS
 			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
