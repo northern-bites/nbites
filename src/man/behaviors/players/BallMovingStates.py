@@ -26,8 +26,11 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
+    if player.firstFrame():
+        player.brain.tracker.repeatWideSnapPan()
 
-    if player.brain.frameCounter % 30 == 0:
+    # if player.brain.frameCounter % 30 == 0:
+    if player.brain.ball.vis.on:
 
         #say(Say.IN_DEBUG, "Put me in front of a ball and switch me to game ready!")
 
