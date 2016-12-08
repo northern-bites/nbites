@@ -23,7 +23,11 @@ import UIKit
 
 
 class ControlBrain {
+    let cambridge_blue = UIColor(colorLiteralRed: 163.0/255.0, green: 187.0/255.0, blue: 173.0/255.0, alpha: 1.0)
+    let jet = UIColor(colorLiteralRed: 46.0/255.0, green: 53.0/255.0, blue: 50.0/255.0, alpha: 1.0)
+    let light_grey = UIColor(colorLiteralRed: 200.0/255.0, green: 199.0/255.0, blue: 200.0/255.0, alpha: 1.0)
     
+
     //BOOL walkCommand, walkStop;
     //float walkHeading,walkX,walkY;
     let walkingThreshold: Float = 100.0
@@ -39,6 +43,7 @@ class ControlBrain {
     func sendNewWalk(currPosition: CGPoint, transition:CGPoint) {
         var robot = blankRobotCommand()
 
+        
         robot.walkCommand = true
         let distance = hypot(currPosition)
         let angle:Float = theta(currPosition) + Float(M_PI)

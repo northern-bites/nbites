@@ -11,6 +11,7 @@ import UIKit
 
 
 class ControlViewController: UIViewController,UIPopoverPresentationControllerDelegate {
+    let jet = UIColor(colorLiteralRed: 46.0/255.0, green: 53.0/255.0, blue: 50.0/255.0, alpha: 1.0)
 
     var mainCenter: CGPoint! = CGPoint(x: 0.0, y: 0.0)
     var newPoint: CGPoint = CGPoint(x: 0.0, y: 0.0)
@@ -22,6 +23,7 @@ class ControlViewController: UIViewController,UIPopoverPresentationControllerDel
             controlView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(doPanGestureFunctions(_:))))
             controlView.addGestureRecognizer(UILongPressGestureRecognizer(target: controlView, action:  #selector(controlView.removeSnap(_:))))
             controlView.realGravity = true
+            controlView.backgroundColor = jet
             mainCenter = controlView.circleCenter
         }
     }
