@@ -187,6 +187,9 @@
     return nbl::SharedConstants::REMOTE_HOST_TIMEOUT();
 }
 
+//http://stackoverflow.com/questions/2597608/c-socket-connection-timeout
+//http://developerweb.net/viewtopic.php?id=3196
+
 +(BOOL) canConnectTo: (NSString *) host {
 
     const char * addr = [host cStringUsingEncoding: NSASCIIStringEncoding];
