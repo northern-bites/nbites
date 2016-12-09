@@ -38,7 +38,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(KickingStates)
         self.addStates(KickOffStates)
         self.addStates(PenaltyKickingStates)
-        self.setName('pOrbit`:w
+        self.setName('pOrbit')
 ')
         self.currentState = 'fallController' # initial state
 

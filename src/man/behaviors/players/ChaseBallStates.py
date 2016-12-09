@@ -473,6 +473,7 @@ def positionForKick(player):
     """
     Get the ball in the sweet spot
     """
+
     if transitions.shouldRedecideKick(player):
         print("I think I should redecide my kick!!")
         return player.goLater('approachBall')
@@ -529,7 +530,8 @@ def positionForKick(player):
         # print player.kick
 	print "Im planning on kicking"
         player.shouldKickOff = False
-        return player.goLater('executeSweetKick')
+	return player.goNow('dontMove')
+        #return player.goLater('executeSweetKick')
         # if player.motionKick or True:
         #    return player.goNow('executeMotionKick')
         # elif player.kick.bhKickType or True:
@@ -540,4 +542,9 @@ def positionForKick(player):
         #     return player.goLater('executeSweetKick')
 
     print "we finished this round!! yay"
+    return player.stay()
+
+def dontMove(player):
+    print("maddeeeeeee itttttttt*************************************************************************")
+    player.brain.nav.stand()
     return player.stay()
