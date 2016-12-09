@@ -18,7 +18,11 @@ from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
 from math import fabs, degrees, radians, cos, sin, pi, copysign
 
-global time  = 0
+#global time = 0
+
+#@superState('gameControllerResponder')
+#def startTimer(player):
+	
 
 
 @superState('gameControllerResponder')
@@ -550,5 +554,9 @@ def positionForKick(player):
 def dontMove(player):
     if player.firstFrame():
 	print("maddeeeeeee itttttttt*************************************************************************")
-    player.brain.nav.stand()
+    	timeToCompletion = player.brain.gameController.timeSincePlaying
+	player.brain.nav.stand()
+	print ("timeToCompletion:")
+	print (round(timeToCompletion,2))
+	print (timeToCompletion)
     return player.stay()
