@@ -18,6 +18,9 @@ from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
 from math import fabs, degrees, radians, cos, sin, pi, copysign
 
+global time  = 0
+
+
 @superState('gameControllerResponder')
 @stay
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
@@ -545,6 +548,7 @@ def positionForKick(player):
     return player.stay()
 
 def dontMove(player):
-    print("maddeeeeeee itttttttt*************************************************************************")
+    if player.firstFrame():
+	print("maddeeeeeee itttttttt*************************************************************************")
     player.brain.nav.stand()
     return player.stay()
