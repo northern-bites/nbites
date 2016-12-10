@@ -11,6 +11,7 @@ import UIKit
 class SweetMovesCollectionViewCell: UICollectionViewCell {
     
 
+    @IBOutlet weak var SweetMovesImage: UIImageView!
     @IBOutlet weak var SweetMovesLabel: UILabel!
     
 }

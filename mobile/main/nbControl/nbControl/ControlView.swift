@@ -11,6 +11,10 @@ import UIKit
 import CoreMotion
 
 class ControlView: BezierPathsView, UIDynamicAnimatorDelegate{
+   
+    let cambridge_blue = UIColor(colorLiteralRed: 163.0/255.0, green: 187.0/255.0, blue: 173.0/255.0, alpha: 1.0)
+    let jet = UIColor(colorLiteralRed: 46.0/255.0, green: 53.0/255.0, blue: 50.0/255.0, alpha: 1.0)
+    let mygray = UIColor(colorLiteralRed: 200.0/255.0, green: 199.0/255.0, blue: 200.0/255.0, alpha: 1.0)
     
     var currentPosition: CGPoint {
         get {
@@ -22,7 +26,7 @@ class ControlView: BezierPathsView, UIDynamicAnimatorDelegate{
     var circleCenter: CGPoint! = CGPoint(x:0.0, y:0.0)
 
     var realGravity = false
-    private let circleSize = 10
+    private let circleSize = 5
     
     private let motionManager = CMMotionManager()
     
@@ -71,17 +75,19 @@ class ControlView: BezierPathsView, UIDynamicAnimatorDelegate{
         let barrierSize = dropSize
         let barrierOrigin = CGPoint(x: bounds.midX-barrierSize.width/2, y: bounds.midY - barrierSize.height/2)
         let path = UIBezierPath(ovalIn: CGRect(origin: barrierOrigin, size: barrierSize))
-
+        mygray.setStroke()
+        path.lineWidth = 8
         dropBehavior.addBarrier(path: path, named: PathNames.MiddleBarrier)
         bezierPaths[PathNames.MiddleBarrier] = path
-//        addController()
+        //        addController()
+        
     }
     
     func addController() {
         print("addController()")
         let drop = UIView(frame: CGRect(x: self.center.x - CGFloat(30), y: self.center.y - CGFloat(30), width: 60.0, height: 60.0))
         drop.layer.cornerRadius = 30.0
-        drop.backgroundColor = UIColor.blue
+        drop.backgroundColor = cambridge_blue
         addSubview(drop)
         dropBehavior.addDrop(drop: drop)
         lastDropped = drop

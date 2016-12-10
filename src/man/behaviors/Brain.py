@@ -135,6 +135,9 @@ class Brain(object):
         self.staggeredPositioning = False
         self.defenderPositioning = 0
 
+
+        self.latestCommandIndex = 0
+
     def initTeamMembers(self):
         self.teamMembers = []
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):

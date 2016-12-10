@@ -27,6 +27,12 @@
 		EA1C554B1DDBCD9300706BCA /* nao_sitting.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */; };
 		EA1C554F1DDBCE3A00706BCA /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = EA1C554E1DDBCE3A00706BCA /* logo.png */; };
 		EA6D4BD11DE21788004B66DF /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6D4BD01DE21788004B66DF /* MenuViewController.swift */; };
+		EA7F4ADE1DF9AB340077AF14 /* Short Straight Kick.JPG in Resources */ = {isa = PBXBuildFile; fileRef = EA7F4ADB1DF9AB340077AF14 /* Short Straight Kick.JPG */; };
+		EA7F4ADF1DF9AB340077AF14 /* Side Kick.JPG in Resources */ = {isa = PBXBuildFile; fileRef = EA7F4ADC1DF9AB340077AF14 /* Side Kick.JPG */; };
+		EA7F4AE01DF9AB340077AF14 /* Straight Kick.JPG in Resources */ = {isa = PBXBuildFile; fileRef = EA7F4ADD1DF9AB340077AF14 /* Straight Kick.JPG */; };
+		EA7F4AE31DF9AB410077AF14 /* Cute Kick.JPG in Resources */ = {isa = PBXBuildFile; fileRef = EA7F4AE11DF9AB410077AF14 /* Cute Kick.JPG */; };
+		EA7F4AE41DF9AB410077AF14 /* Goalie Squat.JPG in Resources */ = {isa = PBXBuildFile; fileRef = EA7F4AE21DF9AB410077AF14 /* Goalie Squat.JPG */; };
+		EA7F4AE61DF9AB460077AF14 /* Big Kick.JPG in Resources */ = {isa = PBXBuildFile; fileRef = EA7F4AE51DF9AB460077AF14 /* Big Kick.JPG */; };
 		EA87345A1DE9F2240026A593 /* ControlBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8734591DE9F2240026A593 /* ControlBrain.swift */; };
 		EABAC8581DE0C00300EAB3C3 /* HardwareTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABAC8571DE0C00300EAB3C3 /* HardwareTableViewController.swift */; };
 		EABC61E61DDE715F00133C43 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABC61E51DDE715F00133C43 /* ControlView.swift */; };
@@ -93,6 +99,12 @@
 		EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = nao_sitting.jpg; sourceTree = "<group>"; };
 		EA1C554E1DDBCE3A00706BCA /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		EA6D4BD01DE21788004B66DF /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
+		EA7F4ADB1DF9AB340077AF14 /* Short Straight Kick.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Short Straight Kick.JPG"; sourceTree = "<group>"; };
+		EA7F4ADC1DF9AB340077AF14 /* Side Kick.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Side Kick.JPG"; sourceTree = "<group>"; };
+		EA7F4ADD1DF9AB340077AF14 /* Straight Kick.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Straight Kick.JPG"; sourceTree = "<group>"; };
+		EA7F4AE11DF9AB410077AF14 /* Cute Kick.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Cute Kick.JPG"; sourceTree = "<group>"; };
+		EA7F4AE21DF9AB410077AF14 /* Goalie Squat.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Goalie Squat.JPG"; sourceTree = "<group>"; };
+		EA7F4AE51DF9AB460077AF14 /* Big Kick.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Big Kick.JPG"; sourceTree = "<group>"; };
 		EA8734591DE9F2240026A593 /* ControlBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlBrain.swift; sourceTree = "<group>"; };
 		EABAC8571DE0C00300EAB3C3 /* HardwareTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HardwareTableViewController.swift; sourceTree = "<group>"; };
 		EABC61E51DDE715F00133C43 /* ControlView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
@@ -193,9 +205,22 @@
 			isa = PBXGroup;
 			children = (
 				EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */,
+				EA7F4AE11DF9AB410077AF14 /* Cute Kick.JPG */,
+				EA7F4AE21DF9AB410077AF14 /* Goalie Squat.JPG */,
+				EA7F4AE51DF9AB460077AF14 /* Big Kick.JPG */,
+				EA7F4ADB1DF9AB340077AF14 /* Short Straight Kick.JPG */,
+				EA7F4ADC1DF9AB340077AF14 /* Side Kick.JPG */,
+				EA7F4ADD1DF9AB340077AF14 /* Straight Kick.JPG */,
 				EA1C554E1DDBCE3A00706BCA /* logo.png */,
 			);
 			name = images;
+			sourceTree = "<group>";
+		};
+		EA684A7D1DF5D5470054D642 /* HeadMovement */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = HeadMovement;
 			sourceTree = "<group>";
 		};
 		EA6D4BD21DE2179F004B66DF /* Info */ = {
@@ -258,6 +283,7 @@
 				EAE1BDC41DCA40E20073C431 /* AppDelegate.swift */,
 				EA6D4BD01DE21788004B66DF /* MenuViewController.swift */,
 				074AD03D1DE9E2F1000A8E8A /* interface */,
+				EA684A7D1DF5D5470054D642 /* HeadMovement */,
 				EAF40FE91DF49D730027571A /* SweetMoves */,
 				EA6D4BD21DE2179F004B66DF /* Info */,
 				EA6D4BD41DE217CB004B66DF /* Hardware */,
@@ -406,17 +432,23 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA7F4AE01DF9AB340077AF14 /* Straight Kick.JPG in Resources */,
 				EA0DA4EF1DDAA75000E7E0B4 /* joystick@1x.png in Resources */,
+				EA7F4AE61DF9AB460077AF14 /* Big Kick.JPG in Resources */,
 				EAE1BDD21DCA40E20073C431 /* LaunchScreen.storyboard in Resources */,
+				EA7F4AE31DF9AB410077AF14 /* Cute Kick.JPG in Resources */,
 				EA1C554F1DDBCE3A00706BCA /* logo.png in Resources */,
 				EA0DA4E71DDAA66400E7E0B4 /* info@3x.png in Resources */,
 				EA0DA4EA1DDAA6F900E7E0B4 /* info@2x.png in Resources */,
+				EA7F4ADE1DF9AB340077AF14 /* Short Straight Kick.JPG in Resources */,
 				EA0DA4F01DDAA75000E7E0B4 /* joystick@2x.png in Resources */,
 				077BF1871DE8996B00754D79 /* Main2.storyboard in Resources */,
 				EA0DA4EB1DDAA6F900E7E0B4 /* info@1x.png in Resources */,
 				EAE1BDCF1DCA40E20073C431 /* Assets.xcassets in Resources */,
 				EA1C554B1DDBCD9300706BCA /* nao_sitting.jpg in Resources */,
 				EA0DA4F11DDAA75000E7E0B4 /* joystick@3x.png in Resources */,
+				EA7F4AE41DF9AB410077AF14 /* Goalie Squat.JPG in Resources */,
+				EA7F4ADF1DF9AB340077AF14 /* Side Kick.JPG in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -205,7 +205,7 @@
             </objects>
             <point key="canvasLocation" x="-1364" y="-213"/>
         </scene>
-        <!--Sweet Moves View Controller-->
+        <!--Sweet Moves-->
         <scene sceneID="QzB-wB-bfJ">
             <objects>
                 <viewController id="yfd-vk-vXT" customClass="SweetMovesViewController" customModule="nbControl" customModuleProvider="target" sceneMemberID="viewController">
@@ -234,10 +234,13 @@
                                             <rect key="frame" x="0.0" y="0.0" width="162" height="162"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jyG-4V-EsZ">
+                                                    <rect key="frame" x="0.0" y="0.0" width="162" height="134"/>
+                                                </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wXk-6n-05c">
-                                                    <rect key="frame" x="8" y="124" width="146" height="30"/>
+                                                    <rect key="frame" x="8" y="132" width="146" height="30"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="nRP-Tq-ovs"/>
+                                                        <constraint firstAttribute="height" constant="30" id="LCA-tA-VZw"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
@@ -246,11 +249,16 @@
                                             </subviews>
                                         </view>
                                         <constraints>
-                                            <constraint firstItem="wXk-6n-05c" firstAttribute="bottom" secondItem="fdf-MC-cw4" secondAttribute="bottomMargin" id="2NC-Y2-Jkx"/>
-                                            <constraint firstItem="wXk-6n-05c" firstAttribute="leading" secondItem="fdf-MC-cw4" secondAttribute="leadingMargin" id="LTi-AD-cWl"/>
-                                            <constraint firstItem="wXk-6n-05c" firstAttribute="trailing" secondItem="fdf-MC-cw4" secondAttribute="trailingMargin" id="PWM-pC-i6p"/>
+                                            <constraint firstItem="jyG-4V-EsZ" firstAttribute="leading" secondItem="fdf-MC-cw4" secondAttribute="leading" id="19x-pJ-gEm"/>
+                                            <constraint firstAttribute="bottomMargin" secondItem="jyG-4V-EsZ" secondAttribute="bottom" constant="20" id="4Dh-Ul-kRA"/>
+                                            <constraint firstItem="wXk-6n-05c" firstAttribute="trailing" secondItem="fdf-MC-cw4" secondAttribute="trailingMargin" id="Dle-uD-TaT"/>
+                                            <constraint firstItem="jyG-4V-EsZ" firstAttribute="top" secondItem="fdf-MC-cw4" secondAttribute="top" id="Im9-0q-WBJ"/>
+                                            <constraint firstItem="wXk-6n-05c" firstAttribute="leading" secondItem="fdf-MC-cw4" secondAttribute="leadingMargin" id="QhZ-d5-AX2"/>
+                                            <constraint firstItem="jyG-4V-EsZ" firstAttribute="centerX" secondItem="wXk-6n-05c" secondAttribute="centerX" id="cB3-DM-rrb"/>
+                                            <constraint firstAttribute="bottom" secondItem="wXk-6n-05c" secondAttribute="bottom" id="fUt-Ho-Rbu"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="SweetMovesImage" destination="jyG-4V-EsZ" id="nHW-AE-ff3"/>
                                             <outlet property="SweetMovesLabel" destination="wXk-6n-05c" id="tgL-KH-Rc0"/>
                                         </connections>
                                     </collectionViewCell>
@@ -269,7 +277,7 @@
                             <constraint firstItem="jyC-io-VDf" firstAttribute="leading" secondItem="OiJ-SU-Tpk" secondAttribute="leadingMargin" id="w6y-5z-Ewm"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="zL8-31-kfI"/>
+                    <navigationItem key="navigationItem" title="Sweet Moves" id="zL8-31-kfI"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gwp-gy-Lm4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

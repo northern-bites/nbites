@@ -23,4 +23,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 		self.returningFromPenalty = False
 		self.commMode = -1
 
-        self.latestCommandIndex = 0
+        
