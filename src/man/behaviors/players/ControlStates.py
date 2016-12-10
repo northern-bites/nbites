@@ -41,7 +41,7 @@ def fallen(player):
 
 @superState('gameControllerResponder')
 def controller(player):
-    command = player.brain.interface.gameState.cmnd
+    command = player.brain.interface.gameState.robot_command
     print "Command index then latest command index"
     print command.command_index
     print player.latestCommandIndex

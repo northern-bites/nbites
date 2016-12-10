@@ -81,6 +81,9 @@ namespace man{
             /* update latest_data robotCommand fields... */
             nbControlHandler();
 
+            printf("command index is: %zi\n",
+                   latest_data.mutable_robot_command()->command_index() );
+
             portals::Message<messages::GameState> output(&latest_data);
             gameStateOutput.setMessage(output);
 

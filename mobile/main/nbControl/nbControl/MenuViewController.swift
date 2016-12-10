@@ -134,24 +134,27 @@ class MenuViewController: UITableViewController {
         print("findAndReloadRobots()!")
 
         var allRobots = [String]()
-        allRobots.append(contentsOf: listOfV4Robots.keys)
-        allRobots.append(contentsOf: listOfV5Robots.keys)
+//        allRobots.append(contentsOf: listOfV4Robots.keys)
+//        allRobots.append(contentsOf: listOfV5Robots.keys)
+        allRobots.append("mal")
+
         self.online = allRobots
-        //allRobots.append("mal")
-//        robotManager.determineOnlineHosts(hosts: allRobots) {
-//            (onlineHosts:[String], offlineHosts:[String])->Void in
-//
-//            print("findAndReloadRobots callback() online:\(onlineHosts) offline:\(offlineHosts.count)")
-//
-//            self.online = onlineHosts
-//            self.offline = offlineHosts
-//
-//            self.tableView.reloadData()
-//
-//            if let refresher = refreshControl {
-//                refresher.endRefreshing()
-//            }
-//        }
+
+
+        robotManager.determineOnlineHosts(hosts: allRobots) {
+            (onlineHosts:[String], offlineHosts:[String])->Void in
+
+            print("findAndReloadRobots callback() online:\(onlineHosts) offline:\(offlineHosts.count)")
+
+            self.online = onlineHosts
+            self.offline = offlineHosts
+
+            self.tableView.reloadData()
+
+            if let refresher = refreshControl {
+                refresher.endRefreshing()
+            }
+        }
     }
 }
 
