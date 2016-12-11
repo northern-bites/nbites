@@ -112,8 +112,8 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots,
         if (filterWhiteSpot((*i), blackSpots, badBlackSpots)) {
             actualWhiteSpots.push_back((*i));
                 if(debugBall) {
-                    bool topBrighter = topOfBallBrighterThanBottomMedian((*i));
-                    bool topRectBrigher = aboveBallRectangleBrighterThanBelowBallRectangle((*i));
+                    topOfBallBrighterThanBottomMedian((*i));
+                    aboveBallRectangleBrighterThanBelowBallRectangle((*i));
                     std::cout<<"filterWhiteSpot returned true\n";
                     debugDraw.drawPoint((*i).ix() + width / 2, -(*i).iy() + height / 2, RED);
                 }
@@ -1169,7 +1169,7 @@ bool BallDetector::whiteBelowSpot(Spot spot) {
  *              half. Returns true if the median of the pixels in 
  *              the top half are brighter.
  ********************************************************************/
-bool BallDetector::topOfBallBrighterThanBottomMedian(Spot spot) {
+std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMedian(Spot spot) {
 
     // convert to raw coordinates
     int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
@@ -1226,11 +1226,13 @@ bool BallDetector::topOfBallBrighterThanBottomMedian(Spot spot) {
     // of a weird property of pixels in the y image)
     float topMedian = topYvalues[topYvalues.size() / 2] / 4;
     float bottomMedian = bottomYvalues[bottomYvalues.size() / 2] / 4;
+    
+    std::pair<double,double> medianBrightnesses = std::make_pair(topMedian, bottomMedian);
 
     printf("Top of ball has median brightness %f\n", topMedian);
     printf("Bottom of ball has median brightness %f\n", bottomMedian);
 
-    return topMedian > bottomMedian;
+    return medianBrightnesses;
 
 } // end topOfBallBrighterThanBottomMedian
 
@@ -1249,7 +1251,7 @@ bool BallDetector::topOfBallBrighterThanBottomMedian(Spot spot) {
 
 //TODO: Implement that the difference needs to be above a certain threshold.
  //Could also have function return integer difference.
-bool BallDetector::topOfBallBrighterThanBottomMean(Spot spot) {
+std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMean(Spot spot) {
 
     // convert to raw coordinates
     int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
@@ -1295,12 +1297,13 @@ bool BallDetector::topOfBallBrighterThanBottomMean(Spot spot) {
     // and bottom halves (have to multiply denominator by 4 because
     // of a weird property of pixels in the y image)
     float topYValueAvg = topYValueTotal / (4 * topPixels);
-    float bottomYValueAvg = bottomYValueTotal / (4 * bottomPixels); 
+    float bottomYValueAvg = bottomYValueTotal / (4 * bottomPixels);
+    std::pair<double,double> meanBrightnesses = std::make_pair(topYValueAvg, bottomYValueAvg);
   
     printf("Top of ball has mean brightness %f\n", topYValueAvg);
     printf("Bottom of ball has mean brightness %f\n", bottomYValueAvg);
 
-    return topYValueAvg > bottomYValueAvg;
+    return meanBrightnesses;
 
 } // end topOfBallBrighterThanBottomMean
 
@@ -1361,7 +1364,7 @@ float BallDetector::getMedianBrightness(Spot spot) {
  ********************************************************************/
 
 //This function should only be called if the ball is not on a field line.
-bool BallDetector::aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot) {
+std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot) {
 
     int leftX = spot.ix() + width / 2 - spot.outerDiam / 4;
     int rightX = spot.ix() + width / 2 + spot.outerDiam / 4;
@@ -1401,13 +1404,14 @@ bool BallDetector::aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot) {
     std::sort(topYvalues.begin(), topYvalues.end());
     std::sort(bottomYvalues.begin(), bottomYvalues.end());
 
-    float topMedian = topYvalues[topYvalues.size() / 2] / 4;
-    float bottomMedian = bottomYvalues[bottomYvalues.size() / 2] / 4;
+    int topMedian = topYvalues[topYvalues.size() / 2] / 4;
+    int bottomMedian = bottomYvalues[bottomYvalues.size() / 2] / 4;
+    std::pair<int,int> medianBrightnesses = std::make_pair(topMedian,bottomMedian);
 
-    printf("Top area above ball has median brightness %f\n", topMedian);
-    printf("Bottom area below ball has median brightness %f\n", bottomMedian);
+    printf("Area above ball has median brightness %d\n", topMedian);
+    printf("Area below ball has median brightness %d\n", bottomMedian);
 
-    return topMedian > bottomMedian;
+    return medianBrightnesses;
 
 }
 

@@ -172,10 +172,10 @@ class BallDetector {
                                 	int bottomQuarer);
 
 			bool whiteBelowSpot(Spot spot);
-                        bool topOfBallBrighterThanBottomMean(Spot spot);    // WILL + MARCUS
-                        bool topOfBallBrighterThanBottomMedian(Spot spot);  // WILL + MARCUS
+                        std::pair<double,double> topOfBallBrighterThanBottomMean(Spot spot);    // WILL + MARCUS
+                        std::pair<double,double> topOfBallBrighterThanBottomMedian(Spot spot);  // WILL + MARCUS
                         float getMedianBrightness(Spot spot);               // WILL + MARCUS
-                        bool aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot); //WILL + MARCUS
+                        std::pair<int,int>  aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot); //WILL + MARCUS
 			bool greenAroundBallFromCentroid(imagePoint p);
 			bool whiteNoBlack(Spot spot);
 			bool checkGradientInSpot(Spot spot);
