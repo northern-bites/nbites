@@ -113,7 +113,7 @@ class MenuViewController: UITableViewController {
         if (indexPath.row < online.count) {
             let host = online[indexPath.row]
             print("MenuViewController: connecting to \(host)")
-            _ = robotManager.connectTo(host, disconnect: true)
+            robotManager.connectTo(host)
         } else {
             print("ERROR indexPath.row \(indexPath.row) >= online.count \(online.count)")
         }
@@ -134,12 +134,16 @@ class MenuViewController: UITableViewController {
         print("findAndReloadRobots()!")
 
         var allRobots = [String]()
-//        allRobots.append(contentsOf: listOfV4Robots.keys)
-//        allRobots.append(contentsOf: listOfV5Robots.keys)
-        allRobots.append("mal")
+        /* Comment for testing */
+        allRobots.append(contentsOf: listOfV4Robots.keys)
+        allRobots.append(contentsOf: listOfV5Robots.keys)
 
+        /* Uncomment for testing */
+//        allRobots.append("mal")
+
+
+        /* Below this line should be uncommented for both testing and release */
         self.online = allRobots
-
 
         robotManager.determineOnlineHosts(hosts: allRobots) {
             (onlineHosts:[String], offlineHosts:[String])->Void in

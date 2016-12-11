@@ -44,6 +44,9 @@ namespace nbl {
 
     /* helper class for retrieving constants from json config file */
     /* see json file for values and comments */
+
+    /* Minor modifications to Log and nblogio files so that this source can run on a phone!*/
+
     class SharedConstants {
         SharedConstants();
     public:
@@ -52,6 +55,7 @@ namespace nbl {
         static SharedConstants * theInstance;
         static SharedConstants * get();
 
+        /*all of these values are copied from LOGGING_CONSTANTS.json */
         NBL_CREATE_CONSTANT_METHOD(YUVImageType_DEFAULT, "YUVImage422")
         NBL_CREATE_CONSTANT_METHOD(YUVImageType_Y16, "YImage16")
         NBL_CREATE_CONSTANT_METHOD(YUVImageType_Y8, "YImage8")
