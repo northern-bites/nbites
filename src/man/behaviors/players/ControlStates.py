@@ -15,11 +15,13 @@ def gameInitial(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.runfallController = False
-    return player.stay()
+    return player.goNow('controller')
 
 @superState('gameControllerResponder')
 def gameReady(player):
-    return player.stay()
+	if player.firstFrame:
+		player.brain.nav.stand()
+	return player.stay()
 
 @superState('gameControllerResponder')
 def gameSet(player):
@@ -31,7 +33,9 @@ def gamePlaying(player):
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
-    return player.stay()
+	if player.firstFrame:
+		player.brain.nav.stand()
+	return player.stay()
 
 @superState('gameControllerResponder')
 def fallen(player):
@@ -68,7 +72,7 @@ def walkInDirection(player):
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
     elif command.walk_stop == False:
         print "walking..."
-        player.setWalk(command.walk_y,command.walk_x,command.walk_heading)
+        player.setWalk(command.walk_x,command.walk_y,command.walk_heading)
     elif command.walk_stop:
         print "stopping walk..."
         player.brain.nav.stand()
