@@ -22,7 +22,7 @@ class HelpTableViewController: UITableViewController {
         var not_moving_rows = ["This could be because the robot has disconnected. To check if the robot has disconnected, please view the manlog and read the yellow printouts"]
         var disconnected_rows = ["if you cannot connect to a robot that appears to be running, check the status of the logging system on that robot with nbtool or by ssh’ing into the robot"]
         var unstable_rows = ["Please design a new kick that works and Cory will add it to the app."]
-        var no_robots_rows = ["First, refresh the robot menu. If your robot still has not appeared please make sure that you are able to ping the robot on terminal. The robot might still be turning on."]
+        var no_robots_rows = ["First, refresh the robot menu. If your robot still has not appeared please make sure that you are able to ping the robot on terminal and logging is turned on. The robot might still be turning on."]
         override func viewDidLoad() {
             super.viewDidLoad()
             tableView.separatorStyle = .none
@@ -56,14 +56,14 @@ class HelpTableViewController: UITableViewController {
             cell.selectionStyle = UITableViewCellSelectionStyle.none
             cell.textLabel?.numberOfLines = 0
             if(indexPath.section == 0) {
-                cell.textLabel?.text = "\(not_moving_rows[indexPath.row]):"
+                cell.textLabel?.text = "\(not_moving_rows[indexPath.row])"
             } else if (indexPath.section == 1)  {
                 cell.textLabel?.text = "\(disconnected_rows[indexPath.row]):"
 
             } else if (indexPath.section == 2){
-                cell.textLabel?.text = "\(unstable_rows[indexPath.row]):"
+                cell.textLabel?.text = "\(unstable_rows[indexPath.row])"
             } else {
-                cell.textLabel?.text = "\(no_robots_rows[indexPath.row]):"
+                cell.textLabel?.text = "\(no_robots_rows[indexPath.row])"
                 
             }
             return cell
