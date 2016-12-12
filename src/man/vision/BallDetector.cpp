@@ -1324,9 +1324,18 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 	return true;
 }
 
+
+
+
 /* Main ball finding routine. Uses white and black spot detection to find the
    ball.
 */
+void BallDetector::myCode(){
+    if(debugBall){
+        debugDraw.drawRect(50,50,10,10,RED);
+    }
+}
+
 bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
                             EdgeList& edges)
 {
@@ -1341,7 +1350,9 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
     edgeList = &edges;
-
+    
+    //testing place
+    myCode();
     int startCol = 0;
     int endCol = width;
     int endRow = width;
