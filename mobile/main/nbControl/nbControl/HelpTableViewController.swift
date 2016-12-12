@@ -86,7 +86,6 @@ class HelpTableViewController: UITableViewController {
             return label
         }
         func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-            
             return 100
             
         }
