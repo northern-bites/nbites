@@ -51,6 +51,9 @@ class ControlBrain {
         print(
             String(format: "dist = %.2f theta = %.2f\n", distance, angle)
         )
+        print(
+            String(format: "X = %.2f y = %.2f\n", currPosition.x, currPosition.y)
+        )
         
         robot.walkHeading = angle
         if (distance < walkingThreshold) {
@@ -59,8 +62,11 @@ class ControlBrain {
         } else {
             print("walk active")
             robot.walkStop = false
-            robot.walkY = distance
-            robot.walkHeading = angle
+//            robot.walkY = distance
+//            robot.walkHeading = angle
+            robot.walkX = Float(-currPosition.x)
+            robot.walkY = Float(currPosition.y)
+            robot.walkHeading = 0.0
         }
 
         if (robotManager.currentAddress() != nil) {

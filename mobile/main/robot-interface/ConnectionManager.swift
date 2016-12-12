@@ -7,10 +7,10 @@
 import Foundation
 import UIKit
 
-//singleton instance of RobotManagerProtocol, implemented by RobotManager
+//Creates an instance of RobotManager
 let robotManager:RobotManagerProtocol = RobotManager()
 
-//this is just a helper that returns a RobotCommandStruct which will do nothing.  From there we can make it do what we want!
+//Initializes the Robot command struct
 func blankRobotCommand() -> RobotCommandStruct {
     return RobotCommandStruct(adjustHead: false, adjustedHeadZ: 0, adjustedHeadY: 0, walkCommand: false, walkStop: false, walkHeading: 0, walkX: 0, walkY: 0, doSweetMove: false, sweetMoveID: 0, logInfo: false, logImage: false)
 }
@@ -19,12 +19,10 @@ protocol RobotManagerProtocol {
     //address of current robot if connected, nil if not connected
     func currentAddress() -> String?
 
-    //connect to robot at address 'address'.  If you're already connected to a robot this won't do anything!
     func connectTo(_ address:String )
 
     func disconnect()
 
-    //send command to robot (add more arguments!)
     func send(_ aCommand: RobotCommandStruct)
 
     //set dispatchIncomingLog log callback
@@ -38,7 +36,6 @@ protocol RobotManagerProtocol {
 
 class RobotManager: RobotManagerProtocol {
 
-    //This is the queue (or thread) we want our robot network stuff to happen on
     let connectionQueue = DispatchQueue(label: "RobotConnectionQueue")
 
     var connection:RobotConnection? = nil
@@ -119,7 +116,6 @@ class RobotManager: RobotManagerProtocol {
         command = aCommand
     }
 
-    /* if we have connection and it is active, close it */
     open func disconnect() {
         if let robot = connection {
             if (robot.active()) {
