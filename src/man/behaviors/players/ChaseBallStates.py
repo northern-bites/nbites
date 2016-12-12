@@ -213,7 +213,54 @@ def prepareForKick(player):
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def particleField(player):
+    '''
+    This state is based on electric field potential vector paths. The side of the ball that we'll
+    kick has an attractive force and the opposite side is a repulsive force with a smaller magnitude
+    '''
+    if player.brain.nav.dodging:
+        return player.stay()
 	
+    #Track ball in the first frame
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        particleField.xController.reset()
+        particleField.hController.reset()
+		
+    ball = player.brain.ball
+    heading = player.brain.loc.h
+    relH = player.decider.normalizeAngle(player.kick.setupH - heading)
+    #Establishes relative heading to ball
+    
+    if (transitions.shouldPositionForKick(player, ball, relH)): #If we should set up for a kick
+        player.brain.nav.stand()
+        destinationX = player.kick.destinationX
+        destinationY = player.kick.destinationY
+        player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+	player.kick.destinationX = destinationX
+        player.kick.destinationY = destinationY
+        return player.goNow('positionForKick')	
+    else: #If we're not filling 
+        attractorX = ball.rel_x - constants.ATTRACTOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
+	attractorY = ball.rel_y - constants.ATTRACTOR_BALL_DIST*sin(-radians(heading - player.kick.setupH))
+	#Calculates the straight line distance to the attarctive point on the ball (hypotenuse)
+	attractorDist = (attractorX**2 + attractorY**2)**0.5
+	if attractorDist == 0
+	    attractorDist = 0.000000001
+
+
+	repulsorX = ball.rel_x - constants.REPULSOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
+        repulsorY = ball.rel_y - constants.REPULSOR_BALL_DIST*sin(-radians(heading - player.kick.setupH))
+        #Calculates the straight line distance to the repulsive point on the ball (hypotenuse)
+        repulsorDist = (repulsorX**2 + repulsorY**2)**0.5
+        if repulsorDist == 0
+            repulsorDist = 0.000000001
+
+	#Define the actual potential field, an attractive one and a repulsive one
+	xComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorX/attractorDist**3 - repulsorX/repulsorDist**3	
+	yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 - repulsorY/repulsorDist**3
+
+	if xComp == 0 and yComp == 0: #If no field present
+	    player.setWalk(0,0,copysign(speeds.SPEED_EIGHT, ball.bearing_deg))
 
 
 
@@ -222,17 +269,15 @@ def particleField(player):
 
 
 
+	return player.stay()
+
+# PID controllers used in Particle Field
+particleField.xController = PID.PIDController(constants.LINE_UP_XP, constants.LINE_UP_XI, constants.LINE_UP_XD)
+particleField.hController = PID.PIDController(constants.LINE_UP_HP, constants.LINE_UP_HI, constants.LINE_UP_HD)
 
 
 
-
-
-
-
-
-
-
-
+###### ^^^^ look into the constants and changing them to patricle field and understanding them better
 
 
 
