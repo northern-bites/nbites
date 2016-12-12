@@ -42,30 +42,22 @@ def fallen(player):
 @superState('gameControllerResponder')
 def controller(player):
     command = player.brain.interface.gameState.robot_command
-    print "Command index then latest command index"
-    print command.command_index
-    print player.latestCommandIndex
     if command.command_index != player.latestCommandIndex:
-        print "nbControl detecting new command: " + command.command_index
+        print "nbControl detecting new command: "
+        print command.command_index
         player.latestCommandIndex = command.command_index
 
         if command.walk_command:
             print "interpreting walk command"
             return player.goNow('walkInDirection')
+        elif command.do_sweetmove:
+        	print "interpreting sweetmoves command"
+        	return player.goNow('doASweetMove')
+       	else:
+       		return player.stay()
 
     return player.stay()
 
-#	if player.lastNum != player.currNum:
-#		if player.commandToDo == 1:
-#			player.lastNum = player.currNum
-#
-#		else if player.commandToDo == 2:
-#			player.lastNum = player.currNum
-#			return player.goNow('kick')
-#		else if player.commandToDo == 3:
-#			player.lastNum = player.currNum
-#			return player.goNow('turnHead')
-#	return player.stay()
 
 @superState('gameControllerResponder')
 def walkInDirection(player):
@@ -76,7 +68,7 @@ def walkInDirection(player):
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
     elif command.walk_stop == False:
         print "walking..."
-        player.setWalk(command.walk_x,command.walk_y,command.walk_heading)
+        player.setWalk(command.walk_y,command.walk_x,command.walk_heading)
     elif command.walk_stop:
         print "stopping walk..."
         player.brain.nav.stand()
@@ -85,11 +77,27 @@ def walkInDirection(player):
     return player.stay()
 
 @superState('gameControllerResponder')
-def kick(player):
+def doASweetMove(player):  
+    command = player.brain.interface.gameState.robot_command
+     
     if player.firstFrame():
     	player.brain.nav.stand()
-        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
-        player.brain.nav.stand()
+    	
+    	if command.sweetmove_id == 0:
+    		player.executeMove(SweetMoves.GOALIE_SQUAT)
+    	elif command.sweetmove_id == 1:
+    		player.executeMove(SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
+    	elif command.sweetmove_id == 2:
+    		player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
+    	elif command.sweetmove_id == 3:
+    		player.executeMove(SweetMoves.LEFT_SIDE_KICK)
+    	elif command.sweetmove_id == 4:
+    		player.executeMove(SweetMoves.LEFT_BIG_KICK)
+    	elif command.sweetmove_id == 5: 
+    		player.executeMove(SweetMoves.CUTE_KICK_LEFT)
+    	else:
+    		player.brain.nav.stand()
+    		
     return player.goNow('controller')
 
 @superState('gameControllerResponder')
