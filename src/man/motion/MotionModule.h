@@ -29,6 +29,7 @@
 #include "StepCommand.h"
 #include "FreezeCommand.h"
 #include "UnfreezeCommand.h"
+#include "SetParamCommand.h"
 
 // Messages
 #include "InertialState.pb.h"
@@ -123,6 +124,9 @@ public:
      */
     void sendMotionCommand(const DestinationCommand::ptr command);
     void sendMotionCommand(messages::DestinationWalk command);
+
+    void sendMotionCommand(const SetParamCommand::ptr command);
+    void sendMotionCommand(messages::SetWalkParams command);
 
     /*
      * Odometry Walk

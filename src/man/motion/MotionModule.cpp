@@ -417,6 +417,11 @@ void MotionModule::processMotionInput()
         {
             sendMotionCommand(bodyCommandInput_.message().dest());
         }
+	else if(bodyCommandInput_.message().type() == 
+		messages::MotionCommand::SET_PARAMS)
+	{
+	  sendMotionCommand(bodyCommandInput_.message().param());
+	}
         else if (bodyCommandInput_.message().type() ==
             messages::MotionCommand::ODOMETRY_WALK)
         {
@@ -992,7 +997,20 @@ void MotionModule::sendMotionCommand(const WalkInPlaceCommand::ptr command)
     walkProvider.setCommand(command);
 }
 
+  //Jack Truskowski -- method to set change the walk parameters. Used EJ's thing as a template. You can fuck with it without telling me, I really don't care
+  void MotionModule::sendMotionCommand(messages::SetParams command){
 
+    float param1 = command.param1();
+    float param2 = command.param2();
+
+    nextProvider = &walkProvider;
+    SetParamCommand::ptr newCommand(
+        new SetParamCommand(
+            param1,
+            param2,
+        );
+    walkProvider.setCommand(newCommand);
+  }
 
 
 // TESTED by EJ, works appropriately. Don't fuck with unless I'm told.

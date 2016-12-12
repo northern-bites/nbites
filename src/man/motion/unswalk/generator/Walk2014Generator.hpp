@@ -26,6 +26,7 @@ class Walk2014Generator : Generator {
    bool isActive();
    bool isStanding();
    ActionCommand::Body active;
+  void modifyParameters(float param1, float param2);
 
    enum Walk2014Option {
       STAND        = 0, // with knees straight and stiffness set to zero to conserve energy and heat generation in motors

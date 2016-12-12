@@ -36,20 +36,20 @@ using namespace Joints;
 using namespace Sensors;
 
 const float MM_PER_M  = 1000.0;                            // number of millimeters in one meter
-const float CROUCH_STAND_PERIOD = 0.5;                     // time in seconds to crouch
-const float COM_OFFSET = 0.01;                             // center of mass offset in x direction in meters
+float CROUCH_STAND_PERIOD = 0.5;                     // time in seconds to crouch
+float COM_OFFSET = 0.01;                             // center of mass offset in x direction in meters
 // const float FORWARD_CHANGE = 0.2;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
 // TODO nikki changed this..
-const float FORWARD_CHANGE = 0.08;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
-const float STAND_HIP_HEIGHT = 0.248;                      // for tall power saving stand
-const float KNEE_PITCH_RANGE = UNSWDEG2RAD(60);                // the knee pitch range from standing to crouching
-const float BASE_WALK_PERIOD = .23; //.25;                 // seconds to walk one step, ie 1/2 walk cycle
-const float WALK_HIP_HEIGHT = .23;                         // Walk hip height - seems to work from .2 to .235
-const float MAX_FORWARD = .21;//2; //.3;                              // meters
-const float MAX_BACKWARDS = .15;
-const float MAX_LEFT = .11; //.2;                                 // meters
-const float MAX_TURN = .87;                                // radians
-const float BASE_LEG_LIFT = 0.016; //0.010;                         // meters
+float FORWARD_CHANGE = 0.08;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
+float STAND_HIP_HEIGHT = 0.248;                      // for tall power saving stand
+float KNEE_PITCH_RANGE = UNSWDEG2RAD(60);                // the kneepitch range from standing to crouching
+float BASE_WALK_PERIOD = .23; //.25;                 // seconds to walk one step, ie 1/2 walk cycle
+float WALK_HIP_HEIGHT = .23;                         // Walk hip height - seems to work from .2 to .235
+float MAX_FORWARD = .21;//2; //.3;                              // meters
+float MAX_BACKWARDS = .15;
+float MAX_LEFT = .11; //.2;                                 // meters
+float MAX_TURN = .87;                                // radians
+float BASE_LEG_LIFT = 0.016; //0.010;                         // meters
 
 void checkNaN(float n, string s){
    if(n != n){
@@ -109,6 +109,12 @@ void Walk2014Generator::initialise() {
    lastKickTime = T;
    dynamicSide = 0.0f;
 }
+
+
+void Walk2014Generator::modifyParameters(float param1, float param2){
+  cout << "In Walk2014Generator.cpp, param1=" << param1 << ", param2=" << param2 << endl;
+}
+
 
 JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
                                           Odometry* odometry,

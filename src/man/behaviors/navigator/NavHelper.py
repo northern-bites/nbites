@@ -13,6 +13,13 @@ def stand(nav):
 
     createAndSendWalkVector(nav, 0, 0, 0)
 
+def changeParams(nav):
+    """
+    Changes Walking Parameters
+    """
+    command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.SET_PARAMS
+
 def walkInPlace(nav):
     """
     Makes the motion engine walk in place. 

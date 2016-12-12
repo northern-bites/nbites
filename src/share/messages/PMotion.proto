@@ -27,17 +27,17 @@ message MotionCommand
         KICK = 4;
         STAND = 5;
         WALK_IN_PLACE = 6;
+	SET_PARAMS = 7;
     }
 
     optional CommandType type = 1;
-
     optional ScriptedMove script = 2;
     optional DestinationWalk dest = 3;
     optional WalkCommand speed = 4;
     optional OdometryWalk odometry_dest = 5;
     optional Kick kick = 6;
-
-    optional int64 timestamp = 7;
+    optional SetParamCommand param = 7;
+    optional int64 timestamp = 8;
 }
 
 message ScriptedMove
@@ -65,6 +65,12 @@ message DestinationWalk
     optional float rel_h = 3;
     optional float gain  = 4;
     optional MotionKick kick = 5;
+}
+
+message SetParamCommand
+{
+	optional float param1 = 1;
+	optional float param2 = 2;
 }
 
 message OdometryWalk

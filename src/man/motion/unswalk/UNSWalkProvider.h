@@ -17,6 +17,7 @@
 #include "../BodyJointCommand.h"
 #include "../WalkInPlaceCommand.h"
 #include "../MotionProvider.h"
+#include "../SetParamCommand.h"
 
 #include "RoboGrams.h"
 #include "RobotLocation.pb.h"
@@ -77,6 +78,7 @@ public:
     void setCommand(const KickCommand::ptr command);
     // StepCommand (currently not used) is actually an odometry destination walk
     void setCommand(const StepCommand::ptr command);
+    void setCommand(const SetParamCommand::ptr command);
 
     std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
         return std::vector<BodyJointCommand::ptr>();

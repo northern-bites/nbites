@@ -271,7 +271,19 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			// TODO incorporate motion kicks
 
 
-		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::KICK) {
+		} else if (currentCommand.get( && currentCommand->getType() == MotionConstants::SET_PARAMS) {
+
+		    cout << "In UNSWalkProvider.cpp, line 276" << endl;
+
+		    SetParamCommand::ptr command = boost::shared_static_cast<SetParamCommand>(currentCommand);
+
+		    Walk2014Generator::modifyParameters(command.param1 command.param2);
+		    
+		}
+
+
+
+		else if (currentCommand.get() && currentCommand->getType() == MotionConstants::KICK) {
 			// logMsg("Kick command sent now!");
 			// tryingToWalk = false;
 			//std::cout << "Kick Command" << std::endl;
@@ -531,6 +543,11 @@ void UNSWalkProvider::setCommand(const WalkInPlaceCommand::ptr command) {
 	currentCommand = command;
 	active();
 }
+
+  void UNSWalkProvider::setCommand(const SetParamCommand:: ptr command){
+    currentCommand = command;
+    active();
+  }
 
 void UNSWalkProvider::updateOdometry(float angleZ) {
 

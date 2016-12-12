@@ -30,7 +30,8 @@ namespace man
                 COORD_HEAD,
                 STIFFNESS,
                 FREEZE,
-                UNFREEZE
+                UNFREEZE,
+		SET_PARAMS
             };
 
             const static unsigned int WALK_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
