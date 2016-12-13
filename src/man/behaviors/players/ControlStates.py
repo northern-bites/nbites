@@ -57,6 +57,9 @@ def controller(player):
         elif command.do_sweetmove:
         	print "interpreting sweetmoves command"
         	return player.goNow('doASweetMove')
+       	elif command.adjust_head:
+       		print "interpreting head move command"
+        	return player.goNow('turnHead')
        	else:
        		return player.stay()
 
@@ -106,8 +109,9 @@ def doASweetMove(player):
 
 @superState('gameControllerResponder')
 def turnHead(player):
+	command = player.brain.interface.gameState.robot_command
 	if player.firstFrame(): 
 		player.brain.nav.stand()
-		player.brain.tracker.lookToAngle(player.headAngle)
+		player.brain.tracker.lookToAngle(command.adjusted_head_y)
 		player.brain.nav.stand()
 	return player.goNow('controller')
