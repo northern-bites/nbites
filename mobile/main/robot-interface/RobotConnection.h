@@ -63,7 +63,7 @@ struct RobotCommandStruct {
 /*is this connection alive?*/
 -(BOOL) active;
 
-/*close this connectin (if its still alive)*/
+/*close this connection (if its still alive)*/
 -(void) close;
 
 /*static function helper for swift*/

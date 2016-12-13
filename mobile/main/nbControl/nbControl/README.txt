@@ -12,7 +12,8 @@ To control the robot walking the user must move the center ball like one would a
 Control SweetMove:
 To control the sweetmove the user needs to click the desired sweetmove out of the selection and it will be performed.
 
-
+Control HeadMove:
+To control the robot's head please move the slider back and forth to control where the head will go. 
 
 
 

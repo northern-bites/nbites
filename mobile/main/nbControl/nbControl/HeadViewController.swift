@@ -32,6 +32,9 @@ class HeadViewController: UIViewController {
         update()
     }
     
+    @IBAction func finishedSliding(_ sender: Any) {
+        sendNewValue(value)
+    }
     
     func headValueChanged() {
         valueSlider.value = value
@@ -44,14 +47,13 @@ class HeadViewController: UIViewController {
     }
     
     func update() {
-        sendNewValue(value)
         valueLabel.text = NumberFormatter.localizedString(from: NSNumber(floatLiteral: Double(value)), number: .decimal)
     }
     func sendNewValue(_ value: Float) {
         var robot = blankRobotCommand()
         
         robot.adjustHead = true
-        robot.adjustedHeadY = value
+        robot.adjustedHeadY = value * 240 - 120
         if (robotManager.currentAddress() != nil) {
             print("Sending head move to robot")
             robotManager.send(robot)
@@ -109,7 +111,7 @@ class HeadViewController: UIViewController {
             let valueRange = CGFloat(maximumValue - minimumValue)
             let angle = CGFloat(value - minimumValue) / valueRange * angleRange + startAngle
             setmyHeadAngle(angle)
-            print("backingVal: \(backingValue) angle: \(angle) valueRange: \(valueRange) angleRange: \(angleRange)")
+            //print("backingVal: \(backingValue) angle: \(angle) valueRange: \(valueRange) angleRange: \(angleRange)")
             
         }
     }

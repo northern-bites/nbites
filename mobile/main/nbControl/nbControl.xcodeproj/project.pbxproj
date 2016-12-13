@@ -25,6 +25,12 @@
 		EA0DA4F01DDAA75000E7E0B4 /* joystick@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4ED1DDAA75000E7E0B4 /* joystick@2x.png */; };
 		EA0DA4F11DDAA75000E7E0B4 /* joystick@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0DA4EE1DDAA75000E7E0B4 /* joystick@3x.png */; };
 		EA0DA4F51DDAAD6E00E7E0B4 /* InfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0DA4F41DDAAD6E00E7E0B4 /* InfoTableViewController.swift */; };
+		EA0E7C8C1E00B03200B21814 /* head@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0E7C891E00B03200B21814 /* head@1x.png */; };
+		EA0E7C8D1E00B03200B21814 /* head@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0E7C8A1E00B03200B21814 /* head@2x.png */; };
+		EA0E7C8E1E00B03200B21814 /* head@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0E7C8B1E00B03200B21814 /* head@3x.png */; };
+		EA0E7C921E00B0AA00B21814 /* help@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0E7C8F1E00B0AA00B21814 /* help@1x.png */; };
+		EA0E7C931E00B0AA00B21814 /* help@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0E7C901E00B0AA00B21814 /* help@2x.png */; };
+		EA0E7C941E00B0AA00B21814 /* help@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = EA0E7C911E00B0AA00B21814 /* help@3x.png */; };
 		EA1071141DDBF19500C3FE08 /* HardwareBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1071131DDBF19500C3FE08 /* HardwareBrain.swift */; };
 		EA1C554B1DDBCD9300706BCA /* nao_sitting.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */; };
 		EA1C554F1DDBCE3A00706BCA /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = EA1C554E1DDBCE3A00706BCA /* logo.png */; };
@@ -106,6 +112,12 @@
 		EA0DA4ED1DDAA75000E7E0B4 /* joystick@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "joystick@2x.png"; sourceTree = "<group>"; };
 		EA0DA4EE1DDAA75000E7E0B4 /* joystick@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "joystick@3x.png"; sourceTree = "<group>"; };
 		EA0DA4F41DDAAD6E00E7E0B4 /* InfoTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoTableViewController.swift; sourceTree = "<group>"; };
+		EA0E7C891E00B03200B21814 /* head@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "head@1x.png"; sourceTree = "<group>"; };
+		EA0E7C8A1E00B03200B21814 /* head@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "head@2x.png"; sourceTree = "<group>"; };
+		EA0E7C8B1E00B03200B21814 /* head@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "head@3x.png"; sourceTree = "<group>"; };
+		EA0E7C8F1E00B0AA00B21814 /* help@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "help@1x.png"; sourceTree = "<group>"; };
+		EA0E7C901E00B0AA00B21814 /* help@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "help@2x.png"; sourceTree = "<group>"; };
+		EA0E7C911E00B0AA00B21814 /* help@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "help@3x.png"; sourceTree = "<group>"; };
 		EA1071131DDBF19500C3FE08 /* HardwareBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HardwareBrain.swift; sourceTree = "<group>"; };
 		EA1C554A1DDBCD9300706BCA /* nao_sitting.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = nao_sitting.jpg; sourceTree = "<group>"; };
 		EA1C554E1DDBCE3A00706BCA /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
@@ -209,6 +221,12 @@
 		EA0DA4E51DDAA56100E7E0B4 /* icons */ = {
 			isa = PBXGroup;
 			children = (
+				EA0E7C8F1E00B0AA00B21814 /* help@1x.png */,
+				EA0E7C901E00B0AA00B21814 /* help@2x.png */,
+				EA0E7C911E00B0AA00B21814 /* help@3x.png */,
+				EA0E7C891E00B03200B21814 /* head@1x.png */,
+				EA0E7C8A1E00B03200B21814 /* head@2x.png */,
+				EA0E7C8B1E00B03200B21814 /* head@3x.png */,
 				EA0DA4EC1DDAA75000E7E0B4 /* joystick@1x.png */,
 				EA0DA4ED1DDAA75000E7E0B4 /* joystick@2x.png */,
 				EA0DA4EE1DDAA75000E7E0B4 /* joystick@3x.png */,
@@ -467,11 +485,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA0E7C921E00B0AA00B21814 /* help@1x.png in Resources */,
 				EA7F4AE01DF9AB340077AF14 /* Straight Kick.JPG in Resources */,
 				EA0DA4EF1DDAA75000E7E0B4 /* joystick@1x.png in Resources */,
 				EA7F4AE61DF9AB460077AF14 /* Big Kick.JPG in Resources */,
 				EAE1BDD21DCA40E20073C431 /* LaunchScreen.storyboard in Resources */,
 				EA7F4AE31DF9AB410077AF14 /* Cute Kick.JPG in Resources */,
+				EA0E7C8E1E00B03200B21814 /* head@3x.png in Resources */,
 				EA1C554F1DDBCE3A00706BCA /* logo.png in Resources */,
 				EA0DA4E71DDAA66400E7E0B4 /* info@3x.png in Resources */,
 				EA0DA4EA1DDAA6F900E7E0B4 /* info@2x.png in Resources */,
@@ -482,12 +502,16 @@
 				EA5D35461DFF0D7100832826 /* kick@3x.png in Resources */,
 				EA5D35451DFF0D7100832826 /* kick@2x.png in Resources */,
 				077BF1871DE8996B00754D79 /* Main2.storyboard in Resources */,
+				EA0E7C931E00B0AA00B21814 /* help@2x.png in Resources */,
 				EA0DA4EB1DDAA6F900E7E0B4 /* info@1x.png in Resources */,
 				EAE1BDCF1DCA40E20073C431 /* Assets.xcassets in Resources */,
 				EA1C554B1DDBCD9300706BCA /* nao_sitting.jpg in Resources */,
+				EA0E7C8D1E00B03200B21814 /* head@2x.png in Resources */,
+				EA0E7C8C1E00B03200B21814 /* head@1x.png in Resources */,
 				EA0DA4F11DDAA75000E7E0B4 /* joystick@3x.png in Resources */,
 				EA7F4AE41DF9AB410077AF14 /* Goalie Squat.JPG in Resources */,
 				EABFF5A31E00552F001315A1 /* README.txt in Resources */,
+				EA0E7C941E00B0AA00B21814 /* help@3x.png in Resources */,
 				EA7F4ADF1DF9AB340077AF14 /* Side Kick.JPG in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

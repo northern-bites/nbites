@@ -64,7 +64,7 @@ class ControlBrain {
             robot.walkStop = false
 //            robot.walkY = distance
 //            robot.walkHeading = angle
-            robot.walkX = Float(-currPosition.x)
+            robot.walkX = Float(currPosition.x)
             robot.walkY = Float(currPosition.y)
             robot.walkHeading = 0.0
         }
