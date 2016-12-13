@@ -6,6 +6,12 @@ from .. import StiffnessModes as stiff
 
 HEAD_MOVE_LENGTH = 4
 
+SIDE_HEAD_RIGHT = (((-27.5,25.0),1.0,1,stiff.LOW_HEAD_STIFFNESSES),)
+
+CENTER_HEAD = (((0.0,25.0),1.0,1,stiff.LOW_HEAD_STIFFNESSES),)
+
+SIDE_HEAD_LEFT = (((27.5,25.0),1.0,1,stiff.LOW_HEAD_STIFFNESSES),)
+
 ZERO_HEADS = (((0.0,0.0),1.0,0, stiff.LOW_HEAD_STIFFNESSES),)
 
 OFF_HEADS = (((0.0,0.0),1.0,1, stiff.NO_HEAD_STIFFNESSES),)

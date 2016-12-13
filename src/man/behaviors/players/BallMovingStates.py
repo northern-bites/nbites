@@ -27,7 +27,10 @@ def gameSet(player):
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
-        player.brain.tracker.repeatWideSnapPan()
+        # player.brain.tracker.repeatWideSnapPan()
+        # player.brain.tracker.performSideStayLeft()
+        # player.brain.tracker.performSideStayRight()
+        player.brain.tracker.performCenterStay()
 
     # if player.brain.frameCounter % 30 == 0:
     if player.brain.ball.vis.on:
