@@ -9,7 +9,7 @@
 //Source http://stackoverflow.com/questions/31735228/how-to-make-a-simple-collection-view-with-swift
 
 import UIKit
-class SweetMovesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDelegateFlowLayout{
+class SweetMovesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDelegateFlowLayout, UIPopoverPresentationControllerDelegate{
     
     let cambridge_blue = UIColor(colorLiteralRed: 163.0/255.0, green: 187.0/255.0, blue: 173.0/255.0, alpha: 1.0)
     let jet = UIColor(colorLiteralRed: 46.0/255.0, green: 53.0/255.0, blue: 50.0/255.0, alpha: 1.0)
@@ -61,6 +61,27 @@ class SweetMovesViewController: UIViewController, UICollectionViewDataSource, UI
         if (robotManager.currentAddress() != nil) {
             robotManager.send(robot)
         }
+    }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        
+        var destinationvc = segue.destination
+        
+        if let navCon = destinationvc as? UINavigationController {
+            destinationvc = navCon.visibleViewController ?? destinationvc
+        }
+        
+        if segue.identifier == "performPopover" {
+            if let vc = destinationvc as? SweetMovesPopoverTableViewController {
+                vc.modalPresentationStyle = UIModalPresentationStyle.popover
+                vc.popoverPresentationController!.delegate = self
+                vc.navigationItem.title = "Info"
+            }
+        }
+    }
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return UIModalPresentationStyle.none
     }
 
 }

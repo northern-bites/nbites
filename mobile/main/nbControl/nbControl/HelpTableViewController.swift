@@ -10,16 +10,16 @@ import UIKit
 
 class HelpTableViewController: UITableViewController {
 
-    let ivory = UIColor(colorLiteralRed: 255.0/255.0, green: 255.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+    //let ivory = UIColor(colorLiteralRed: 255.0/255.0, green: 255.0/255.0, blue: 242.0/255.0, alpha: 1.0)
     let cambridge_blue = UIColor(colorLiteralRed: 163.0/255.0, green: 187.0/255.0, blue: 173.0/255.0, alpha: 1.0)
-    let myrtle_green = UIColor(colorLiteralRed: 53.0/255.0, green: 114.0/255.0, blue: 102.0/255.0, alpha: 1.0)
-    let warm_black = UIColor(colorLiteralRed: 14.0/255.0, green: 59.0/255.0, blue: 67.0/255.0, alpha: 1.0)
+    //let myrtle_green = UIColor(colorLiteralRed: 53.0/255.0, green: 114.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+    //let warm_black = UIColor(colorLiteralRed: 14.0/255.0, green: 59.0/255.0, blue: 67.0/255.0, alpha: 1.0)
     let jet = UIColor(colorLiteralRed: 46.0/255.0, green: 53.0/255.0, blue: 50.0/255.0, alpha: 1.0)
-    let honeydew = UIColor(colorLiteralRed: 237.0/255.0, green: 255.0/255.0, blue: 236.0/255.0, alpha: 1.0)
+    //let honeydew = UIColor(colorLiteralRed: 237.0/255.0, green: 255.0/255.0, blue: 236.0/255.0, alpha: 1.0)
     let light_slate_gray = UIColor(colorLiteralRed: 200.0/255.0, green: 199.0/255.0, blue: 200.0/255.0, alpha: 1.0)
     
         var sections = ["\tThe robot is not moving!","\tThe robot disconnected!", "\tThe robot is falling over!", "\tThere are no robots available."]
-        var not_moving_rows = ["This could be because the robot has disconnected. To check if the robot has disconnected, please view the manlog and read the yellow printouts"]
+        var not_moving_rows = ["This could be because the robot has disconnected. To check if the robot has disconnected, please view the manlog and read the yellow printouts. This could also be because the wrong player was installed. Please make sure that pControl was installed."]
         var disconnected_rows = ["if you cannot connect to a robot that appears to be running, check the status of the logging system on that robot with nbtool or by ssh’ing into the robot"]
         var unstable_rows = ["Please design a new kick that works and Cory will add it to the app."]
         var no_robots_rows = ["First, refresh the robot menu. If your robot still has not appeared please make sure that you are able to ping the robot on terminal and logging is turned on. The robot might still be turning on."]
