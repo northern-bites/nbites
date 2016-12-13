@@ -543,17 +543,27 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
   RANSACCircle result = RANSACCircle();
   unsigned int ransacSeed = 1;
 
-  edges.mapToField(field.getFieldHomography());
+  // FieldHomography h = field.getFieldHomography();
+  // edges.mapToField(field.getFieldHomography());
   AngleBinsIterator<Edge> abi(edges);
   
   int var = 0;
   
   for (Edge* e = *abi; e; e = *++abi) {
+    // double wx, wy;
+    // bool edgePointOnField = h.fieldCoords(e->x(), e->y(), wx, wy, 0);
+    // std::cout << "On field: " << edgePointOnField << "; (" << wx << ", " << wy << ")" << std::endl;
+
     #ifdef OFFLINE
-      _potentials.push_back(Point(e->field().x(), e->field().y()*2));
+      double y;
+      if(e->onField() && field.onField(e->x(), y)) {
+        // std::cout << "On field: " << edgePointOnField << "; (" << e->field().x() << ", " << wy << ")" << std::endl;
+        _potentials.push_back(Point(e->field().x(), e->field().y()));
+        
+      }
     #endif
     
-    points.push_back(PointI(e->field().x(), e->field().y()*2));
+    // points.push_back(PointI(e->field().x(), e->field().y()*2));
 
     // e->set((int)(e->field().x()), (int)(e->field().y()), e->mag());
     // if (e->y() > 0)
@@ -563,33 +573,45 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
     //     e->set(var, var, e->mag());
     //   }
     // }
-    std::cout << var << " - x: " << e->x() << " (" << (int)(e->field().x()) << ")\ty: " << e->y() << " (" << (int)(e->field().y()) << ")\tm: " << e->mag() << "\t|\tang: " << e->radians() << "\thoriz: " << field.horizonAt(e->x())<<  std::endl;
+    // std::cout << var << " - x: " << e->x() << " (" << (int)(e->field().x()) << ")\ty: " << e->y() << " (" << (int)(e->field().y()) << ")\tm: " << e->mag() << "\t|\tang: " << e->radians() << "\thoriz: " << field.horizonAt(e->x())<<  std::endl;
     var++;
   }
 
-  std::vector<bool> cons (false, points.size());
-  std::vector<bool> cons_buf_1 (false, points.size());
-  std::vector<bool> cons_buf_2 (true, points.size());
-  std::vector<bool> cons_buf[] = {cons_buf_1, cons_buf_2};
+  // int num_points = 25;
 
-  std::cout << "cons_buf[0][0]: " << (*cons_buf)[0] << std::endl;
+  // std::vector<PointI> pts(num_points * 3);
 
-  bool circleFound = RANSAC::findCircleOfRadius3P(points, 190, 20, NULL, result, 50, 1.2, points.size(), cons_buf, &ransacSeed);
-  std::cout << "Circle found: " << circleFound << std::endl;
+  // std::vector<bool> cons_buf[2];
+  // cons_buf[0].insert(cons_buf[0].end(), num_points, false);
+  // cons_buf[1].insert(cons_buf[1].end(), num_points, false);
 
-  free(&cons);
-  free(&cons_buf);
-  free(&cons_buf_1);
-  free(&cons_buf_2);
+  // std::vector<bool> *cons;
 
-  // AngleBinsIterator<Edge> abi2(edges);
-  // for (Edge* e = *abi2; e; e = *++abi2) {
-  //   if (e->mag() < 50)
-  //   {
-  //     edges.remove(e);
-  //     continue;
-  //   }
+  // unsigned int seed = 0;
+
+  // PointF c;
+
+  // c.x() = random() % 2000 - 1000;
+  // c.y() = random() % 2000 - 1000;
+
+  // std::cout << "Center: (" << c.x() << ", " << c.y() << ")" << std::endl;
+
+  // float radius = random() % 900 + 100;
+
+  // std::cout << "Radius: " << radius << std::endl;
+
+  // int j;
+  // for (j = 0; j < num_points; ++ j) {
+  //    pts.push_back(PointI((int)(c.x() + cos(j * 2 * M_PI / num_points) * radius), (int)(c.y() + sin(j * 2 * M_PI / num_points) * radius)));
+  //    std::cout << "(" << (int)(c.x() + cos(j * 2 * M_PI / num_points) * radius) << ", " << (int)(c.y() + sin(j * 2 * M_PI / num_points) * radius) << ")" << std::endl;
   // }
+
+  // std::cout << "Made my points vector" << std::endl;
+
+  // bool found = RANSAC::findCircleOfRadius3P(pts, radius, radius / 10, &cons, result, 32, 10,
+  //       num_points / 2, cons_buf, &seed);
+
+  // std::cout << "Found: " << found << "; " << (int)(result.centre.x()) << ", " << (int)(result.centre.y()) << std::endl;
 
   _on = true;
   _ccx = 100;

@@ -44,7 +44,7 @@ Edge& Edge::operator=(const Edge& e)
 void Edge::setField(const FieldHomography& h)
 {
   double wx, wy, dwx, dwy;
-  h.fieldCoords(_x, _y, wx, wy);
+  _onField = h.fieldCoords(_x, _y, wx, wy);
   h.fieldVector(0, 0, sin(), -cos(), dwx, dwy);
   _field = FieldEdge(wx, wy, atan2(dwy, dwx));
 }

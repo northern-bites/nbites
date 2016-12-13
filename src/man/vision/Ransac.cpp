@@ -200,7 +200,7 @@ bool RANSAC::findCircleOfRadius3P(
       float                      radius_e,
       std::vector<bool>        **cons,
       RANSACCircle              &result,
-      unsigned int               k,
+      unsigned int               k, // attempts to create a circle from 3 pts
       float                      e,
       unsigned int               n,
       std::vector<bool>          cons_buf[2],
@@ -265,23 +265,17 @@ bool RANSAC::findCircleOfRadius3P(
          this_concensus = &cons_buf[0];
       }
 
-      std::cout << "this_concensus: " << this_concensus << std::endl;
-      std::cout << "this_concensus[0] = " << (*this_concensus)[0];
-
       for (j = 0; j < 4; ++ j) {
          pos_var[j] = neg_var[j] = 0;
       }
 
       unsigned int n_concensus_points = 0;
       for (j = 0; j != points.size(); ++j) {
-         std::cout << j << std::endl;
          const PointF &p = points[j].cast<float>();
          const PointF &d = c.centre - p;
          /* TODO(carl) look into integer version of this */
          float dist = d.norm() - c.radius;
          float dist2 = dist * dist;
-
-         std::cout << dist2 << ", " << e2 << std::endl;
 
          if (dist2 < e2) {
             int quadrant = 0;
@@ -299,8 +293,6 @@ bool RANSAC::findCircleOfRadius3P(
                }
             }
 
-            std::cout << quadrant << std::endl;
-
             if (dist > 0) {
                pos_var[quadrant] += dist2;
             } else {
@@ -313,8 +305,9 @@ bool RANSAC::findCircleOfRadius3P(
             (*this_concensus)[j] = false;
          }
 
-         std::cout << "this_concensus[" << j << "] = " << (*this_concensus)[j] << std::endl;
       }
+
+      std::cout << "Hello?" << std::endl;
 
       const float k = 0.2;
 
@@ -329,9 +322,13 @@ bool RANSAC::findCircleOfRadius3P(
          minerr = c.var;
          c.var  = c.var / (points.size() * e);
          result = c;
+         std::cout << "This might be the line" << std::endl;
          best_concensus = this_concensus;
+         std::cout << "What about this one?" << std::endl;
       }
    }
+
+   std::cout << "Got here" << std::endl;
 
    if (minerr < std::numeric_limits<float>::max()) {
       *cons = best_concensus;

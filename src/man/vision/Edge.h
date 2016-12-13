@@ -227,6 +227,8 @@ class Edge : public AngleElement
   int _x, _y;
   int _mag;
 
+  bool _onField = true;
+
   HoughLine* _memberOf;
   Edge* _nextMember;
 
@@ -252,6 +254,7 @@ public:
   int x() const { return _x;}
   int y() const { return _y;}
   int mag() const { return _mag;}
+  bool onField() const { return _onField; }
 
   const Edge* next() const { return (const Edge*)AngleElement::next(); }
   Edge* next() { return (Edge*)AngleElement::next(); }
