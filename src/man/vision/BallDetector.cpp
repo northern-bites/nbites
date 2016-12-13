@@ -69,9 +69,9 @@ void BallDetector::processDarkSpots(SpotList & darkSpots, intPairVector & blackS
                                         // add this spot to the list of black spots
 					blackSpots.push_back(std::make_pair(midX, midY));
 
-                                        float medianBrightness = getMedianBrightness((*i));
-                                        printf("Black spot at (%d, %d) has a median brightness of %f\n",
-                                                midX, midY, medianBrightness);
+                                        // float medianBrightness = getMedianBrightness((*i));
+                                        // printf("Black spot at (%d, %d) has a median brightness of %f\n",
+                                        //         midX, midY, medianBrightness);
 
                                         // what is the difference between 'blackSpots'
                                         // and 'actualBlackSpots' ?
@@ -112,7 +112,7 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots,
         if (filterWhiteSpot((*i), blackSpots, badBlackSpots)) {
             actualWhiteSpots.push_back((*i));
                 if(debugBall) {
-                    topOfBallBrighterThanBottomMedian((*i));
+                    // topOfBallBrighterThanBottomMedian((*i));
                     aboveBallRectangleBrighterThanBelowBallRectangle((*i));
                     std::cout<<"filterWhiteSpot returned true\n";
                     debugDraw.drawPoint((*i).ix() + width / 2, -(*i).iy() + height / 2, RED);
@@ -1369,44 +1369,59 @@ std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangl
     int leftX = spot.ix() + width / 2 - spot.outerDiam / 4;
     int rightX = spot.ix() + width / 2 + spot.outerDiam / 4;
 
+    // std::cout << "Left X: " << leftX << std::endl;
+    // std::cout << "Right X: " << rightX << std::endl;
+
     //Top Rect
     int topRectBottomY = -spot.iy() + height / 2 - spot.outerDiam / 4;
     int topRectTopY = -spot.iy() + height / 2 - (spot.outerDiam + spot.innerDiam) / 4;
 
-    //Bottom Rect
+    // std::cout << "Top Rect Bottom Y: " << topRectBottomY << std::endl;
+    // std::cout << "Top Rect Top Y: " << topRectTopY << std::endl;
+
+    // //Bottom Rect
     int bottomRectTopY = -spot.iy() + height / 2 + spot.outerDiam / 4;
     int bottomRectBottomY = -spot.iy() + height / 2 + (spot.outerDiam + spot.innerDiam) / 4;
 
-    std::vector<int> topYvalues;
-    std::vector<int> bottomYvalues;
+    // std::cout << "Bottom Rect Top Y: " << bottomRectTopY << std::endl;
+    // std::cout << "Bottom Rect Bottom Y: " << bottomRectBottomY << std::endl;
 
-    for (int x=leftX; x<=rightX; x++) {
-      for (int y=topRectBottomY; y<=topRectTopY; y++) {
+    std::vector<int> topYValues;
+    std::vector<int> bottomYValues;
 
-        if (debugBall)
-          debugDraw.drawDot(x,y,WHITE);
-        topYvalues.push_back(*(yImage.pixelAddr(x,y)));
-
-      }
+    //Top Rect
+    for (int x = leftX; x <= rightX; x++) {
+        for (int y = topRectTopY; y <= topRectBottomY; y++) {
+            if (debugBall) {
+                debugDraw.drawDot(x,y,RED);
+            }
+            topYValues.push_back(*(yImage.pixelAddr(x,y)));
+        }
     }
 
-    for (int x=leftX; x<=rightX; x++) {
-      for (int y=bottomRectBottomY; y<=bottomRectTopY; y++) {
+    // std::cout << "Top Length: " << topYValues.size() << std::endl;
 
-        if (debugBall)
-          debugDraw.drawDot(x,y,WHITE);
-        bottomYvalues.push_back(*(yImage.pixelAddr(x,y)));
-
-      }
+    //Bottom Rect
+    for (int x = leftX; x <= rightX; x++) {
+        for (int y = bottomRectTopY; y <= bottomRectBottomY; y++) {
+            if (debugBall) {
+                debugDraw.drawDot(x,y,BLUE);
+            }
+            bottomYValues.push_back(*(yImage.pixelAddr(x,y)));
+        }
     }
 
-    // sort both vectors
-    std::sort(topYvalues.begin(), topYvalues.end());
-    std::sort(bottomYvalues.begin(), bottomYvalues.end());
+    // std::cout << "Bottom Length: " << bottomYValues.size() << std::endl;
 
-    int topMedian = topYvalues[topYvalues.size() / 2] / 4;
-    int bottomMedian = bottomYvalues[bottomYvalues.size() / 2] / 4;
-    std::pair<int,int> medianBrightnesses = std::make_pair(topMedian,bottomMedian);
+    // // sort both vectors
+    std::sort(topYValues.begin(), topYValues.end());
+    std::sort(bottomYValues.begin(), bottomYValues.end());
+
+    int topMedian = topYValues[topYValues.size() / 2] / 4;
+
+    int bottomMedian = bottomYValues[bottomYValues.size() / 2] / 4;
+
+    std::pair<int,int> medianBrightnesses = std::make_pair(topMedian, bottomMedian);
 
     printf("Area above ball has median brightness %d\n", topMedian);
     printf("Area below ball has median brightness %d\n", bottomMedian);
