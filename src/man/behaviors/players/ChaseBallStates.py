@@ -255,16 +255,27 @@ def particleField(player):
         if repulsorDist == 0
             repulsorDist = 0.000000001
 
-	#Define the actual potential field, an attractive one and a repulsive one
+	#Define the actual particle field, an attractive one and a repulsive one
 	xComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorX/attractorDist**3 - repulsorX/repulsorDist**3	
 	yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 - repulsorY/repulsorDist**3
 
 	if xComp == 0 and yComp == 0: #If no field present
 	    player.setWalk(0,0,copysign(speeds.SPEED_EIGHT, ball.bearing_deg))
+	else: #if the particle field is detected
+	    normalizer = speeds.SPEED_SEVEN/(xComp**2 + yComp**2)**0.5
+	    #Speed is set based on relative distance from attractive point
+	    
+	    if fabs(ball.bearing_deg) < 2*constants.FACING_KICK_ACCEPTABLE_BEARING:
+		hComp = 0
+	    elif attractorDist < constants.CLOSE_TO_ATTRACTOR_DIST: #If we're closer than the acceptable distance to repulsive particle
+		hComp = copysign(speeds.SPEED_SEVEN, ball.bearing_deg)
+	    else: #If we're not close enough to the repulsive particle
+		hComp = copySign(speeds.SPEED_FIVE, ball.bearing_deg)
+	'''	
+	    player.setWalk(normalizer*xComp, normalizer*yComp, hComp)
+	'''	 	
 
-
-
-
+	#MONEY SPOT RIGHT HERE ^^ PID WILL COME INTO PLAY IN SET WALK
 
 
 
@@ -558,3 +569,17 @@ def dontMove(player):
 	print ("timeToCompletion:")
 	print (round(timeToCompletion,3))
     return player.stay()
+
+'''
+1) Figure out where we go to particle filter whether that's in dribble or from prepare for kick
+2) Decide on setWalk from PID or particle field (or both...?)  
+3) Fix one of Dan's issues (At least address it)
+4) Run with no errors
+5) At least try to test on the field
+'''
+
+
+
+
+
+'''
