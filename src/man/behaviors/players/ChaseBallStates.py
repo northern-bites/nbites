@@ -597,9 +597,5 @@ def dontMove(player):
     return player.stay()
 
 '''
-1) Figure out where we go to particle filter whether that's in dribble or from prepare for kick
-2) Decide on setWalk from PID or particle field (or both...?)  
 3) Fix one of Dan's issues (At least address it)
-4) Run with no errors
-5) At least try to test on the field
 '''
