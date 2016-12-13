@@ -271,17 +271,41 @@ def particleField(player):
 		hComp = copysign(speeds.SPEED_SEVEN, ball.bearing_deg)
 	    else: #If we're not close enough to the repulsive particle
 		hComp = copySign(speeds.SPEED_FIVE, ball.bearing_deg)
-	'''	
-	    player.setWalk(normalizer*xComp, normalizer*yComp, hComp)
-	'''	 	
+
+	    player.setWalk(normalizer*xComp, normalizer*yComp, hComp)	 	
 
 	#MONEY SPOT RIGHT HERE ^^ PID WILL COME INTO PLAY IN SET WALK
-
+	    # Calculate corrections in x and h using PID controller 
+    	    xError = attractorDist - constants.LINE_UP_X #calculate error based on distance from attractive point, NOT ball center
+            hError = player.brain.ball.bearing
+	    if xError > 0 or hError > 0: #These are not actual thresholds. We couldn't test so couldn't determine the actual thresholds
+		player.goNow('particleFieldCorrection') 
+	    
+	# If close enough to ball, go orbit
+        if player.brain.ball.distance < constants.LINE_UP_X:
+            player.setWalk(0, 0, 0)
+            return player.goLater('orbitBall')
 
 
 
 	return player.stay()
+	
+def particleFieldCorrection(player):
 
+    xError = attractorDist - constants.LINE_UP_X #calculate error based on distance from attractive point, NOT ball center
+    hError = player.brain.ball.bearing 
+    
+    xSpeedCorrect = particleField.xController.correct(xError)
+    hSpeedCorrect = particleField.hController.correct(hError)
+	
+    player.setWalk(xSpeedCorrect, 0, hSpeedCorrect)
+
+    if xError == 0 and hError == 0: #If we've compensated for the error using the PID controller sufficiently
+    	return player.goNow('particleField')
+    return player.stay()	
+	
+	
+	
 # PID controllers used in Particle Field
 particleField.xController = PID.PIDController(constants.LINE_UP_XP, constants.LINE_UP_XI, constants.LINE_UP_XD)
 particleField.hController = PID.PIDController(constants.LINE_UP_HP, constants.LINE_UP_HI, constants.LINE_UP_HD)
@@ -435,8 +459,9 @@ def dribble(player):
         relH < constants.ORBIT_GOOD_BEARING):
         player.setWalk(0, 0, 0)
         return player.goLater('orbitBall')  
-	#significantly smaller orbit now using particle field! if we're close enough to orbiti and within acceptable bearing
-
+	#significantly smaller orbit now using particle field! if we're close enough to orbit and within acceptable bearing
+	#Change to particleField potentially?
+	
     if player.brain.ball.vis == True:
         if transitions.inGoalBox(player):
             player.brain.nav.walk(0.8, 0, 0)
@@ -577,10 +602,4 @@ def dontMove(player):
 3) Fix one of Dan's issues (At least address it)
 4) Run with no errors
 5) At least try to test on the field
-'''
-
-
-
-
-
 '''

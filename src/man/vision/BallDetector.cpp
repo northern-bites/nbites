@@ -1387,7 +1387,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
 							  filterThresholdDark, greenThresholdDark, 0.5);
 
-    if(darkSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
+    if(darkSpotDetector.spotDetect(yImage, *homography, &greenImage)) {
         SpotList darkSpots = darkSpotDetector.spots();
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
 		if (debugSpots) {
