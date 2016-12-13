@@ -420,21 +420,22 @@ orbitBall.hController = PID.PIDController(constants.ORBIT_HP, constants.ORBIT_HI
 ### ^^Why are these outside of the orbit ball function?? ^^
 
 @superState('positionAndKickBall')
-@ifSwitchNow(transitions.shouldSpinToKickHeading, 'orbitBall')
+@ifSwitchNow(transitions.shouldSpinToKickHeading, 'particleField') #was orbitBall
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def dribble(player):
     if transitions.shouldNotDribble(player):
-        if player.lastDiffState == 'orbitBall':
+        if player.lastDiffState == 'particleField':  #was orbitBall
             return player.goNow('approachBall')
-        return player.goNow('orbitBall')
+        return player.goNow('particleField')  #was orbitBall
     ball = player.brain.ball
     relH = player.decider.normalizeAngle(player.brain.loc.h)
     if ball.distance < constants.LINE_UP_X and not (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
         player.setWalk(0, 0, 0)
-        return player.goLater('orbitBall')
+        return player.goLater('orbitBall')  
+	#significantly smaller orbit now using particle field! if we're close enough to orbiti and within acceptable bearing
 
     if player.brain.ball.vis == True:
         if transitions.inGoalBox(player):
