@@ -10,7 +10,7 @@ import UIKit
 
 
 
-class ControlViewController: UIViewController,UIPopoverPresentationControllerDelegate {
+class ControlViewController: UIViewController, UIPopoverPresentationControllerDelegate {
     let jet = UIColor(colorLiteralRed: 46.0/255.0, green: 53.0/255.0, blue: 50.0/255.0, alpha: 1.0)
 
     var mainCenter: CGPoint! = CGPoint(x: 0.0, y: 0.0)
@@ -60,7 +60,27 @@ class ControlViewController: UIViewController,UIPopoverPresentationControllerDel
         controlView.animating = false
     }
     
-    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        
+        var destinationvc = segue.destination
+        
+        if let navCon = destinationvc as? UINavigationController {
+            destinationvc = navCon.visibleViewController ?? destinationvc
+        }
+        
+        if segue.identifier == "performPopoverControl" {
+            if let vc = destinationvc as? SweetMovesPopoverTableViewController {
+                vc.modalPresentationStyle = UIModalPresentationStyle.popover
+                vc.popoverPresentationController!.delegate = self
+                vc.navigationItem.title = "Info"
+            }
+        }
+    }
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return UIModalPresentationStyle.none
+    }
+
     
 }
 

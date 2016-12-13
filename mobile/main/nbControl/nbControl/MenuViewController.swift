@@ -12,23 +12,6 @@ var robot: String?
 
 class MenuViewController: UITableViewController {
     
-//    struct RobotName {
-//        static let shehulk = 23
-//        static let batman = 22
-//        static let buzz = 21
-//        static let wasp = 20
-//        static let elektra = 19
-//        static let blt = 18
-//        static let zoe = 17
-//        static let mal = 16
-//        static let vera = 15
-//        static let kaylee = 14
-//        static let inara = 13
-//        static let simon = 12
-//        static let jayne = 11
-//        static let river = 10
-//        static let wash = 9
-//    }
     let sections = ["Online", "Offline"]
     
     let baseIPaddress = "139.140.192."
@@ -55,12 +38,6 @@ class MenuViewController: UITableViewController {
         } else {
             tableView.backgroundView = refresher
         }
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-        
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
     // MARK: - Table view data source
@@ -152,11 +129,32 @@ class MenuViewController: UITableViewController {
 
             self.online = onlineHosts
             self.offline = offlineHosts
+            
+            /* HACKITY HACK HACK */
+            self.online.append("shehulk")
 
             self.tableView.reloadData()
 
             if let refresher = refreshControl {
                 refresher.endRefreshing()
+            }
+        }
+    }
+    
+  
+    fileprivate struct StoryBoard {
+        static let ShowGraphSegue = "help"
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        var destinationvc = segue.destination
+        
+        if let navCon = destinationvc as? UINavigationController {
+            destinationvc = navCon.visibleViewController ?? destinationvc
+        }
+        if segue.identifier == "help" {
+            if let vc = destinationvc as? HelpTableViewController {
+                vc.navigationItem.title = "Help"
             }
         }
     }
