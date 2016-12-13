@@ -73,6 +73,15 @@ class HeadTracker(FSA.FSA):
             self.headMove = headMove
             self.switchTo('repeatHeadMove')
 
+    def performSideStayLeft(self):
+        self.performHeadMove(HeadMoves.SIDE_HEAD_LEFT)
+
+    def performSideStayRight(self):
+        self.performHeadMove(HeadMoves.SIDE_HEAD_RIGHT)
+
+    def performCenterStay(self):
+        self.performHeadMove(HeadMoves.CENTER_HEAD)
+
     ##################### Fixed Pitch #######################
     def performBasicPan(self):
         '''Perform the basic fixed pitch pan once.'''

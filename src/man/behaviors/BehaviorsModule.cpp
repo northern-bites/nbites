@@ -10,6 +10,10 @@
 #include "BehaviorsModule.h"
 #include "PyObjects.h"
 
+
+#include "TextToSpeech.h"
+
+
 using namespace boost::python;
 
 extern "C" void initLedCommand_proto();
@@ -32,6 +36,8 @@ namespace behaviors {
 
 const char * BRAIN_MODULE = "python.Brain";
 static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
+
+unsigned int num_crashed_say = 0;
 
 BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
     : error_state(false),
@@ -119,11 +125,16 @@ bool BehaviorsModule::import_modules ()
     if (brain_module == NULL) {
         // error, couldn't import noggin.Brain
         std::cout << "Error importing noggin.Brain module" << std::endl;
-        if (PyErr_Occurred())
+        if (PyErr_Occurred()) {
+            std::cout<<"num_crashed_say "<< num_crashed_say<<std::endl;
+            if (num_crashed_say == 0) {
+                man::tts::say(IN_SCRIMMAGE, "python crash");
+            }    
             PyErr_Print();
-        else
+        } else {
             std::cout << "  No Python exception information available"
                       << std::endl;
+        }
         return false;
     }
 
@@ -162,10 +173,15 @@ void BehaviorsModule::getBrainInstance ()
 
     if (brain_instance == NULL) {
         std::cout << "Error accessing Brain" << std::endl;
-        if (PyErr_Occurred())
+        if (PyErr_Occurred()) {
+            std::cout<<"num_crashed_say "<< num_crashed_say<<std::endl;
+            if (num_crashed_say == 0) {
+                man::tts::say(IN_SCRIMMAGE, "python crash");
+                }
             PyErr_Print();
-        else
+        } else {
             std::cout << "  No error available" << std::endl;
+        }
     }
 
     // Successfully reloaded
@@ -180,6 +196,7 @@ void BehaviorsModule::run_ ()
         this->reload_hard();
         error_state = false;
         num_crashed++;
+        num_crashed_say = num_crashed;
     }
 
     // Latch incoming messages and prepare outgoing messages
@@ -196,6 +213,10 @@ void BehaviorsModule::run_ ()
             // report error
             std::cout << "Error occurred in Brain.run() method" << std::endl;
             if (PyErr_Occurred()) {
+                std::cout<<"num_crashed_say "<< num_crashed_say<<std::endl;
+                if (num_crashed_say == 1) {
+                    man::tts::say(IN_SCRIMMAGE, "python crash");
+                }
                 PyErr_Print();
             } else {
                 std::cout << "  No Python exception information available"
@@ -325,11 +346,16 @@ void BehaviorsModule::modifySysPath ()
     PyObject *sys_module = PyImport_ImportModule("sys");
     if (sys_module == NULL) {
         std::cout << "** Error importing sys module: **" << std::endl;
-        if (PyErr_Occurred())
+        if (PyErr_Occurred()) {
+            std::cout<<"num_crashed_say "<< num_crashed_say<<std::endl;
+            if (num_crashed_say == 0) {
+                man::tts::say(IN_SCRIMMAGE, "python crash");
+            }
             PyErr_Print();
-        else
+        } else {
             std::cout << "** No Python exception information available **"
                       << std::endl;
+        }
     }
     else
     {
