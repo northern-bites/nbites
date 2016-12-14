@@ -1366,6 +1366,11 @@ float BallDetector::getMedianBrightness(Spot spot) {
 //This function should only be called if the ball is not on a field line.
 std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot) {
 
+    // if (-spot.iy() + height / 2 - (spot.outerDiam + spot.innerDiam) / 4 < 0 or -spot.iy() + height / 2 + (spot.outerDiam + spot.innerDiam) / 4 > height) {
+    //     std::pair<int,int> medianBrightnesses = std::make_pair(-1,-1);
+    //     return medianBrightnesses;
+    // }
+
     int leftX = spot.ix() + width / 2 - spot.outerDiam / 4;
     int rightX = spot.ix() + width / 2 + spot.outerDiam / 4;
 
@@ -1393,7 +1398,12 @@ std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangl
     for (int x = leftX; x <= rightX; x++) {
         for (int y = topRectTopY; y <= topRectBottomY; y++) {
             if (debugBall) {
-                debugDraw.drawDot(x,y,RED);
+                if (y%2==0 && x%2==0) {
+                   debugDraw.drawDot(x,y,RED); 
+                }
+                else if (y%2==1 && x%2==1) {
+                    debugDraw.drawDot(x,y,RED);
+                }
             }
             topYValues.push_back(*(yImage.pixelAddr(x,y)));
         }
@@ -1405,7 +1415,12 @@ std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangl
     for (int x = leftX; x <= rightX; x++) {
         for (int y = bottomRectTopY; y <= bottomRectBottomY; y++) {
             if (debugBall) {
-                debugDraw.drawDot(x,y,BLUE);
+                if (y%2==0 && x%2==0) {
+                   debugDraw.drawDot(x,y,BLUE); 
+                }
+                else if (y%2==1 && x%2==1) {
+                    debugDraw.drawDot(x,y,BLUE);
+                }
             }
             bottomYValues.push_back(*(yImage.pixelAddr(x,y)));
         }
@@ -1609,6 +1624,8 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 		}
 		return false;
 	}
+
+    //FUNCTIONS GO HERE.
 
     // count up how many black spots are inside
     int spots = 0;
