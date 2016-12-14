@@ -186,7 +186,7 @@
         [self close];
         return NULL;
     }
-
+    /*convert c++ log to string app can use*/
     NSLog(@"connection to '%@' read '%s' !", _address, recvd->logClass.c_str() );
 
     Log * ret = NULL;

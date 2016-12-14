@@ -131,7 +131,7 @@ class MenuViewController: UITableViewController {
             self.offline = offlineHosts
             
             /* HACKITY HACK HACK */
-            self.online.append("shehulk")
+            //self.online.append("shehulk")
 
             self.tableView.reloadData()
 

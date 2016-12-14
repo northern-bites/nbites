@@ -62,7 +62,6 @@ class ControlViewController: UIViewController, UIPopoverPresentationControllerDe
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        
         var destinationvc = segue.destination
         
         if let navCon = destinationvc as? UINavigationController {
@@ -70,7 +69,7 @@ class ControlViewController: UIViewController, UIPopoverPresentationControllerDe
         }
         
         if segue.identifier == "performPopoverControl" {
-            if let vc = destinationvc as? SweetMovesPopoverTableViewController {
+            if let vc = destinationvc as? ControlPopoverTableViewController {
                 vc.modalPresentationStyle = UIModalPresentationStyle.popover
                 vc.popoverPresentationController!.delegate = self
                 vc.navigationItem.title = "Info"
