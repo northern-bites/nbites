@@ -1366,13 +1366,14 @@ float BallDetector::getMedianBrightness(Spot spot) {
 //This function should only be called if the ball is not on a field line.
 std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangle(Spot spot) {
 
-    // if (-spot.iy() + height / 2 - (spot.outerDiam + spot.innerDiam) / 4 < 0 or -spot.iy() + height / 2 + (spot.outerDiam + spot.innerDiam) / 4 > height) {
-    //     std::pair<int,int> medianBrightnesses = std::make_pair(-1,-1);
-    //     return medianBrightnesses;
-    // }
+    if ((-spot.iy() + height / 2 - (spot.outerDiam + spot.innerDiam) / 4) < 0 || (-spot.iy() + height / 2 + (spot.outerDiam + spot.innerDiam) / 4 > height)) {
+        std::pair<int,int> medianBrightnesses = std::make_pair(-1,-1);
+        return medianBrightnesses;
+    }
 
     int leftX = spot.ix() + width / 2 - spot.outerDiam / 4;
     int rightX = spot.ix() + width / 2 + spot.outerDiam / 4;
+
 
     // std::cout << "Left X: " << leftX << std::endl;
     // std::cout << "Right X: " << rightX << std::endl;
@@ -1428,7 +1429,7 @@ std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangl
 
     // std::cout << "Bottom Length: " << bottomYValues.size() << std::endl;
 
-    // // sort both vectors
+    // sort both vectors
     std::sort(topYValues.begin(), topYValues.end());
     std::sort(bottomYValues.begin(), bottomYValues.end());
 
