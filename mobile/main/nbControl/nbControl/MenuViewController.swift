@@ -16,8 +16,7 @@ class MenuViewController: UITableViewController {
     
     let baseIPaddress = "139.140.192."
     
-    var listOfV5Robots = ["shehulk": "23","batman":"22","buzz":"21","wasp":"20","elektra":"19","blt":"18",
-                          "localhost":"0"] //for testing
+    var listOfV5Robots = ["shehulk": "23","batman":"22","buzz":"21","wasp":"20","elektra":"19","blt":"18"] //for testing
     
     var listOfV4Robots = ["zoe":"17", "mal":"16", "vera":"15", "kaylee":"14", "inara":"13", "simon":"12", "jayne":"11", "river":"10", "wash":"9"]
     
