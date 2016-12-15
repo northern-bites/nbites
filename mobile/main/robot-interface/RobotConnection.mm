@@ -81,7 +81,7 @@
     internal->logClass = std::string(cstr);
 }
 
-// set command adds the header for the log
+// setcommand adds the header for the log
 -(void) setCommand: (NSString *) theCommand {
     std::string key = "NULLKEY";
     std::string fname = std::string([theCommand cStringUsingEncoding:NSASCIIStringEncoding]);
