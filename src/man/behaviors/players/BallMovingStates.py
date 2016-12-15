@@ -8,6 +8,11 @@ from ..Say import *
 import math
 import time
 
+HEAD_MOVING = False
+HEAD_LEFT = False
+HEAD_RIGHT = False
+HEAD_STRAIGHT = True
+
 @superState('gameControllerResponder')
 def gameInitial(player):
     if player.firstFrame():
@@ -31,16 +36,21 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         #continous wide snap panning (see HeadMoves.py for angles)
-        # player.brain.tracker.repeatWideSnapPan()
+        if HEAD_MOVING:
+            player.brain.tracker.repeatWideSnapPan()
 
-        #keep head still at left angle used in wide snap pan 
-        # player.brain.tracker.performSideStayLeft()
+        #keep head still at left angle used in wide snap pan
+        elif HEAD_LEFT:  
+            player.brain.tracker.performSideStayLeft()
         
         #keep head still at right angle used in wide snap pan 
-        # player.brain.tracker.performSideStayRight()
+        elif HEAD_RIGHT:
+            player.brain.tracker.performSideStayRight()
         
         #keep head looking straight ahead (center position in wide snap pan)
-        player.brain.tracker.performCenterStay()
+        else:
+            HEAD_STRAIGHT = True
+            player.brain.tracker.performCenterStay()
 
     # if the robot sees the ball  
     if player.brain.ball.vis.on:
