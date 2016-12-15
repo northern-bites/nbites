@@ -111,8 +111,9 @@ bool BallDetector::processWhiteSpots(SpotList & whiteSpots,
 		midY + 2 * projectedBallRadius(p), midY, RED);*/
         if (filterWhiteSpot((*i), blackSpots, badBlackSpots)) {
             actualWhiteSpots.push_back((*i));
+                std::cout << "--------------------------ACTUAL WHITE SPOTS-----------------------------" << std::endl;
                 if(debugBall) {
-                    // topOfBallBrighterThanBottomMedian((*i));
+                    topOfBallBrighterThanBottomMedian((*i));
                     aboveBallRectangleBrighterThanBelowBallRectangle((*i));
                     std::cout<<"filterWhiteSpot returned true\n";
                     debugDraw.drawPoint((*i).ix() + width / 2, -(*i).iy() + height / 2, RED);
@@ -1176,13 +1177,18 @@ std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMedian(Spot sp
     int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
     int midX = spot.ix() + width / 2;
 
-    printf("X: [%d, %d, %d]\n", leftX, rightX, midX);
+    std::cout << "Mid X: " << midX << std::endl;
+
+
+    // printf("X: [%d, %d, %d]\n", leftX, rightX, midX);
 
     int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
     int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
     int midY = -spot.iy() + height / 2;
 
-    printf("Y: [%d, %d, %d]\n", bottomY, topY, midY);
+    std::cout << "Mid Y: " << midY << std::endl;
+
+    // printf("Y: [%d, %d, %d]\n", bottomY, topY, midY);
 
     // counters for the number of top and bottom pixels checked
     int topPixels = 0;
@@ -1191,6 +1197,8 @@ std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMedian(Spot sp
     // vectors for the brightness values
     std::vector<int> topYvalues;
     std::vector<int> bottomYvalues;
+
+    int topTotalBrightness = 0, bottomTotalBrightness = 0;
 
     // These for-loops should be able to be combined into one,
     // but I wanted to make sure it was working first
@@ -1203,6 +1211,7 @@ std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMedian(Spot sp
         if (debugBall)
           debugDraw.drawDot(x,y,WHITE);
         topYvalues.push_back(*(yImage.pixelAddr(x,y)));
+        topTotalBrightness += *(yImage.pixelAddr(x,y));  
 
       }
     }
@@ -1214,7 +1223,8 @@ std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMedian(Spot sp
 
         if (debugBall)
           debugDraw.drawDot(x,y,BLACK);
-        bottomYvalues.push_back(*(yImage.pixelAddr(x,y))); 
+        bottomYvalues.push_back(*(yImage.pixelAddr(x,y)));
+        bottomTotalBrightness += *(yImage.pixelAddr(x,y));  
       }
     }
 
@@ -1229,8 +1239,13 @@ std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMedian(Spot sp
     
     std::pair<double,double> medianBrightnesses = std::make_pair(topMedian, bottomMedian);
 
-    printf("Top of ball has median brightness %f\n", topMedian);
-    printf("Bottom of ball has median brightness %f\n", bottomMedian);
+    std::cout << "<-----------------BALL--------------------->" << std::endl;
+
+    std::cout << "Top Half Mean brightness: " << topTotalBrightness/(topYvalues.size()*4) << std::endl;
+    std::cout << "Bottom Half Mean brightness: " << bottomTotalBrightness/(bottomYvalues.size()*4) << std::endl;
+    std::cout << "Top Half Median brightness: " << topMedian << std::endl;
+    std::cout << "Bottom Half Median brightness: " << bottomMedian << std::endl;
+
 
     return medianBrightnesses;
 
@@ -1258,13 +1273,13 @@ std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMean(Spot spot
     int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
     int midX = spot.ix() + width / 2;
 
-    printf("X: [%d, %d, %d]\n", leftX, rightX, midX);
+    // printf("X: [%d, %d, %d]\n", leftX, rightX, midX);
 
     int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
     int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
     int midY = -spot.iy() + height / 2;
 
-    printf("Y: [%d, %d, %d]\n", bottomY, topY, midY);
+    // printf("Y: [%d, %d, %d]\n", bottomY, topY, midY);
 
     // counters for the number of top and bottom pixels checked
     int topPixels = 0;
@@ -1300,8 +1315,8 @@ std::pair<double,double> BallDetector::topOfBallBrighterThanBottomMean(Spot spot
     float bottomYValueAvg = bottomYValueTotal / (4 * bottomPixels);
     std::pair<double,double> meanBrightnesses = std::make_pair(topYValueAvg, bottomYValueAvg);
   
-    printf("Top of ball has mean brightness %f\n", topYValueAvg);
-    printf("Bottom of ball has mean brightness %f\n", bottomYValueAvg);
+    // printf("Top of ball has mean brightness %f\n", topYValueAvg);
+    // printf("Bottom of ball has mean brightness %f\n", bottomYValueAvg);
 
     return meanBrightnesses;
 
@@ -1394,6 +1409,7 @@ std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangl
 
     std::vector<int> topYValues;
     std::vector<int> bottomYValues;
+    int topTotalBrightness = 0, bottomTotalBrightness = 0;
 
     //Top Rect
     for (int x = leftX; x <= rightX; x++) {
@@ -1407,6 +1423,7 @@ std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangl
                 }
             }
             topYValues.push_back(*(yImage.pixelAddr(x,y)));
+            topTotalBrightness += *(yImage.pixelAddr(x,y)); 
         }
     }
 
@@ -1424,6 +1441,7 @@ std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangl
                 }
             }
             bottomYValues.push_back(*(yImage.pixelAddr(x,y)));
+            bottomTotalBrightness += *(yImage.pixelAddr(x,y)); 
         }
     }
 
@@ -1439,8 +1457,13 @@ std::pair<int,int> BallDetector::aboveBallRectangleBrighterThanBelowBallRectangl
 
     std::pair<int,int> medianBrightnesses = std::make_pair(topMedian, bottomMedian);
 
-    printf("Area above ball has median brightness %d\n", topMedian);
-    printf("Area below ball has median brightness %d\n", bottomMedian);
+    std::cout << "<-----------------AREA--------------------->" << std::endl;
+
+    std::cout << "Top Half Mean brightness: " << topTotalBrightness/(topYValues.size()*4) << std::endl;
+    std::cout << "Bottom Half Mean brightness: " << bottomTotalBrightness/(bottomYValues.size()*4) << std::endl;
+    std::cout << "Top Half Median brightness: " << topMedian << std::endl;
+    std::cout << "Bottom Half Median brightness: " << bottomMedian << std::endl;
+    std::cout << std::endl;
 
     return medianBrightnesses;
 
@@ -1626,7 +1649,16 @@ bool BallDetector::filterWhiteSpot(Spot spot, intPairVector & blackSpots,
 		return false;
 	}
 
-    //FUNCTIONS GO HERE.
+    if(debugBall) {
+        // std::cout << "<WILL MARCUS FUNCTIONS>" << std::endl;
+
+        // std::cout << "-------------------NOT ACTUAL WHITE SPOTS---------------"<<std::endl;
+        // topOfBallBrighterThanBottomMean(spot);
+        // topOfBallBrighterThanBottomMedian(spot);
+        // aboveBallRectangleBrighterThanBelowBallRectangle(spot);
+        // std::cout<<"filterWhiteSpot returned true\n";
+        // debugDraw.drawPoint((*i).ix() + width / 2, -(*i).iy() + height / 2, RED);
+    }
 
     // count up how many black spots are inside
     int spots = 0;
