@@ -13,12 +13,16 @@ def stand(nav):
 
     createAndSendWalkVector(nav, 0, 0, 0)
 
-def changeParams(nav):
+def changeParams(nav, param1, param2):
     """
     Changes Walking Parameters
     """
+    print "In NavHelper.py, line 20"
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.SET_PARAMS
+    command.param.param1 = param1 #param is name of protobuf, param1 is memeber of that protobuf (see PMotion.py)
+    command.param.param2 = param2
+    command.timestamp = int(nav.brain.time * 1000)
 
 def walkInPlace(nav):
     """

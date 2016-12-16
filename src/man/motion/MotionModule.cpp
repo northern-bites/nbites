@@ -415,18 +415,18 @@ void MotionModule::processMotionInput()
         if (bodyCommandInput_.message().type() ==
             messages::MotionCommand::DESTINATION_WALK)
         {
-            sendMotionCommand(bodyCommandInput_.message().dest());
+           sendMotionCommand(bodyCommandInput_.message().dest());
         }
 	else if(bodyCommandInput_.message().type() == 
 		messages::MotionCommand::SET_PARAMS)
 	{
+	  std::cout << "Received command in MotionModule.cpp" << std::endl;
 	  sendMotionCommand(bodyCommandInput_.message().param());
 	}
         else if (bodyCommandInput_.message().type() ==
             messages::MotionCommand::ODOMETRY_WALK)
         {
             sendMotionCommand(bodyCommandInput_.message().odometry_dest());
-
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::WALK_COMMAND)
@@ -454,7 +454,9 @@ void MotionModule::processMotionInput()
             gainsOn = true;
             stiff = true;
             sendMotionCommand(bodyCommandInput_.message().script());
-        }
+        }else{
+	  std::cout << "Failed to recognize command in MotionModule.cpp" << std::endl;
+	}
     }
 
     // (5) Process head commands.
@@ -993,23 +995,27 @@ void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
 
 void MotionModule::sendMotionCommand(const WalkInPlaceCommand::ptr command)
 {
+  std::cout << "In sendMotionCommand (line 999)" << std::endl;
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }
 
   //Jack Truskowski -- method to set change the walk parameters. Used EJ's thing as a template. You can fuck with it without telling me, I really don't care
-  void MotionModule::sendMotionCommand(messages::SetParams command){
-
+  void MotionModule::sendMotionCommand(messages::SetParamCommand command){
+    /*
     float param1 = command.param1();
     float param2 = command.param2();
-
+    */
     nextProvider = &walkProvider;
+    /*
     SetParamCommand::ptr newCommand(
         new SetParamCommand(
             param1,
             param2,
         );
-    walkProvider.setCommand(newCommand);
+    */
+    std::cout << "In MotionModule.cpp, line 1014" << std::endl;
+    //walkProvider.setCommand(command);
   }
 
 

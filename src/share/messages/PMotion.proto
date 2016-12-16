@@ -37,7 +37,7 @@ message MotionCommand
     optional OdometryWalk odometry_dest = 5;
     optional Kick kick = 6;
     optional SetParamCommand param = 7;
-    optional int64 timestamp = 8;
+    optional int64 timestamp = 9;
 }
 
 message ScriptedMove

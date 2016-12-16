@@ -126,7 +126,7 @@ public:
     void sendMotionCommand(messages::DestinationWalk command);
 
     void sendMotionCommand(const SetParamCommand::ptr command);
-    void sendMotionCommand(messages::SetWalkParams command);
+    void sendMotionCommand(messages::SetParamCommand command);
 
     /*
      * Odometry Walk

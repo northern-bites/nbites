@@ -84,6 +84,11 @@ class Navigator(FSA.FSA):
             
         FSA.FSA.run(self)
 
+    def updateParams(self, param1, param2):
+        print "In Navigator.py, line 88"
+        helper.changeParams(self, param1, param2)
+    
+
     def performSweetMove(self, move):
         """
         Do a sweet ass move. Goes to stopped after done.

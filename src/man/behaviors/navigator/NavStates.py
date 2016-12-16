@@ -294,6 +294,10 @@ def locationsMatch(odom, dest):
 
     return False
 
+def changeParams(param1, param2):
+    print "In NavStates.py, line 298"
+    helper.changeParams(param1,param2);
+
 def walkingTo(nav):
     """
     State to be used for odometry walking.

@@ -271,13 +271,13 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			// TODO incorporate motion kicks
 
 
-		} else if (currentCommand.get( && currentCommand->getType() == MotionConstants::SET_PARAMS) {
+		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::SET_PARAMS) {
 
-		    cout << "In UNSWalkProvider.cpp, line 276" << endl;
+		  std::cout << "In UNSWalkProvider.cpp, line 276" << endl;
 
-		    SetParamCommand::ptr command = boost::shared_static_cast<SetParamCommand>(currentCommand);
+		  SetParamCommand::ptr command = boost::shared_static_cast<SetParamCommand>(currentCommand);
 
-		    Walk2014Generator::modifyParameters(command.param1 command.param2);
+		  //Walk2014Generator::modifyParameters(command.param1() command.param2());
 		    
 		}
 

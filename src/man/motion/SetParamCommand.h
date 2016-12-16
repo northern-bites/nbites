@@ -22,7 +22,7 @@ public:
     {
       //setChainList();
       //call the method to change parameters here?
-      cout << "Modifying Parameters..." << endl;
+      std::cout << "Modifying Parameters..." << std::endl;
     }
 
     virtual ~SetParamCommand() {}
