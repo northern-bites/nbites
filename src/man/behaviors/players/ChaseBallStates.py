@@ -1,26 +1,18 @@
 """
 Here we house all of the state methods used for chasing the ball
 """
-#
 import SharedTransitions as shared
-##
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import RoleConstants as roleConstants
 import PlayOffBallTransitions as playOffTransitions
-#
 import PlayOffBallStates as playOffStates
-##
 from ..navigator import Navigator
-#
 from ..navigator import PID
 from ..navigator import BrunswickSpeeds as speeds
 import ClaimTransitions as claimTransitions
-##
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
-# from noggin_constants import MAX_SPEED, MIN_SPEED
-# ^ this is uncommented in previous version
 from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
 from math import fabs, degrees, radians, cos, sin, pi, copysign
@@ -272,15 +264,15 @@ def particleField(player):
 	    else: #If we're not close enough to the repulsive particle
 		hComp = copySign(speeds.SPEED_FIVE, ball.bearing_deg)
 
-	    player.setWalk(normalizer*xComp, normalizer*yComp, hComp)	 	
-
-	#MONEY SPOT RIGHT HERE ^^ PID WILL COME INTO PLAY IN SET WALK
 	    # Calculate corrections in x and h using PID controller 
     	    xError = attractorDist - constants.LINE_UP_X #calculate error based on distance from attractive point, NOT ball center
             hError = player.brain.ball.bearing
+	    #If there are errors in heading and x directions, fix them and set walk accordingly, else base walk on particle field vectors
 	    if xError > 0 or hError > 0: #These are not actual thresholds. We couldn't test so couldn't determine the actual thresholds
 		player.goNow('particleFieldCorrection') 
-	    
+	    else:
+		 player.setWalk(normalizer*xComp, normalizer*yComp, hComp)
+    
 	# If close enough to ball, go orbit
         if player.brain.ball.distance < constants.LINE_UP_X:
             player.setWalk(0, 0, 0)
