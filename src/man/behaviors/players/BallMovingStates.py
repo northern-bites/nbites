@@ -61,8 +61,6 @@ def gamePlaying(player):
         # if the robot sees the ball  
         if player.brain.ball.vis.on:
 
-            #say(Say.IN_SCRIMMAGE, "Put me in front of a ball and switch me to game ready!")
-
             ball = player.brain.ball #ball info from Brain
             dist = ball.distance #distance from robot to ball in cm
             player.brain.ballPos.append(dist)
@@ -72,31 +70,38 @@ def gamePlaying(player):
             # xPos = ball.x #ball x location in world space
             # yPos = ball.y #ball y location in world space
 
-            #say(Say.IN_DEBUG, "The ball is " + str(math.floor(dist)) + " centimeters away.")
-            
             # print out all the info we are getting! huzzah!
             print  "Distance: " + str(dist) 
 
+    # Head not moving, add a ball position to the list every 5 frames if we see ball
     elif player.brain.ball.vis.on and player.brain.frameCounter % 5 == 0:
         ball = player.brain.ball
         dist = ball.distance
         player.brain.ballPos.append(dist)
 
+    # keep track of how many times distances change between positions
     counter = 0
+
     if len(player.brain.ballPos) == 30:
         distances = player.brain.ballPos
         for index in range(1, len(player.brain.ballPos)):
-            if abs(distances[index - 1] - distances[index]) > 1:
+            
+            if abs(distances[index - 1] - distances[index]) > 1: #if distances change by at least 1 cm
                 counter += 1
+            
             if float(counter) / len(distances) > 0.5:
-                # sanity check
+                # sanity check - if we're not sure if the ball has moved
                 if abs(distances[len(distances) / 2] - distances[-1]) < 3:
                     say(Say.IN_SCRIMMAGE, "Ball has not moved or has moved back.")
                     player.brain.ballPos = []
                     return player.stay()
+                
+                # Robot has determined that the ball is/has moved 
                 say(Say.IN_SCRIMMAGE, "Ball is moving!")
                 player.brain.ballPos = []
                 return player.stay()
+
+        # Ball positions haven't changed enough for the ball to have moved
         say(Say.IN_SCRIMMAGE, "Ball is not moving.")
         print("Ball is not moving.")
         player.brain.ballPos = []
