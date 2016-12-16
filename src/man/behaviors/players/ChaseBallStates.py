@@ -196,7 +196,6 @@ def prepareForKick(player):
         return player.goNow('orbitBall')
 #
     return player.goNow('dribble')
-## Go now to particle field instead of dribble here
 
 
 @superState('gameControllerResponder')
