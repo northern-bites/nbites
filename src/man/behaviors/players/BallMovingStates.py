@@ -34,12 +34,13 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
+
     if player.firstFrame():
 
         # Empty data structure of ball positions
         player.brain.ballPos = []
         
-        #continous wide snap panning (see HeadMoves.py for angles)
+        #continuous wide snap panning (see HeadMoves.py for angles)
         if HEAD_MOVING:
             player.brain.tracker.repeatWideSnapPan()
 
@@ -76,10 +77,29 @@ def gamePlaying(player):
             # print out all the info we are getting! huzzah!
             print  "Distance: " + str(dist) 
 
-    elif player.brain.ball.vis.on and player.brain.frameCounter % 15 == 0:
+    elif player.brain.ball.vis.on and player.brain.frameCounter % 5 == 0:
         ball = player.brain.ball
         dist = ball.distance
         player.brain.ballPos.append(dist)
+
+    counter = 0
+    if len(player.brain.ballPos) == 30:
+        distances = player.brain.ballPos
+        for index in range(1, len(player.brain.ballPos)):
+            if abs(distances[index - 1] - distances[index]) > 1:
+                counter += 1
+            if float(counter) / len(distances) > 0.5:
+                # sanity check
+                if abs(distances[len(distances) / 2] - distances[-1]) < 3:
+                    say(Say.IN_SCRIMMAGE, "Ball has not moved or has moved back.")
+                    player.brain.ballPos = []
+                    return player.stay()
+                say(Say.IN_SCRIMMAGE, "Ball is moving!")
+                player.brain.ballPos = []
+                return player.stay()
+        say(Say.IN_SCRIMMAGE, "Ball is not moving.")
+        print("Ball is not moving.")
+        player.brain.ballPos = []
     
     return player.stay()
 
