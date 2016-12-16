@@ -51,8 +51,12 @@ class Brain(object):
         self.teamNumber = teamNum
 
         self.counter = 0
-        self.frameCounter = 0
+
         self.time = time.time()
+
+        # CLB Final attributes
+        self.frameCounter = 0
+        self.ballPos = []        
 
         # Initalize the leds and game controller
         self.leds = Leds.Leds(self)
