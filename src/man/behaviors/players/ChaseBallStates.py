@@ -595,7 +595,3 @@ def dontMove(player):
 	print ("timeToCompletion:")
 	print (round(timeToCompletion,3))
     return player.stay()
-
-'''
-3) Fix one of Dan's issues (At least address it)
-'''
