@@ -389,7 +389,6 @@ def orbitBall(player):
 #	return player.goNow('positionForKick')
 ##
         player.setWalk(0, 0, 0)
-##	^ why??
 
         # return player.goLater('positionForKick')
         if transitions.shouldNotDribble(player):
