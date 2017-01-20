@@ -198,6 +198,10 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 		return latestVisionLog == null ? null : latestVisionLog.find("debugImage");
 	}
 
+	protected final Block getFullYBlock() {
+		return latestVisionLog == null ? null : latestVisionLog.find("fullYImage");
+	}
+
 	/******
 	 * Begin internal implementation.
 	 */

@@ -434,8 +434,8 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     //-------------------
     // FULL Y IMAGE
     //-------------------
-    int fullYImageLength = (width/4) * (height/2); //TODO: this ought to be the size of full Y image. using white for now.
-    retVec.push_back(Block { std::string{ (const char*) module.whiteImage(topCamera)->pixArray(), fullYImageLength}, json::Object{}, "fullYImage", "nbcross", 0, 0});
+    int fullYImageLength = (width/2) * (height/2); //TODO: this ought to be the size of full Y image. using debug for now.
+    retVec.push_back(Block{ std::string{ (const char *) module.getDebugImage(topCamera)->pixArray(), fullYImageLength}, json::Object{}, "fullYImage", "nbcross", 0, 0});
 
     RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));
 }
