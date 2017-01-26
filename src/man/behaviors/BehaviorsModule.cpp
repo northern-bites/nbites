@@ -290,6 +290,7 @@ void BehaviorsModule::prepareMessages()
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);
+    // std::cout << ledCommand << std::endl;
     pyInterface.setLedCommand_ptr(ledCommand.get());
 
     motionRequest = portals::Message<messages::MotionRequest>(0);
@@ -366,5 +367,5 @@ void BehaviorsModule::modifySysPath ()
     }
 }
 
-}
-}
+} // namespace behaviors
+} // namespace man

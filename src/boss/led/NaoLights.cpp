@@ -4,8 +4,8 @@
 #include <iostream>
 
 #define LEDS_ENABLED
-//#define DEBUG_NAOLIGHTS_INIT
-//#define DEBUG_NAOLIGHTS_COMMAND
+// #define DEBUG_NAOLIGHTS_INIT
+// #define DEBUG_NAOLIGHTS_COMMAND
 
 NaoLights::NaoLights(boost::shared_ptr<AL::ALBroker> broker)
     :Lights(),
@@ -35,6 +35,7 @@ NaoLights::~NaoLights(){
  */
 void NaoLights::generateLeds(){
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
+        std::cout << LED_NAMES[i] << std::endl;
         ledList.push_back(new NaoRGBLight(LED_NAMES[i],
                                           i,
                                           ALNames::NUM_RGB_LEDS[i],
