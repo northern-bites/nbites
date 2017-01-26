@@ -1535,12 +1535,29 @@ bool BallDetector::isBlack() {
 void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
                              ImageLiteU8 black,
                              ImageLiteU16 yImg,
+                             ImageLiteU16 fullYImg,
 							 EdgeDetector * edgeD) {
     whiteImage = white;
     greenImage = green;
     blackImage = black;
     yImage = yImg;
+    fullYImage = fullYImg;
 	edgeDetector = edgeD;
+}
+
+ImageLiteU16 BallDetector::getImage() {
+    int wd = fullYImage.width();
+    int ht = fullYImage.height();
+
+    uint16_t* pixels = new uint16_t[wd * ht];
+    for(int j=1; j<ht-1; ++j) {
+        for(int i=1; i<wd-1; ++i) {
+            pixels[i + wd * j] = 0;
+        }
+    }
+    fullYImage = ImageLiteU16(0,0,wd,ht,wd,pixels);
+    std::cout<<"CALL TO GETIMAGE\n";
+    return fullYImage; //fullYImage;
 }
 
 void BallDetector::billToImageCoordinates(double bx, double by, 

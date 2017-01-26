@@ -56,6 +56,7 @@ public:
 
 #ifdef OFFLINE
 	void setDebugDrawingParameters(nbl::SExpr* debugParams);
+    ImageLiteU16 fullY;
 #endif
     
     // For use by vision_defs

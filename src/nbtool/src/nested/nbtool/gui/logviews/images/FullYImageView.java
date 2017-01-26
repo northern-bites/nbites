@@ -10,9 +10,12 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import nbtool.images.Y8Image;
 import nbtool.images.Y8ThreshImage;
+import nbtool.images.Y16Image;
 
 import nbtool.data.log.Log;
 import nbtool.data.SExpr;
+
+
 
 import javax.swing.JSlider;
 import javax.swing.JButton;
@@ -50,10 +53,6 @@ public class FullYImageView extends VisionView implements IOFirstResponder {
     BufferedImage fullyimage; // right now just do white image until i get grad working
     Log balls;
 
-    // Gradient sliders
-    private JSlider gFuzzyU;
-    private JSlider gFuzzyV;
-
     // Save button
     private JButton saveButton;
 
@@ -86,20 +85,10 @@ public class FullYImageView extends VisionView implements IOFirstResponder {
         };
 
         // Save button
-        saveButton = new JButton("Save fuzzy gradient parameters");
-        saveButton.setToolTipText("Save current fuzzy parms to config/gradientParams.txt");
+        saveButton = new JButton("Save Spot Filter Params");
+        saveButton.setToolTipText("Save current Spot Filter");
         saveButton.addActionListener(press);
         add(saveButton);
-
-        // Init and add green sliders.
-        gFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
-        gFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
-
-        gFuzzyU.addChangeListener(slide);
-        gFuzzyV.addChangeListener(slide);
-
-        add(gFuzzyU);
-        add(gFuzzyV);
     }
 
     public void paintComponent(Graphics g) {
@@ -125,12 +114,8 @@ public class FullYImageView extends VisionView implements IOFirstResponder {
             //drawBalls();
             g.drawImage(fullyimage, lB, vB, width/2, height/2, null);
         } else {
-            System.out.printf("[ROBOT VIEW] gradient image was null\n");
+            System.out.printf("[FULL Y VIEW] y image was null\n");
         }
-
-        gFuzzyU.setBounds(hB*1 + lB, vB + sH*2 + tB*3, width/2, sH);
-        gFuzzyV.setBounds(hB*1 + lB, vB + sH*4 + tB*3, width/2, sH);
-        g.drawString("width of fuzzy threshold for gradient", hB*1 + lB, vB + sH + tB*3);
 
         // Draw button
         saveButton.setBounds(hB*1 + lB,  vB + sH*6 + tB*3, width/2, tB*3);
@@ -194,7 +179,7 @@ public class FullYImageView extends VisionView implements IOFirstResponder {
 
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
-        System.out.printf("[ROBOT VIEW] IO received\n");
+        System.out.printf("[FULL Y VIEW] IO received\n");
 
         // if (this.getWhiteBlock() != null) {
         //     Y8Image white8 = new Y8Image(width/2, height/2, this.getWhiteBlock().data);
@@ -202,8 +187,8 @@ public class FullYImageView extends VisionView implements IOFirstResponder {
         // }
 
         if (this.getFullYBlock() != null) {
-            Y8Image robot8 = new Y8Image(width/2, height/2, this.getFullYBlock().data);
-            this.fullyimage = robot8.toBufferedImage();
+            Y16Image robot16 = new Y16Image(width/2, height/2, this.getFullYBlock().data);
+            this.fullyimage = robot16.toBufferedImage();
         }
 
         if (firstLoad) {
@@ -273,8 +258,8 @@ public class FullYImageView extends VisionView implements IOFirstResponder {
 
     // Check to see if any parameters are zero to avoid devide-by-zero error later
     private void zeroParam() {
-        if (gFuzzyU.getValue() == 0) gFuzzyU.setValue(1);
-        if (gFuzzyV.getValue() == 0) gFuzzyV.setValue(1);
+        // if (gFuzzyU.getValue() == 0) gFuzzyU.setValue(1);
+        // if (gFuzzyV.getValue() == 0) gFuzzyV.setValue(1);
     }
 
     // If and only if it is the first load, we need to set the positions of the sliders
@@ -284,8 +269,8 @@ public class FullYImageView extends VisionView implements IOFirstResponder {
 
         // gFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * gPrecision));
         // gFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * gPrecision));
-        gFuzzyU.setValue(1);
-        gFuzzyV.setValue(1);
+        // gFuzzyU.setValue(1);
+        // gFuzzyV.setValue(1);
 
         firstLoad = false;
     }

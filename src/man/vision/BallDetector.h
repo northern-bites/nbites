@@ -151,7 +151,7 @@ namespace man {
 			bool hardSanityCheck(int leftx, int rightx, int topy, int bottomy);
 
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
-						   ImageLiteU16 yImg, EdgeDetector * edgeD);
+						   ImageLiteU16 yImg, ImageLiteU16 fullYImg, EdgeDetector * edgeD);
 			void getColor(int x, int y);
 			int  getGreen();
 			int  getWhite();
@@ -176,6 +176,8 @@ namespace man {
 			void setDebugGreenDark(int gd) { greenThresholdDark = gd; }
 			void setDebugFilterBrite(int fb) { filterThresholdBrite = fb; }
 			void setDebugGreenBrite(int gb) { greenThresholdBrite = gb; }
+
+			ImageLiteU16 getImage();
 #endif
 		private:
 			FieldHomography* homography;
@@ -191,7 +193,7 @@ namespace man {
 
 			DebugImage debugDraw;
 			ImageLiteU8 whiteImage, greenImage, blackImage;
-			ImageLiteU16 yImage;
+			ImageLiteU16 yImage, fullYImage;
 			EdgeDetector * edgeDetector;
 			EdgeList * edgeList;
 
