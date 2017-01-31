@@ -21,6 +21,10 @@ class NaoRGBLight{
     AL::ALValue * getAlias(){return &alias;}
     AL::ALValue * getCommand(){return &command;}
 
+    void printInfo() {
+        std::cout << "NaoRGBLight Object with name " << NBLedName << " and ID " << NBLedID << std::endl;
+    }
+
  private:
     void makeAlias();
     void makeCommand();

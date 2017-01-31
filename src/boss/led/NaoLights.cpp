@@ -36,11 +36,13 @@ NaoLights::~NaoLights(){
 void NaoLights::generateLeds(){
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         std::cout << LED_NAMES[i] << std::endl;
+        // not creating valid naorbglight objects for the new group numbers
         ledList.push_back(new NaoRGBLight(LED_NAMES[i],
                                           i,
                                           ALNames::NUM_RGB_LEDS[i],
                                           ALNames::LED_START_COLOR[i],
                                           ALNames::LED_END_COLOR[i]));
+        ledList.at(i)->printInfo();
 
         try {
             AL::ALValue newAlias = *ledList[i]->getAlias();
@@ -50,6 +52,8 @@ void NaoLights::generateLeds(){
                       << e.toString() << std::endl;
         }
     }
+
+    std::cout << ledList.size() << std::endl;
 }
 
 void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
@@ -64,22 +68,24 @@ void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
 
 void NaoLights::setRGB(const unsigned int led_id, const int newRgbHex){
     hexList[led_id] = newRgbHex;
+    std::cout << "hexList[" << led_id << "] = " << newRgbHex << std::endl;
 }
 
 void NaoLights::sendLights(){
 #ifdef DEBUG_NAOLIGHTS_INIT
-    std::cout << "  NaoLights::sendLights() start" << std::endl;
+    // std::cout << "  NaoLights::sendLights() start" << std::endl;
 #endif
 
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){ //HAack
-        if(ledList[i]->updateCommand(hexList[i])){
+        if(ledList[i]->updateCommand(hexList[i])){ // only true under the before number
+            std::cout << "sending led light command for group " << i << std::endl;
             sendLightCommand(*ledList[i]->getCommand());
         }
     }
 
     //sendLightCommand(*(ledList[0]->getCommand()));
 #ifdef DEBUG_NAOLIGHTS_INIT
-    std::cout << "  NaoLights::sendLights() end" << std::endl;
+    // std::cout << "  NaoLights::sendLights() end" << std::endl;
 #endif
 }
 

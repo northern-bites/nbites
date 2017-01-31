@@ -48,8 +48,8 @@ class Leds():
 	startup
 	"""
 	initialLeds = [
-		(GOALBOX_LED, 0xFF00FF, 0.0),
-		(CHEST_LED, 0xFF00FF, 0.0),
+		# (GOALBOX_LED, 0xFF00FF, 0.0),
+		# (CHEST_LED, 0xFF00FF, 0.0),
 		(BRAIN_ONE, 0xFFFFFF, 0.0),
 		(BRAIN_FIVE, 0xFFFFFF, 0.0),
 		(BRAIN_TEN, 0xFFFFFF, 0.0),

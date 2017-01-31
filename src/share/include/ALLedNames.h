@@ -83,7 +83,7 @@ static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
     RED_LED, RED_LED,                              // Right Eye
     RED_LED,                                       // Chest
     RED_LED,RED_LED,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};                              // Feet
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};                              // Feet
 
 static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
@@ -94,7 +94,7 @@ static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     NUM_LED_COLORS, NUM_LED_COLORS, // Right Eye
     NUM_LED_COLORS,                // Chest
     NUM_LED_COLORS,NUM_LED_COLORS,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Feet
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3}; // Feet
 
 static const std::string brainL[NUM_BRAIN_LEDS] = {
     ValuePreFix + BrainLed + std::string("/Front/Right/1") + LedPostFix,
@@ -320,8 +320,8 @@ static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &brainL[1],
     &brainL[2],
     &brainL[3],
-    &earL[LEFT_LED][6],
-    &earL[LEFT_LED][6],
+    &earL[LEFT_LED][7],
+    &earL[LEFT_LED][7],
     &brainL[6],
     &brainL[7],
     &brainL[8],
