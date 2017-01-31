@@ -2,7 +2,7 @@ class Leds():
 	LED_OFF = 0
 	LED_ON  = 1
 
-	NUM_LED_GROUPS = 26
+	NUM_LED_GROUPS = 26 + 12
 
 	(LEFT_CALIBRATION_ONE_LED, # left ear front
 	LEFT_CALIBRATION_TWO_LED,
@@ -29,7 +29,19 @@ class Leds():
 	GOALBOX_LED, # one of the top right eyes
 	CHEST_LED, # the chest
 	LEFT_FOOT_LED,
-	RIGHT_FOOT_LED) = range(NUM_LED_GROUPS)
+	RIGHT_FOOT_LED,
+	BRAIN_ZERO,
+	BRAIN_ONE,
+	BRAIN_TWO,
+	BRAIN_THREE,
+	BRAIN_FOUR,
+	BRAIN_FIVE,
+	BRAIN_SIX,
+	BRAIN_SEVEN,
+	BRAIN_EIGHT,
+	BRAIN_NINE,
+	BRAIN_TEN,
+	BRAIN_ELEVEN) = range(NUM_LED_GROUPS)
 
 	"""
 	LEDs persist throughout man restart so we need to reset them on
@@ -37,7 +49,10 @@ class Leds():
 	"""
 	initialLeds = [
 		(GOALBOX_LED, 0xFF00FF, 0.0),
-		(CHEST_LED, 0xFF00FF, 0.0)
+		(CHEST_LED, 0xFF00FF, 0.0),
+		(BRAIN_ONE, 0xFFFFFF, 0.0),
+		(BRAIN_FIVE, 0xFFFFFF, 0.0),
+		(BRAIN_TEN, 0xFFFFFF, 0.0),
 	]
 
 	def __init__(self, brain):
@@ -55,6 +70,7 @@ class Leds():
 				print "invalid led command " + str(ledTuple)
 				continue
 			# ledTuple[0] is an int
+			print ledTuple[0]
 			self.brain.interface.ledCommand.add_led_id(ledTuple[0])
 			self.brain.interface.ledCommand.add_rgb_hex(ledTuple[1])
 

@@ -3,6 +3,7 @@
 
 namespace ALNames {
 
+static const std::string BrainLed = "Head/Led";
 static const std::string FaceLed ="Face/Led";
 static const std::string EarLed ="Ears/Led";
 static const std::string LFootLed ="LFoot/Led";
@@ -34,6 +35,7 @@ enum LedOrientation{
 };
 
 // NUM_FACE_LEDS refers to how many LEDS there are per eye
+static const unsigned int NUM_BRAIN_LEDS = 12;
 static const unsigned int NUM_FACE_LEDS  = 8;
 static const unsigned int NUM_EAR_LEDS   = 10;
 static const unsigned int NUM_FOOT_LEDS  = 1;
@@ -60,7 +62,7 @@ static const unsigned int NUM_LED_COLORS = 3;
 static const unsigned int NUM_LED_ORIENTATIONS = 2;
 static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
 
-static const unsigned int NUM_UNIQUE_LEDS = 26;
+static const unsigned int NUM_UNIQUE_LEDS = 26 + 12;
 static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
     NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
@@ -69,7 +71,8 @@ static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     NUM_ROLE_LEDS,                                 // Left Eye
     NUM_BALL_LEDS, NUM_GOALBOX_LEDS,               // Right Eye
     NUM_CHEST_LEDS,
-    NUM_FOOT_LEDS,NUM_FOOT_LEDS};
+    NUM_FOOT_LEDS,NUM_FOOT_LEDS,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
     BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,  // Ear fronts
@@ -79,7 +82,8 @@ static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
     RED_LED,                                       // Left Eye
     RED_LED, RED_LED,                              // Right Eye
     RED_LED,                                       // Chest
-    RED_LED,RED_LED};                              // Feet
+    RED_LED,RED_LED,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};                              // Feet
 
 static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
@@ -89,7 +93,23 @@ static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     NUM_LED_COLORS,                // Left Eye
     NUM_LED_COLORS, NUM_LED_COLORS, // Right Eye
     NUM_LED_COLORS,                // Chest
-    NUM_LED_COLORS,NUM_LED_COLORS}; // Feet
+    NUM_LED_COLORS,NUM_LED_COLORS,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Feet
+
+static const std::string brainL[NUM_BRAIN_LEDS] = {
+    ValuePreFix + BrainLed + std::string("/Front/Right/1") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Front/Right/0") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Middle/Right/0") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Rear/Right/0") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Rear/Right/1") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Rear/Right/2") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Rear/Left/2") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Rear/Left/1") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Rear/Left/0") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Middle/Left/0") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Front/Left/0") + LedPostFix,
+    ValuePreFix + BrainLed + std::string("/Front/Left/1") + LedPostFix,
+};
 
 static const std::string faceL[NUM_LED_ORIENTATIONS][NUM_LED_COLORS][NUM_FACE_LEDS] ={
 /*  Face Leds Left */
@@ -296,7 +316,78 @@ static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &chestL[0],
     &footL[LEFT_LED][0],
     &footL[RIGHT_LED][0],
+    &brainL[0],
+    &brainL[1],
+    &brainL[2],
+    &brainL[3],
+    &earL[LEFT_LED][6],
+    &earL[LEFT_LED][6],
+    &brainL[6],
+    &brainL[7],
+    &brainL[8],
+    &brainL[9],
+    &brainL[10],
+    &brainL[11]
 };
 };
+
+/*
+brain 0
+brain 1
+brain 2
+brain 3
+brain 4
+brain 5
+brain 6
+brain 7
+brain 8
+brain 9
+brain 10
+brain 11
+
+r eye 0
+r eye 1
+r eye 2
+r eye 3
+r eye 4
+r eye 5
+r eye 6
+r eye 7
+
+l eye 0
+l eye 1
+l eye 2
+l eye 3
+l eye 4
+l eye 5
+l eye 6
+l eye 7
+
+r ear 0
+r ear 1
+r ear 2
+r ear 3
+r ear 4
+r ear 5
+r ear 6
+r ear 7
+r ear 8
+r ear 9
+
+l ear 0
+l ear 1
+l ear 2
+l ear 3
+l ear 4
+l ear 5
+l ear 6
+l ear 7
+l ear 8
+l ear 9
+
+chest
+r foot
+l foot
+*/
 
 #endif

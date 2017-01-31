@@ -4,8 +4,8 @@
 #include <iostream>
 
 #define LEDS_ENABLED
-// #define DEBUG_NAOLIGHTS_INIT
-// #define DEBUG_NAOLIGHTS_COMMAND
+#define DEBUG_NAOLIGHTS_INIT
+#define DEBUG_NAOLIGHTS_COMMAND
 
 NaoLights::NaoLights(boost::shared_ptr<AL::ALBroker> broker)
     :Lights(),

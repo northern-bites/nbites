@@ -17,7 +17,7 @@ void LedEnactor::setLeds(messages::LedCommand command)
 
         naoLights.setRGB(command.led_id(i),command.rgb_hex(i));
     }
-    naoLights.setRGB(23, 0xFFAA00);
+    naoLights.setRGB(31, 0xFFFFFF);
     // actually set robot leds
     naoLights.sendLights();
 }
