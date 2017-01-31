@@ -1548,16 +1548,25 @@ void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
 ImageLiteU16 BallDetector::getImage() {
     int wd = fullYImage.width();
     int ht = fullYImage.height();
+    // std::cout<<"Width: "<<wd<<std::endl;
+    // std::cout<<"Height: "<<ht<<std::endl;
 
     uint16_t* pixels = new uint16_t[wd * ht];
-    for(int j=1; j<ht-1; ++j) {
-        for(int i=1; i<wd-1; ++i) {
+    for(int j=0; j<ht; ++j) {
+        for(int i=0; i<wd; ++i) {
+            // std::cout<<"Setting Pixel: ["<<j<<", "<<i<<"]"<<std::endl;
             pixels[i + wd * j] = 0;
         }
     }
-    fullYImage = ImageLiteU16(0,0,wd,ht,wd,pixels);
-    std::cout<<"CALL TO GETIMAGE\n";
-    return fullYImage; //fullYImage;
+    ImageLiteU16 imm = ImageLiteU16(0,0,wd,ht,wd,pixels);
+    
+    for(int i=60; i<100; ++i) {
+        for(int j=60; j<100; ++j) {
+            *imm.pixelAddr(i,j) = 1020;
+        }
+    }
+    // std::cout<<"CALL TO GETIMAGE\n";
+    return imm; //fullYImage;
 }
 
 void BallDetector::billToImageCoordinates(double bx, double by, 

@@ -180,11 +180,18 @@ public class FullYImageView extends VisionView implements IOFirstResponder {
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
         System.out.printf("[FULL Y VIEW] IO received\n");
+        SExpr tree = this.getBallBlock().parseAsSExpr();
+        SExpr blackTree = this.getBlackSpotBlock().parseAsSExpr();
+        System.out.println(blackTree.print());
 
-        // if (this.getWhiteBlock() != null) {
-        //     Y8Image white8 = new Y8Image(width/2, height/2, this.getWhiteBlock().data);
-        //     this.whiteImage = white8.toBufferedImage();
-        // }
+        String b = "darkSpot";
+        for (int i= 0; ; i++) {
+            SExpr bl = blackTree.find(b+i);
+            if (!bl.exists()) {
+                break;
+            }
+            System.out.println("FOUND");
+        }
 
         if (this.getFullYBlock() != null) {
             Y16Image robot16 = new Y16Image(width/2, height/2, this.getFullYBlock().data);
