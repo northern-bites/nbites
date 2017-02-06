@@ -72,7 +72,7 @@ static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     NUM_BALL_LEDS, NUM_GOALBOX_LEDS,               // Right Eye
     NUM_CHEST_LEDS,
     NUM_FOOT_LEDS,NUM_FOOT_LEDS,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
     BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,  // Ear fronts
@@ -257,6 +257,12 @@ static const std::string goalBoxL[NUM_LED_COLORS][NUM_GOALBOX_LEDS] ={
      faceL[RIGHT_LED][BLUE_LED][7]}
 };
 
+static const std::string eyeOne[NUM_LED_COLORS][1] = {
+    {faceL[RIGHT_LED][RED_LED][0]},
+    {faceL[RIGHT_LED][GREEN_LED][0]},
+    {faceL[RIGHT_LED][BLUE_LED][0]}
+};
+
 static const std::string roleL[NUM_LED_COLORS][NUM_ROLE_LEDS] ={
 /* Red*/
     {faceL[LEFT_LED][RED_LED][0],
@@ -313,11 +319,12 @@ static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &roleL[0][0],                   // Role
     &ballL[0][0],                   // Ball
     &goalBoxL[0][0],                // Goalbox
-    &chestL[0],
+    &chestL[0], //23
+    // &eyeOne[0][0],
     &footL[LEFT_LED][0],
     &footL[RIGHT_LED][0],
-    &brainL[0],
-    &brainL[1],
+    &eyeOne[0][0], //26
+    &earL[RIGHT_LED][0], //27
     &brainL[2],
     &brainL[3],
     &earL[LEFT_LED][7],

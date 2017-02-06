@@ -68,7 +68,7 @@ void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
 
 void NaoLights::setRGB(const unsigned int led_id, const int newRgbHex){
     hexList[led_id] = newRgbHex;
-    std::cout << "hexList[" << led_id << "] = " << newRgbHex << std::endl;
+    // std::cout << "hexList[" << led_id << "] = 0x" << std::hex << newRgbHex << std::endl;
 }
 
 void NaoLights::sendLights(){
