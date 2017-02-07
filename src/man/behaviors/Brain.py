@@ -77,8 +77,6 @@ class Brain(object):
         self.time = time.time()
         self.counter += 1
 
-        self.leds.executeLeds(self.leds.initialLeds)
-
         # if self.counter % 10 == 0:
         #     print(self.interface.vision)
 

@@ -145,7 +145,7 @@ class Leds():
 				print "invalid led command " + str(ledTuple)
 				continue
 			# ledTuple[0] is an int
-			print ledTuple[0]
+			# print ledTuple[0]
 			self.brain.interface.ledCommand.add_led_id(ledTuple[0])
 			self.brain.interface.ledCommand.add_rgb_hex(ledTuple[1])
 
@@ -190,7 +190,14 @@ class Leds():
 	the ear are numbered from 0 to 9, with 0 at around 1:00, increasing 
 	clockwise.
 	"""
-	def setRightEarSegmentsUpTo(segment):
+	def setRightEarSegmentsUpTo(self, segment):
+
+		earLEDs = []
+
+		for i in range(0, segment):
+			earLEDs.append([self.RIGHT_EAR_ZERO + i, 0xFFFFFF, 0.0])
+
+		self.executeLeds(earLEDs)
 		return
 
 	"""
@@ -199,7 +206,14 @@ class Leds():
 	the ear are numbered from 0 to 9, with 0 at around 11:00, increasing
 	counter-clockwise.
 	"""
-	def setLeftEarSegmentsUpTo(segment):
+	def setLeftEarSegmentsUpTo(self, segment):
+
+		earLEDs = []
+
+		for i in range(0, segment):
+			earLEDs.append([self.LEFT_EAR_ZERO + i, 0xFFFFFF, 0.0])
+
+		self.executeLeds(earLEDs)
 		return
 
 	"""
@@ -209,23 +223,25 @@ class Leds():
 	0 at around 1:00, increasing clockwise if you're looking at the top
 	of the head with the back of the robot facing you.
 	"""
-	def setBrainSegmentsUpTo(segment):
+	def setBrainSegmentsUpTo(self, segment):
 		return
 
 	"""
 	Turns on or off a specific segment in the brain.
 	"""
-	def setBrainSegment(segment, onOrOff):
+	def setBrainSegment(self, segment, onOrOff):
 		return
 
 	"""
 	Sets the left foot to a specific color.
 	"""
-	def setLeftFoot(color):
+	def setLeftFoot(self, color):
+		self.executeLeds([[self.LEFT_FOOT, color, 0.0]])
 		return
 
 	"""
 	Sets the right foot to a specific color.
 	"""
-	def setRightFoot(color):
+	def setRightFoot(self, color):
+		self.executeLeds([[self.RIGHT_FOOT, color, 0.0]])
 		return
