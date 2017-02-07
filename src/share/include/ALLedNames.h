@@ -82,11 +82,11 @@ static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
     0, 0, 0};
     // BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,  // Ear fronts
     // BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,
@@ -318,6 +318,7 @@ static const std::string foot[NUM_LED_ORIENTATIONS][NUM_LED_COLORS]={
      ValuePreFix +RFootLed + Green +LedPostFix,
      ValuePreFix +RFootLed + Blue +LedPostFix},
 };
+
 static const std::string chest[NUM_LED_COLORS]={
 /* Chest Led*/
     ValuePreFix +ChestLed + Red +LedPostFix,
@@ -495,10 +496,10 @@ static const std::string chest[NUM_LED_COLORS]={
 
 // static const std::string strPtr = footL[RIGHT_LED][0];
 static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
-    &brain[0],
-    &brain[1],
-    &brain[2],
-    &brain[3],
+    &brain[0], //0
+    &brain[1], //1
+    &brain[2], //2
+    &brain[3], 
     &brain[4],
     &brain[5],
     &brain[6],
@@ -508,16 +509,16 @@ static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &brain[10],
     &brain[11],
     
-    &eye[RIGHT_LED][0][0],
-    &eye[RIGHT_LED][1][0],
-    &eye[RIGHT_LED][2][0],
-    &eye[RIGHT_LED][3][0],
-    &eye[RIGHT_LED][4][0],
-    &eye[RIGHT_LED][5][0],
-    &eye[RIGHT_LED][6][0],
-    &eye[RIGHT_LED][7][0],
+    &eye[RIGHT_LED][0][0], //12
+    &eye[RIGHT_LED][1][0], //13
+    &eye[RIGHT_LED][2][0], //14
+    &eye[RIGHT_LED][3][0], //15
+    &eye[RIGHT_LED][4][0], //16
+    &eye[RIGHT_LED][5][0], //17
+    &eye[RIGHT_LED][6][0], //18
+    &eye[RIGHT_LED][7][0], //19
 
-    &eye[LEFT_LED][0][0],
+    &eye[LEFT_LED][0][0], //0x14
     &eye[LEFT_LED][1][0],
     &eye[LEFT_LED][2][0],
     &eye[LEFT_LED][3][0],
