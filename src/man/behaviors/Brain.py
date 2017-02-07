@@ -76,7 +76,7 @@ class Brain(object):
         # Update Environment
         self.time = time.time()
         self.counter += 1
-
+        
         # if self.counter % 10 == 0:
         #     print(self.interface.vision)
 

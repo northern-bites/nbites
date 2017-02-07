@@ -4,8 +4,8 @@
 #include <iostream>
 
 #define LEDS_ENABLED
-#define DEBUG_NAOLIGHTS_INIT
-#define DEBUG_NAOLIGHTS_COMMAND
+// #define DEBUG_NAOLIGHTS_INIT
+// #define DEBUG_NAOLIGHTS_COMMAND
 
 NaoLights::NaoLights(boost::shared_ptr<AL::ALBroker> broker)
     :Lights(),
@@ -73,7 +73,7 @@ void NaoLights::setRGB(const unsigned int led_id, const int newRgbHex){
 
 void NaoLights::sendLights(){
 #ifdef DEBUG_NAOLIGHTS_INIT
-    // std::cout << "  NaoLights::sendLights() start" << std::endl;
+    std::cout << "  NaoLights::sendLights() start" << std::endl;
 #endif
 
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){ //HAack
@@ -85,7 +85,7 @@ void NaoLights::sendLights(){
 
     //sendLightCommand(*(ledList[0]->getCommand()));
 #ifdef DEBUG_NAOLIGHTS_INIT
-    // std::cout << "  NaoLights::sendLights() end" << std::endl;
+    std::cout << "  NaoLights::sendLights() end" << std::endl;
 #endif
 }
 

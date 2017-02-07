@@ -151,21 +151,46 @@ class Leds():
 
 
 	"""
-	Sets the chest to a color, represented by a hexidecimal number (0xFFFFFF).
+	Sets the chest to a color, represented by a hexadecimal number (0xFFFFFF).
 	"""
-	def setChestLed(color):
+	def setChestLed(self, color):
+		self.executeLeds([(self.CHEST, color, 0.0)])
 		return
 
 	"""
 	Sets the entire right eye to a color.
 	"""
-	def setRightEyeFull(color):
+	def setRightEyeFull(self, color):
+		list = [
+			(self.RIGHT_EYE_ZERO, color, 0.0),
+			(self.RIGHT_EYE_ONE, color, 0.0),
+			(self.RIGHT_EYE_TWO, color, 0.0),
+			(self.RIGHT_EYE_THREE, color, 0.0),
+			(self.RIGHT_EYE_FOUR, color, 0.0),
+			(self.RIGHT_EYE_FIVE, color, 0.0),
+			(self.RIGHT_EYE_SIX, color, 0.0),
+			(self.RIGHT_EYE_SEVEN, color, 0.0),
+		]
+		
+		self.executeLeds(list)
 		return
 
 	"""
 	Sets the entire left eye to a color.
 	"""
-	def setLeftEyeFull(color):
+	def setLeftEyeFull(self, color):
+		list = [
+			(self.LEFT_EYE_ZERO, color, 0.0),
+			(self.LEFT_EYE_ONE, color, 0.0),
+			(self.LEFT_EYE_TWO, color, 0.0),
+			(self.LEFT_EYE_THREE, color, 0.0),
+			(self.LEFT_EYE_FOUR, color, 0.0),
+			(self.LEFT_EYE_FIVE, color, 0.0),
+			(self.LEFT_EYE_SIX, color, 0.0),
+			(self.LEFT_EYE_SEVEN, color, 0.0),
+		]
+
+		self.executeLeds(list)
 		return
 
 	"""
@@ -173,7 +198,11 @@ class Leds():
 	are numbered from 0 to 7, starting at the top and going around
 	clockwise.
 	"""
-	def setRightEyeSegment(segment, color):
+	def setRightEyeSegment(self, segment, color):
+		if (segment < 0 or segment > 7):
+			return
+
+		self.executeLeds([(self.RIGHT_EYE_ZERO + segment, color, 0.0)])
 		return
 
 	"""
@@ -181,7 +210,11 @@ class Leds():
 	are numbered from 0 to 7, starting at the top and going around
 	clockwise.
 	"""
-	def setLeftEyeSegment(segment, color):
+	def setLeftEyeSegment(self, segment, color):
+		if (segment < 0 or segment > 7):
+			return 
+
+		self.executeLeds([(self.LEFT_EYE_ZERO + segment, color, 0.0)])
 		return
 
 	"""
