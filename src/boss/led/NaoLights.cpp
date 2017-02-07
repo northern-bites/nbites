@@ -39,7 +39,7 @@ void NaoLights::generateLeds(){
         // not creating valid naorbglight objects for the new group numbers
         ledList.push_back(new NaoRGBLight(LED_NAMES[i],
                                           i,
-                                          ALNames::NUM_RGB_LEDS[i],
+                                          1,
                                           ALNames::LED_START_COLOR[i],
                                           ALNames::LED_END_COLOR[i]));
         ledList.at(i)->printInfo();
@@ -68,7 +68,7 @@ void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
 
 void NaoLights::setRGB(const unsigned int led_id, const int newRgbHex){
     hexList[led_id] = newRgbHex;
-    // std::cout << "hexList[" << led_id << "] = 0x" << std::hex << newRgbHex << std::endl;
+    std::cout << "hexList[" << led_id << "] = 0x" << std::hex << newRgbHex << std::endl;
 }
 
 void NaoLights::sendLights(){

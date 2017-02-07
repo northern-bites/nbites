@@ -1,7 +1,7 @@
 #include "NaoRGBLight.h"
 
 using std::string;
-//#define DEBUG_NAOLIGHTS_INIT
+#define DEBUG_NAOLIGHTS_INIT
 
 const float NaoRGBLight::LED_ON = 1.0f;
 const float NaoRGBLight::LED_OFF = 0.0f;
