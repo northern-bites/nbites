@@ -24,9 +24,8 @@ void LedEnactor::setLeds(messages::LedCommand command)
 
 void LedEnactor::noMan()
 {
-    for (int i=20; i<ALNames::NUM_UNIQUE_LEDS; i++)
-    {
-        // naoLights.setRGB(i, 0xFFFFFF);
+    for (int i=12; i<ALNames::NUM_UNIQUE_LEDS; i++) {
+        naoLights.setRGB(i, 0xFFFFFF);
     }
     naoLights.sendLights();
 }

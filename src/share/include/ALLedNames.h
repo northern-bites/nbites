@@ -63,7 +63,11 @@ static const unsigned int NUM_LED_ORIENTATIONS = 2;
 static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
 
 static const unsigned int NUM_UNIQUE_LEDS = 51;
-static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
+
+// NUM_RGB_LEDS shows how many lights are in a grouping. An RGB triplet counts
+// as one. So if you were to have a group of 5 eye segments it would get a
+// 5 in this array.
+static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 
     1, 1, 1, 1, 1, 1, 1, 1, 
@@ -71,16 +75,11 @@ static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
     1, 1, 1};
 
-    // NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
-    // NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
-    // NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,
-    // NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,
-    // NUM_ROLE_LEDS,                                 // Left Eye
-    // NUM_BALL_LEDS, NUM_GOALBOX_LEDS,               // Right Eye
-    // NUM_CHEST_LEDS,
-    // NUM_FOOT_LEDS,NUM_FOOT_LEDS,
-    // 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-
+// LED_START_COLOR indicates the start color index for that grouping. LEDs that
+// are single-colored (just blue) start at index 2, skipping over red and green.
+// LEDs that are multicolored start at index 0, getting red, green, then blue.
+// I don't totally get what's going on here, but it has to do with either
+// string array indexing or hex color splitting.
 static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     0, 0, 0, 0, 0, 0, 0, 0, 
@@ -88,16 +87,8 @@ static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
     0, 0, 0};
-    // BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,  // Ear fronts
-    // BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,
-    // BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,  // Ear backs
-    // BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,
-    // RED_LED,                                       // Left Eye
-    // RED_LED, RED_LED,                              // Right Eye
-    // RED_LED,                                       // Chest
-    // RED_LED,RED_LED,
-    // 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2};                              // Feet
 
+// LED_END_COLOR is the end color index. See above.
 static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
     3, 3, 3, 3, 3, 3, 3, 3, 
@@ -105,15 +96,6 @@ static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
     3, 3, 3};
-    // NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
-    // NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
-    // NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
-    // NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
-    // NUM_LED_COLORS,                // Left Eye
-    // NUM_LED_COLORS, NUM_LED_COLORS, // Right Eye
-    // NUM_LED_COLORS,                // Chest
-    // NUM_LED_COLORS,NUM_LED_COLORS,
-    // 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3}; // Feet
 
 static const std::string brain[NUM_BRAIN_LEDS] = {
     ValuePreFix + BrainLed + std::string("/Front/Right/1") + LedPostFix,
@@ -220,69 +202,6 @@ static const std::string eye[NUM_LED_ORIENTATIONS][NUM_FACE_LEDS][NUM_LED_COLORS
     }
 };
 
-// static const std::string faceL[NUM_LED_ORIENTATIONS][NUM_LED_COLORS][NUM_FACE_LEDS] ={
-// /*  Face Leds Left */
-//     {
-//         /* Red*/
-//         {ValuePreFix + FaceLed + Red + Left + std::string("/0Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Left + std::string("/45Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Left + std::string("/90Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Left + std::string("/135Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Left + std::string("/180Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Left + std::string("/225Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Left + std::string("/270Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Left + std::string("/315Deg")+LedPostFix},
-//         /* Green*/
-//         {ValuePreFix + FaceLed + Green + Left + std::string("/0Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Left + std::string("/45Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Left + std::string("/90Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Left + std::string("/135Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Left + std::string("/180Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Left + std::string("/225Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Left + std::string("/270Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Left + std::string("/315Deg")+LedPostFix},
-//         /* Blue*/
-//         {ValuePreFix + FaceLed + Blue + Left + std::string("/0Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Left + std::string("/45Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Left + std::string("/90Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Left + std::string("/135Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Left + std::string("/180Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Left + std::string("/225Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Left + std::string("/270Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Left + std::string("/315Deg")+LedPostFix},
-//     },
-// /* Face Leds Right */
-//     {
-//         /* Red*/
-//         {ValuePreFix + FaceLed + Red + Right + std::string("/0Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Right + std::string("/45Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Right + std::string("/90Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Right + std::string("/135Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Right + std::string("/180Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Right + std::string("/225Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Right + std::string("/270Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Red + Right + std::string("/315Deg")+LedPostFix},
-//         /* Green*/
-//         {ValuePreFix + FaceLed + Green + Right + std::string("/0Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Right + std::string("/45Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Right + std::string("/90Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Right + std::string("/135Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Right + std::string("/180Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Right + std::string("/225Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Right + std::string("/270Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Green + Right + std::string("/315Deg")+LedPostFix},
-//         /* Blue*/
-//         {ValuePreFix + FaceLed + Blue + Right + std::string("/0Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Right + std::string("/45Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Right + std::string("/90Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Right + std::string("/135Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Right + std::string("/180Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Right + std::string("/225Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Right + std::string("/270Deg")+LedPostFix,
-//          ValuePreFix + FaceLed + Blue + Right + std::string("/315Deg")+LedPostFix},
-//     },
-// };
-
 static const std::string ear[NUM_LED_ORIENTATIONS][NUM_EAR_LEDS] ={
 /* Ear Led Left*/
     {ValuePreFix + EarLed + Left + std::string("/0Deg")+LedPostFix,
@@ -326,175 +245,6 @@ static const std::string chest[NUM_LED_COLORS]={
     ValuePreFix +ChestLed + Blue +LedPostFix
 };
 
-
-/* NOTE: EYE LEDS ON NaoV4 ARE ROTATED (RIGHT ALSO BACKWARDS) FROM THE SPECS!!
-   In other words, the specs aren't right so below is a "hack" until
-   the hardware is actually to spec. HACK
-*/
-// static const std::string ballL[NUM_LED_COLORS][NUM_BALL_LEDS] ={
-// /* Red*/
-//     {faceL[RIGHT_LED][RED_LED][2],
-//      faceL[RIGHT_LED][RED_LED][3],
-//      faceL[RIGHT_LED][RED_LED][4],
-//      faceL[RIGHT_LED][RED_LED][5],
-//      faceL[RIGHT_LED][RED_LED][6]},
-// /* Green*/
-//     {faceL[RIGHT_LED][GREEN_LED][2],
-//      faceL[RIGHT_LED][GREEN_LED][3],
-//      faceL[RIGHT_LED][GREEN_LED][4],
-//      faceL[RIGHT_LED][GREEN_LED][5],
-//      faceL[RIGHT_LED][GREEN_LED][6]},
-// /* Blue*/
-//     {faceL[RIGHT_LED][BLUE_LED][2],
-//      faceL[RIGHT_LED][BLUE_LED][3],
-//      faceL[RIGHT_LED][BLUE_LED][4],
-//      faceL[RIGHT_LED][BLUE_LED][5],
-//      faceL[RIGHT_LED][BLUE_LED][6]}
-// };
-
-// static const std::string goalBoxL[NUM_LED_COLORS][NUM_GOALBOX_LEDS] ={
-// /* Red*/
-//     {faceL[RIGHT_LED][RED_LED][0],
-//      faceL[RIGHT_LED][RED_LED][1],
-//      faceL[RIGHT_LED][RED_LED][7]},
-// /* Green*/
-//     {faceL[RIGHT_LED][GREEN_LED][0],
-//      faceL[RIGHT_LED][GREEN_LED][1],
-//      faceL[RIGHT_LED][GREEN_LED][7]},
-// /* Blue*/
-//     {faceL[RIGHT_LED][BLUE_LED][0],
-//      faceL[RIGHT_LED][BLUE_LED][1],
-//      faceL[RIGHT_LED][BLUE_LED][7]}
-// };
-
-// static const std::string rightEyeZero[NUM_LED_COLORS] = {
-//     faceL[RIGHT_LED][RED_LED][0],
-//     faceL[RIGHT_LED][GREEN_LED][0],
-//     faceL[RIGHT_LED][BLUE_LED][0]
-// };
-
-// static const std::string rightEyeOne[NUM_LED_COLORS] = {
-//     faceL[RIGHT_LED][RED_LED][1],
-//     faceL[RIGHT_LED][GREEN_LED][1],
-//     faceL[RIGHT_LED][BLUE_LED][1]
-// };
-
-// static const std::string rightEyeTwo[NUM_LED_COLORS] = {
-//     faceL[RIGHT_LED][RED_LED][2],
-//     faceL[RIGHT_LED][GREEN_LED][2],
-//     faceL[RIGHT_LED][BLUE_LED][2]
-// };
-
-// static const std::string rightEyeThree[NUM_LED_COLORS] = {
-//     faceL[RIGHT_LED][RED_LED][3],
-//     faceL[RIGHT_LED][GREEN_LED][3],
-//     faceL[RIGHT_LED][BLUE_LED][3]
-// };
-
-// static const std::string rightEyeFour[NUM_LED_COLORS] = {
-//     faceL[RIGHT_LED][RED_LED][4],
-//     faceL[RIGHT_LED][GREEN_LED][4],
-//     faceL[RIGHT_LED][BLUE_LED][4]
-// };
-
-// static const std::string rightEyeFive[NUM_LED_COLORS] = {
-//     faceL[RIGHT_LED][RED_LED][5],
-//     faceL[RIGHT_LED][GREEN_LED][5],
-//     faceL[RIGHT_LED][BLUE_LED][5]
-// };
-
-// static const std::string rightEyeSix[NUM_LED_COLORS] = {
-//     faceL[RIGHT_LED][RED_LED][6],
-//     faceL[RIGHT_LED][GREEN_LED][6],
-//     faceL[RIGHT_LED][BLUE_LED][6]
-// };
-
-// static const std::string rightEyeSeven[NUM_LED_COLORS] = {
-//     faceL[RIGHT_LED][RED_LED][7],
-//     faceL[RIGHT_LED][GREEN_LED][7],
-//     faceL[RIGHT_LED][BLUE_LED][7]
-// };
-
-// static const std::string leftEyeZero[NUM_LED_COLORS] = {
-//     faceL[LEFT_LED][RED_LED][0],
-//     faceL[LEFT_LED][GREEN_LED][0],
-//     faceL[LEFT_LED][BLUE_LED][0]
-// };
-
-// static const std::string leftEyeOne[NUM_LED_COLORS] = {
-//     faceL[LEFT_LED][RED_LED][1],
-//     faceL[LEFT_LED][GREEN_LED][1],
-//     faceL[LEFT_LED][BLUE_LED][1]
-// };
-
-// static const std::string leftEyeTwo[NUM_LED_COLORS] = {
-//     faceL[LEFT_LED][RED_LED][2],
-//     faceL[LEFT_LED][GREEN_LED][2],
-//     faceL[LEFT_LED][BLUE_LED][2]
-// };
-
-// static const std::string leftEyeThree[NUM_LED_COLORS] = {
-//     faceL[LEFT_LED][RED_LED][3],
-//     faceL[LEFT_LED][GREEN_LED][3],
-//     faceL[LEFT_LED][BLUE_LED][3]
-// };
-
-// static const std::string leftEyeFour[NUM_LED_COLORS] = {
-//     faceL[LEFT_LED][RED_LED][4],
-//     faceL[LEFT_LED][GREEN_LED][4],
-//     faceL[LEFT_LED][BLUE_LED][4]
-// };
-
-// static const std::string leftEyeFive[NUM_LED_COLORS] = {
-//     faceL[LEFT_LED][RED_LED][5],
-//     faceL[LEFT_LED][GREEN_LED][5],
-//     faceL[LEFT_LED][BLUE_LED][5]
-// };
-
-// static const std::string leftEyeSix[NUM_LED_COLORS] = {
-//     faceL[LEFT_LED][RED_LED][6],
-//     faceL[LEFT_LED][GREEN_LED][6],
-//     faceL[LEFT_LED][BLUE_LED][6]
-// };
-
-// static const std::string leftEyeSeven[NUM_LED_COLORS] = {
-//     faceL[LEFT_LED][RED_LED][7],
-//     faceL[LEFT_LED][GREEN_LED][7],
-//     faceL[LEFT_LED][BLUE_LED][7]
-// };
-
-// static const std::string roleL[NUM_LED_COLORS][NUM_ROLE_LEDS] ={
-// /* Red*/
-//     {faceL[LEFT_LED][RED_LED][0],
-//      faceL[LEFT_LED][RED_LED][1],
-//      faceL[LEFT_LED][RED_LED][2],
-//      faceL[LEFT_LED][RED_LED][3],
-//      faceL[LEFT_LED][RED_LED][4],
-//      faceL[LEFT_LED][RED_LED][5],
-//      faceL[LEFT_LED][RED_LED][6],
-//      faceL[LEFT_LED][RED_LED][7]},
-// /* Green*/
-//     {faceL[LEFT_LED][GREEN_LED][0],
-//      faceL[LEFT_LED][GREEN_LED][1],
-//      faceL[LEFT_LED][GREEN_LED][2],
-//      faceL[LEFT_LED][GREEN_LED][3],
-//      faceL[LEFT_LED][GREEN_LED][4],
-//      faceL[LEFT_LED][GREEN_LED][5],
-//      faceL[LEFT_LED][GREEN_LED][6],
-//      faceL[LEFT_LED][GREEN_LED][7]},
-// /* Blue*/
-//     {faceL[LEFT_LED][BLUE_LED][0],
-//      faceL[LEFT_LED][BLUE_LED][1],
-//      faceL[LEFT_LED][BLUE_LED][2],
-//      faceL[LEFT_LED][BLUE_LED][3],
-//      faceL[LEFT_LED][BLUE_LED][4],
-//      faceL[LEFT_LED][BLUE_LED][5],
-//      faceL[LEFT_LED][BLUE_LED][6],
-//      faceL[LEFT_LED][BLUE_LED][7]},
-// };
-
-
-// static const std::string strPtr = footL[RIGHT_LED][0];
 static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &brain[0], //0
     &brain[1], //1
@@ -554,104 +304,6 @@ static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &foot[LEFT_LED][0]
 };
 
-//     &earL[LEFT_LED][0],             // Left Calibration 1
-//     &earL[LEFT_LED][1],             // 2
-//     &earL[LEFT_LED][2],             // 3
-//     &earL[LEFT_LED][3],             // 4
-//     &earL[LEFT_LED][4],             // 5
-//     &earL[RIGHT_LED][1],            // Right Calibration 1
-//     &earL[RIGHT_LED][2],            // 2
-//     &earL[RIGHT_LED][3],            // 3
-//     &earL[RIGHT_LED][4],            // 4
-//     &earL[RIGHT_LED][5],            // 5
-//     &earL[LEFT_LED][5],             // Left Comm 1
-//     &earL[LEFT_LED][6],             // 2
-//     &earL[LEFT_LED][7],             // 3
-//     &earL[LEFT_LED][8],             // 4
-//     &earL[LEFT_LED][9],             // 5
-//     &earL[RIGHT_LED][6],            // Right Comm 1
-//     &earL[RIGHT_LED][7],            // 2
-//     &earL[RIGHT_LED][8],            // 3
-//     &earL[RIGHT_LED][9],            // 4
-//     &earL[RIGHT_LED][0],            // 5
-//     &roleL[0][0],                   // Role
-//     &ballL[0][0],                   // Ball
-//     &goalBoxL[0][0],                // Goalbox
-//     &chestL[0], //23
-//     &footL[LEFT_LED][0],
-//     &footL[RIGHT_LED][0],
-//     &rightEyeZero[0], //26
-//     &rightEyeOne[0], //27
-//     &rightEyeTwo[0],
-//     &rightEyeThree[0],
-//     &rightEyeFour[0],
-//     &rightEyeFive[0],
-//     &rightEyeSix[0],
-//     &rightEyeSeven[0],
-//     &brainL[8],
-//     &brainL[9],
-//     &brainL[10],
-//     &brainL[1],
-// };
 };
-
-/*
-brain 0
-brain 1
-brain 2
-brain 3
-brain 4
-brain 5
-brain 6
-brain 7
-brain 8
-brain 9
-brain 10
-brain 11
-
-r eye 0
-r eye 1
-r eye 2
-r eye 3
-r eye 4
-r eye 5
-r eye 6
-r eye 7
-
-l eye 0
-l eye 1
-l eye 2
-l eye 3
-l eye 4
-l eye 5
-l eye 6
-l eye 7
-
-r ear 0
-r ear 1
-r ear 2
-r ear 3
-r ear 4
-r ear 5
-r ear 6
-r ear 7
-r ear 8
-r ear 9
-
-l ear 0
-l ear 1
-l ear 2
-l ear 3
-l ear 4
-l ear 5
-l ear 6
-l ear 7
-l ear 8
-l ear 9
-
-chest
-r foot
-l foot
-*/
 
 #endif
