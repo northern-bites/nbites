@@ -61,51 +61,12 @@ class Leds():
 	RIGHT_FOOT	#38
 	) = range(NUM_LED_GROUPS)
 
-	# (LEFT_CALIBRATION_ONE_LED, # left ear front
-	# LEFT_CALIBRATION_TWO_LED,
-	# LEFT_CALIBRATION_THREE_LED,
-	# LEFT_CALIBRATION_FOUR_LED,
-	# LEFT_CALIBRATION_FIVE_LED,
-	# RIGHT_CALIBRATION_ONE_LED, # right ear front
-	# RIGHT_CALIBRATION_TWO_LED,
-	# RIGHT_CALIBRATION_THREE_LED,
-	# RIGHT_CALIBRATION_FOUR_LED,
-	# RIGHT_CALIBRATION_FIVE_LED,
-	# LEFT_COMM_ONE_LED, # left ear back
-	# LEFT_COMM_TWO_LED,
-	# LEFT_COMM_THREE_LED,
-	# LEFT_COMM_FOUR_LED,
-	# LEFT_COMM_FIVE_LED,
-	# RIGHT_COMM_ONE_LED, # right ear back
-	# RIGHT_COMM_TWO_LED,
-	# RIGHT_COMM_THREE_LED,
-	# RIGHT_COMM_FOUR_LED,
-	# RIGHT_COMM_FIVE_LED,
-	# ROLE_LED, # full left eye
-	# BALL_LED, # right eye 1-4
-	# GOALBOX_LED, # one of the top right eyes
-	# CHEST_LED, # the chest
-	# LEFT_FOOT_LED,
-	# RIGHT_FOOT_LED,
-	# BRAIN_ZERO,
-	# BRAIN_ONE,
-	# BRAIN_TWO,
-	# BRAIN_THREE,
-	# BRAIN_FOUR,
-	# BRAIN_FIVE,
-	# BRAIN_SIX,
-	# BRAIN_SEVEN,
-	# BRAIN_EIGHT,
-	# BRAIN_NINE,
-	# BRAIN_TEN,
-	# BRAIN_ELEVEN) = range(NUM_LED_GROUPS)
-
 	"""
 	LEDs persist throughout man restart so we need to reset them on
 	startup
 	"""
 	initialLeds = [
-		(CHEST, 0xFF00FF, 0.0),
+		(CHEST, 0xFFFFFF, 0.0),
 		(RIGHT_EYE_ZERO, 0xFF0000, 0.0),
 		(RIGHT_EYE_ONE, 0xffbf00, 0.0),
 		(RIGHT_EYE_TWO, 0x80ff00, 0.0),
@@ -113,39 +74,51 @@ class Leds():
 		(RIGHT_EYE_FOUR, 0x00FFFF, 0.0),
 		(RIGHT_EYE_FIVE, 0x0040ff, 0.0),
 		(RIGHT_EYE_SIX, 0x7f00ff, 0.0),
-		(RIGHT_EYE_SEVEN, 0xff00bf, 0.0)
-		# (LEFT_FOOT_LED, 0xFF0000, 0.0),
-		# (RIGHT_FOOT_LED, 0xFF0000, 0.0),
-		# (RIGHT_EYE_ZERO, 00000000, 0.0),
-		# (RIGHT_EYE_ONE, 00000000, 0.0),
-		# (RIGHT_EYE_TWO, 00000000, 0.0),
-		# (RIGHT_EYE_THREE, 00000000, 0.0),
-		# (RIGHT_EYE_FOUR, 00000000, 0.0),
-		# (RIGHT_EYE_FIVE, 00000000, 0.0),
-		# (RIGHT_EYE_SIX, 00000000, 0.0),
-		# (RIGHT_EYE_SEVEN, 00000000, 0.0),
-		# (BRAIN_ONE, 0xFFFFFF, 0.0),
-		# (BRAIN_FIVE, 0xFFFFFF, 0.0),
-		# (BRAIN_TEN, 0xFFFFFF, 0.0),
-	]
+		(RIGHT_EYE_SEVEN, 0xff00bf, 0.0),
+		(RIGHT_EYE_ZERO, 0xFF0000, 0.0),
+		(LEFT_EYE_ONE, 0xffbf00, 0.0),
+		(LEFT_EYE_TWO, 0x80ff00, 0.0),
+		(LEFT_EYE_THREE, 0x00ff40, 0.0),
+		(LEFT_EYE_FOUR, 0x00FFFF, 0.0),
+		(LEFT_EYE_FIVE, 0x0040ff, 0.0),
+		(LEFT_EYE_SIX, 0x7f00ff, 0.0),
+		(LEFT_EYE_SEVEN, 0xff00bf, 0.0),
+		(RIGHT_EAR_ZERO, 0x000000, 0.0),
+		(RIGHT_EAR_ONE, 0x000000, 0.0),
+		(RIGHT_EAR_TWO, 0x000000, 0.0),
+		(RIGHT_EAR_THREE, 0x000000, 0.0),
+		(RIGHT_EAR_FOUR, 0x000000, 0.0),
+		(RIGHT_EAR_FIVE, 0x000000, 0.0),
+		(RIGHT_EAR_SIX, 0x000000, 0.0),
+		(RIGHT_EAR_SEVEN, 0x000000, 0.0),
+		(RIGHT_EAR_EIGHT, 0x000000, 0.0),
+		(RIGHT_EAR_NINE, 0x000000, 0.0),
+		(LEFT_EAR_ZERO, 0x000000, 0.0),
+		(LEFT_EAR_ONE, 0x000000, 0.0),
+		(LEFT_EAR_TWO, 0x000000, 0.0),
+		(LEFT_EAR_THREE, 0x000000, 0.0),
+		(LEFT_EAR_FOUR, 0x000000, 0.0),
+		(LEFT_EAR_FIVE, 0x000000, 0.0),
+		(LEFT_EAR_SIX, 0x000000, 0.0),
+		(LEFT_EAR_SEVEN, 0x000000, 0.0),
+		(LEFT_EAR_EIGHT, 0x000000, 0.0),
+		(LEFT_EAR_NINE, 0x000000, 0.0),
+		]
 
 	def __init__(self, brain):
 		print("initialized leds obj")
 		self.brain = brain
-		# self.chestBlue = [(Leds.CHEST_LED, 0x000000, 0.0)]
 
 	"""
 	executeLeds takes in an array of tuples representing LED commands, and executes
 	each LED command in the array immediately.
 	"""
 	def executeLeds(self, listOfLeds):
-		print "--- New executeLeds command in Leds.py ---"
 		for ledTuple in listOfLeds:
 			if len(ledTuple) != 3:
 				print "invalid led command " + str(ledTuple)
 				continue
-			# ledTuple[0] is an int
-			# print ledTuple[0]
+
 			self.brain.interface.ledCommand.add_led_id(ledTuple[0])
 			self.brain.interface.ledCommand.add_rgb_hex(ledTuple[1])
 
