@@ -103,7 +103,7 @@ class Leds():
 		(LEFT_EAR_SEVEN, 0x000000, 0.0),
 		(LEFT_EAR_EIGHT, 0x000000, 0.0),
 		(LEFT_EAR_NINE, 0x000000, 0.0),
-		]
+	]
 
 	def __init__(self, brain):
 		print("initialized leds obj")

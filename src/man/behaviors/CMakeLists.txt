@@ -33,7 +33,7 @@ set( BEHAVIORS_PYTHON_SRCS __init__.py
 set ( BEHAVIORS_SWITCH ${CMAKE_CURRENT_BINARY_DIR}/players/Switch.py)
 
 # Python subdirectories
-# set( BEHAVIORS_PYTHON_SUBDIRS headTracker
+set ( BEHAVIORS_PYTHON_SUBDIRS FSMs )
 #                            kickDecider
 #                            navigator
 #                            players
