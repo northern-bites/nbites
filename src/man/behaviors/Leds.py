@@ -225,6 +225,9 @@ class Leds():
 	"""
 	def setRightEarSegmentsUpTo(self, segment):
 
+		if (segment < 0 or segment > 9):
+			return
+
 		earLEDs = []
 
 		for i in range(0, segment):
@@ -240,6 +243,9 @@ class Leds():
 	counter-clockwise.
 	"""
 	def setLeftEarSegmentsUpTo(self, segment):
+
+		if (segment < 0 or segment > 9):
+			return 
 
 		earLEDs = []
 
