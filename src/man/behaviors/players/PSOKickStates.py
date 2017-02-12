@@ -1,5 +1,6 @@
 from ..headTracker import HeadMoves
 from .. import PSOMoves
+#from .. import PSOKickModule
 from ..util import *
 import PMotion_proto
 
@@ -27,6 +28,8 @@ def gamePlaying(player):
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
+    #if player.firstFrame:
+        #PSOKickModule.main()
     return player.stay()
 
 @superState('gameControllerResponder')
