@@ -26,6 +26,7 @@ set( BEHAVIORS_PYTHON_SRCS __init__.py
                         Leds.py
                         StiffnessModes.py
                         SweetMoves.py
+                        PSOMoves.py
                         Say.py
                         )
 
@@ -39,7 +40,8 @@ set( BEHAVIORS_PYTHON_SUBDIRS headTracker
                            players
                            robots
                            typeDefs
-                           util )
+                           util
+                           psoKick )
 
 # The CPP library
 add_library(
