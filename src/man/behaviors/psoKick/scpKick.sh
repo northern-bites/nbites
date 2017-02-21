@@ -5,7 +5,7 @@ if [ $# -ne 2 ]; then
     echo "Try robot-address = robot name and username = nao if unsure."
     exit 1
 fi
-
+echo "Start installing to robot"
 
 ROBOT=$1
 ROBOT_UNAME=$2

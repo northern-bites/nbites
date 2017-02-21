@@ -1,5 +1,5 @@
 from ..headTracker import HeadMoves
-from .. import PSOMoves
+from ..psoKick import PSOMoves
 #from .. import PSOKickModule
 from ..util import *
 import PMotion_proto
@@ -7,8 +7,8 @@ import PMotion_proto
 @superState('gameControllerResponder')
 def gameInitial(player):
     if player.firstFrame():
-        player.gainsOn()
-        player.brain.nav.stand()
+        #player.gainsOn()
+        #player.brain.nav.stand()
         player.runfallController = False
     return player.stay()
 
@@ -36,7 +36,7 @@ def gamePenalized(player):
 def kick(player):
     if player.firstFrame():
         # player.brain.nav.callKickEngine(PMotion_proto.messages.Kick.M_Left_Chip_Shot)
-        player.executeMove(PSOMoves.CUTE_KICK_LEFT)
+        player.executeMove(PSOMoves.LEFT_STRAIGHT_KICK)
 
     return player.stay()
 
