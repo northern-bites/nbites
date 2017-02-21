@@ -27,7 +27,6 @@ set( BEHAVIORS_PYTHON_SRCS __init__.py
                         StiffnessModes.py
                         SweetMoves.py
                         Say.py
-                        PSOMoves.py
                         )
 
 # The switch file

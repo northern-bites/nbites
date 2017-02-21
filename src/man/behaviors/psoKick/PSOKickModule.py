@@ -17,7 +17,7 @@ kick = move.LEFT_STRAIGHT_KICK
 num_groups = 5
 num_limbs = 4
 num_joints = 20
-ROBOT_ADDRESS = "river"
+ROBOT_ADDRESS = " river "
 ROBOT_USERNAME = "nao"
 
 
@@ -27,36 +27,44 @@ def startMe():
 	print("start pso stuff")
 	for i in range(0,Num_Particles-1):
 		#randomly change positions
-		move.startChanging()
+		helper.startChanging()
 		for j in range(0,num_groups):
 			for k in range(0,num_limbs):
 				l_num = helper.getLimbNumber(k)
 				for l in range(0,l_num):
-					move.changeJointAngles(j,k, l,move.getRandomJointAngle(l))
-		move.stopChanging()
-		subprocess.call(['psoKick/scpKick.sh river nao'],shell=True)
+					helper.changeJointAngles(j,k, l,helper.getRandomJointAngle(l))
+		kick = helper.stopChanging()
+		helper.writeNewKick()
+		print(kick)
+
+		subprocess.call(['psoKick/scpKick.sh'+ROBOT_ADDRESS+ROBOT_USERNAME],shell=True)
 		print(i+1)
-		myFitness = input("Particle's Fitness Eval:")
-		particle = helper.Particle(move.LEFT_STRAIGHT_KICK, i, myFitness)#change current_best so that the position is a little more random
+		myFitness = raw_input("Particle's Fitness Eval:")
+		particle = helper.Particle(kick, i, int(myFitness))#change current_best so that the position is a little more random
 		swarm.particles.append(particle)
+	counter = 1
 	while(keepGoing):
   		print("In generation")
   		for i in swarm.particles:
-  			move.startChanging()
+  			helper.startChanging()
 			for j in range(0,num_groups):
 				for k in range(0,num_limbs):
 					l_num = helper.getLimbNumber(k)
 					for l in range(0,l_num):
-						move.changeJointAngles(j,k, l,i.position[j][k][l])
-			move.stopChanging()
-			subprocess.call("scpKick.sh")
+						helper.changeJointAngles(j,k, l,i.position[j][k][l])
+			helper.stopChanging()
+			subprocess.call(['psoKick/scpKick.sh river nao'],shell=True)
+			
+			print(counter)
+			counter= counter + 1
+			
 			particleFitness = input("Particle's Fitness:")
 			if particleFitness == 'q':
 				keepGoing = False
 			if particleFitness > i.pBest:
-				pBest = particleFitness
-			if pBest>gBest:
-				gBest = pBest
+				i.pBest = particleFitness
+			if i.pBest>i.gBest:
+				i.gBest = i.pBest
 		for i in swarm.particle:
 			for j in range(0,num_groups):
 				for k in range(0,num_limbs):

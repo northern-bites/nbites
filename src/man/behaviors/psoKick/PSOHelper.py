@@ -49,18 +49,38 @@ def getLimbNumber(currentLimb):
 	else:
 		return 6
 
-def changeMove(group,limb, joint):
-	move.changeJointAngles(group,limb, joint)
-
 def listit(t):
     return list(map(listit, t)) if isinstance(t, (list, tuple)) else t
 def tupleit(t):
     return tuple(map(tupleit, t)) if isinstance(t, (tuple, list)) else t
-# def getLimbNumber(currentLimb,num_limbs):
-# 	if currentLimb == 0 or currentLimb == 3:
-# 		return 4
-# 	else:
-# 		return 6
+def getRandomJointAngle(joint):
+    return float("{0:.2f}".format(random.uniform(lower_bound_joints[joint], upper_bound_joints[joint])))
+# #   kick = listit(kick)
+# #   kick[group][limb][joint] = kick[group][limb][:joint] + getRandomJointAngle(joint) + kick[group][limb][joint+1:]
+# #   kick = tupleit(kick)
+def startChanging():
+    global kick
+    kick = listit(kick)
+def stopChanging():
+    global kick
+    kick = tupleit(kick)
+    #write to file!
+    return kick
+
+def writeNewKick():
+	f = open("PSOMoves.py", 'w')
+	f.write("import StiffnessModes as stiff\n\n")
+	f.write("LEFT_STRAIGHT_KICK=")
+	f.write(str(kick))
+	f.close()
+
+def changeJointAngles(group,limb, joint,NewPos):
+    global kick
+    kick[group][limb][joint] = NewPos
+
+def changeMove(group,limb, joint):
+	move.changeJointAngles(group,limb, joint)
+
 
 # def changeJointAngles(kick, group,limb, joint):
 #   kick[group][limb][joint] = kick[group][limb][:joint] + getRandomJointAngle(joint) + kick[group][limb][joint+1:]
