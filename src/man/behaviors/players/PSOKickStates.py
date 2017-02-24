@@ -35,6 +35,7 @@ def kick(player):
     if player.firstFrame():
         # player.brain.nav.callKickEngine(PMotion_proto.messages.Kick.M_Left_Chip_Shot)
         player.executeMove(PSOMoves.LEFT_STRAIGHT_KICK)
+        print("FROM kickstate"+str(PSOMoves.LEFT_STRAIGHT_KICK))
 
     return player.stay()
 
