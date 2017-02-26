@@ -2,8 +2,8 @@ import time
 import sys
 import math
 
-from Leds import *
-from FSMs import GSM
+import Leds
+from FSMs import *
 
 # Redirect standard error to standard out
 _stderr = sys.stderr
@@ -41,7 +41,7 @@ class Brain(object):
         self.interface = interface.interface
 
         self.leds = Leds(self)
-        self.gameStateModule = GSM.GSM(self)
+        self.player = Player.Player(self)
 
         print "Brain initialized: player " + str(self.playerNumber) + " and team " + str(self.teamNumber)
 
@@ -78,6 +78,10 @@ class Brain(object):
         # Update Environment
         self.time = time.time()
         self.counter += 1
+
+        self.gameStateModule.run(self.interface.gameState)
+        # if self.counter % 30 == 0:
+        #     print(self.interface.gameState.state)
         
         if self.counter == 10:
             self.leds.executeLeds(self.leds.initialLeds)
