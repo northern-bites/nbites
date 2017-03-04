@@ -20,6 +20,7 @@ set( BEHAVIORS_SRCS BehaviorsModule
 # Python sources
 set( BEHAVIORS_PYTHON_SRCS __init__.py
                         Brain.py
+                        BrainHelper.py
                         # GameController.py
                         # FallController.py
                         # Stability.py

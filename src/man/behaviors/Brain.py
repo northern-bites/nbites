@@ -2,6 +2,7 @@ import time
 import sys
 import math
 
+import BrainHelper as helper
 import Leds
 from FSMs import *
 
@@ -40,7 +41,7 @@ class Brain(object):
 
         self.interface = interface.interface
 
-        self.leds = Leds(self)
+        self.leds = Leds.Leds(self)
         self.player = Player.Player(self)
 
         print "Brain initialized: player " + str(self.playerNumber) + " and team " + str(self.teamNumber)
@@ -79,7 +80,8 @@ class Brain(object):
         self.time = time.time()
         self.counter += 1
 
-        self.gameStateModule.run(self.interface.gameState)
+        self.player.run()
+        helper.updateGameState(self.player, self.interface)
         # if self.counter % 30 == 0:
         #     print(self.interface.gameState.state)
         
