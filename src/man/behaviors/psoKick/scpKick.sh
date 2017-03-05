@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #This script scp's the current PSO kick to the robot
 
 if [ $# -ne 2 ]; then

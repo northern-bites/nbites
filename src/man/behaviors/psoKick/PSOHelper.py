@@ -72,8 +72,9 @@ def getRandomJointAngle(joint):
     return float("{0:.2f}".format(random.uniform(lower_bound_joints[joint], upper_bound_joints[joint])))
 
 def getRandJointInRange(currPosition,group,limb, joint):
-	lower = currPosition[group][limb][joint]-threshold
-	upper = currPosition[group][limb][joint]+threshold
+	basis = listit(LEFT_STRAIGHT_KICK)
+	lower = basis[group][limb][joint]-threshold
+	upper = basis[group][limb][joint]+threshold
 	if (lower < lower_bound_joints[joint]):
 		lower = lower_bound_joints[joint]+1
 	if (upper > upper_bound_joints[joint]):
@@ -104,7 +105,8 @@ def changeJointAngles(group,limb, joint,NewPos):
 class Particle:
 	def __init__(self,currentPosition, particleID,currBest):
 		self.particleID = particleID
-		self.pBest = currBest
+		self.pBest = int(currBest)
+		self.basis = listit(LEFT_STRAIGHT_KICK)
 		#need to change this so that it deals with the weirdness of the kick
 		self.pBest_position= [[0]*num_limbs]*num_groups
 		self.position = [[0]*num_limbs]*num_groups
@@ -120,7 +122,36 @@ class Particle:
 		self.pBest_position = listit(currentPosition)
 		
 	def updatePosition(self, newPosition):
+		newPosition = listit(newPosition)
+		for j in range(0,num_groups):
+			for k in range(0,num_limbs):
+				l_num = getLimbNumber(k)
+				for l in range(0,l_num):
+					lower = self.basis[j][k][l]-threshold
+					upper = self.basis[j][k][l]+threshold
+					if (lower < lower_bound_joints[l]):
+						lower = lower_bound_joints[l]+1
+					if (upper > upper_bound_joints[l]):
+						upper = upper_bound_joints[l]-1
+					if newPosition[j][k][l]<lower:
+						newPosition[j][k][l]=lower
+					if newPosition[j][k][l]>upper:
+						newPosition[j][k][l]=upper
 		self.position  = listit(newPosition)
+	def updatePositionAt(self, j,k,l,new):
+		lower = self.basis[j][k][l]-threshold
+		upper = self.basis[j][k][l]+threshold
+		if (lower < lower_bound_joints[l]):
+			lower = lower_bound_joints[l]+1
+		if (upper > upper_bound_joints[l]):
+			upper = upper_bound_joints[l]-1
+		if new<lower:
+			new=lower
+		if new>upper:
+			new=upper
+		self.position[j][k][l]  = new 
+
+
 	def getPosition(self, j,k,l):
 		return self.position[j][k][l]
 
@@ -132,6 +163,10 @@ class Particle:
 		return self.pBest_position[j][k][l]
 	def updateVelocity(self, newPosition):
 		self.velocity = listit(newPosition)
+
+	def updateVelocityAt(self, j,k,l,new):
+		self.velocity[j][k][l]  = new 
+
 	def getVelocity(self, j,k,l):
 		return self.velocity[j][k][l]
 
@@ -140,7 +175,7 @@ class Swarm:
 	def __init__(self,currentPosition,numParticles,gBest):
 		self.particles = []
 		self.numParticles = numParticles
-		self.gBest = gBest
+		self.gBest = int(gBest)
 		self.gBest_position = listit(currentPosition)
 		
 
