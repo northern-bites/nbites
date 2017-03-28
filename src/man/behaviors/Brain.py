@@ -32,6 +32,7 @@ class Brain(object):
         """
         Class constructor
         """
+
         # Parse arguments
         self.playerNumber = playerNum
         self.teamNumber = teamNum
@@ -43,6 +44,7 @@ class Brain(object):
 
         self.leds = Leds.Leds(self)
         self.player = Player.Player(self)
+        # self.navigator = Navigator.Navigator(self)
 
         print "Brain initialized: player " + str(self.playerNumber) + " and team " + str(self.teamNumber)
 
@@ -80,12 +82,13 @@ class Brain(object):
         self.time = time.time()
         self.counter += 1
 
-        self.player.run()
-        helper.updateGameState(self.player, self.interface)
+        if self.counter > 60:
+            helper.updateGameState(self.player, self.interface)
+            self.player.run()
         # if self.counter % 30 == 0:
         #     print(self.interface.gameState.state)
         
-        if self.counter == 10:
+        if self.counter == 60:
             self.leds.executeLeds(self.leds.initialLeds)
 
 

@@ -1,6 +1,4 @@
 def updateGameState(player, interface):
-	stateDict = {0: "initial", 1: "ready", 2: "set", 3: "playing", 4: "finished"}
-	print stateDict[interface.gameState.state]
-	if(stateDict[interface.gameState.state] != player.gsmMachine.state):
-		print "SWITCHING"
-		getattr(player.gsmMachine, 'to_' + stateDict[interface.gameState.state])()
+	stateDict = {0: "GameInitial", 1: "GameReady", 2: "GameSet", 3: "GamePlaying", 4: "GameFinished"}
+	if(stateDict[interface.gameState.state] != player.gsm.currentStateName):
+		player.gsm.switchToState(stateDict[interface.gameState.state])

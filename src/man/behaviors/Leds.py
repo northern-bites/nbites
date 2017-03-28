@@ -119,8 +119,9 @@ class Leds():
 				print "invalid led command " + str(ledTuple)
 				continue
 
-			self.brain.interface.ledCommand.add_led_id(ledTuple[0])
-			self.brain.interface.ledCommand.add_rgb_hex(ledTuple[1])
+			if self.brain.interface.ledCommand:
+				self.brain.interface.ledCommand.add_led_id(ledTuple[0])
+				self.brain.interface.ledCommand.add_rgb_hex(ledTuple[1])
 
 
 	"""
