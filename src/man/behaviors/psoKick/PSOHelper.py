@@ -136,37 +136,41 @@ class Particle:
 				l_num = getLimbNumber(k)
 				for l in range(0,l_num):
 					self.velocity[j][k][l] = 0
-		
-
 	def updatePosition(self, newPosition):
 		newPosition = listit(newPosition)
-		# for j in range(0,num_groups):
-		# 	for k in range(0,num_limbs):
-		# 		l_num = getLimbNumber(k)
-		# 		for l in range(0,l_num):
-		# 			lower = self.basis[j][k][l]-threshold
-		# 			upper = self.basis[j][k][l]+threshold
-		# 			if (lower < lower_bound_joints[l]):
-		# 				lower = lower_bound_joints[l]+1
-		# 			if (upper > upper_bound_joints[l]):
-		# 				upper = upper_bound_joints[l]-1
-		# 			if newPosition[j][k][l]<lower:
-		# 				newPosition[j][k][l]=lower
-		# 			if newPosition[j][k][l]>upper:
-		# 				newPosition[j][k][l]=upper
 		self.position  = listit(newPosition)
 	def updatePositionAt(self, j,k,l,new):
-		# lower = self.basis[j][k][l]-threshold
-		# upper = self.basis[j][k][l]+threshold
-		# if (lower < lower_bound_joints[l]):
-		# 	lower = lower_bound_joints[l]+1
-		# if (upper > upper_bound_joints[l]):
-		# 	upper = upper_bound_joints[l]-1
-		# if new<lower:
-		# 	new=lower
-		# if new>upper:
-		# 	new=upper
 		self.position[j][k][l]  = new 
+
+	# def updatePosition(self, newPosition):
+	# 	newPosition = listit(newPosition)
+	# 	for j in range(0,num_groups):
+	# 		for k in range(0,num_limbs):
+	# 			l_num = getLimbNumber(k)
+	# 			for l in range(0,l_num):
+	# 				lower = self.basis[j][k][l]-threshold
+	# 				upper = self.basis[j][k][l]+threshold
+	# 				if (lower < lower_bound_joints[l]):
+	# 					lower = lower_bound_joints[l]+1
+	# 				if (upper > upper_bound_joints[l]):
+	# 					upper = upper_bound_joints[l]-1
+	# 				if newPosition[j][k][l]<lower:
+	# 					newPosition[j][k][l]=lower
+	# 				if newPosition[j][k][l]>upper:
+	# 					newPosition[j][k][l]=upper
+	# 	self.position  = listit(newPosition)
+	# def updatePositionAt(self, j,k,l,new):
+	# 	lower = self.basis[j][k][l]-threshold
+	# 	upper = self.basis[j][k][l]+threshold
+	# 	if (lower < lower_bound_joints[l]):
+	# 		lower = lower_bound_joints[l]+1
+	# 	if (upper > upper_bound_joints[l]):
+	# 		upper = upper_bound_joints[l]-1
+	# 	if new<lower:
+	# 		new=lower
+	# 	if new>upper:
+	# 	# 	new=upper
+	# 	self.position[j][k][l]  = new 
 
 
 	def getPosition(self, j,k,l):
