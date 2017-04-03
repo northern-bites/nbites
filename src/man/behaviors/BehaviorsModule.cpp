@@ -298,6 +298,7 @@ void BehaviorsModule::prepareMessages()
 
     bodyMotionCommand = portals::Message<messages::MotionCommand>(0);
     pyInterface.setBodyMotionCommand_ptr(bodyMotionCommand.get());
+    // std::cout << bodyMotionCommand.get()->type << std::endl;
 
     headMotionCommand = portals::Message<messages::HeadMotionCommand>(0);
     pyInterface.setHeadMotionCommand_ptr(headMotionCommand.get());

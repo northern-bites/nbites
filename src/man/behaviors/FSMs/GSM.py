@@ -5,6 +5,12 @@ class GameInitial(State.State):
 	def onEnter(self, fromState):
 		self.brain.leds.setChestLed(0x000000)
 
+	def run(self):
+		command = self.brain.interface.bodyMotionCommand
+		command.type = command.CommandType.STAND
+		command.timestamp = int(self.brain.time * 1000)
+		print(self.brain.interface.bodyMotionCommand)
+
 class GameReady(State.State):
 	def onEnter(self, fromState):
 		self.brain.leds.setChestLed(0x0000FF)

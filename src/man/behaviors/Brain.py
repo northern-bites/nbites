@@ -82,13 +82,13 @@ class Brain(object):
         self.time = time.time()
         self.counter += 1
 
-        if self.counter > 60:
+        if self.counter > 10:
             helper.updateGameState(self.player, self.interface)
             self.player.run()
         # if self.counter % 30 == 0:
         #     print(self.interface.gameState.state)
         
-        if self.counter == 60:
+        if self.counter == 10:
             self.leds.executeLeds(self.leds.initialLeds)
 
 
