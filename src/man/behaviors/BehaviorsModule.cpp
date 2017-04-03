@@ -322,6 +322,7 @@ void BehaviorsModule::sendMessages()
 
     if (bodyMotionCommand.get()->timestamp() != 0)
     {
+        std::cout << bodyMotionCommand.get()->timestamp() << std::endl;
         bodyMotionCommandOut.setMessage(bodyMotionCommand);
     }
     if (headMotionCommand.get()->timestamp() != 0)
