@@ -21,15 +21,15 @@ ROBOT_USERNAME = "nao"
 cmd ='psoKick/scpKick.sh '+ROBOT_ADDRESS+' '+ROBOT_USERNAME
 
 
-def evaluate(kick):
-	totalSum = 0
-	for j in range(0,num_groups):
-		for k in range(0,num_limbs):
-			l_num = helper.getLimbNumber(k)
-			for l in range(0,l_num):
-				if (j != 4):
-					totalSum = totalSum + kick[j][k][l]
-	return totalSum
+# def evaluate(kick):
+# 	totalSum = 0
+# 	for j in range(0,num_groups):
+# 		for k in range(0,num_limbs):
+# 			l_num = helper.getLimbNumber(k)
+# 			for l in range(0,l_num):
+# 				if (j != 4):
+# 					totalSum = totalSum + kick[j][k][l]
+# 	return totalSum
 
 def startMe():
 	global theKick
@@ -56,13 +56,13 @@ def startMe():
 		i.updatePosition(kick)
 		helper.writeNewKick()
 		
-		# subprocess.call([cmd],shell=True)
+		subprocess.call([cmd],shell=True)
 		
-		# print("MY KICK:")
-		# helper.printKick(kick)
-		# print
-		# particleFitness = raw_input("Particle's Fitness:")
-		particleFitness = evaluate(kick)
+		print("MY KICK:")
+		helper.printKick(kick)
+		print
+		particleFitness = raw_input("Particle's Fitness:")
+		# particleFitness = evaluate(kick)
 
 		i.pBest = int(particleFitness)
 		if i.pBest>swarm.gBest:
@@ -90,14 +90,16 @@ def startMe():
 					kick = helper.stopChanging()
 					helper.writeNewKick()
 
-					# subprocess.call([cmd],shell=True)
-					# particleFitness = int(raw_input("Particle's Fitness:"))
-					particleFitness = evaluate(kick)
+					subprocess.call([cmd],shell=True)
+					particleFitness = int(raw_input("Particle's Fitness:"))
+					# particleFitness = evaluate(kick)
 					if(particleFitness > i.pBest):
 						i.pBest = particleFitness
 						i.updatepBestPosition(i.position)
-						
+						# sys.stdout.write(str(i.particleID)+" "+str(evaluate(i.position)) + "\n")
+
 						if i.pBest>swarm.gBest:
+
 							swarm.gBest = i.pBest
 							swarm.updategBestPosition(i.position)
 
@@ -117,10 +119,10 @@ def startMe():
 						else:
 							i.updatePositionAt(4,k, l,theKick[4][k][l])
 			
-			sys.stdout.write(str(evaluate(i.position)) + " ")
+			# sys.stdout.write(str(evaluate(i.position)) + " ")
 			# print(i.particleID)
 			# print(evaluate(i.position))
-		print
+		# print
 		counter= counter + 1
 
 

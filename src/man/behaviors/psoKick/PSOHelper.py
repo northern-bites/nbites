@@ -83,14 +83,14 @@ def getRandomJointAngle(joint):
 
 def getRandJointInRange(currPosition,group,limb, joint):
 	basis = listit(LEFT_STRAIGHT_KICK)
-	# lower = basis[group][limb][joint]-threshold
-	# upper = basis[group][limb][joint]+threshold
-	# if (lower < lower_bound_joints[joint]):
-	# 	lower = lower_bound_joints[joint]+1
-	# if (upper > upper_bound_joints[joint]):
-	# 	upper = upper_bound_joints[joint]-1
-	# return float("{0:.2f}".format(random.uniform(lower, upper)))
-	return float("{0:.2f}".format(random.uniform(lower_bound_joints[joint], upper_bound_joints[joint])))
+	lower = basis[group][limb][joint]-threshold
+	upper = basis[group][limb][joint]+threshold
+	if (lower < lower_bound_joints[joint]):
+		lower = lower_bound_joints[joint]+1
+	if (upper > upper_bound_joints[joint]):
+		upper = upper_bound_joints[joint]-1
+	return float("{0:.2f}".format(random.uniform(lower, upper)))
+	# return float("{0:.2f}".format(random.uniform(lower_bound_joints[joint], upper_bound_joints[joint])))
 
 def startChanging():
     global kick
@@ -136,41 +136,41 @@ class Particle:
 				l_num = getLimbNumber(k)
 				for l in range(0,l_num):
 					self.velocity[j][k][l] = 0
-	def updatePosition(self, newPosition):
-		newPosition = listit(newPosition)
-		self.position  = listit(newPosition)
-	def updatePositionAt(self, j,k,l,new):
-		self.position[j][k][l]  = new 
-
 	# def updatePosition(self, newPosition):
 	# 	newPosition = listit(newPosition)
-	# 	for j in range(0,num_groups):
-	# 		for k in range(0,num_limbs):
-	# 			l_num = getLimbNumber(k)
-	# 			for l in range(0,l_num):
-	# 				lower = self.basis[j][k][l]-threshold
-	# 				upper = self.basis[j][k][l]+threshold
-	# 				if (lower < lower_bound_joints[l]):
-	# 					lower = lower_bound_joints[l]+1
-	# 				if (upper > upper_bound_joints[l]):
-	# 					upper = upper_bound_joints[l]-1
-	# 				if newPosition[j][k][l]<lower:
-	# 					newPosition[j][k][l]=lower
-	# 				if newPosition[j][k][l]>upper:
-	# 					newPosition[j][k][l]=upper
 	# 	self.position  = listit(newPosition)
 	# def updatePositionAt(self, j,k,l,new):
-	# 	lower = self.basis[j][k][l]-threshold
-	# 	upper = self.basis[j][k][l]+threshold
-	# 	if (lower < lower_bound_joints[l]):
-	# 		lower = lower_bound_joints[l]+1
-	# 	if (upper > upper_bound_joints[l]):
-	# 		upper = upper_bound_joints[l]-1
-	# 	if new<lower:
-	# 		new=lower
-	# 	if new>upper:
-	# 	# 	new=upper
 	# 	self.position[j][k][l]  = new 
+
+	def updatePosition(self, newPosition):
+		newPosition = listit(newPosition)
+		for j in range(0,num_groups):
+			for k in range(0,num_limbs):
+				l_num = getLimbNumber(k)
+				for l in range(0,l_num):
+					lower = self.basis[j][k][l]-threshold
+					upper = self.basis[j][k][l]+threshold
+					if (lower < lower_bound_joints[l]):
+						lower = lower_bound_joints[l]+1
+					if (upper > upper_bound_joints[l]):
+						upper = upper_bound_joints[l]-1
+					if newPosition[j][k][l]<lower:
+						newPosition[j][k][l]=lower
+					if newPosition[j][k][l]>upper:
+						newPosition[j][k][l]=upper
+		self.position  = listit(newPosition)
+	def updatePositionAt(self, j,k,l,new):
+		lower = self.basis[j][k][l]-threshold
+		upper = self.basis[j][k][l]+threshold
+		if (lower < lower_bound_joints[l]):
+			lower = lower_bound_joints[l]+1
+		if (upper > upper_bound_joints[l]):
+			upper = upper_bound_joints[l]-1
+		if new<lower:
+			new=lower
+		if new>upper:
+			new=upper
+		self.position[j][k][l]  = new 
 
 
 	def getPosition(self, j,k,l):
