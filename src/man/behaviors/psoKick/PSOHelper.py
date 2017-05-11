@@ -3,15 +3,15 @@ from . import PSOMoves as move
 from . import StiffnessModes as stiff
 import random
 
-lower_bound_joints = [-119.5,-18.0,-119.5,-88.5, 
-					-65.62,-21.74,-88.00,-5.29,-68.15,-22.79,
-					-65.62,-45.29,-88.00,-5.90,-67.97,-44.06,
-					-119.5,-76.0,-119.5,2.0]
+lower_bound_joints = [[-119.5,-18.0,-119.5,-88.5], 
+					[-65.62,-21.74,-88.00,-5.29,-68.15,-22.79],
+					[-65.62,-45.29,-88.00,-5.90,-67.97,-44.06],
+					[-119.5,-76.0,-119.5,2.0]]
 
-upper_bound_joints = [119.5,76.0,119.5,-2.0,
-					42.44,45.29,27.73,121.04,52.86,44.06,
-					42.44,21.74,27.73,121.47,121.47,22.80,
-					119.5,18.0,119.5,88.5]
+upper_bound_joints = [[119.5,76.0,119.5,-2.0],
+					[42.44,45.29,27.73,121.04,52.86,44.06],
+					[42.44,21.74,27.73,121.47,121.47,22.80],
+					[119.5,18.0,119.5,88.5]]
 
 # ((LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll),
 # (LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll),
@@ -60,7 +60,7 @@ kick = LEFT_STRAIGHT_KICK
 num_groups = 5
 num_limbs = 4
 num_joints = 20
-threshold= 5
+threshold= 0
 
 def printKick(kick):
 	for j in range(0,num_groups):
@@ -85,11 +85,21 @@ def getRandJointInRange(currPosition,group,limb, joint):
 	basis = listit(LEFT_STRAIGHT_KICK)
 	lower = basis[group][limb][joint]-threshold
 	upper = basis[group][limb][joint]+threshold
-	if (lower < lower_bound_joints[joint]):
-		lower = lower_bound_joints[joint]+1
-	if (upper > upper_bound_joints[joint]):
-		upper = upper_bound_joints[joint]-1
-	return float("{0:.2f}".format(random.uniform(lower, upper)))
+	print "lower1: " +str(lower)
+	print "upper1: "+str(upper)
+	if (lower < lower_bound_joints[limb][joint]):
+		lower = lower_bound_joints[limb][joint]+1
+
+	print "lower_bound"+ str(lower_bound_joints[limb][joint])
+	print "upper_bound"+ str(upper_bound_joints[limb][joint])
+
+	if (upper > upper_bound_joints[limb][joint]):
+		upper = upper_bound_joints[limb][joint]-1
+	print "lower: " +str(lower)
+	print "upper: "+str(upper)
+	var = float("{0:.2f}".format(random.uniform(lower, upper)))
+	print var
+	return var
 	# return float("{0:.2f}".format(random.uniform(lower_bound_joints[joint], upper_bound_joints[joint])))
 
 def startChanging():
@@ -150,10 +160,10 @@ class Particle:
 				for l in range(0,l_num):
 					lower = self.basis[j][k][l]-threshold
 					upper = self.basis[j][k][l]+threshold
-					if (lower < lower_bound_joints[l]):
-						lower = lower_bound_joints[l]+1
-					if (upper > upper_bound_joints[l]):
-						upper = upper_bound_joints[l]-1
+					if (lower < lower_bound_joints[k][l]):
+						lower = lower_bound_joints[k][l]+1
+					if (upper > upper_bound_joints[k][l]):
+						upper = upper_bound_joints[k][l]-1
 					if newPosition[j][k][l]<lower:
 						newPosition[j][k][l]=lower
 					if newPosition[j][k][l]>upper:
@@ -162,10 +172,10 @@ class Particle:
 	def updatePositionAt(self, j,k,l,new):
 		lower = self.basis[j][k][l]-threshold
 		upper = self.basis[j][k][l]+threshold
-		if (lower < lower_bound_joints[l]):
-			lower = lower_bound_joints[l]+1
-		if (upper > upper_bound_joints[l]):
-			upper = upper_bound_joints[l]-1
+		if (lower < lower_bound_joints[k][l]):
+			lower = lower_bound_joints[k][l]+1
+		if (upper > upper_bound_joints[k][l]):
+			upper = upper_bound_joints[k][l]-1
 		if new<lower:
 			new=lower
 		if new>upper:

@@ -7,9 +7,9 @@
 
 from . import PSOMoves as move
 from . import PSOHelper as helper
-import random,sys, subprocess
+import random,sys, subprocess,os
 
-ROBOT_ADDRESS = "river"
+ROBOT_ADDRESS = "buzz"
 
 Num_Particles = 20
 current_best = helper.LEFT_STRAIGHT_KICK
@@ -50,8 +50,8 @@ def startMe():
 				for l in range(0,l_num):
 					if (j != 4):
 						helper.changeJointAngles(j,k, l,helper.getRandJointInRange(i.position,j,k,l))
-					else:
-						helper.changeJointAngles(4,k, l,theKick[4][k][l])
+					# else:
+					# 	helper.changeJointAngles(4,k, l,theKick[4][k][l])
 		kick = helper.stopChanging()
 		i.updatePosition(kick)
 		helper.writeNewKick()
@@ -63,7 +63,14 @@ def startMe():
 		print
 		particleFitness = raw_input("Particle's Fitness:")
 		# particleFitness = evaluate(kick)
-
+		while particleFitness.isdigit() == False:
+			if particleFitness == 'q':
+				print("Exiting program!")
+				return
+			elif particleFitness == 'r':
+				subprocess.call([cmd],shell=True)
+			else:
+				particleFitness = raw_input("Try again: Particle's Fitness:")
 		i.pBest = int(particleFitness)
 		if i.pBest>swarm.gBest:
 			swarm.gBest = i.pBest
@@ -76,7 +83,6 @@ def startMe():
 
 	  		for i in swarm.particles:
 	  			r = random.randint(0,9)
-	  			r = 0 #HACKKKK
 	  			if (r == 0) :
 		  			helper.startChanging()
 					for j in range(0,num_groups):
@@ -91,7 +97,18 @@ def startMe():
 					helper.writeNewKick()
 
 					subprocess.call([cmd],shell=True)
-					particleFitness = int(raw_input("Particle's Fitness:"))
+
+					particleFitness = raw_input("Particle's Fitness:")
+
+					while particleFitness.isdigit() == False:
+						if particleFitness == 'q':
+							print("Exiting program!")
+							return
+						elif particleFitness == 'r':
+							subprocess.call([cmd],shell=True)
+						else:
+							particleFitness = raw_input("Try again: Particle's Fitness:")
+					particleFitness = int(particleFitness)
 					# particleFitness = evaluate(kick)
 					if(particleFitness > i.pBest):
 						i.pBest = particleFitness
