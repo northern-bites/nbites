@@ -39,7 +39,8 @@ set( BEHAVIORS_PYTHON_SUBDIRS headTracker
                            players
                            robots
                            typeDefs
-                           util )
+                           util 
+                           psoKick)
 
 # The CPP library
 add_library(
