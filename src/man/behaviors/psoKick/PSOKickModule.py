@@ -9,7 +9,7 @@ from . import PSOMoves as move
 from . import PSOHelper as helper
 import random,sys, subprocess
 
-ROBOT_ADDRESS = "river"
+ROBOT_ADDRESS = "buzz"
 
 Num_Particles = 20
 current_best = helper.LEFT_STRAIGHT_KICK
