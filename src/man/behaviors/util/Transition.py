@@ -36,6 +36,7 @@ def getNextState(fsa, state):
     #@todo: make it so we can tell the transition whether to use goNow or goLater
     for transition, targetState in state.transitions.iteritems():
         if transition.checkCondition(fsa):
+            fsa.lastTransition = transition.__name__
 
             if DEBUG:
                 fsa.printf(fsa.name + " switching to " + targetState.__name__ +
@@ -92,6 +93,7 @@ def ifSwitch(predicate, state, nextFrame=False):
                 return newState
 
             if predicate(fsa):
+                fsa.lastTransition = predicate.__name__
                 if nextFrame:
                     return fsa.goLater(state)
                 else:

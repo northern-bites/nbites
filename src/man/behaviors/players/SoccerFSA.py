@@ -117,7 +117,7 @@ class SoccerFSA(FSA.FSA):
         """
         Put heads into neutral position
         """
-        self.brain.tracker.performHeadMove(HeadMoves.ZERO_HEADS)
+        self.brain.tracker.switchTo("faceForward")
 
     def kickScan(self):
         self.brain.tracker.performHeadMove(HeadMoves.KICK_SCAN)

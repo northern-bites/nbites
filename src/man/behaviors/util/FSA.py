@@ -2,8 +2,9 @@
 This file contains an implementation of a finite state automaton.
 """
 import time
+import inspect
 
-DEBUG = False
+DEBUG = True
 COUNT_FPS = False
 
 # Should I stay? Or should I go?
@@ -43,6 +44,7 @@ class FSA:
         self.currentState = ""
         self.lastState = ""
         self.lastDiffState = ""
+        self.lastTransition = ""
 
         self.name = "FSA"
         self.helperName = "Helper"
@@ -65,12 +67,13 @@ class FSA:
 
     def addStates(self,module):
         # gives a list of all methods and attributes of a module
-        if DEBUG: print "Listing states loaded:"
+        if DEBUG: print "Listing states loaded for " + self.name + ":"
         for candidate in dir(module):
             attribute = getattr(module,candidate)
             if callable(attribute):
                 if DEBUG: print candidate
                 self.states[candidate] = attribute
+        if DEBUG: print "\n"
 
     def addState(self, name, method):
         if callable(method):
@@ -208,7 +211,8 @@ class FSA:
                 self.printf(self.name+": switched to '"+
                             self.currentState+"\' after " +
                             str(self.counter + 1) +
-                            " frames in state \'"+self.lastState+"\'",
+                            " frames in state \'"+self.lastState+"\'" +
+                            " because of transition \'"+self.lastTransition+"\'",
                             self.stateChangeColor)
             self.lastDiffState = self.lastState
             self.counter = 0
@@ -244,5 +248,6 @@ class FSA:
             return
         self.lastState = self.currentState
         self.currentState = newState
+        self.lastTransition = "SwitchTo called from " + inspect.stack()[1][3] + "()"
 
         self.updateStateInfo()

@@ -66,131 +66,131 @@ class HeadTrackingHelper(object):
         # when a move is done
         return move
 
-    def startingPan(self, headMove):
-        """Calculates the first part of a fixed pitch pan to get there quickly."""
-        if len(headMove) < 2:
-            # Not a normal pan: there's only 1 headMove.
-            # Don't do a starting move.
-            return
+    # def startingPan(self, headMove):
+    #     """Calculates the first part of a fixed pitch pan to get there quickly."""
+    #     if len(headMove) < 2:
+    #         # Not a normal pan: there's only 1 headMove.
+    #         # Don't do a starting move.
+    #         return
 
-        headMoveYaw = headMove[1][0][0]
-        headMovePitch = headMove[1][0][1]
+    #     headMoveYaw = headMove[1][0][0]
+    #     headMovePitch = headMove[1][0][1]
 
-        #TODO do this math in C++
-        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
-        degreesPerSecond = 80 #fast, but hopefully won't destabilize the walk much
-        yawDiff = MyMath.fabs(curYaw - headMoveYaw)
-        totalTime = yawDiff/degreesPerSecond
+    #     #TODO do this math in C++
+    #     curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+    #     degreesPerSecond = 80 #fast, but hopefully won't destabilize the walk much
+    #     yawDiff = MyMath.fabs(curYaw - headMoveYaw)
+    #     totalTime = yawDiff/degreesPerSecond
 
-        newHeadMove = ( ((headMoveYaw,headMovePitch), totalTime, 1,
-                         StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #     newHeadMove = ( ((headMoveYaw,headMovePitch), totalTime, 1,
+    #                      StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-        self.executeHeadMove(newHeadMove)
+    #     self.executeHeadMove(newHeadMove)
 
-    #maxRight = maximum negative angle
-    #maxLeft = maximum positive angle
-    #beginDirection: True = right, False = left
-    def boundsSnapPan(self, maxRight, maxLeft, beginDirection = True): #Default right
-        """Generates snap pan betwewn two maxima"""
+    # #maxRight = maximum negative angle
+    # #maxLeft = maximum positive angle
+    # #beginDirection: True = right, False = left
+    # def boundsSnapPan(self, maxRight, maxLeft, beginDirection = True): #Default right
+    #     """Generates snap pan betwewn two maxima"""
 
-        SNAP_PAN_PAN_TIME = 0.3
-        SNAP_PAN_WAIT_TIME = 0.2
-        SNAP_TIME_DEGREE_INTERVALS = 45
+    #     SNAP_PAN_PAN_TIME = 0.3
+    #     SNAP_PAN_WAIT_TIME = 0.2
+    #     SNAP_TIME_DEGREE_INTERVALS = 45
 
-        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+    #     curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
 
-        startingYaw = (((curYaw // (SNAP_TIME_DEGREE_INTERVALS / 2)) + 1) // 2) * SNAP_TIME_DEGREE_INTERVALS
+    #     startingYaw = (((curYaw // (SNAP_TIME_DEGREE_INTERVALS / 2)) + 1) // 2) * SNAP_TIME_DEGREE_INTERVALS
 
-        newSnapPanHeadMove = ()
+    #     newSnapPanHeadMove = ()
 
-        if (beginDirection): #Right direction - negative angles
+    #     if (beginDirection): #Right direction - negative angles
 
-            while (startingYaw > maxRight):
+    #         while (startingYaw > maxRight):
 
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #             newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #             newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-                startingYaw -= SNAP_TIME_DEGREE_INTERVALS
+    #             startingYaw -= SNAP_TIME_DEGREE_INTERVALS
 
-            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-            newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #         newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #         newSnapPanHeadMove += (((maxRight, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-        else: #Left direction - positive angles
+    #     else: #Left direction - positive angles
 
-            while (startingYaw < maxLeft):
+    #         while (startingYaw < maxLeft):
 
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #             newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #             newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-                startingYaw += SNAP_TIME_DEGREE_INTERVALS
+    #             startingYaw += SNAP_TIME_DEGREE_INTERVALS
 
-            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-            newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #         newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #         newSnapPanHeadMove += (((maxLeft, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-            startingYaw -= SNAP_TIME_DEGREE_INTERVALS
+    #         startingYaw -= SNAP_TIME_DEGREE_INTERVALS
 
-            while (startingYaw > maxRight):
+    #         while (startingYaw > maxRight):
 
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-                newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #             newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #             newSnapPanHeadMove += (((startingYaw, 25), SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-                startingYaw -= SNAP_TIME_DEGREE_INTERVALS
+    #             startingYaw -= SNAP_TIME_DEGREE_INTERVALS
 
-        return newSnapPanHeadMove
+    #     return newSnapPanHeadMove
 
-    def goalieShortRangePan(self):
+    # def goalieShortRangePan(self):
 
-        GOALIE_SNAP_PAN_SHORT_PAN_TIME = 0.8
-        GOALIE_SNAP_PAN_LONG_PAN_TIME = 1
-        GOALIE_SNAP_PAN_WAIT_TIME = 0.5
-        # GOALIE_SNAP_PAN_LONG_WAIT_TIME = 0.5
+    #     GOALIE_SNAP_PAN_SHORT_PAN_TIME = 0.8
+    #     GOALIE_SNAP_PAN_LONG_PAN_TIME = 1
+    #     GOALIE_SNAP_PAN_WAIT_TIME = 0.5
+    #     # GOALIE_SNAP_PAN_LONG_WAIT_TIME = 0.5
 
-        numberOfIntermediatePans = 5
+    #     numberOfIntermediatePans = 5
 
-        newGoalieSnapPanHeadMove = ()
+    #     newGoalieSnapPanHeadMove = ()
 
-        newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-        newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #     newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #     newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-        for i in range(0, numberOfIntermediatePans-1):
-            newGoalieSnapPanHeadMove += ((( 45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-            newGoalieSnapPanHeadMove += ((( 45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-            newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-            newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #     for i in range(0, numberOfIntermediatePans-1):
+    #         newGoalieSnapPanHeadMove += ((( 45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #         newGoalieSnapPanHeadMove += ((( 45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #         newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_SHORT_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #         newGoalieSnapPanHeadMove += (((-45.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-        newGoalieSnapPanHeadMove += ((( 75.0, 25), GOALIE_SNAP_PAN_LONG_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-        newGoalieSnapPanHeadMove += ((( 75.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-        newGoalieSnapPanHeadMove += (((-75.0, 25), GOALIE_SNAP_PAN_LONG_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
-        newGoalieSnapPanHeadMove += (((-75.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #     newGoalieSnapPanHeadMove += ((( 75.0, 25), GOALIE_SNAP_PAN_LONG_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #     newGoalieSnapPanHeadMove += ((( 75.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #     newGoalieSnapPanHeadMove += (((-75.0, 25), GOALIE_SNAP_PAN_LONG_PAN_TIME, 1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
+    #     newGoalieSnapPanHeadMove += (((-75.0, 25), GOALIE_SNAP_PAN_WAIT_TIME,   1, StiffnessModes.LOW_HEAD_STIFFNESSES), )
 
-        return newGoalieSnapPanHeadMove
+    #     return newGoalieSnapPanHeadMove
 
-    # Should be generalized.
-    def convertKickPan(self, headMove, invert):
-        """
-        Converts the first step of the kick pan to have the same speed
-        as the second step, regardless of starting yaw.
-        ASSERT: 2 step headMove.
-        """
-        headMoveYaw = headMove[0][0][0]
-        headMovePitch = headMove[0][0][1]
+    # # Should be generalized.
+    # def convertKickPan(self, headMove, invert):
+    #     """
+    #     Converts the first step of the kick pan to have the same speed
+    #     as the second step, regardless of starting yaw.
+    #     ASSERT: 2 step headMove.
+    #     """
+    #     headMoveYaw = headMove[0][0][0]
+    #     headMovePitch = headMove[0][0][1]
 
-        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
-        degreesPerSecond = (headMoveYaw*2)/headMove[0][1] # double the yaw b/c pans are symmetric
-        yawDiff = MyMath.fabs(curYaw-headMoveYaw)
-        totalTime = yawDiff/degreesPerSecond
+    #     curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+    #     degreesPerSecond = (headMoveYaw*2)/headMove[0][1] # double the yaw b/c pans are symmetric
+    #     yawDiff = MyMath.fabs(curYaw-headMoveYaw)
+    #     totalTime = yawDiff/degreesPerSecond
 
-        if invert is True:
-            newHeadMove = ( ((-1*headMoveYaw,headMovePitch),
-                             totalTime, headMove[0][2], headMove[0][3]),
-                            ((-1*headMove[1][0][0],headMove[1][0][1]),
-                             headMove[1][1], headMove[1][2], headMove[1][3]) )
-        else:
-            newHeadMove = ( ((headMoveYaw,headMovePitch),
-                             totalTime, 1, headMove[0][3]),
-                            headMove[1] )
+    #     if invert is True:
+    #         newHeadMove = ( ((-1*headMoveYaw,headMovePitch),
+    #                          totalTime, headMove[0][2], headMove[0][3]),
+    #                         ((-1*headMove[1][0][0],headMove[1][0][1]),
+    #                          headMove[1][1], headMove[1][2], headMove[1][3]) )
+    #     else:
+    #         newHeadMove = ( ((headMoveYaw,headMovePitch),
+    #                          totalTime, 1, headMove[0][3]),
+    #                         headMove[1] )
 
-        return newHeadMove
+    #     return newHeadMove
 
     def trackObject(self):
         """
@@ -287,31 +287,31 @@ class HeadTrackingHelper(object):
         command.timestamp = int(self.tracker.brain.time * 1000)
 
     # Unsafe to call... TODO: CoordHeadCommands for messages.
-    def lookAtTarget(self, target):
+#     def lookAtTarget(self, target):
 
-        '''
-        Hacked warning message.
-        Method is unsafe to call!!
-        '''
-        print ("HeadTrackingHelper.lookAtTarget method was called. METHOD IS UNSAFE! Looking in general direction of target in lieu of using target's exact loc values.")
-#        self.lookToPoint(target)
+#         '''
+#         Hacked warning message.
+#         Method is unsafe to call!!
+#         '''
+#         print ("HeadTrackingHelper.lookAtTarget method was called. METHOD IS UNSAFE! Looking in general direction of target in lieu of using target's exact loc values.")
+# #        self.lookToPoint(target)
 
-        if hasattr(target, "height"):
-             height = target.height
-        else:
-             height = 0
+#         if hasattr(target, "height"):
+#              height = target.height
+#         else:
+#              height = 0
 
-        if hasattr(target, "loc"):
-             target = target.loc
+#         if hasattr(target, "loc"):
+#              target = target.loc
 
-        print str(target.rel_x) + " " + str(target.rel_y)
+#         print str(target.rel_x) + " " + str(target.rel_y)
 
-        headMove = self.tracker.brain.motion.CoordHeadCommand(relX = target.rel_x,
-                                            relY = target.rel_y,
-                                            relZ = height)
+#         headMove = self.tracker.brain.motion.CoordHeadCommand(relX = target.rel_x,
+#                                             relY = target.rel_y,
+#                                             relZ = height)
 
-        self.tracker.brain.motion.coordHead(headMove)
-        return headMove
+#         self.tracker.brain.motion.coordHead(headMove)
+#         return headMove
 
 
     def lookToPoint(self, target):
@@ -411,13 +411,13 @@ class HeadTrackingHelper(object):
         Repeat a dynamic pan around the ball. Should keep the ball
         in sight at all times, but we need careful escape clauses.
         """
-        ball = self.tracker.brain.ball
-        self.executeHeadMove(self.convertKickPan(HeadMoves.BALLTRACK_PAN(ball.distance, ball.bearing)))
+    #     ball = self.tracker.brain.ball
+    #     self.executeHeadMove(self.convertKickPan(HeadMoves.BALLTRACK_PAN(ball.distance, ball.bearing)))
 
-    def printHeadAngles(self):
-        print "Current yaw is: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
-        print "Current pitch is: " + str(degrees(self.tracker.brain.interface.joints.head_pitch))
+    # def printHeadAngles(self):
+    #     print "Current yaw is: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
+    #     print "Current pitch is: " + str(degrees(self.tracker.brain.interface.joints.head_pitch))
 
-    # Regardless of state, is the head moving?
-    def isActive(self):
-        return self.tracker.brain.motion.head_is_active
+    # # Regardless of state, is the head moving?
+    # def isActive(self):
+    #     return self.tracker.brain.motion.head_is_active

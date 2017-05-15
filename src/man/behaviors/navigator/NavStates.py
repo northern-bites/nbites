@@ -23,19 +23,19 @@ def scriptedMove(nav):
 
 scriptedMove.sweetMove = None
 
-def kickEngine(nav):
-    """
-    State that we stay in while calling kick engine
-    """
-    if nav.firstFrame():
-        # print "First frame of kick engine"
-        helper.executeKickEngine(nav, kickEngine.kickType)
-        return nav.stay()
+# def kickEngine(nav):
+#     """
+#     State that we stay in while calling kick engine
+#     """
+#     if nav.firstFrame():
+#         # print "First frame of kick engine"
+#         helper.executeKickEngine(nav, kickEngine.kickType)
+#         return nav.stay()
 
-    helper.stand(nav)
-    return nav.stay()
+#     helper.stand(nav)
+#     return nav.stay()
 
-kickEngine.kickType = None
+# kickEngine.kickType = None
 
 def goToPosition(nav):
     """
@@ -45,6 +45,7 @@ def goToPosition(nav):
     Absolute locations get transformed to relative locations based on current loc
     For relative locations we use our bearing to that point as the heading
     """
+    print "Current Location: " + str(nav.brain.loc.x) + ", " + str(nav.brain.loc.y)
     relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
 
     if nav.firstFrame():
@@ -83,7 +84,7 @@ def goToPosition(nav):
 
     if isinstance(goToPosition.dest, RobotLocation):
         dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
-        # print("Distance: ", dist)
+        print("Distance: ", dist)
         if dist < 30:
             # print("I'm close enough ! I should not go fast anymore")
             goToPosition.fast = False
@@ -92,7 +93,7 @@ def goToPosition(nav):
     # print("My reldest: ", str(relDest))
 
     if goToPosition.fast:
-        # print("goToPosition fast")
+        print("goToPosition fast")
         # So that fast mode works for objects of type RobotLocation also
         if isinstance(goToPosition.dest, RobotLocation) and not goToPosition.close:
             # print("It is an instance of a robot location")
@@ -192,6 +193,7 @@ goToPosition.precision = "how precise we want to be in moving"
 goToPosition.speeds = ''
 goToPosition.bookingIt = False
 goToPosition.close = False
+
 
 # State where we are moving away from an obstacle
 def dodge(nav):

@@ -82,6 +82,9 @@ class Brain(object):
         self.visionCircle = None
 
         # FSAs
+        print(dir(Switch))
+        print(dir(Switch.selectedPlayer))
+
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracker.HeadTracker(self)
         self.nav = Navigator.Navigator(self)

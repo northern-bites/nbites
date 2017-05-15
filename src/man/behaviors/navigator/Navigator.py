@@ -9,18 +9,19 @@ from math import pi, sqrt
 from ..kickDecider import kicks
 from ..util import Transition
 import PMotion_proto
+import sys
 
 #speed gains
-FULL_SPEED = 1.0
-HASTY_SPEED = 0.9
-FAST_SPEED = 0.8
-QUICK_SPEED = 0.85 #0.7
-BRISK_SPEED = 0.6
-MEDIUM_SPEED = 0.5
-GRADUAL_SPEED = 0.4
-CAREFUL_SPEED = 0.3
-SLOW_SPEED = 0.2
-SLUGGISH_SPEED = 0.1
+# FULL_SPEED = 1.0
+# HASTY_SPEED = 0.9
+# FAST_SPEED = 0.8
+# QUICK_SPEED = 0.85 #0.7
+# BRISK_SPEED = 0.6
+# MEDIUM_SPEED = 0.5
+# GRADUAL_SPEED = 0.4
+# CAREFUL_SPEED = 0.3
+# SLOW_SPEED = 0.2
+# SLUGGISH_SPEED = 0.1
 KEEP_SAME_SPEED = -1
 #walk speed adapt
 ADAPTIVE = True
@@ -56,9 +57,9 @@ class Navigator(FSA.FSA):
         self.destination = None # Used to set walking_to in world model proto
 
         # initialize obstacle counts
-        navTrans.shouldDodge.sOrACount = 0
-        navTrans.shouldDodge.vCount = 0
-        NavStates.goToPosition.avoidObstacles = True
+        # navTrans.shouldDodge.sOrACount = 0
+        # navTrans.shouldDodge.vCount = 0
+        # NavStates.goToPosition.avoidObstacles = True
         self.dodging = False
 
         #transitions
@@ -91,26 +92,27 @@ class Navigator(FSA.FSA):
         NavStates.scriptedMove.sweetMove = move
         self.switchTo('scriptedMove')
 
-    def callKickEngine(self, kickType):
-        """
-        Do a BH kick engine kick. Never write a sweet ass move again. Except standups :)
-        By default, execute forward kick.
-        """
-        NavStates.kickEngine.kickType = kickType
-        self.switchTo('kickEngine')
+    # def callKickEngine(self, kickType):
+    #     """
+    #     Do a BH kick engine kick. Never write a sweet ass move again. Except standups :)
+    #     By default, execute forward kick.
+    #     """
+    #     NavStates.kickEngine.kickType = kickType
+    #     self.switchTo('kickEngine')
 
-    def chaseBall(self, speed = speeds.SPEED_EIGHT, fast = False):
-        """
-        Calls goTo on ball, which should be a RobotLocation.
+    # def chaseBall(self, speed = speeds.SPEED_EIGHT, fast = False):
+    #     """
+    #     Calls goTo on ball, which should be a RobotLocation.
 
-        Theoretically walks into the ball, so make sure to switch the behavior beforehand.
-        """
-        self.destination = self.brain.ball
+    #     Theoretically walks into the ball, so make sure to switch the behavior beforehand.
+    #     """
+    #     self.destination = self.brain.ball
 
-        self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
+    #     self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = speeds.SPEED_EIGHT,
-             avoidObstacles = False, adaptive = False, fast = False, pb = False, useLoc = True):
+             avoidObstacles = False, adaptive = False, fast = False, 
+             pb = False, useLoc = True):
         """
         General go to method.
         Ideal for going to a field position, or for going to a relative location
@@ -176,8 +178,8 @@ class Navigator(FSA.FSA):
 
         # print speed
 
-        if self.currentState is not 'goToPosition':
-            self.switchTo('goToPosition')
+        # if self.currentState is not 'goToPosition':
+        self.switchTo('goToPosition')
 
     def updateDest(self, dest, speed = KEEP_SAME_SPEED, fast = None):
         """  Update the destination we're headed to   """
@@ -276,7 +278,7 @@ class Navigator(FSA.FSA):
         walking/executing a sweet move.
         """
         self.destination = None
-        # print("I'm in stand!")
+        print("I'm in stand!")
 
         self.switchTo('stand')
 

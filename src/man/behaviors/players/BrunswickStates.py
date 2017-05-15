@@ -3,6 +3,7 @@ Game controller states for pBrunswick, our soccer player.
 """
 
 from ..Say import *
+import BrunswickHelper as helper
 
 import noggin_constants as nogginConstants
 from math import fabs
@@ -11,8 +12,6 @@ from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
 from math import fabs, degrees
-
-DEBUG_MANUAL_PLACEMENT = False
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -24,26 +23,29 @@ def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = False
-        player.gainsOn()
+        
         player.stand()
-        player.zeroHeads()
-        player.brain.resetInitialLocalization()
         player.lastStiffStatus = True
-        #Reset role to player number
+        player.zeroHeads()
+        
+        player.brain.resetInitialLocalization()
+        
         player.role = player.brain.playerNumber
         roleConstants.setRoleConstants(player, player.role)
 
-    # print "Current Angle: " + str(degrees(player.brain.interface.joints.head_yaw))
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
         player.stand()
         player.zeroHeads()
+    
     # Remember last stiffness.
     player.lastStiffStatus = player.brain.interface.stiffStatus.on
 
     return player.stay()
 
 @superState('gameControllerResponder')
+@stay
+@defaultState('localize')
 def gameReady(player):
     """
     Stand up, and pan for localization, and walk to kicking off positions.
@@ -51,27 +53,48 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = True
-        player.brain.nav.stand()
-        player.brain.tracker.repeatWideSnapPan()
+        
+        # player.stand()
+        player.brain.tracker.switchTo('snap')
 
-        player.timeReadyBegan = player.brain.time
-        if player.lastDiffState == 'gameInitial':
-            player.brain.resetInitialLocalization()
+        # player.timeReadyBegan = player.brain.time
+        # if player.lastDiffState == 'gameInitial':
+        #     player.brain.resetInitialLocalization()
 
-        if player.wasPenalized:
-            player.wasPenalized = False
-            return player.goNow('manualPlacement')
+        # if player.wasPenalized:
+        #     player.wasPenalized = False
+        #     return player.goNow('manualPlacement')
 
     # Wait until the sensors are calibrated before moving.
-    if not player.brain.motion.calibrated:
-        return player.stay()
+    # if player.brain.motion.calibrated:
+    #     player.helper.walkToReadyPosition(player.brain, player.role)
 
-    # # CHINA HACK player 5 walking off field so start by walking forward
-    # if player.brain.playerNumber == 5 and player.stateTime <= 4:
-    #     player.setWalk(0.6, 0, 0)
-    #     return player.stay()
 
-    return player.goNow('positionReady')
+@superState('gameReady')
+@stay
+@ifSwitchLater(helper.shouldWalkToReadyPosition, 'walkToReadyPosition')
+def localize(player):
+    print "in localize"
+    print helper.shouldWalkToReadyPosition(player)
+
+@superState('gameReady')
+@stay
+@ifSwitchNow(helper.inReadyPosition, 'inKickoffPosition')
+def walkToReadyPosition(player):
+    if player.firstFrame():
+        helper.walkToReadyPosition(player.brain, player.role)
+    print player.brain.nav.destination
+
+@superState('gameReady')
+@stay
+@ifSwitchNow(helper.noLongerInReadyPosition, 'walkToReadyPosition')
+def inKickoffPosition(player):
+    print "in kickoff position"
+
+
+
+
+
 
 @superState('gameControllerResponder')
 def gameSet(player):
@@ -79,45 +102,45 @@ def gameSet(player):
     Fixate on the ball, or scan to look for it
     """
 
-    if player.brain.interface.fallStatus.pickup == 1:
-        player.brain.pickedUpInSet = True
+    # if player.brain.interface.fallStatus.pickup == 1:
+    #     player.brain.pickedUpInSet = True
 
-    if player.firstFrame():
-        #The player's currentState = gameSet
+    # if player.firstFrame():
+    #     #The player's currentState = gameSet
 
-        # print "GAME SET FIRST FRAME"
+    #     # print "GAME SET FIRST FRAME"
 
-        player.inKickingState = False
-        player.brain.fallController.enabled = True
-        player.gainsOn()
-        player.stand()
-        player.brain.nav.stand()
+    #     player.inKickingState = False
+    #     player.brain.fallController.enabled = True
+    #     player.gainsOn()
+    #     player.stand()
+    #     player.brain.nav.stand()
 
-        player.brain.whistleHeard = False
-        player.brain.whistlePenalty = False
+    #     player.brain.whistleHeard = False
+    #     player.brain.whistlePenalty = False
 
-        player.brain.gameSetX = player.brain.loc.x
-        player.brain.gameSetY = player.brain.loc.y
-        player.brain.gameSetH = player.brain.loc.h
+    #     player.brain.gameSetX = player.brain.loc.x
+    #     player.brain.gameSetY = player.brain.loc.y
+    #     player.brain.gameSetH = player.brain.loc.h
 
-        # player.brain.tracker.helper.boundsSnapPan(-90, 90, False)
-        player.brain.tracker.performGameSetInitialWideSnapPan()
-        # player.brain.tracker.helper.startingPan(Head)
-        # player.brain.tracker.helper.executeHeadMove(player.brain.tracker.helper.boundsSnapPan(-90, 90, False))
+    #     # player.brain.tracker.helper.boundsSnapPan(-90, 90, False)
+    #     player.brain.tracker.performGameSetInitialWideSnapPan()
+    #     # player.brain.tracker.helper.startingPan(Head)
+    #     # player.brain.tracker.helper.executeHeadMove(player.brain.tracker.helper.boundsSnapPan(-90, 90, False))
 
-        if player.wasPenalized:
-            player.wasPenalized = False
-            return player.goNow('manualPlacement')
+    #     if player.wasPenalized:
+    #         player.wasPenalized = False
+    #         return player.goNow('manualPlacement')
 
-    elif player.brain.tracker.isStopped():
+    # elif player.brain.tracker.isStopped():
 
-        # print "TRUE"
+    #     # print "TRUE"
 
-        player.brain.tracker.trackBall(True)
-        # print "Current Angle: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
-    # Wait until the sensors are calibrated before moving.
-    if not player.brain.motion.calibrated:
-        return player.stay()
+    #     player.brain.tracker.trackBall(True)
+    #     # print "Current Angle: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
+    # # Wait until the sensors are calibrated before moving.
+    # if not player.brain.motion.calibrated:
+    #     return player.stay()
     
     return player.stay()
 
@@ -251,6 +274,16 @@ def waitForKickoff(player):
 
 waitForKickoff.ballRelX = "the relX position of the ball when we started"
 waitForKickoff.ballRelY = "the relY position of the ball when we started"
+
+
+
+
+
+
+
+
+
+
 
 ### PENALTY KICK PLAY ###
 @superState('gameControllerResponder')

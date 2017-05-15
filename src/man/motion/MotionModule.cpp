@@ -234,6 +234,7 @@ bool MotionModule::postProcess()
     }
 
     //return if one of the enactors is active
+    return true;
     return curProvider->isActive()  || curHeadProvider->isActive();
 }
 
