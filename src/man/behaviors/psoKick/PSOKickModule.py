@@ -11,7 +11,7 @@ import random,sys, subprocess,os
 
 ROBOT_ADDRESS = "buzz"
 
-Num_Particles = 20
+Num_Particles = 10
 current_best = helper.LEFT_STRAIGHT_KICK
 theKick = helper.LEFT_STRAIGHT_KICK
 num_groups = 5
@@ -61,7 +61,7 @@ def startMe():
 		print("MY KICK:")
 		helper.printKick(kick)
 		print
-		particleFitness = raw_input("Particle's Fitness:")
+		particleFitness = raw_input("Initialize "+ str(i.particleID)+": Particle's Fitness:")
 		# particleFitness = evaluate(kick)
 		while particleFitness.isdigit() == False:
 			if particleFitness == 'q':
@@ -79,8 +79,6 @@ def startMe():
 	# while(keepGoing):
 	while(counter < 1000):
   		if(counter != 0):
-  			# print("In generation"+ str(counter))
-
 	  		for i in swarm.particles:
 	  			r = random.randint(0,9)
 	  			if (r == 0) :
@@ -98,8 +96,10 @@ def startMe():
 
 					subprocess.call([cmd],shell=True)
 
-					particleFitness = raw_input("Particle's Fitness:")
-
+					particleFitness = raw_input(str(counter)+" "+str(i.particleID)+": Particle's Fitness:")
+					print("MY KICK:")
+					helper.printKick(kick)
+					print
 					while particleFitness.isdigit() == False:
 						if particleFitness == 'q':
 							print("Exiting program!")

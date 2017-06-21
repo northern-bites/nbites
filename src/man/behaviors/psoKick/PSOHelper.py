@@ -60,7 +60,7 @@ kick = LEFT_STRAIGHT_KICK
 num_groups = 5
 num_limbs = 4
 num_joints = 20
-threshold= 0
+threshold= 3
 
 def printKick(kick):
 	for j in range(0,num_groups):
@@ -85,21 +85,13 @@ def getRandJointInRange(currPosition,group,limb, joint):
 	basis = listit(LEFT_STRAIGHT_KICK)
 	lower = basis[group][limb][joint]-threshold
 	upper = basis[group][limb][joint]+threshold
-	print "lower1: " +str(lower)
-	print "upper1: "+str(upper)
 	if (lower < lower_bound_joints[limb][joint]):
 		lower = lower_bound_joints[limb][joint]+1
 
-	print "lower_bound"+ str(lower_bound_joints[limb][joint])
-	print "upper_bound"+ str(upper_bound_joints[limb][joint])
-
 	if (upper > upper_bound_joints[limb][joint]):
 		upper = upper_bound_joints[limb][joint]-1
-	print "lower: " +str(lower)
-	print "upper: "+str(upper)
-	var = float("{0:.2f}".format(random.uniform(lower, upper)))
-	print var
-	return var
+
+	return float("{0:.2f}".format(random.uniform(lower, upper)))
 	# return float("{0:.2f}".format(random.uniform(lower_bound_joints[joint], upper_bound_joints[joint])))
 
 def startChanging():
