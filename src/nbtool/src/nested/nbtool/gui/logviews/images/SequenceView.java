@@ -26,6 +26,8 @@ import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
 
+//this is an important file
+
 public class SequenceView extends ViewParent implements MouseMotionListener {
 	BufferedImage images[];
 	
