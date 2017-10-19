@@ -28,6 +28,7 @@
 
 #include "Helpers.hpp"
 
+
 messages::YUVImage emptyTop(
                             man::vision::DEFAULT_TOP_IMAGE_WIDTH * 2,
                             man::vision::DEFAULT_TOP_IMAGE_HEIGHT
@@ -39,6 +40,12 @@ messages::YUVImage emptyBot(
                             );
 
 /* NBCROSS FUNCTIONS */
+
+NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_Tripoint())
+    (const std::vector<nbl::logptr> &arguments)
+{
+	printf("I got %d arguments\n", arguments.size());
+}
 
 NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     (const std::vector<nbl::logptr> &arguments)
