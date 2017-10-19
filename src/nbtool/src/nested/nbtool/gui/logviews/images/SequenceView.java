@@ -83,20 +83,13 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 			Debug.info("hello %s", "cutie");
 			return;
 		}
-			
-		
-//		Log toSend = Log.explicitLog(null, null, "", 0);
-//		
-//		toSend.addBlockFromLog(displayedLog);
-//		for (int i = 0; i < alsoSelected.size(); ++i) {
-//			toSend.addBlockFromLog(alsoSelected.get(i));
-//		}
 		
 		List<Log> logs = new LinkedList<>();
 		logs.add(displayedLog);
 		for (int i = 0; i < alsoSelected.size(); ++i) {
 			logs.add(alsoSelected.get(i));
 		}
+		Debug.info("Right before call %s", "woof");
 
 		assert(ci.tryAddCall(new IOFirstResponder(){
 
@@ -126,6 +119,7 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 
 	@Override
 	public void setupDisplay() {
+		sendToNbCross();
 //		System.out.print(alsoSelected.size());
 		this.images = new BufferedImage[alsoSelected.size()+1];
 		this.images[0] = displayedLog.blocks.get(0).parseAsYUVImage().toBufferedImage();;
