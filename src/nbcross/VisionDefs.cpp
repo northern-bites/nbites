@@ -45,6 +45,13 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
     (const std::vector<nbl::logptr> &arguments)
 {
 	printf("I got %d arguments\n", arguments.size());
+
+
+
+
+
+
+    RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));	
 }
 
 NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
