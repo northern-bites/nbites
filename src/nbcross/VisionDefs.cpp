@@ -72,7 +72,6 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
     	printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
 	}
    
-
 	
 	messages::YUVImage* newSubtractedImage;
 
@@ -80,7 +79,7 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 	// Do subtraction part now
 	int width = realImages[0].width();
 	int height = realImages[0].height();
-	if (realImages[0].width() == realImages[1].width() && realImages[0].height() == realImages[1].height()){
+	if (realImages[0].yImage().width() == realImages[1].yImage().width() && realImages[0].yImage().height() == realImages[1].yImage().height()){
 		for (int w = 0; w < realImages[0].width(); w++) {
 			for (int h = 0; h < realImages[0].height(); h++) {
 				std::cout<<h<< " "<<w<<std::endl;
