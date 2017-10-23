@@ -42,14 +42,68 @@ messages::YUVImage emptyBot(
 /* NBCROSS FUNCTIONS */
 
 NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_Tripoint())
-    (const std::vector<nbl::logptr> &arguments)
+    (const std::vector<nbl::logptr> &logs)
 {
-	printf("I got %d arguments\n", arguments.size());
+	printf("I got %d logs\n", logs.size());
+	std::vector<messages::YUVImage> realImages;
+
+	//got all of the images in a realImages vector
+	for (int i = 0; i < logs.size();i++){
+ 		Block& imageBlock = logs[i]->blocks[0];
+    	bool topCamera;
+    	if (imageBlock.whereFrom == "camera_TOP") {
+        	topCamera = true;
+   		} else if (imageBlock.whereFrom == "camera_BOT") {
+        	topCamera = false;
+    	} else {
+        	throw std::runtime_error("unknown camera in Vision()");
+    	}
+
+    	int width = 2 * imageBlock.dict.at(SharedConstants::LOG_BLOCK_IMAGE_WIDTH_PIXELS()).asConstNumber().asInt();
+    	int height = imageBlock.dict.at(SharedConstants::LOG_BLOCK_IMAGE_HEIGHT_PIXELS()).asConstNumber().asInt();
+
+    	imageSizeCheck(topCamera, width, height);
+
+    	printf("ARGUMENT WAS: camera:%d width:%d height:%d ",!topCamera, width, height);
+
+    	std::string lbuf;
+    	realImages.push_back(imageBlock.copyAsYUVImage(lbuf));
+
+    	printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
+	}
+   
+
+	
+	messages::YUVImage* newSubtractedImage;
+
+	// newSubtractedImage->makeMeCopyOf(realImages[0]);
+	// Do subtraction part now
+	int width = realImages[0].width();
+	int height = realImages[0].height();
+	if (realImages[0].width() == realImages[1].width() && realImages[0].height() == realImages[1].height()){
+		for (int w = 0; w < realImages[0].width(); w++) {
+			for (int h = 0; h < realImages[0].height(); h++) {
+				std::cout<<h<< " "<<w<<std::endl;
+				fflush(stdout);
+				//newSubtractedImage->yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
+				realImages[0].yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
 
 
+			}
+		}
+	}
+   // printf("parsed image width=%d, height=%d\n", newSubtractedImage->width(), newSubtractedImage->height() );
 
+    std::vector<Block> retVec;
+    int yLength = (width / 4) * (height / 2) * 2;
 
+	uint8_t yBuf[yLength];
+	//Im not sure if this is copying just one pixel or the whole thing.
+    memcpy(yBuf, realImages[0].yImage().pixelAddress(0,0), yLength);
 
+     // Convert to string and set log
+    std::string yBuffer((const char*)yBuf, yLength);
+    retVec.push_back(Block{yBuffer, json::Object{}, "yBuffer", "nbcross", 0, 0});
 
     RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));	
 }
