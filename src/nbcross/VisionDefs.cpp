@@ -93,25 +93,19 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 			}
 		}
 	} 
-	// else {
-	// 	for (int w = 0; w < realImages[0].yImage().width(); w++) {
-	// 		for (int h = 0; h < realImages[0].yImage().height(); h++) {
-	// 			newSubtractedImage.yImage().putPixel(w,h,realImages[0].yImage().getPixel(w,h));
-	// 		}
-	// 	}
-	// }
-   // printf("parsed image width=%d, height=%d\n", newSubtractedImage->width(), newSubtractedImage->height() );
+
 
     std::vector<Block> retVec;
     int yLength = (width / 4) * (height / 2) * 2;
 
 	uint8_t yBuf[yLength];
+
 	//Im not sure if this is copying just one pixel or the whole thing.
     memcpy(yBuf, newSubtractedImage.yImage().pixelAddress(0,0), yLength);
 
      // Convert to string and set log
-    std::string yBuffer((const char*)yBuf, yLength);
-    retVec.push_back(Block{yBuffer, json::Object{}, "yBuffer", "nbcross", 0, 0});
+    std::string YUVImage422((const char*)yBuf, yLength);
+    retVec.push_back(Block{YUVImage422, json::Object{}, "YUVImage422", "nbcross", 0, 0});
 
     RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));	
 }
