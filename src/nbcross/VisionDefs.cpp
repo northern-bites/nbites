@@ -46,7 +46,8 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 {
 	printf("I got %d logs\n", logs.size());
 	std::vector<messages::YUVImage> realImages;
-
+	std::vector<std::string> buffers;
+	messages::YUVImage newSubtractedImage;
 	//got all of the images in a realImages vector
 	for (int i = 0; i < logs.size();i++){
  		Block& imageBlock = logs[i]->blocks[0];
@@ -66,28 +67,34 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 
     	printf("ARGUMENT WAS: camera:%d width:%d height:%d ",!topCamera, width, height);
 
-    	std::string lbuf;
-    	realImages.push_back(imageBlock.copyAsYUVImage(lbuf));
-
+    	std::string lbuf= "";
+    	buffers.push_back(lbuf);
+    	realImages.push_back(imageBlock.copyAsYUVImage(buffers[i]));
+    	if(i == 0){
+    		std::string subtractedImageData;
+    		newSubtractedImage = imageBlock.copyAsYUVImage(subtractedImageData);
+    	}
     	printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
 	}
    
-	
-	messages::YUVImage* newSubtractedImage;
+	//std::string subtractedImageData;
+	//messages::YUVImage newSubtractedImage = realImages[0].copyAsYUVImage(subtractedImageData);
 
-	// newSubtractedImage->makeMeCopyOf(realImages[0]);
 	// Do subtraction part now
 	int width = realImages[0].width();
 	int height = realImages[0].height();
-	if (realImages[0].yImage().width() == realImages[1].yImage().width() && realImages[0].yImage().height() == realImages[1].yImage().height()){
-		for (int w = 0; w < realImages[0].width(); w++) {
-			for (int h = 0; h < realImages[0].height(); h++) {
-				std::cout<<h<< " "<<w<<std::endl;
-				fflush(stdout);
-				//newSubtractedImage->yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
-				realImages[0].yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
-
-
+	if(logs.size() > 1) {
+		if (realImages[0].yImage().width() == realImages[1].yImage().width() && realImages[0].yImage().height() == realImages[1].yImage().height()){
+			for (int w = 0; w < realImages[0].yImage().width(); w++) {
+				for (int h = 0; h < realImages[0].yImage().height(); h++) {
+					newSubtractedImage.yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
+				}
+			}
+		}
+	} else {
+		for (int w = 0; w < realImages[0].yImage().width(); w++) {
+			for (int h = 0; h < realImages[0].yImage().height(); h++) {
+				newSubtractedImage.yImage().putPixel(w,h,realImages[0].yImage().getPixel(w,h));
 			}
 		}
 	}
@@ -98,7 +105,7 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 
 	uint8_t yBuf[yLength];
 	//Im not sure if this is copying just one pixel or the whole thing.
-    memcpy(yBuf, realImages[0].yImage().pixelAddress(0,0), yLength);
+    memcpy(yBuf, newSubtractedImage.yImage().pixelAddress(0,0), yLength);
 
      // Convert to string and set log
     std::string yBuffer((const char*)yBuf, yLength);
