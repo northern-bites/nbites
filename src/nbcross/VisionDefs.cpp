@@ -48,6 +48,8 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 	std::vector<messages::YUVImage> realImages;
 	std::vector<std::string> buffers;
 	messages::YUVImage newSubtractedImage;
+	std::string subtractedImageData;
+
 	//got all of the images in a realImages vector
 	for (int i = 0; i < logs.size();i++){
  		Block& imageBlock = logs[i]->blocks[0];
@@ -71,7 +73,6 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
     	buffers.push_back(lbuf);
     	realImages.push_back(imageBlock.copyAsYUVImage(buffers[i]));
     	if(i == 0){
-    		std::string subtractedImageData;
     		newSubtractedImage = imageBlock.copyAsYUVImage(subtractedImageData);
     	}
     	printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
@@ -91,13 +92,14 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 				}
 			}
 		}
-	} else {
-		for (int w = 0; w < realImages[0].yImage().width(); w++) {
-			for (int h = 0; h < realImages[0].yImage().height(); h++) {
-				newSubtractedImage.yImage().putPixel(w,h,realImages[0].yImage().getPixel(w,h));
-			}
-		}
-	}
+	} 
+	// else {
+	// 	for (int w = 0; w < realImages[0].yImage().width(); w++) {
+	// 		for (int h = 0; h < realImages[0].yImage().height(); h++) {
+	// 			newSubtractedImage.yImage().putPixel(w,h,realImages[0].yImage().getPixel(w,h));
+	// 		}
+	// 	}
+	// }
    // printf("parsed image width=%d, height=%d\n", newSubtractedImage->width(), newSubtractedImage->height() );
 
     std::vector<Block> retVec;
