@@ -80,7 +80,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 	private void sendToNbCross() {
 		CrossInstance ci = CrossServer.instanceByIndex(0);
 		if (ci == null) {
-			Debug.info("hello %s", "cutie");
 			return;
 		}
 		
@@ -89,14 +88,19 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 		for (int i = 0; i < alsoSelected.size(); ++i) {
 			logs.add(alsoSelected.get(i));
 		}
-		Debug.info("Right before call %s", "woof");
 
 		assert(ci.tryAddCall(new IOFirstResponder(){
 
 			@Override
 			public void ioReceived(IOInstance inst, int ret, Log... out) {
+					
+				assert(out != null);
+				assert(out.length > 0);
+				for (int i = 0; i < out.length; ++i) {
+					images[i] = out[i].blocks.get(0).parseAsYUVImage().toBufferedImage();
+				}
+				repaint();
 				
-//				assert(out.length == 1);
 //				assert(out[0].logClass.equals("VisionReturn"));
 //				latestVisionLog = out[0];
 //				outer.ioReceived(inst, ret, out);
