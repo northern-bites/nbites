@@ -169,23 +169,6 @@
             -0.176787
         }
     },
-  "shehulk" :
-    {
-      "camera_TOP" :
-        {
-          "d_roll" :
-            0.008715,
-          "d_tilt" :
-            -0.224611
-        },
-      "camera_BOT" :
-        {
-          "d_roll" :
-            0.059919,
-          "d_tilt" :
-            -0.205483
-        }
-    },
   "elektra" :
     {
       "camera_TOP" :
@@ -203,21 +186,21 @@
             -0.117167
         }
     },
-  "jayne" :
+  "shehulk" :
     {
       "camera_TOP" :
         {
           "d_roll" :
-            0,
+            -0.005279,
           "d_tilt" :
-            0
+            -0.263015
         },
       "camera_BOT" :
         {
           "d_roll" :
-            0,
+            0.089631,
           "d_tilt" :
-            0
+            -0.244215
         }
     },
   "kaylee" :
@@ -235,6 +218,23 @@
             -0.016782,
           "d_tilt" :
             0.001572
+        }
+    },
+  "jayne" :
+    {
+      "camera_TOP" :
+        {
+          "d_roll" :
+            0,
+          "d_tilt" :
+            0
+        },
+      "camera_BOT" :
+        {
+          "d_roll" :
+            0,
+          "d_tilt" :
+            0
         }
     },
   "zoe" :
