@@ -8,9 +8,9 @@
           "uAtY255" :
             255,
           "vAtY0" :
-            121,
+            132,
           "vAtY255" :
-            194,
+            190,
           "u_fuzzy_range" :
             103,
           "v_fuzzy_range" :
@@ -19,17 +19,17 @@
       "white" :
         {
           "uAtY0" :
-            160,
+            238,
           "uAtY255" :
-            144,
+            160,
           "vAtY0" :
-            208,
+            232,
           "vAtY255" :
-            0,
+            44,
           "u_fuzzy_range" :
-            117,
+            125,
           "v_fuzzy_range" :
-            153
+            156
         },
       "black" :
         {
@@ -52,13 +52,13 @@
       "green" :
         {
           "uAtY0" :
-            156,
+            184,
           "uAtY255" :
-            151,
+            165,
           "vAtY0" :
-            129,
+            115,
           "vAtY255" :
-            200,
+            208,
           "u_fuzzy_range" :
             115,
           "v_fuzzy_range" :
@@ -67,11 +67,11 @@
       "white" :
         {
           "uAtY0" :
-            111,
+            100,
           "uAtY255" :
             200,
           "vAtY0" :
-            145,
+            132,
           "vAtY255" :
             223,
           "u_fuzzy_range" :
