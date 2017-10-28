@@ -4,13 +4,13 @@
       "green" :
         {
           "uAtY0" :
-            255,
+            241,
           "uAtY255" :
-            255,
+            18,
           "vAtY0" :
-            132,
+            137,
           "vAtY255" :
-            190,
+            121,
           "u_fuzzy_range" :
             103,
           "v_fuzzy_range" :
@@ -19,13 +19,13 @@
       "white" :
         {
           "uAtY0" :
-            238,
+            171,
           "uAtY255" :
-            160,
+            147,
           "vAtY0" :
-            232,
+            158,
           "vAtY255" :
-            44,
+            49,
           "u_fuzzy_range" :
             125,
           "v_fuzzy_range" :
