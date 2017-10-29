@@ -96,6 +96,7 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 					
 				assert(out != null);
 				assert(out.length > 0);
+				Debug.warn("GOT IO RECEIVED");
 				for (int i = 0; i < out.length; ++i) {
 					images[i] = out[i].blocks.get(0).parseAsYUVImage().toBufferedImage();
 				}
