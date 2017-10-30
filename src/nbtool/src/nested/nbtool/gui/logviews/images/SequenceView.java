@@ -41,29 +41,46 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 		double frame_height = this.getSize().getHeight();
 		
 		if (images.length < 4) {
-			// draw each of the 1-3 images as big as possible
+			 for (BufferedImage img : images) {
+		        	if (img != null) {
+		        		int imageWidth = (int)frame_width/3;
+		        		int imageHeight = (int)frame_height/3;
+		        		
+		        		g.drawImage(img,offsetX, offsetY,imageWidth ,imageHeight , null);
+
+
+		        		if (offsetX+imageWidth >= frame_width) {
+		        			offsetY += 10+imageHeight;
+		        			offsetX = 5;
+		        		} else {
+		            		offsetX +=imageWidth+ 10;
+
+		        		}
+
+		        	}
+		        }
 		} else {
-			// grid them
+			 for (BufferedImage img : images) {
+		        	if (img != null) {
+		        		int imageWidth = (int)frame_width/4;
+		        		int imageHeight = (int)frame_height/4;
+		        		
+		        		g.drawImage(img,offsetX, offsetY,imageWidth ,imageHeight , null);
+
+
+		        		if (offsetX+imageWidth >= frame_width) {
+		        			offsetY += 10+imageHeight;
+		        			offsetX = 5;
+		        		} else {
+		            		offsetX +=imageWidth+ 10;
+
+		        		}
+
+		        	}
+		        }
 		}
 
-        for (BufferedImage img : images) {
-        	if (img != null) {
-        		int imageWidth = (int)frame_width/4;
-        		int imageHeight = (int)frame_height/4;
-        		
-        		g.drawImage(img,offsetX, offsetY,imageWidth ,imageHeight , null);
-
-
-        		if (offsetX+imageWidth >= frame_width) {
-        			offsetY += 10+imageHeight;
-        			offsetX = 5;
-        		} else {
-            		offsetX +=imageWidth+ 10;
-
-        		}
-
-        	}
-        }
+       
     }
 	
 	public SequenceView() {
@@ -101,13 +118,13 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 				assert(out != null);
 				assert(out.length > 0);
 				Debug.warn("GOT IO RECEIVED");
-				for (int i = 0; i < out.length; ++i) {
+				//for (int i = 0; i < out.length; ++i) {
+				if(out.length > 0 && images.length > 2) {
 					//images[i] = out[i].blocks.get(0).parseAsYUVImage().toBufferedImage();
-					
-					images[i] = new YUYV8888Image(
-							outerThis.yuvImages[i].width,
-							outerThis.yuvImages[i].height,
-							out[i].blocks.get(0).data).toBufferedImage(); 
+					images[2] = new YUYV8888Image(
+							outerThis.yuvImages[0].width,
+							outerThis.yuvImages[0].height,
+							out[0].blocks.get(0).data).toBufferedImage(); 
 					//out[i].blocks.get(0).toBufferedImage();
 
 					
@@ -162,9 +179,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 //			}
 //		}
 		
-		/*
-		 * TODO Send selected views to nbcross
-		 * */
 		
 		
 		
