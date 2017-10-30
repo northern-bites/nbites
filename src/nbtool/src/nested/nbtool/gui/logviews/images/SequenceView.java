@@ -18,6 +18,7 @@ import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.misc.VisionView;
 import nbtool.gui.utilitypanes.UtilityManager;
+import nbtool.images.YUYV8888Image;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.nio.CrossServer;
@@ -98,7 +99,14 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 				assert(out.length > 0);
 				Debug.warn("GOT IO RECEIVED");
 				for (int i = 0; i < out.length; ++i) {
-					images[i] = out[i].blocks.get(0).parseAsYUVImage().toBufferedImage();
+					//images[i] = out[i].blocks.get(0).parseAsYUVImage().toBufferedImage();
+					
+					images[i] = new YUYV8888Image(images[i].
+							getWidth(),images[i].getHeight(),
+							out[i].blocks.get(0).data).toBufferedImage(); 
+					//out[i].blocks.get(0).toBufferedImage();
+
+					
 				}
 				repaint();
 				
