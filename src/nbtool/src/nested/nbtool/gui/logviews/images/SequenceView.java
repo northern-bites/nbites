@@ -31,6 +31,7 @@ import nbtool.util.Utility;
 
 public class SequenceView extends ViewParent implements MouseMotionListener {
 	BufferedImage images[];
+	YUYV8888Image yuvImages[];
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -90,6 +91,8 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 			logs.add(alsoSelected.get(i));
 		}
 
+		final SequenceView outerThis = this;
+		
 		assert(ci.tryAddCall(new IOFirstResponder(){
 
 			@Override
@@ -101,8 +104,9 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 				for (int i = 0; i < out.length; ++i) {
 					//images[i] = out[i].blocks.get(0).parseAsYUVImage().toBufferedImage();
 					
-					images[i] = new YUYV8888Image(images[i].
-							getWidth(),images[i].getHeight(),
+					images[i] = new YUYV8888Image(
+							outerThis.yuvImages[i].width,
+							outerThis.yuvImages[i].height,
 							out[i].blocks.get(0).data).toBufferedImage(); 
 					//out[i].blocks.get(0).toBufferedImage();
 
@@ -135,11 +139,16 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 		sendToNbCross();
 //		System.out.print(alsoSelected.size());
 		this.images = new BufferedImage[alsoSelected.size()+1];
-		this.images[0] = displayedLog.blocks.get(0).parseAsYUVImage().toBufferedImage();;
+		this.yuvImages = new YUYV8888Image[this.images.length];
+		
+		this.yuvImages[0] = displayedLog.blocks.get(0).parseAsYUVImage();
+
+		this.images[0] = displayedLog.blocks.get(0).parseAsYUVImage().toBufferedImage();
 //
 		for (int i = 0; i < alsoSelected.size(); ++i) {
 //			this.images[i] = displayedLog.blocks.get(i).parseAsYUVImage().toBufferedImage();
-			this.images[i] = alsoSelected.get(i).blocks.get(0).parseAsYUVImage().toBufferedImage();
+			this.yuvImages[i+1] = alsoSelected.get(i).blocks.get(0).parseAsYUVImage();
+			this.images[i+1] = alsoSelected.get(i).blocks.get(0).parseAsYUVImage().toBufferedImage();
 		}
 		
 //		for (BufferedImage image : this.images) {
