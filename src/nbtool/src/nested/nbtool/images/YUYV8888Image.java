@@ -7,6 +7,8 @@ public final class YUYV8888Image extends ImageParent {
 
 	public YUYV8888Image(int w, int h, byte[] d) {
 		super(w, h, d);
+		System.out.printf("[DEBUG PRINT] %d, %d len=%d\n", w, h, d.length);
+
 	}
 	
 	public int yPixelAt(int x, int y) {
