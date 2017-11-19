@@ -75,7 +75,7 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
     	if(i == 0){
     		newSubtractedImage = imageBlock.copyAsYUVImage(subtractedImageData);
     	}
-    	printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
+    	//printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
 	}
    
 	//std::string subtractedImageData;
@@ -92,6 +92,20 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 				}
 			}
 		}
+		// if (realImages[0].uImage().width() == realImages[1].uImage().width() && realImages[0].uImage().height() == realImages[1].uImage().height()){
+		// 	for (int w = 0; w < realImages[0].uImage().width(); w++) {
+		// 		for (int h = 0; h < realImages[0].uImage().height(); h++) {
+		// 			newSubtractedImage.uImage().putPixel(w,h,abs(realImages[0].uImage().getPixel(w,h) - realImages[1].uImage().getPixel(w,h)));
+		// 		}
+		// 	}
+		// }
+		// if (realImages[0].vImage().width() == realImages[1].vImage().width() && realImages[0].vImage().height() == realImages[1].vImage().height()){
+		// 	for (int w = 0; w < realImages[0].vImage().width(); w++) {
+		// 		for (int h = 0; h < realImages[0].vImage().height(); h++) {
+		// 			newSubtractedImage.vImage().putPixel(w,h,abs(realImages[0].vImage().getPixel(w,h) - realImages[1].vImage().getPixel(w,h)));
+		// 		}
+		// 	}
+		// }
 	} 
 
 
@@ -103,10 +117,10 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
 	//Im not sure if this is copying just one pixel or the whole thing.
     memcpy(yBuf, newSubtractedImage.yImage().pixelAddress(0,0), buffers[0].size());
 
+
      // Convert to string and set log
     std::string YUVImage422((const char*)yBuf, buffers[0].size());
     retVec.push_back(Block{YUVImage422, json::Object{}, "YUVImage422", "nbcross", 0, 0});
-
     RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));	
 }
 
