@@ -99,6 +99,7 @@ private:
     CornerDetector* cornerDetector[2];
     CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
+    std::vector<messages::YUVImage> imageToSubtract;
 
     bool blackStar_;
 

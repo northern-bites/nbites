@@ -77,36 +77,34 @@ NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_T
     	}
     	//printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
 	}
+
+	std::string rname = realImages[0]->topLevelDictionary.at(SharedConstants::LOG_TOPLEVEL_HOST_NAME()).asString();
+
+    man::vision::VisionModule& module = getModuleRef(rname);
+
+    if(realImages.size() > 1){
+    	module.
+    }
+
+
+    module.run();
+
    
 	//std::string subtractedImageData;
 	//messages::YUVImage newSubtractedImage = realImages[0].copyAsYUVImage(subtractedImageData);
 
-	// Do subtraction part now
-	int width = realImages[0].width();
-	int height = realImages[0].height();
-	if(logs.size() > 1) {
-		if (realImages[0].yImage().width() == realImages[1].yImage().width() && realImages[0].yImage().height() == realImages[1].yImage().height()){
-			for (int w = 0; w < realImages[0].yImage().width(); w++) {
-				for (int h = 0; h < realImages[0].yImage().height(); h++) {
-					newSubtractedImage.yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
-				}
-			}
-		}
-		// if (realImages[0].uImage().width() == realImages[1].uImage().width() && realImages[0].uImage().height() == realImages[1].uImage().height()){
-		// 	for (int w = 0; w < realImages[0].uImage().width(); w++) {
-		// 		for (int h = 0; h < realImages[0].uImage().height(); h++) {
-		// 			newSubtractedImage.uImage().putPixel(w,h,abs(realImages[0].uImage().getPixel(w,h) - realImages[1].uImage().getPixel(w,h)));
-		// 		}
-		// 	}
-		// }
-		// if (realImages[0].vImage().width() == realImages[1].vImage().width() && realImages[0].vImage().height() == realImages[1].vImage().height()){
-		// 	for (int w = 0; w < realImages[0].vImage().width(); w++) {
-		// 		for (int h = 0; h < realImages[0].vImage().height(); h++) {
-		// 			newSubtractedImage.vImage().putPixel(w,h,abs(realImages[0].vImage().getPixel(w,h) - realImages[1].vImage().getPixel(w,h)));
-		// 		}
-		// 	}
-		// }
-	} 
+	// // Do subtraction part now
+	// int width = realImages[0].width();
+	// int height = realImages[0].height();
+	// if(logs.size() > 1) {
+	// 	if (realImages[0].yImage().width() == realImages[1].yImage().width() && realImages[0].yImage().height() == realImages[1].yImage().height()){
+	// 		for (int w = 0; w < realImages[0].yImage().width(); w++) {
+	// 			for (int h = 0; h < realImages[0].yImage().height(); h++) {
+	// 				newSubtractedImage.yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
+	// 			}
+	// 		}
+	// 	}
+	// } 
 
 
     std::vector<Block> retVec;
