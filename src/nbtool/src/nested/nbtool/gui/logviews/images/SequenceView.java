@@ -18,7 +18,7 @@ import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.misc.VisionView;
 import nbtool.gui.utilitypanes.UtilityManager;
-import nbtool.images.YUYV8888Image;
+import nbtool.images.Y16Image;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.nio.CrossServer;
@@ -117,17 +117,17 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 					
 				assert(out != null);
 				assert(out.length > 0);
-				//Debug.warn("GOT IO RECEIVED");
+				Debug.warn("GOT IO RECEIVED");
 				//for (int i = 0; i < out.length; ++i) {
-				if(out.length > 0 && images.length > 2) {
+				if(out.length > 0) {//todo
 					//images[i] = out[i].blocks.get(0).parseAsYUVImage().toBufferedImage();
-					images[2] = new YUYV8888Image(
+					Debug.warn("GOT IO RECEIVED ABOUT TO PARSE");
+					//new YImage //todo
+					images[2] = new Y16Image(
 							outerThis.yuvImages[0].width,
 							outerThis.yuvImages[0].height,
 							out[0].blocks.get(0).data).toBufferedImage(); 
 					//out[i].blocks.get(0).toBufferedImage();
-
-					
 				}
 				repaint();
 				
@@ -147,7 +147,7 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 				
 			}
 
-		}, "CppSequenceViewFunction", logs.toArray(new Log[0])));
+		}, "Vision", logs.toArray(new Log[0])));
 	}
 
 

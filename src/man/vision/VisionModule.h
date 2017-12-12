@@ -40,6 +40,7 @@ public:
     portals::OutPortal<messages::Vision> visionOut;
     portals::OutPortal<messages::RobotObstacle> robotObstacleOut;
 
+    ImageFrontEnd* getFrontEndSubtract(bool topCamera = true) const { return frontEndSubtract[!topCamera]; }
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
@@ -57,7 +58,7 @@ public:
 #ifdef OFFLINE
 	void setDebugDrawingParameters(nbl::SExpr* debugParams);
 #endif
-    
+    void setSecondImage(messages::YUVImage& newImage);
     // For use by vision_defs
     void setColorParams(Colors* colors, bool topCamera);
     void setCalibrationParams(CalibrationParams* params, bool topCamera);
@@ -68,6 +69,9 @@ public:
     json::Object latestUsedColorParams[2];
     Colors* colorParams[2];
     CalibrationParams* calibrationParams[2];
+
+    messages::YUVImage* imageToSubtract;
+
 
 protected:
     virtual void run_();
@@ -99,7 +103,7 @@ private:
     CornerDetector* cornerDetector[2];
     CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
-    std::vector<messages::YUVImage> imageToSubtract;
+    ImageFrontEnd* frontEndSubtract[2];
 
     bool blackStar_;
 

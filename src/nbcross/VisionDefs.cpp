@@ -41,92 +41,92 @@ messages::YUVImage emptyBot(
 
 /* NBCROSS FUNCTIONS */
 
-NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_Tripoint())
-    (const std::vector<nbl::logptr> &logs)
-{
-	printf("I got %d logs\n", logs.size());
-	std::vector<messages::YUVImage> realImages;
-	std::vector<std::string> buffers;
-	messages::YUVImage newSubtractedImage;
-	std::string subtractedImageData;
+// NBCROSS_FUNCTION(CppSequenceViewFunction, true, nbl::SharedConstants::LogClass_Tripoint())
+//     (const std::vector<nbl::logptr> &logs)
+// {
+// 	printf("I got %d logs\n", logs.size());
+// 	std::vector<messages::YUVImage> realImages;
+// 	std::vector<std::string> buffers;
+// 	messages::YUVImage newSubtractedImage;
+// 	std::string subtractedImageData;
 
-	//got all of the images in a realImages vector
-	for (int i = 0; i < logs.size();i++){
- 		Block& imageBlock = logs[i]->blocks[0];
-    	bool topCamera;
-    	if (imageBlock.whereFrom == "camera_TOP") {
-        	topCamera = true;
-   		} else if (imageBlock.whereFrom == "camera_BOT") {
-        	topCamera = false;
-    	} else {
-        	throw std::runtime_error("unknown camera in Vision()");
-    	}
+// 	//got all of the images in a realImages vector
+// 	for (int i = 0; i < logs.size();i++){
+//  		Block& imageBlock = logs[i]->blocks[0];
+//     	bool topCamera;
+//     	if (imageBlock.whereFrom == "camera_TOP") {
+//         	topCamera = true;
+//    		} else if (imageBlock.whereFrom == "camera_BOT") {
+//         	topCamera = false;
+//     	} else {
+//         	throw std::runtime_error("unknown camera in Vision()");
+//     	}
 
-    	int width = 2 * imageBlock.dict.at(SharedConstants::LOG_BLOCK_IMAGE_WIDTH_PIXELS()).asConstNumber().asInt();
-    	int height = imageBlock.dict.at(SharedConstants::LOG_BLOCK_IMAGE_HEIGHT_PIXELS()).asConstNumber().asInt();
+//     	int width = 2 * imageBlock.dict.at(SharedConstants::LOG_BLOCK_IMAGE_WIDTH_PIXELS()).asConstNumber().asInt();
+//     	int height = imageBlock.dict.at(SharedConstants::LOG_BLOCK_IMAGE_HEIGHT_PIXELS()).asConstNumber().asInt();
 
-    	imageSizeCheck(topCamera, width, height);
+//     	imageSizeCheck(topCamera, width, height);
 
-    	printf("ARGUMENT WAS: camera:%d width:%d height:%d ",!topCamera, width, height);
+//     	printf("ARGUMENT WAS: camera:%d width:%d height:%d ",!topCamera, width, height);
 
-    	std::string lbuf= "";
-    	buffers.push_back(lbuf);
-    	realImages.push_back(imageBlock.copyAsYUVImage(buffers[i]));
-    	if(i == 0){
-    		newSubtractedImage = imageBlock.copyAsYUVImage(subtractedImageData);
-    	}
-    	//printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
-	}
+//     	std::string lbuf= "";
+//     	buffers.push_back(lbuf);
+//     	realImages.push_back(imageBlock.copyAsYUVImage(buffers[i]));
+//     	if(i == 0){
+//     		newSubtractedImage = imageBlock.copyAsYUVImage(subtractedImageData);
+//     	}
+//     	//printf("parsed image width=%d, height=%d\n", realImages[i].width(), realImages[i].height());
+// 	}
 
-	std::string rname = realImages[0]->topLevelDictionary.at(SharedConstants::LOG_TOPLEVEL_HOST_NAME()).asString();
+// 	std::string rname = realImages[0]->topLevelDictionary.at(SharedConstants::LOG_TOPLEVEL_HOST_NAME()).asString();
 
-    man::vision::VisionModule& module = getModuleRef(rname);
+//     man::vision::VisionModule& module = getModuleRef(rname);
 
-    if(realImages.size() > 1){
-    	module.
-    }
+//     if(realImages.size() > 1){
+//     	module.
+//     }
 
 
-    module.run();
+//     module.run();
 
    
-	//std::string subtractedImageData;
-	//messages::YUVImage newSubtractedImage = realImages[0].copyAsYUVImage(subtractedImageData);
+// 	//std::string subtractedImageData;
+// 	//messages::YUVImage newSubtractedImage = realImages[0].copyAsYUVImage(subtractedImageData);
 
-	// // Do subtraction part now
-	// int width = realImages[0].width();
-	// int height = realImages[0].height();
-	// if(logs.size() > 1) {
-	// 	if (realImages[0].yImage().width() == realImages[1].yImage().width() && realImages[0].yImage().height() == realImages[1].yImage().height()){
-	// 		for (int w = 0; w < realImages[0].yImage().width(); w++) {
-	// 			for (int h = 0; h < realImages[0].yImage().height(); h++) {
-	// 				newSubtractedImage.yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
-	// 			}
-	// 		}
-	// 	}
-	// } 
-
-
-    std::vector<Block> retVec;
-    //int yLength = (width / 4) * (height / 2) * 2;
-
-	uint8_t yBuf[buffers[0].size()];
-
-	//Im not sure if this is copying just one pixel or the whole thing.
-    memcpy(yBuf, newSubtractedImage.yImage().pixelAddress(0,0), buffers[0].size());
+// 	// // Do subtraction part now
+// 	// int width = realImages[0].width();
+// 	// int height = realImages[0].height();
+// 	// if(logs.size() > 1) {
+// 	// 	if (realImages[0].yImage().width() == realImages[1].yImage().width() && realImages[0].yImage().height() == realImages[1].yImage().height()){
+// 	// 		for (int w = 0; w < realImages[0].yImage().width(); w++) {
+// 	// 			for (int h = 0; h < realImages[0].yImage().height(); h++) {
+// 	// 				newSubtractedImage.yImage().putPixel(w,h,abs(realImages[0].yImage().getPixel(w,h) - realImages[1].yImage().getPixel(w,h)));
+// 	// 			}
+// 	// 		}
+// 	// 	}
+// 	// } 
 
 
-     // Convert to string and set log
-    std::string YUVImage422((const char*)yBuf, buffers[0].size());
-    retVec.push_back(Block{YUVImage422, json::Object{}, "YUVImage422", "nbcross", 0, 0});
-    RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));	
-}
+//     std::vector<Block> retVec;
+//     //int yLength = (width / 4) * (height / 2) * 2;
 
-NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
+// 	uint8_t yBuf[buffers[0].size()];
+
+// 	//Im not sure if this is copying just one pixel or the whole thing.
+//     memcpy(yBuf, newSubtractedImage.yImage().pixelAddress(0,0), buffers[0].size());
+
+
+//      // Convert to string and set log
+//     std::string YUVImage422((const char*)yBuf, buffers[0].size());
+//     retVec.push_back(Block{YUVImage422, json::Object{}, "YUVImage422", "nbcross", 0, 0});
+//     RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));	
+// }
+
+NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
     (const std::vector<nbl::logptr> &arguments)
 {
     printf("Vision()\n");
-    NBL_ASSERT(arguments.size() == 1);
+    //NBL_ASSERT(arguments.size() == 1);
     NBL_ASSERT(arguments[0]->blocks.size() > 2);
 
     logptr theLog = arguments[0];
@@ -149,7 +149,7 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
 
     imageSizeCheck(topCamera, width, height);
 
-    printf("ARGUMENT WAS: camera:%d width:%d height:%d",
+    printf("ARGUMENT WAS: camera:%d width:%d height:%d\n",
            !topCamera, width, height);
 
 //    messages::YUVImage realImage = imageBlock.copyAsYUVImage();
@@ -244,11 +244,37 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
         module.setDebugDrawingParameters(deser);
         delete deser;
     }
-
+    messages::YUVImage _temp;
+    std::string subtractedImageData;
+    if(arguments.size() > 1){//do subtracting stuff
+    	_temp= arguments[1]->blocks[0].copyAsYUVImage(subtractedImageData);
+    	module.setSecondImage(_temp);
+    } else {
+    	module.imageToSubtract = NULL;
+    }
     // Run it!
     module.run();
 
     std::vector<Block> retVec;
+
+ 	// -----------
+    //   Y IMAGE SUBTRACT
+    // -----------
+    if(arguments.size() > 1){//do subtracting stuff
+	    man::vision::ImageFrontEnd* frontEndSubtract = module.getFrontEndSubtract(topCamera);
+	    // Create temp buffer and fill with yImage from FrontEnd
+	    int yLengthSubtract = (width / 4) * (height / 2) * 2;
+	    uint8_t yBufSubtract[yLengthSubtract];
+	    memcpy(yBufSubtract, frontEndSubtract->yImage().pixelAddr(), yLengthSubtract);
+	    // Convert to string and set log
+	    std::string yBufferSub((const char*)yBufSubtract, yLengthSubtract);
+	    retVec.push_back(Block{yBufferSub, json::Object{}, "yBufferSub", "nbcross", 0, 0});
+	} 
+
+
+
+
+
     // -----------
     //   Y IMAGE
     // -----------

@@ -61,6 +61,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 //        getColorsFromLisp(colors, i);
 
         frontEnd[i] = new ImageFrontEnd();
+        frontEndSubtract[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
         rejectedEdges[i] = new EdgeList(32000);
@@ -127,6 +128,7 @@ VisionModule::~VisionModule()
     for (int i = 0; i < 2; i++) {
         delete colorParams[i];
         delete frontEnd[i];
+        delete frontEndSubtract[i];
         delete edgeDetector[i];
         delete edges[i];
         delete rejectedEdges[i];
@@ -282,6 +284,54 @@ void VisionModule::run_()
 
         // Run edge detection
         PROF_ENTER2(P_EDGE_TOP, P_EDGE_BOT, i==0)
+
+
+        //subtraction stuff!!
+        std::cout<<imageToSubtract<<" WOOF "<<std::endl;
+        if (imageToSubtract) {//Not sure how this is supposed to work so LOL
+            // Construct YuvLite object for use in vision system
+            messages::YUVImage& imageToSubtractRef = *imageToSubtract;
+            // printf("pixels = %p\n", imageToSubtractRef.pixelAddress(0, 0));
+            std::cout<<"woof woof woooooooooooooooooff"<<std::endl;
+            fflush(stdout);
+            // std::cout<<imageToSubtractRef.pixelAddress(0, 0)<<std::endl;
+            std::cout<<"1.5"<<std::endl;
+            fflush(stdout);
+
+            YuvLite yuvLiteSubtract(imageToSubtractRef.width() / 4,
+                        imageToSubtractRef.height() / 2,
+                        imageToSubtractRef.rowPitch(),
+                        imageToSubtractRef.pixelAddress(0, 0));
+            std::cout<<"2"<<std::endl;
+            fflush(stdout);
+#ifdef OFFLINE
+            // std::cout<< yuvLiteSubtract.pixelAddr(0, 0)<<std::endl;
+            frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i], fakeColorTableBytes);
+            std::cout<<"offline finished "<<std::endl;
+
+#else
+            std::cout<<"online"<<std::endl;
+            frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i]);
+#endif
+            std::cout<<"3"<<std::endl;
+            fflush(stdout);
+            PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
+            std::cout<<"4"<<std::endl;
+            fflush(stdout);
+            ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
+            if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
+                for (int w = 0; w < yImage.width(); w++) {
+                    for (int h = 0; h < yImage.height(); h++) {
+                        *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h)) - *(YSubtraction.pixelAddr(w,h)));
+                    }
+                }
+            }
+            std::cout<<"5"<<std::endl;
+            fflush(stdout);
+        }
+
+
+   
 
 #ifdef OFFLINE
         if (blackStar_) {
@@ -573,6 +623,17 @@ void VisionModule::reloadColorParams() {
     for (int i = 0; i < 2; ++i) {
         setColorParams(calibration::getSavedColors(i==0, serializedColors, &latestUsedColorParams[i]), i==0);
     }
+}
+
+void VisionModule::setSecondImage(messages::YUVImage& newImage) {
+    printf("Set the new image\n");
+    imageToSubtract = &newImage;
+    // &(imageToSubtract) = new messages::YUVImage(newImage.width(),newImage.height());
+    // for(int w = 0; w < newImage.width(); w++) {
+    //     for(int h = 0; h < newImage.height();h++) {
+    //         imageToSubtract.putPixel(w,h,newImage.getPixel(w,h));
+    //     }
+    // }
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
