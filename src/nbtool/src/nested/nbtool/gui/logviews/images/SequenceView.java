@@ -19,6 +19,8 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.misc.VisionView;
 import nbtool.gui.utilitypanes.UtilityManager;
 import nbtool.images.Y16Image;
+import nbtool.images.YUYV8888Image;
+
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.nio.CrossServer;
@@ -122,10 +124,26 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
 				if(out.length > 0) {//todo
 					//images[i] = out[i].blocks.get(0).parseAsYUVImage().toBufferedImage();
 					Debug.warn("GOT IO RECEIVED ABOUT TO PARSE");
+
+					int ywidth, yheight;
+
+					System.out.println("Height: "+outerThis.yuvImages[0].height+" width: "+outerThis.yuvImages[0].width);
+					//System.out.println(outerThis.yuvImages[0].size());
+
+					if (outerThis.yuvImages[0].height == 480) {
+						ywidth=640; yheight = 480;
+					} else {
+						ywidth=320; yheight = 240;
+
+					}
+
+					ywidth = 320;
+					yheight = 240;
+
 					//new YImage //todo
 					images[2] = new Y16Image(
-							outerThis.yuvImages[0].width,
-							outerThis.yuvImages[0].height,
+							ywidth,
+							yheight,
 							out[0].blocks.get(0).data).toBufferedImage(); 
 					//out[i].blocks.get(0).toBufferedImage();
 				}
