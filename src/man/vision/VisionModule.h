@@ -87,6 +87,7 @@ private:
     nbl::io::FileMonitor camOffsetsMonitor;
     void reloadColorParams();
     void reloadCameraOffsets();
+    float sdev(ImageLiteU16* image);
 
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];

@@ -286,38 +286,21 @@ void VisionModule::run_()
         PROF_ENTER2(P_EDGE_TOP, P_EDGE_BOT, i==0)
 
 
-        //subtraction stuff!!
-        std::cout<<imageToSubtract<<" WOOF "<<std::endl;
+        //****SUBTRACTION STUFF****
         if (imageToSubtract) {//Not sure how this is supposed to work so LOL
             // Construct YuvLite object for use in vision system
             messages::YUVImage& imageToSubtractRef = *imageToSubtract;
-            // printf("pixels = %p\n", imageToSubtractRef.pixelAddress(0, 0));
-            std::cout<<"woof woof woooooooooooooooooff"<<std::endl;
-            fflush(stdout);
-            // std::cout<<imageToSubtractRef.pixelAddress(0, 0)<<std::endl;
-            std::cout<<"1.5"<<std::endl;
-            fflush(stdout);
-
             YuvLite yuvLiteSubtract(imageToSubtractRef.width() / 4,
                         imageToSubtractRef.height() / 2,
                         imageToSubtractRef.rowPitch(),
                         imageToSubtractRef.pixelAddress(0, 0));
-            std::cout<<"2"<<std::endl;
-            fflush(stdout);
 #ifdef OFFLINE
-            // std::cout<< yuvLiteSubtract.pixelAddr(0, 0)<<std::endl;
             frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i], fakeColorTableBytes);
-            std::cout<<"offline finished "<<std::endl;
-
 #else
-            std::cout<<"online"<<std::endl;
             frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i]);
 #endif
-            std::cout<<"3"<<std::endl;
-            fflush(stdout);
+            //do the subtraction to get the differential image
             PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
-            std::cout<<"4"<<std::endl;
-            fflush(stdout);
             ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
             if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
                 for (int w = 0; w < yImage.width(); w++) {
@@ -326,12 +309,14 @@ void VisionModule::run_()
                     }
                 }
             }
-            std::cout<<"5"<<std::endl;
-            fflush(stdout);
+            //find the sd
+            float sd = sdev(&YSubtraction);
+
+            std::cout<<"Sd: "<< sd<<std::endl;
+
+
+
         }
-
-
-   
 
 #ifdef OFFLINE
         if (blackStar_) {
@@ -626,14 +611,7 @@ void VisionModule::reloadColorParams() {
 }
 
 void VisionModule::setSecondImage(messages::YUVImage& newImage) {
-    printf("Set the new image\n");
     imageToSubtract = &newImage;
-    // &(imageToSubtract) = new messages::YUVImage(newImage.width(),newImage.height());
-    // for(int w = 0; w < newImage.width(); w++) {
-    //     for(int h = 0; h < newImage.height();h++) {
-    //         imageToSubtract.putPixel(w,h,newImage.getPixel(w,h));
-    //     }
-    // }
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
@@ -651,6 +629,27 @@ void VisionModule::reloadCameraOffsets() {
     for (int i = 0; i < 2; ++i) {
         setCalibrationParams(calibration::getSavedOffsets( name, i==0, serializedOffsets) , i==0);
     }
+}
+float VisionModule::sdev(ImageLiteU16* image) {
+        // assert(image.length>0 && image[0].length>0);
+        float mean = 0;
+
+        for (int w = 0; w < image->width(); w++) {
+            for (int h = 0; h < image->height(); h++) {
+                mean += *(image->pixelAddr(w,h));
+            }
+        }
+
+        mean /= (image->width() * image->height());
+        float dev = 0;
+
+        for (int w = 0; w < image->width(); w++) {
+            for (int h = 0; h < image->height(); h++) {
+                dev += (*(image->pixelAddr(w,h)) - mean) * (*(image->pixelAddr(w,h)) - mean);
+            }
+        }
+
+        return (float) sqrt(dev / (image->width() * image->height()));
 }
 
 void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
