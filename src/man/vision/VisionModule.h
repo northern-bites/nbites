@@ -58,7 +58,7 @@ public:
 #ifdef OFFLINE
 	void setDebugDrawingParameters(nbl::SExpr* debugParams);
 #endif
-    void setSecondImage(messages::YUVImage& newImage);
+    void setSecondImage(messages::YUVImage& newImage,bool newTopCamera);
     // For use by vision_defs
     void setColorParams(Colors* colors, bool topCamera);
     void setCalibrationParams(CalibrationParams* params, bool topCamera);
@@ -71,7 +71,7 @@ public:
     CalibrationParams* calibrationParams[2];
 
     messages::YUVImage* imageToSubtract;
-
+    bool topCamera;
 
 protected:
     virtual void run_();
@@ -88,6 +88,7 @@ private:
     void reloadColorParams();
     void reloadCameraOffsets();
     float sdev(ImageLiteU16* image);
+    void testNoise(ImageLiteU16* image);
 
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];

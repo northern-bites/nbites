@@ -15,7 +15,7 @@
 #include "Profiler.h"
 #include "DebugConfig.h"
 //#include "PostDetector.h"
-
+#include <random>
 #include "VisionCalibration.hpp"
 
 namespace man {
@@ -288,34 +288,35 @@ void VisionModule::run_()
 
         //****SUBTRACTION STUFF****
         if (imageToSubtract) {//Not sure how this is supposed to work so LOL
-            // Construct YuvLite object for use in vision system
-            messages::YUVImage& imageToSubtractRef = *imageToSubtract;
-            YuvLite yuvLiteSubtract(imageToSubtractRef.width() / 4,
-                        imageToSubtractRef.height() / 2,
-                        imageToSubtractRef.rowPitch(),
-                        imageToSubtractRef.pixelAddress(0, 0));
-#ifdef OFFLINE
-            frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i], fakeColorTableBytes);
-#else
-            frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i]);
-#endif
-            //do the subtraction to get the differential image
-            PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
-            ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
-            if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
-                for (int w = 0; w < yImage.width(); w++) {
-                    for (int h = 0; h < yImage.height(); h++) {
-                        *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h)) - *(YSubtraction.pixelAddr(w,h)));
+            if(topCamera) { //this is a hack to have the code only run on the top camera images as that is what i am testing with
+
+                // Construct YuvLite object for use in vision system
+                messages::YUVImage& imageToSubtractRef = *imageToSubtract;
+                YuvLite yuvLiteSubtract(imageToSubtractRef.width() / 4,
+                            imageToSubtractRef.height() / 2,
+                            imageToSubtractRef.rowPitch(),
+                            imageToSubtractRef.pixelAddress(0, 0));
+    #ifdef OFFLINE
+                frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i], fakeColorTableBytes);
+    #else
+                frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i]);
+    #endif
+                //do the subtraction to get the differential image
+                PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
+                ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
+                if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
+                    for (int w = 0; w < yImage.width(); w++) {
+                        for (int h = 0; h < yImage.height(); h++) {
+                            *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h)) - *(YSubtraction.pixelAddr(w,h)));
+                        }
                     }
                 }
+                //find the sd
+                
+                testNoise(&YSubtraction);
+                float sd = sdev(&YSubtraction);
+                std::cout<<"Sd: "<< sd<<std::endl;
             }
-            //find the sd
-            float sd = sdev(&YSubtraction);
-
-            std::cout<<"Sd: "<< sd<<std::endl;
-
-
-
         }
 
 #ifdef OFFLINE
@@ -610,8 +611,10 @@ void VisionModule::reloadColorParams() {
     }
 }
 
-void VisionModule::setSecondImage(messages::YUVImage& newImage) {
+void VisionModule::setSecondImage(messages::YUVImage& newImage, bool newTopCamera) {
+
     imageToSubtract = &newImage;
+    topCamera = newTopCamera;
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
@@ -633,23 +636,72 @@ void VisionModule::reloadCameraOffsets() {
 float VisionModule::sdev(ImageLiteU16* image) {
         // assert(image.length>0 && image[0].length>0);
         float mean = 0;
-
+        std::cout<<"Width: "<<image->width()<<" Height: "<<image->height()<<std::endl;
         for (int w = 0; w < image->width(); w++) {
             for (int h = 0; h < image->height(); h++) {
-                mean += *(image->pixelAddr(w,h));
+                //use with no abs image
+                int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
+
+                mean += actual;
             }
         }
-
+        std::cout<<"Sum of all pixelAddr "<< mean<<std::endl;
         mean /= (image->width() * image->height());
+        std::cout<<"mean "<< mean<<std::endl;
+
         float dev = 0;
 
         for (int w = 0; w < image->width(); w++) {
             for (int h = 0; h < image->height(); h++) {
-                dev += (*(image->pixelAddr(w,h)) - mean) * (*(image->pixelAddr(w,h)) - mean);
+                 //use with no abs image
+                int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
+                dev += (actual - mean) * (actual - mean);
             }
         }
 
         return (float) sqrt(dev / (image->width() * image->height()));
+}
+
+
+void VisionModule::testNoise(ImageLiteU16* image) {
+    int totalSize = image->width() * image->height();
+    int vec[totalSize];
+    bzero(vec, totalSize * sizeof(int));
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(0,255);
+    //create random differential image
+    int same = 0;
+    for (int w = 0; w < image->width(); w++) {
+        for (int h = 0; h < image->height(); h++) {
+            int _n1 = distribution(generator);
+            int _n2 = distribution(generator);
+            if(_n1 == _n2) { //for testing this code
+                same++;
+            }
+            int subtractionNum = _n1-_n2;
+            *(image->pixelAddr(w,h)) = subtractionNum;
+            int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
+
+            vec[w*image->height()+h] = (int)actual;
+        }
+    }
+    std::cout<<"Number of the same "<< same<<std::endl;
+    //put numbers into a histogram & print it
+    int arraysize = 512;
+    int array[512] = {0};
+    //int * array = (int*) malloc(256);
+    int sumcheck = 0;
+
+    for (int i = 0; i < totalSize; i++) {
+        sumcheck +=vec[i];
+        int val = vec[i]+arraysize/2;
+        array[val]++;
+    }
+    std::cout<< "sumcheck "<<sumcheck<< std::endl;
+    for (int range = 0; range < arraysize; range++) {
+        std::cout<< range-256<<": "<<array[range]<< std::endl;  
+    }  
 }
 
 void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
