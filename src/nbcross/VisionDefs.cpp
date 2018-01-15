@@ -246,7 +246,7 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
     }
     messages::YUVImage _temp;
     std::string subtractedImageData;
-    if(arguments.size() > 1){//do subtracting stuff
+    if(arguments.size() > 1 && topCamera){//do subtracting stuff
     	_temp= arguments[1]->blocks[0].copyAsYUVImage(subtractedImageData);
     	module.setSecondImage(_temp,topCamera);
     } else {

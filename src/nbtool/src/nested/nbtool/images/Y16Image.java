@@ -22,6 +22,11 @@ public final class Y16Image extends ImageParent {
 			
 			y = y >> 2;
 			// y must but in the range 0-255
+
+			if (y < 0 || y > 255) {
+				System.out.printf("oh noes! about to use y=%d\n", y);
+			}
+
 			Color color = new Color(y, y, y);
 			ret.setRGB(c, r, color.getRGB());
 		    }

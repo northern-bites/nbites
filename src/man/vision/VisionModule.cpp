@@ -183,7 +183,6 @@ void VisionModule::run_()
     double topTimes[12];
     double bottomTimes[12];
     double* times[2] = { topTimes, bottomTimes };
-
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
         PROF_ENTER2(P_VISION_TOP, P_VISION_BOT, i==0)
@@ -282,43 +281,10 @@ void VisionModule::run_()
 
         times[i][3] = timer.end();
 
-        // Run edge detection
+       
+
+// Run edge detection
         PROF_ENTER2(P_EDGE_TOP, P_EDGE_BOT, i==0)
-
-
-        //****SUBTRACTION STUFF****
-        if (imageToSubtract) {//Not sure how this is supposed to work so LOL
-            if(topCamera) { //this is a hack to have the code only run on the top camera images as that is what i am testing with
-
-                // Construct YuvLite object for use in vision system
-                messages::YUVImage& imageToSubtractRef = *imageToSubtract;
-                YuvLite yuvLiteSubtract(imageToSubtractRef.width() / 4,
-                            imageToSubtractRef.height() / 2,
-                            imageToSubtractRef.rowPitch(),
-                            imageToSubtractRef.pixelAddress(0, 0));
-    #ifdef OFFLINE
-                frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i], fakeColorTableBytes);
-    #else
-                frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i]);
-    #endif
-                //do the subtraction to get the differential image
-                PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
-                ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
-                if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
-                    for (int w = 0; w < yImage.width(); w++) {
-                        for (int h = 0; h < yImage.height(); h++) {
-                            *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h)) - *(YSubtraction.pixelAddr(w,h)));
-                        }
-                    }
-                }
-                //find the sd
-                
-                testNoise(&YSubtraction);
-                float sd = sdev(&YSubtraction);
-                std::cout<<"Sd: "<< sd<<std::endl;
-            }
-        }
-
 #ifdef OFFLINE
         if (blackStar_) {
 //            printf("\nUSING NULL IMAGE FOR EDGE DETECTION THROWOUTS\n\n");
@@ -367,6 +333,70 @@ void VisionModule::run_()
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
         PROF_EXIT2(P_LINECLASS_TOP, P_LINECLASS_BOT, i==0)
         times[i][10] = timer.end();
+
+        //****SUBTRACTION STUFF****
+        if (!i && imageToSubtract) {
+            // Construct YuvLite object for use in vision system
+            messages::YUVImage& imageToSubtractRef = *imageToSubtract;
+            YuvLite yuvLiteSubtract(imageToSubtractRef.width() / 4,
+                        imageToSubtractRef.height() / 2,
+                        imageToSubtractRef.rowPitch(),
+                        imageToSubtractRef.pixelAddress(0, 0));
+#ifdef OFFLINE
+            frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i], fakeColorTableBytes);
+#else
+            frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i]);
+#endif
+            //do the subtraction to get the differential image
+            ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
+            if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
+                for (int w = 0; w < yImage.width(); w++) {
+                    for (int h = 0; h < yImage.height(); h++) {
+                        *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h)) - *(YSubtraction.pixelAddr(w,h)));
+                        //const int THRESHOLD = 7;
+                        const int THRESHOLD = 50;
+
+                        if(*(YSubtraction.pixelAddr(w,h)) <= THRESHOLD) {
+                            *(YSubtraction.pixelAddr(w,h)) = 0;
+                        } else {// for testing
+                            //*(YSubtraction.pixelAddr(w,h)) = 255;
+                            *(YSubtraction.pixelAddr(w,h)) = 511;
+
+                        }
+                    }
+                }
+            }
+            //find the sd & get rid of noise
+                
+            // testNoise(&YSubtraction);
+            float sd = sdev(&YSubtraction);
+            std::cout<<"Sd: "<< sd<<std::endl;
+
+
+
+            // //run diff image through ball detection
+            // PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
+            // ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
+            //                        frontEnd[i]->orangeImage(), yImage, edgeDetector[i]);
+            // ballDetected |= ballDetector[i]->findBall(whiteImage,
+            //                                       kinematics[i]->wz0(), *(edges[i]));
+            // PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
 			//ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
@@ -676,9 +706,9 @@ void VisionModule::testNoise(ImageLiteU16* image) {
         for (int h = 0; h < image->height(); h++) {
             int _n1 = distribution(generator);
             int _n2 = distribution(generator);
-            if(_n1 == _n2) { //for testing this code
-                same++;
-            }
+            // if(_n1 == _n2) { //for testing this code
+            //     same++;
+            // }
             int subtractionNum = _n1-_n2;
             *(image->pixelAddr(w,h)) = subtractionNum;
             int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
@@ -686,7 +716,6 @@ void VisionModule::testNoise(ImageLiteU16* image) {
             vec[w*image->height()+h] = (int)actual;
         }
     }
-    std::cout<<"Number of the same "<< same<<std::endl;
     //put numbers into a histogram & print it
     int arraysize = 512;
     int array[512] = {0};
@@ -698,8 +727,10 @@ void VisionModule::testNoise(ImageLiteU16* image) {
         int val = vec[i]+arraysize/2;
         array[val]++;
     }
-    std::cout<< "sumcheck "<<sumcheck<< std::endl;
     for (int range = 0; range < arraysize; range++) {
+        // for(int i = 0; i < array[range];i++){
+        //     std::cout<<range-256<< ",";
+        // }
         std::cout<< range-256<<": "<<array[range]<< std::endl;  
     }  
 }
@@ -823,5 +854,162 @@ void VisionModule::logImage(int i)
 }
 #endif
 
+}
+bool VisionModule::findBallYImage(ImageLiteU8 white, double cameraHeight,
+                            EdgeList& edges)
+{
+    Ball reset;
+    _best = reset;
+    width = white.width();
+    height = white.height();
+#ifdef OFFLINE
+    candidates.clear();
+#endif
+    bool foundBall = false;
+    int BOTTOMEDGEWHITEMAX = 25;
+    int BUFFER = 10;
+    edgeList = &edges;
+
+    int startCol = 0;
+    int endCol = width;
+    int endRow = width;
+    if(!topCamera) {
+        adjustWindow(startCol, endCol, endRow);
+    }
+
+    // Then we are going to filter out all of the blobs that obviously
+    // aren't part of the ball
+    intPairVector blackSpots;
+    intPairVector badBlackSpots;
+    spotVector actualBlackSpots;
+    spotVector actualWhiteSpots;
+
+    debugBlackSpots.clear();
+    debugWhiteSpots.clear();
+
+    ImageLiteU16 smallerY;
+    ImageLiteU8 smallerGreen;
+
+    //int horiz = 0;
+    if (topCamera) {
+        //horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
+        smallerY = ImageLiteU16(yImage, 0, 0, yImage.width(), yImage.height());
+        //smallerGreen = ImageLiteU8(greenImage, 0, 0, greenImage.width(),greenImage.height());
+    } else {
+        std::cout<<"YO! YOU ARE PASSING IN A NON TOP CAMERA IMAGE! WTF U DOING!"<< std::endl;
+        ((startCol - 3 > 0) ? startCol = startCol-3 : startCol = 0);
+        ((endCol + 3 < width) ? endCol = endCol+3 : endCol = width);
+        ((endRow + 3 < height) ? endRow = endRow+3 : endRow = height);
+        smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
+        smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
+    }
+
+    if(debugBall) {
+        std::cout<<"Top Camera: "<<topCamera<<std::endl;
+        if(!topCamera) { debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW); }
+    }
+
+    if(!topCamera && (!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions())) {
+        std::cout<< "I should not be hit! what is happening!"<<std::endl;
+        return false;
+    }
+    SpotDetector darkSpotDetector;
+    //initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
+                             // filterThresholdDark, greenThresholdDark, 0.5);
+
+    if(darkSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
+        SpotList darkSpots = darkSpotDetector.spots();
+        processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
+        if (debugSpots) {
+            ImageLiteU8 filteredImage = darkSpotDetector.filteredImage();
+            int max = field->horizonAt(0);
+            if (!topCamera) {
+                max = 0;
+            }
+            int box = 1;
+            for (int i = max; i < height && box != 0; i+= box) {
+                uint8_t* row = filteredImage.pixelAddr(0, i);
+                box = row[1];
+                debugDraw.drawBox(1, box + 1, i+box, i, BLUE);
+            }
+        }
+    }
+
+    if(debugBall) {
+        for(int z = 0; z < blackSpots.size(); z++) {
+            std::pair<int, int> spot = blackSpots[z];
+            std::cout<<"Dark Spot "<<z<<", X: "<<spot.first<<", Y: "
+                     <<spot.second<<std::endl;
+        }
+    }
+
+    SpotDetector whiteSpotDetector;
+    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
+                              topCamera, filterThresholdBrite, greenThresholdBrite,
+                              0.5);
+    if(whiteSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
+        if (debugSpots) {
+            int max = field->horizonAt(0);
+            if (!topCamera) {
+                max = 0;
+            }
+            ImageLiteU8 filteredImage = whiteSpotDetector.filteredImage();
+            int box = 1;
+            for (int i = max; i < height && box > 0; i+= box) {
+                uint8_t* row = filteredImage.pixelAddr(0, i);
+                box = row[1];
+                int bx = 10 - width / 2;
+                int by = -i + height / 2;
+                imagePoint p = imagePoint(bx, by);
+                int radius = projectedBallRadius(p);
+                debugDraw.drawBox(10, box + 11, i+box, i, RED);
+                debugDraw.drawBox(width - 2* radius - 1, width - 1, i + 2*radius, i, BLUE);
+            }
+        }
+        SpotList whiteSpots = whiteSpotDetector.spots();
+        if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
+                             cameraHeight,foundBall)) {
+#ifdef OFFLINE
+            foundBall = true;
+#else
+            return true;
+#endif
+        }
+    }
+
+    // run blobber on parts of the image where spot detector won't work
+    int bottomThird = max(field->horizonAt(width / 2), height *3 / 10);
+    //debugDraw.drawLine(0, bottomThird, width - 1, bottomThird, BLUE);
+    if (topCamera) {
+        ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
+                                height - bottomThird);
+        blobber.run(bottomWhite.pixelAddr(), bottomWhite.width(),
+                    bottomWhite.height(), bottomWhite.pitch());
+    } else {
+        bottomThird = 0;
+        blobber.run(white.pixelAddr(), white.width(), endRow, white.pitch());
+    }
+
+    if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots,
+                    actualWhiteSpots,
+                 cameraHeight, bottomThird)) {
+#ifdef OFFLINE
+        foundBall = true;
+#else
+        return true;
+#endif
+    }
+
+    if(blackSpots.size() != 0) {
+        if (findCorrelatedBlackSpots(blackSpots, actualBlackSpots, cameraHeight, foundBall)) {
+#ifdef OFFLINE
+            foundBall = true;
+#else
+        return true;
+#endif
+       }
+    }
+
+    return foundBall;
 }
 }
