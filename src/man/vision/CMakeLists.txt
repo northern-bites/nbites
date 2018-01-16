@@ -17,6 +17,7 @@ SET( VISION_SRCS
   Vision.cpp
   Spots.cpp
   BallDetector.cpp
+  DiffBallDetector.cpp
   RobotObstacle.cpp
   Ransac.cpp
   VisionCalibration.cpp

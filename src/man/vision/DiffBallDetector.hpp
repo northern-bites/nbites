@@ -5,12 +5,14 @@
 //  Created by Cory Alini on 1/15/18.
 //  Copyright © 2018 nbites.coryalini. All rights reserved.
 //
+//
 
 #ifndef DiffBallDetector_hpp
 #define DiffBallDetector_hpp
 
 #include "BallDetector.h"
-
+namespace man {
+namespace vision {
 class DiffBallDetector  {
 public:
     DiffBallDetector(FieldHomography* homography_, Field* field_, bool topCamera);
@@ -47,8 +49,9 @@ private:
     
     
     
+}; 
+
 }
-
-
+}
 #endif /* DiffBallDetector_hpp */
 
