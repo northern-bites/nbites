@@ -14,6 +14,7 @@
 #include "Field.h"
 
 #include "BallDetector.h"
+#include "DiffBallDetector.hpp"
 #include "RobotObstacle.h"
 #include "InertialState.pb.h"
 #include "VisionRobot.pb.h"
@@ -46,6 +47,7 @@ public:
     HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
 	DebugImage* getDebugImage(bool topCamera = true) const { return debugImage[!topCamera]; }
     BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
+    DiffBallDetector* getDiffBallDetector(bool topCamera = true) const { return diffBallDetector[!topCamera]; }
     EdgeList* getRejectedEdges(bool topCamera = true) const {return rejectedEdges[!topCamera]; }
     HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
     Kinematics* getKinematics(bool topCamera = true) const {return kinematics[!topCamera]; }
@@ -105,6 +107,7 @@ private:
     CornerDetector* cornerDetector[2];
     CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
+    DiffBallDetector* diffBallDetector[2];
     ImageFrontEnd* frontEndSubtract[2];
 
     bool blackStar_;

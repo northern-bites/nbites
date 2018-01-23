@@ -431,8 +431,10 @@ bool SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h,
       return false;
     }
   }
-
+std::cout<<"will it hit?"<<std::endl;
+// Cory commented this out as it was causing the spot detector to spit out false
   if(!spotDetect(green)) {
+      std::cout<<"Yup! Hit the spot I thought!"<<std::endl;
     return false;
   }
 

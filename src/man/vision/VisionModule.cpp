@@ -94,6 +94,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 		}
 
         ballDetector[i] = new BallDetector(homography[i], field, i == 0);
+        diffBallDetector[i] = new DiffBallDetector(homography[i], field, i == 0);
         boxDetector[i] = new GoalboxDetector();
         centerCircleDetector[i] = new CenterCircleDetector();
 
@@ -144,6 +145,7 @@ VisionModule::~VisionModule()
         delete cornerDetector[i];
         delete centerCircleDetector[i];
         delete ballDetector[i];
+        delete diffBallDetector[i];
     }
 	delete field;
 }
@@ -373,27 +375,16 @@ void VisionModule::run_()
             std::cout<<"Sd: "<< sd<<std::endl;
 
 
-
-            // //run diff image through ball detection
-            // PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
-            // ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
-            //                        frontEnd[i]->orangeImage(), yImage, edgeDetector[i]);
-            // ballDetected |= ballDetector[i]->findBall(whiteImage,
-            //                                       kinematics[i]->wz0(), *(edges[i]));
-            // PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
+            bool diffBallDetected = false;
+             //run diff image through ball detection
+             PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
+             diffBallDetector[i]->setImages(YSubtraction, edgeDetector[i]);
+             diffBallDetected |= diffBallDetector[i]->findBallYImage(YSubtraction,kinematics[i]->wz0(), *(edges[i]));
+             PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
+            
+            std::cout<<"Did I detect a ball? "<<diffBallDetected<<std::endl;
 
         }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

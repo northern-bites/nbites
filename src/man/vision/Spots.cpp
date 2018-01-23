@@ -90,6 +90,7 @@ bool SpotDetector::alloc(const ImageLiteBase& src)
 
 bool SpotDetector::spotDetect(const ImageLiteU8* green)
 {
+    std::cout<<"Got to the other spot detect function"<<std::endl;
   if(!green->hasProperDimensions()) {
     _spots.clear();
     return false;
