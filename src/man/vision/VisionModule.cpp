@@ -147,6 +147,7 @@ VisionModule::~VisionModule()
         delete ballDetector[i];
         delete diffBallDetector[i];
     }
+
 	delete field;
 }
 
@@ -154,6 +155,7 @@ VisionModule::~VisionModule()
 // TODO use horizon on top image
 void VisionModule::run_()
 {
+    subtractedSpots.clear();
     PROF_ENTER(P_VISION)
     // Get messages from inPortals
     topIn.latch();
@@ -380,6 +382,8 @@ void VisionModule::run_()
              PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
              diffBallDetector[i]->setImages(YSubtraction, edgeDetector[i]);
              diffBallDetected |= diffBallDetector[i]->findBallYImage(YSubtraction,kinematics[i]->wz0(), *(edges[i]));
+            
+             diffBallDetector[i]->getSpotXY(subtractedSpots);
              PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
             
             std::cout<<"Did I detect a ball? "<<diffBallDetected<<std::endl;
@@ -768,6 +772,9 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		ballDetector[1]->setDebugFilterBrite(filterBrite);
 		ballDetector[0]->setDebugGreenBrite(greenBrite);
 		ballDetector[1]->setDebugGreenBrite(greenBrite);
+        
+        
+        
 		debugImage[0]->reset();
 		debugImage[1]->reset();
 		//std::cout << "out" << std::endl;

@@ -31,6 +31,8 @@ public:
     bool processWhiteSpots(SpotList & whiteSpots, intPairVector & blackSpots,
                            intPairVector & badBlackSpots, spotVector & actualWhiteSpots,
                            double cameraHeight, bool & foundBall);
+    void getSpotXY(std::vector<std::pair<int,int>>&spots);
+
 private:
     
     FieldHomography* homography;
@@ -49,21 +51,21 @@ private:
     EdgeDetector * edgeDetector;
     EdgeList * edgeList;
 
-#ifdef OFFLINE
-    bool debugBall;
-    bool debugSpots;
-    int filterThresholdDark;
-    int greenThresholdDark;
-    int filterThresholdBrite;
-    int greenThresholdBrite;
-#else
+//#ifdef OFFLINE
+//    bool debugBall;
+//    bool debugSpots;
+//    int filterThresholdDark;
+//    int greenThresholdDark;
+//    int filterThresholdBrite;
+//    int greenThresholdBrite;
+//#else
     static const bool debugBall = false;
     static const bool debugSpots = false;
     static const int filterThresholdDark = 104;
     static const int greenThresholdDark = 12;
     static const int filterThresholdBrite = 130;
     static const int greenThresholdBrite = 80;
-#endif
+//#endif
     
     
     

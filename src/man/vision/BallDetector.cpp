@@ -1389,6 +1389,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 
     if(darkSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
         SpotList darkSpots = darkSpotDetector.spots();
+        std::cout<<"Real ball: "<<darkSpots.size()<<std::endl;
         processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
 		if (debugSpots) {
 			ImageLiteU8 filteredImage = darkSpotDetector.filteredImage();
