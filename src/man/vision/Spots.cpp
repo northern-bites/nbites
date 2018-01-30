@@ -90,7 +90,7 @@ bool SpotDetector::alloc(const ImageLiteBase& src)
 
 bool SpotDetector::spotDetect(const ImageLiteU8* green)
 {
-  if(!green->hasProperDimensions()) {
+  if(green && !green->hasProperDimensions()) {
     _spots.clear();
     return false;
   }
@@ -104,7 +104,6 @@ bool SpotDetector::spotDetect(const ImageLiteU8* green)
     uint8_t* row = filteredImage().pixelAddr(0, y);
     int x0 = (row[0] >> 1);
     _runLengthU8(row + x0, filteredImage().width() - row[0] + 1, spotThreshold, outerColumns);
-
     for (int i = 0; outerColumns[i] >= 0; ++i)
     {
       int x = outerColumns[i] + x0;
@@ -176,6 +175,7 @@ bool SpotDetector::spotDetect(const ImageLiteU8* green)
       else
         ++i;
   }
+    
   return true;
 }
 

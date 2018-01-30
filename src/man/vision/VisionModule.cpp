@@ -94,6 +94,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 		}
 
         ballDetector[i] = new BallDetector(homography[i], field, i == 0);
+        diffBallDetector[i] = new DiffBallDetector(homography[i], field, i == 0);
         boxDetector[i] = new GoalboxDetector();
         centerCircleDetector[i] = new CenterCircleDetector();
 
@@ -144,7 +145,9 @@ VisionModule::~VisionModule()
         delete cornerDetector[i];
         delete centerCircleDetector[i];
         delete ballDetector[i];
+        delete diffBallDetector[i];
     }
+
 	delete field;
 }
 
@@ -152,6 +155,7 @@ VisionModule::~VisionModule()
 // TODO use horizon on top image
 void VisionModule::run_()
 {
+    subtractedSpots.clear();
     PROF_ENTER(P_VISION)
     // Get messages from inPortals
     topIn.latch();
@@ -373,27 +377,18 @@ void VisionModule::run_()
             std::cout<<"Sd: "<< sd<<std::endl;
 
 
-
-            // //run diff image through ball detection
-            // PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
-            // ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
-            //                        frontEnd[i]->orangeImage(), yImage, edgeDetector[i]);
-            // ballDetected |= ballDetector[i]->findBall(whiteImage,
-            //                                       kinematics[i]->wz0(), *(edges[i]));
-            // PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
+            bool diffBallDetected = false;
+             //run diff image through ball detection
+             PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
+             diffBallDetector[i]->setImages(YSubtraction, edgeDetector[i]);
+             diffBallDetected |= diffBallDetector[i]->findBallYImage(YSubtraction,kinematics[i]->wz0(), *(edges[i]));
+            
+             diffBallDetector[i]->getSpotXY(subtractedSpots);
+             PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
+            
+            std::cout<<"Did I detect a ball? "<<diffBallDetected<<std::endl;
 
         }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -777,6 +772,9 @@ void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamer
 		ballDetector[1]->setDebugFilterBrite(filterBrite);
 		ballDetector[0]->setDebugGreenBrite(greenBrite);
 		ballDetector[1]->setDebugGreenBrite(greenBrite);
+        
+        
+        
 		debugImage[0]->reset();
 		debugImage[1]->reset();
 		//std::cout << "out" << std::endl;
@@ -855,161 +853,5 @@ void VisionModule::logImage(int i)
 #endif
 
 }
-bool VisionModule::findBallYImage(ImageLiteU8 white, double cameraHeight,
-                            EdgeList& edges)
-{
-    Ball reset;
-    _best = reset;
-    width = white.width();
-    height = white.height();
-#ifdef OFFLINE
-    candidates.clear();
-#endif
-    bool foundBall = false;
-    int BOTTOMEDGEWHITEMAX = 25;
-    int BUFFER = 10;
-    edgeList = &edges;
 
-    int startCol = 0;
-    int endCol = width;
-    int endRow = width;
-    if(!topCamera) {
-        adjustWindow(startCol, endCol, endRow);
-    }
-
-    // Then we are going to filter out all of the blobs that obviously
-    // aren't part of the ball
-    intPairVector blackSpots;
-    intPairVector badBlackSpots;
-    spotVector actualBlackSpots;
-    spotVector actualWhiteSpots;
-
-    debugBlackSpots.clear();
-    debugWhiteSpots.clear();
-
-    ImageLiteU16 smallerY;
-    ImageLiteU8 smallerGreen;
-
-    //int horiz = 0;
-    if (topCamera) {
-        //horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
-        smallerY = ImageLiteU16(yImage, 0, 0, yImage.width(), yImage.height());
-        //smallerGreen = ImageLiteU8(greenImage, 0, 0, greenImage.width(),greenImage.height());
-    } else {
-        std::cout<<"YO! YOU ARE PASSING IN A NON TOP CAMERA IMAGE! WTF U DOING!"<< std::endl;
-        ((startCol - 3 > 0) ? startCol = startCol-3 : startCol = 0);
-        ((endCol + 3 < width) ? endCol = endCol+3 : endCol = width);
-        ((endRow + 3 < height) ? endRow = endRow+3 : endRow = height);
-        smallerY = ImageLiteU16(yImage, startCol, 0, endCol, endRow);
-        smallerGreen = ImageLiteU8(greenImage, startCol, 0, endCol, endRow);
-    }
-
-    if(debugBall) {
-        std::cout<<"Top Camera: "<<topCamera<<std::endl;
-        if(!topCamera) { debugDraw.drawBox(startCol, endCol, endRow, 0, YELLOW); }
-    }
-
-    if(!topCamera && (!smallerY.hasProperDimensions() || !smallerGreen.hasProperDimensions())) {
-        std::cout<< "I should not be hit! what is happening!"<<std::endl;
-        return false;
-    }
-    SpotDetector darkSpotDetector;
-    //initializeSpotterSettings(darkSpotDetector, true, 3.0f, 3.0f, topCamera,
-                             // filterThresholdDark, greenThresholdDark, 0.5);
-
-    if(darkSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
-        SpotList darkSpots = darkSpotDetector.spots();
-        processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
-        if (debugSpots) {
-            ImageLiteU8 filteredImage = darkSpotDetector.filteredImage();
-            int max = field->horizonAt(0);
-            if (!topCamera) {
-                max = 0;
-            }
-            int box = 1;
-            for (int i = max; i < height && box != 0; i+= box) {
-                uint8_t* row = filteredImage.pixelAddr(0, i);
-                box = row[1];
-                debugDraw.drawBox(1, box + 1, i+box, i, BLUE);
-            }
-        }
-    }
-
-    if(debugBall) {
-        for(int z = 0; z < blackSpots.size(); z++) {
-            std::pair<int, int> spot = blackSpots[z];
-            std::cout<<"Dark Spot "<<z<<", X: "<<spot.first<<", Y: "
-                     <<spot.second<<std::endl;
-        }
-    }
-
-    SpotDetector whiteSpotDetector;
-    initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
-                              topCamera, filterThresholdBrite, greenThresholdBrite,
-                              0.5);
-    if(whiteSpotDetector.spotDetect(smallerY, *homography, &smallerGreen)) {
-        if (debugSpots) {
-            int max = field->horizonAt(0);
-            if (!topCamera) {
-                max = 0;
-            }
-            ImageLiteU8 filteredImage = whiteSpotDetector.filteredImage();
-            int box = 1;
-            for (int i = max; i < height && box > 0; i+= box) {
-                uint8_t* row = filteredImage.pixelAddr(0, i);
-                box = row[1];
-                int bx = 10 - width / 2;
-                int by = -i + height / 2;
-                imagePoint p = imagePoint(bx, by);
-                int radius = projectedBallRadius(p);
-                debugDraw.drawBox(10, box + 11, i+box, i, RED);
-                debugDraw.drawBox(width - 2* radius - 1, width - 1, i + 2*radius, i, BLUE);
-            }
-        }
-        SpotList whiteSpots = whiteSpotDetector.spots();
-        if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
-                             cameraHeight,foundBall)) {
-#ifdef OFFLINE
-            foundBall = true;
-#else
-            return true;
-#endif
-        }
-    }
-
-    // run blobber on parts of the image where spot detector won't work
-    int bottomThird = max(field->horizonAt(width / 2), height *3 / 10);
-    //debugDraw.drawLine(0, bottomThird, width - 1, bottomThird, BLUE);
-    if (topCamera) {
-        ImageLiteU8 bottomWhite(whiteImage, 0, bottomThird, whiteImage.width(),
-                                height - bottomThird);
-        blobber.run(bottomWhite.pixelAddr(), bottomWhite.width(),
-                    bottomWhite.height(), bottomWhite.pitch());
-    } else {
-        bottomThird = 0;
-        blobber.run(white.pixelAddr(), white.width(), endRow, white.pitch());
-    }
-
-    if(processBlobs(blobber, blackSpots, foundBall, badBlackSpots,
-                    actualWhiteSpots,
-                 cameraHeight, bottomThird)) {
-#ifdef OFFLINE
-        foundBall = true;
-#else
-        return true;
-#endif
-    }
-
-    if(blackSpots.size() != 0) {
-        if (findCorrelatedBlackSpots(blackSpots, actualBlackSpots, cameraHeight, foundBall)) {
-#ifdef OFFLINE
-            foundBall = true;
-#else
-        return true;
-#endif
-       }
-    }
-
-    return foundBall;
-}
 }

@@ -361,7 +361,6 @@ public class DebugImageView extends VisionView implements
 			SExpr blob = ball.get(1).find("blob").get(1);
 			double diam = ball.get(1). find("expectedDiam").get(1).valueAsDouble();
 			SExpr loc = blob.find("center").get(1);
-
 			int x = (int) Math.round(loc.get(0).valueAsDouble());
 			int y = (int) Math.round(loc.get(1).valueAsDouble());
 			graph.draw(new Ellipse2D.Double((x - diam/2) * multiplier,
@@ -713,7 +712,6 @@ public class DebugImageView extends VisionView implements
 		}
 
 		if (this.getWhiteBlock() != null) {
-			System.out.println("here");
 			white8 = new Y8Image(width, height, this.getWhiteBlock().data);
 			displayImages[WHITE_IMAGE] = white8.toBufferedImage();
 		}

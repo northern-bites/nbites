@@ -268,7 +268,22 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
 	    memcpy(yBufSubtract, frontEndSubtract->yImage().pixelAddr(), yLengthSubtract);
 	    // Convert to string and set log
 	    std::string yBufferSub((const char*)yBufSubtract, yLengthSubtract);
-	    retVec.push_back(Block{yBufferSub, json::Object{}, "yBufferSub", "nbcross", 0, 0});
+        json::Object attributes;
+        json::Array spots;
+
+        std::cout<<"NUM SPOTS "<< module.subtractedSpots.size()<<std::endl;
+        for (int i = 0; i < module.subtractedSpots.size(); ++i) {
+            json::Object spotAttrs;
+            spotAttrs["x"] = json::Number(module.subtractedSpots[i].x);
+            spotAttrs["y"] = json::Number(module.subtractedSpots[i].y);
+            spotAttrs["innerDiam"] = json::Number(module.subtractedSpots[i].innerDiam);
+
+            spots.push_back(spotAttrs);
+        }
+        
+        attributes["spots"] = spots;
+        
+	    retVec.push_back(Block{yBufferSub, attributes, "yBufferSub", "nbcross", 0, 0});
 	} 
 
 

@@ -431,7 +431,7 @@ bool SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h,
       return false;
     }
   }
-
+// Cory commented this out as it was causing the spot detector to spit out false
   if(!spotDetect(green)) {
     return false;
   }
