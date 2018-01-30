@@ -33,6 +33,7 @@ public:
                            double cameraHeight, bool & foundBall);
     void getSpotXY(std::vector<Spot >&spots);
 
+
 private:
     
     FieldHomography* homography;
@@ -59,6 +60,7 @@ private:
 //    int filterThresholdBrite;
 //    int greenThresholdBrite;
 //#else
+
     static const bool debugBall = false;
     static const bool debugSpots = false;
     static const int filterThresholdDark = 104;
@@ -66,7 +68,7 @@ private:
     static const int filterThresholdBrite = 130;
     static const int greenThresholdBrite = 80;
 //#endif
-    
+
     
     
     
