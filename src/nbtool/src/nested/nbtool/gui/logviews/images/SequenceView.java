@@ -162,13 +162,20 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
                     
                     JsonArray pnts = out[0].blocks.get(0).dict.get("spots").asArray();
                     for (Json.JsonValue value : pnts) {
-                        Integer coordinate[] = new Integer[2];
-                        Integer the_x = value.asObject().get("x").asNumber().asInt();
-                        Integer the_y = value.asObject().get("y").asNumber().asInt();
+                        Integer coordinate[] = new Integer[3];
+                        Float _x = value.asObject().get("x").asNumber().asFloat();
+                        Float _y = value.asObject().get("y").asNumber().asFloat();
+                        Float _innerDiam = value.asObject().get("innerDiam").asNumber().asFloat();
+                        Integer x = (int)(float)_x;
+                        Integer y = (int)(float)_y;
+                        Integer innerDiam = (int)(float)_innerDiam;
+
+
+                        coordinate[0]=x;
+                        coordinate[1]=y;
+                        coordinate[2]=innerDiam;
                         
-                        coordinate[0]=the_x;
-                        coordinate[1]=the_y;
-                        System.out.println("("+coordinate[0]+","+coordinate[1]+")");
+                        System.out.println("("+coordinate[0]+","+coordinate[1]+"):"+innerDiam);
 
                         spotCoordinates.add(coordinate);
                     }
@@ -196,16 +203,20 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
             int midX = coordinate[0] + diff_img_width/2;
             int midY = -coordinate[1] + diff_img_height/2;
             int len =coordinate[2];
-            int x = (midX-len)+offsetX;
-            int y = (midY-len)+offsetY;
+            int x = (midX-len);//+offsetX;
+            int y = (midY-len);//+offsetY;
             
 //            int x = coordinate[0]+offsetX;
 //            int y = coordinate[1]+offsetY;
             double ang1 = 0.0;
-            Ellipse2D.Double ellipse = new Ellipse2D.Double(x,y,10,10);
-            Shape rotated = (AffineTransform.getRotateInstance(ang1, x, y).createTransformedShape(ellipse));
-            graph.draw(rotated);
-//            graph.draw(ellipse);
+            Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,
+                                                            len*2, len*2);//Ellipse2D.Double(x,y,10,10);
+            
+            
+            
+            Shape rotated = (AffineTransform.getRotateInstance(ang1,midX+offsetX , midY+offsetY).createTransformedShape(ellipse));
+//            graph.draw(rotated);
+            graph.draw(ellipse);
 
         }
     }
