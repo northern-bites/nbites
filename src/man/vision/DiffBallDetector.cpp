@@ -19,12 +19,10 @@ namespace man {
         spotVector actualBlackSpots;
         spotVector actualWhiteSpots;
         SpotList darkSpots;
-        
+        SpotList brightSpots;
         
         DiffBallDetector::DiffBallDetector(FieldHomography* homography_,Field* field_, bool topCamera_):
-        homography(homography_),
-        field(field_),
-        topCamera(topCamera_){
+        homography(homography_),field(field_),topCamera(topCamera_){
             if (topCamera) {
                 std::cout<<"YO! you are passing in a bottom camera image! get yo act together."<<std::endl;
             }
@@ -51,40 +49,40 @@ namespace man {
             //START DARK SPOTS
             if(darkSpotDetector.spotDetect(diffImage, *homography, NULL)) {
                 darkSpots = darkSpotDetector.spots();
-                std::cout<<"There are "<<darkSpots.size()<<" spots"<<std::endl;
+                //                std::cout<<"There are "<<darkSpots.size()<<" spots"<<std::endl;
                 //                for(int i = 0; i < darkSpots.size(); i++){
                 //                    std::pair<int, int> spot = darkSpots[i];
                 //                    std::cout<<"Dark Spot "<<i<<", X: "<<spot.first<<", Y: "
                 //                    <<spot.second<<std::endl;
                 //                }
                 //                    std::cout<<"Dark Spot "<<z<<", X: "<<spot.rawX<<", Y: "
-                processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
-                std::cout<<"There are "<<blackSpots.size()<<" blackspots"<<std::endl;
+//                processDarkSpots(darkSpots, blackSpots, badBlackSpots, actualBlackSpots);
+                //                std::cout<<"There are "<<blackSpots.size()<<" blackspots"<<std::endl;
                 
                 
             }
             
             
-            //START WHITE SPOTS
             SpotDetector whiteSpotDetector;
             initializeSpotterSettings(whiteSpotDetector, false, 13.0f, 13.0f,
-                                      topCamera, filterThresholdBrite, greenThresholdBrite,
-                                      0.5);
-            SpotList whiteSpots = whiteSpotDetector.spots();
-            if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots,
-                                 cameraHeight,foundBall)) {
-#ifdef OFFLINE
-                foundBall = true;
-#else
-                return true;
-#endif
+                                      topCamera, filterThresholdBrite, greenThresholdBrite,0.5);
+            if(whiteSpotDetector.spotDetect(diffImage, *homography, NULL)) {
+                brightSpots = whiteSpotDetector.spots();
+                
+//                if(processWhiteSpots(whiteSpots, blackSpots, badBlackSpots, actualWhiteSpots, cameraHeight,foundBall)) {
+//#ifdef OFFLINE
+//                    foundBall = true;
+//#else
+//                    return true;
+//#endif
+//                }
             }
         }
         
         void DiffBallDetector::setImages(ImageLiteU16 yImg,EdgeDetector * edgeD) {
             yImage = yImg;
             edgeDetector = edgeD;
-            blackSpots.clear();
+            //blackSpots.clear();
             
         }
         
@@ -106,12 +104,16 @@ namespace man {
             
         }
         
-        void DiffBallDetector::getSpotXY(std::vector<Spot >&spots)  {
+        void DiffBallDetector::getDarkSpots(std::vector<Spot >&spots)  {
             for (auto i = darkSpots.begin(); i != darkSpots.end(); i++) {
                 spots.push_back(*i);
             }
         }
-        
+        void DiffBallDetector::getBrightSpots(std::vector<Spot >&spots)  {
+            for (auto i = brightSpots.begin(); i != brightSpots.end(); i++) {
+                spots.push_back(*i);
+            }
+        }
         
         void DiffBallDetector::processDarkSpots(SpotList & darkSpots, intPairVector & blackSpots,
                                                 intPairVector & badBlackSpots, spotVector & actualBlackSpots)
@@ -120,8 +122,8 @@ namespace man {
                 // convert back to raw coordinates
                 int midX = (*i).ix() + width / 2;
                 int midY = -(*i).iy() + height / 2;
-                std::cout<<"Real: ("<<(*i).ix()<<","<<(*i).iy()<<")"<<std::endl;
-                std::cout<<"Changed:("<<midX<<","<<midY<<")"<<std::endl;
+                //                std::cout<<"Real: ("<<(*i).ix()<<","<<(*i).iy()<<")"<<std::endl;
+                //                std::cout<<"Changed:("<<midX<<","<<midY<<")"<<std::endl;
                 blackSpots.push_back(std::make_pair(midX, midY));
                 //                blackSpots.push_back(std::make_pair((*i).ix(), (*i).iy()));
                 
@@ -172,8 +174,7 @@ namespace man {
             //            }
             //            return foundBall;
         }
-        
     }
 }
-    
-    
+
+

@@ -31,7 +31,8 @@ public:
     bool processWhiteSpots(SpotList & whiteSpots, intPairVector & blackSpots,
                            intPairVector & badBlackSpots, spotVector & actualWhiteSpots,
                            double cameraHeight, bool & foundBall);
-    void getSpotXY(std::vector<Spot >&spots);
+    void getDarkSpots(std::vector<Spot >&spots);
+    void getBrightSpots(std::vector<Spot >&spots);
 
 
 private:
