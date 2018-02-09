@@ -274,8 +274,11 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
         std::cout<<"NUM SPOTS "<< module.subtractedSpots.size()<<std::endl;
         for (int i = 0; i < module.subtractedSpots.size(); ++i) {
             json::Object spotAttrs;
-            spotAttrs["x"] = json::Number(module.subtractedSpots[i].first);
-            spotAttrs["y"] = json::Number(module.subtractedSpots[i].second);
+            
+            spotAttrs["x"] = json::Number(module.subtractedSpots[i].ix());
+            spotAttrs["y"] = json::Number(module.subtractedSpots[i].iy());
+            spotAttrs["innerDiam"] = json::Number(module.subtractedSpots[i].innerDiam);
+
             spots.push_back(spotAttrs);
         }
         
