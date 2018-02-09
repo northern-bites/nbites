@@ -73,7 +73,9 @@ public:
     CalibrationParams* calibrationParams[2];
 
     messages::YUVImage* imageToSubtract;
-    std::vector<Spot>subtractedSpots;
+    std::vector<Spot>subtractedBlackSpots;
+    std::vector<Spot>subtractedWhiteSpots;
+
 
     bool topCamera;
 

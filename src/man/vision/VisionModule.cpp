@@ -155,7 +155,9 @@ VisionModule::~VisionModule()
 // TODO use horizon on top image
 void VisionModule::run_()
 {
-    subtractedSpots.clear();
+    subtractedBlackSpots.clear();
+    subtractedWhiteSpots.clear();
+
     PROF_ENTER(P_VISION)
     // Get messages from inPortals
     topIn.latch();
@@ -354,11 +356,12 @@ void VisionModule::run_()
             //do the subtraction to get the differential image
             ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
             if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
+                int max = 0;
                 for (int w = 0; w < yImage.width(); w++) {
                     for (int h = 0; h < yImage.height(); h++) {
                         *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h)) - *(YSubtraction.pixelAddr(w,h)));
-                        //const int THRESHOLD = 7;
-                        const int THRESHOLD = 50;
+                        const int THRESHOLD = 51.57;
+//                        const int THRESHOLD = 60; //50;
 
                         if(*(YSubtraction.pixelAddr(w,h)) <= THRESHOLD) {
                             *(YSubtraction.pixelAddr(w,h)) = 0;
@@ -383,10 +386,12 @@ void VisionModule::run_()
              diffBallDetector[i]->setImages(YSubtraction, edgeDetector[i]);
              diffBallDetected |= diffBallDetector[i]->findBallYImage(YSubtraction,kinematics[i]->wz0(), *(edges[i]));
             
-             diffBallDetector[i]->getSpotXY(subtractedSpots);
+             diffBallDetector[i]->getDarkSpots(subtractedBlackSpots);
+             diffBallDetector[i]->getBrightSpots(subtractedWhiteSpots);
+
              PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
             
-            std::cout<<"Did I detect a ball? "<<diffBallDetected<<std::endl;
+//            std::cout<<"Did I detect a ball? "<<diffBallDetected<<std::endl;
 
         }
 

@@ -16,6 +16,12 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.AffineTransform;
+import javax.swing.JCheckBox;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import javax.swing.JPanel;
+import java.awt.GridLayout;
+
 
 import nbtool.data.calibration.ColorParam;
 import nbtool.data.log.Block;
@@ -36,22 +42,41 @@ import nbtool.nio.CrossServer.CrossInstance;
 import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
+import nbtool.util.Debug;
 
-//this is an important file
 
-public class SequenceView extends ViewParent implements MouseMotionListener {
-    ArrayList<Integer[]> spotCoordinates = new ArrayList<Integer[]>();
-    BufferedImage images[];
-    BufferedImage diffImage;
-    int numImages;
-    //    YUYV8888Image yuvImages[];
-    double frame_width;
-    double frame_height;
-    int diff_img_width;
-    int diff_img_height;
-    
+public class SequenceView extends ViewParent implements MouseMotionListener, ItemListener {
+    private ArrayList<Integer[]> blackSpotCoordinates = new ArrayList<Integer[]>();
+    private ArrayList<Integer[]> whiteSpotCoordinates = new ArrayList<Integer[]>();
+
+    private BufferedImage images[];
+    private BufferedImage diffImage;
+    private BufferedImage originalDiffImage = null;
+    private int numImages;
+    private double frame_width;
+    private double frame_height;
+    private int diff_img_width;
+    private int diff_img_height;
+    JPanel checkBoxPanel;
+    private JCheckBox showBlackSpots;
+    private JCheckBox showWhiteSpots;
+    private boolean showBlack;
+    private boolean showWhite;
+
     static final int DEFAULT_WIDTH = 320;
     static final int DEFAULT_HEIGHT = 240;
+    
+    
+    public SequenceView() {
+        super();
+        setLayout(null);
+        
+        this.images = null;
+
+        showBlack = false;
+        showWhite = false;
+    }
+    
     
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -59,7 +84,11 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
         int offsetX = 5;
         frame_width = this.getSize().getWidth();
         frame_height = this.getSize().getHeight();
+        int offX = (int)frame_width/3-300;
+        int offY = (int)frame_width/3-30;
         
+        setDiffImage();
+
         if (images.length < 4) {
             for (BufferedImage img : images) {
                 if (img != null) {
@@ -79,14 +108,19 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
             if(diffImage != null){
                 diff_img_width = (int)frame_width/2;
                 diff_img_height= (int)frame_height/2;
-                int offX = (int)frame_width/4;
-                int offY = (int)frame_width/3;
+
+                if(showBlackSpots.isSelected()){
+                    drawSpots(blackSpotCoordinates, Color.RED);
+                }
+                if(showWhiteSpots.isSelected()) {
+                    drawSpots(whiteSpotCoordinates,Color.YELLOW);
+                }
+                checkBoxPanel.setBounds(offX+diff_img_width+50,offY, 200, 200);
 
                 g.drawImage(diffImage,offX, offY,diff_img_width ,diff_img_height , null);
-                drawSpots(g,offX, offY);
 
             }
-        } else {
+        } else if(images.length<16){
             for (BufferedImage img : images) {
                 if (img != null) {
                     int imageWidth = (int)frame_width/4-10;
@@ -107,21 +141,28 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
                 int imageHeight = (int)frame_height/4;
                 g.drawImage(diffImage,offsetX, offsetY,imageWidth ,imageHeight , null);
             }
+        } else {
+            Debug.warn("NO MORE THAN 16 PHOTOS DUDE!");
         }
     }
-    
-    public SequenceView() {
-        super();
-        setLayout(null);
-        
-        this.images = null;
-    }
+
     
     @Override
     public void mouseDragged(MouseEvent e) {}
     @Override
     public void mouseMoved(MouseEvent e) {}
     
+    private void setDiffImage() {
+        if (originalDiffImage == null) {
+            diffImage = null;
+        } else {
+            BufferedImage convertedImg = new BufferedImage(originalDiffImage.getWidth(), originalDiffImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            
+            convertedImg.getGraphics().drawImage(originalDiffImage, 0, 0, null);
+            
+            diffImage = convertedImg;
+        }
+    }
     
     private void sendToNbCross() {
         CrossInstance ci = CrossServer.instanceByIndex(0);
@@ -149,19 +190,15 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
                     Debug.warn("GOT IO RECEIVED ABOUT TO PARSE");
                     int ywidth, yheight;
                     
-//                    System.out.println("Height: "+outerThis.yuvImages[0].height+" width: "+outerThis.yuvImages[0].width);
-                    
-                    //                    if (outerThis.yuvImages[0].height == 480) {
-                    //                        ywidth=640; yheight = 480;
-                    //                    } else {
-                    //                        ywidth=320; yheight = 240;
-                    //                    }
                     ywidth = 320;
                     yheight = 240;
-                    diffImage = new Y16Image(ywidth,yheight, out[0].blocks.get(0).data).toBufferedImage();
                     
-                    JsonArray pnts = out[0].blocks.get(0).dict.get("spots").asArray();
-                    for (Json.JsonValue value : pnts) {
+                    originalDiffImage = new Y16Image(ywidth,yheight, out[0].blocks.get(0).data).toBufferedImage();
+                    
+                    setDiffImage();
+                    
+                    JsonArray blkpts = out[0].blocks.get(0).dict.get("blackspots").asArray();
+                    for (Json.JsonValue value : blkpts) {
                         Integer coordinate[] = new Integer[3];
                         Float _x = value.asObject().get("x").asNumber().asFloat();
                         Float _y = value.asObject().get("y").asNumber().asFloat();
@@ -175,11 +212,31 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
                         coordinate[1]=y;
                         coordinate[2]=innerDiam;
                         
-                        System.out.println("("+coordinate[0]+","+coordinate[1]+"):"+innerDiam);
+                        System.out.println("B:("+coordinate[0]+","+coordinate[1]+"):"+innerDiam);
 
-                        spotCoordinates.add(coordinate);
+                        blackSpotCoordinates.add(coordinate);
+                    }
+                    
+                    
+                    JsonArray whtpts = out[0].blocks.get(0).dict.get("whitespots").asArray();
+                    for (Json.JsonValue value : whtpts) {
+                        Integer coordinate[] = new Integer[3];
+                        Float _x = value.asObject().get("x").asNumber().asFloat();
+                        Float _y = value.asObject().get("y").asNumber().asFloat();
+                        Float _innerDiam = value.asObject().get("innerDiam").asNumber().asFloat();
+                        Integer x = (int)(float)_x;
+                        Integer y = (int)(float)_y;
+                        Integer innerDiam = (int)(float)_innerDiam;
+                        
+                        coordinate[0]=x;
+                        coordinate[1]=y;
+                        coordinate[2]=innerDiam;
+                        System.out.println("W:("+coordinate[0]+","+coordinate[1]+"):"+innerDiam);
+                        whiteSpotCoordinates.add(coordinate);
                     }
                 }
+                createCheckBoxes();
+
                 repaint();
             }
             
@@ -191,36 +248,89 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
             
         }, "Vision", logs.toArray(new Log[0])));
     }
-    private void drawSpots(Graphics g,int offsetX, int offsetY){
-        int multiplier = 2;
+    private void createCheckBoxes() {
+        checkBoxPanel = new JPanel();
+        checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
+        showBlackSpots = new JCheckBox("Show Black Spots: "+blackSpotCoordinates.size());
+        showWhiteSpots = new JCheckBox("Show White Spots: "+ whiteSpotCoordinates.size());
         
-        Graphics2D graph = (Graphics2D)g;
-        g.setColor(Color.RED);
+        // add their listeners
+        showBlackSpots.addItemListener(this);
+        showWhiteSpots.addItemListener(this);
+        
+        checkBoxPanel.add(showBlackSpots);
+        checkBoxPanel.add(showWhiteSpots);
+        
+        showBlackSpots.setSelected(false);
+        showWhiteSpots.setSelected(false);
+        
+        add(checkBoxPanel);
+    }
+    public void itemStateChanged(ItemEvent e) {
+        Object source = e.getSource();
+        if (source == showBlackSpots) {
+            showBlack = !showBlack;
+            System.out.println("Black is"+showBlack);
 
+        } else if (source == showWhiteSpots) {
+            showWhite = !showWhite;
+            System.out.println("White is"+showWhite);
+        } else {
+            Debug.warn("Error: item state listener in sequence view!");
+
+        }
+        
+//        Object source = e.getItemSelectable();
+//        if (e.getStateChange() == ItemEvent.SELECTED) {
+//            if (source == showBlackSpots) {
+//                showBlack = true;
+//            } else if (source == showWhiteSpots) {
+//                showWhite = true;
+//            } else {
+//                Debug.warn("Error: item state listener in sequence view SELECTED!!");
+//            }
+//        } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+//            if (source == showBlackSpots) {
+//                showBlack = false;
+//            } else if (source == showWhiteSpots) {
+//                showWhite = false;
+//            } else {
+//                Debug.warn("Error: item state listener in sequence view DESELECTED!!");
+//            }
+//        }
+
+        repaint();
+    }
+    
+    private void drawSpots(ArrayList<Integer[]> spotCoordinates, Color color) {
+        int multiplier = 2;
+        Graphics2D graph = diffImage.createGraphics();
+        
+        int width = diffImage.getWidth();
+        int height = diffImage.getHeight();
+
+//        Graphics2D graph = (Graphics2D)g;
+        graph.setColor(color);
+        
         for(int i = 0; i < spotCoordinates.size(); i++) {
             Integer coordinate[] = new Integer[3];
             coordinate = spotCoordinates.get(i);
-            int midX = coordinate[0] + diff_img_width/2;
-            int midY = -coordinate[1] + diff_img_height/2;
+            int midX = coordinate[0] + width/2;
+            int midY = -coordinate[1] + height/2;
             int len =coordinate[2];
             int x = (midX-len);//+offsetX;
             int y = (midY-len);//+offsetY;
             
-//            int x = coordinate[0]+offsetX;
-//            int y = coordinate[1]+offsetY;
+//            int x = coordinate[0]-len;
+//            int y = coordinate[1]-len;
             double ang1 = 0.0;
-            Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,
-                                                            len*2, len*2);//Ellipse2D.Double(x,y,10,10);
             
-            
-            
-            Shape rotated = (AffineTransform.getRotateInstance(ang1,midX+offsetX , midY+offsetY).createTransformedShape(ellipse));
-//            graph.draw(rotated);
+            Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,len*2, len*2);
             graph.draw(ellipse);
-
         }
+        
+        graph.dispose();
     }
-    
     
     @Override
     public void setupDisplay() {
@@ -233,27 +343,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener {
             this.images[i+1] = alsoSelected.get(i).blocks.get(0).parseAsYUVImage().toBufferedImage();
             i++;
         }
-        
-//        this.yuvImages = new YUYV8888Image[this.images.length];
-//        this.yuvImages[0] = displayedLog.blocks.get(0).parseAsYUVImage();
-//        this.yuvImages[i+1] = alsoSelected.get(i).blocks.get(0).parseAsYUVImage();
-
-        //        for (int i = 0; i < alsoSelected.size(); ++i) {
-        //            this.yuvImages[i+1] = alsoSelected.get(i).blocks.get(0).parseAsYUVImage();
-        //            this.images[i+1] = alsoSelected.get(i).blocks.get(0).parseAsYUVImage().toBufferedImage();
-        //        }
-        
-        //		for (BufferedImage image : this.images) {
-        //			for (int x = 0; x < image.getWidth(); ++x) {
-        //				for (int y = 0; y < image.getHeight(); ++y){
-        //					Color c = new Color(image.getRGB(x, y));
-        //					if (c.getGreen() > 100) {
-        //						image.setRGB(x, y, Color.PINK.getRGB());
-        //					}
-        //				}
-        //			}
-        //		}
-        
         
         if(alsoSelected.size() == 16){
             Debug.warn("This view can only can display 16 images at a time.");
