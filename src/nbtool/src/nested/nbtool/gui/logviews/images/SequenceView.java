@@ -44,7 +44,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
     static int displayParams[] = new int[NUM_PARAMS];
     static boolean firstLoad = true;
     static boolean diffImageExists = true;
-    
     private BufferedImage images[];
     private BufferedImage diffImage;
     private BufferedImage originalDiffImage = null;
@@ -90,7 +89,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             
         }
         createAdjusters();
-        
     }
     
     
@@ -101,7 +99,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         frame_width = this.getSize().getWidth();
         frame_height = this.getSize().getHeight();
         
-        
         setDiffImage();
         
         if (images.length < 4) {
@@ -110,7 +107,7 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
                 if (img != null) {
                     int imageWidth = (int)frame_width/3;
                     int imageHeight = (int)frame_height/3;
-                    
+
                     g.drawImage(img,offsetX, offsetY,imageWidth ,imageHeight , null);
                     
                     if (offsetX+imageWidth >= frame_width) {
@@ -131,14 +128,12 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
                 
                 checkBoxPanel.setBounds(offX+diff_img_width+50,offY, 200, 50);
                 paramPanel.setBounds(offX+diff_img_width+50,offY+50, 300, 100);
-                
                 if(showBlackSpots.isSelected()){
                     drawSpots(blackSpotCoordinates, Color.RED);
                 }
                 if(showWhiteSpots.isSelected()) {
                     drawSpots(whiteSpotCoordinates,Color.YELLOW);
                 }
-                
                 g.drawImage(diffImage,offX, offY,diff_img_width ,diff_img_height , null);
                 
             }
@@ -168,7 +163,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             Debug.warn("NO MORE THAN 16 PHOTOS DUDE!");
         }
     }
-    
     @Override
     public void mouseDragged(MouseEvent e) {}
     @Override
@@ -203,7 +197,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         for (int i = 0; i < alsoSelected.size(); ++i) {
             logs.add(alsoSelected.get(i));
         }
-        
         assert(ci.tryAddCall(new IOFirstResponder(){
             
             @Override
@@ -232,7 +225,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
                         coordinate[0]=x;
                         coordinate[1]=y;
                         coordinate[2]=innerDiam;
-                        
                         blackSpotCoordinates.add(coordinate);
                     }
                     
@@ -249,7 +241,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
                         coordinate[0]=x;
                         coordinate[1]=y;
                         coordinate[2]=innerDiam;
-                        //                        System.out.println("W:("+coordinate[0]+","+coordinate[1]+"):"+innerDiam);
                         whiteSpotCoordinates.add(coordinate);
                     }
                     showBlackSpots.setText("Show Black Spots: "+blackSpotCoordinates.size());
@@ -284,7 +275,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         showWhiteSpots.setSelected(false);
         add(checkBoxPanel);
         
-        
         SpinnerModel filterDarkModel = new
         SpinnerNumberModel(104, 0, 512, 4);
         SpinnerModel greenDarkModel = new
@@ -310,7 +300,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         greenDark.addChangeListener(this);
         filterDark.addChangeListener(this);
         add(paramPanel);
-        
     }
     public void itemStateChanged(ItemEvent e) {
         Object source = e.getSource();
@@ -335,7 +324,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         displayParams[3] = ((Integer)greenBrite.getValue()).intValue();
         sendToNbCross();
     }
-    
     protected JSpinner addLabeledSpinner(Container c, String label,
                                          SpinnerModel model) {
         JLabel l = new JLabel(label);
@@ -363,8 +351,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             int x = (midX-len);//+offsetX;
             int y = (midY-len);//+offsetY;
             
-            //            int x = coordinate[0]-len;
-            //            int y = coordinate[1]-len;
             Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,len*2, len*2);
             graph.draw(ellipse);
         }
