@@ -33,7 +33,7 @@ public:
                            double cameraHeight, bool & foundBall);
     void getDarkSpots(std::vector<Spot >&spots);
     void getBrightSpots(std::vector<Spot >&spots);
-
+    void setParams(std::vector<int>&params);
 
 private:
     
@@ -53,22 +53,22 @@ private:
     EdgeDetector * edgeDetector;
     EdgeList * edgeList;
 
-//#ifdef OFFLINE
-//    bool debugBall;
-//    bool debugSpots;
-//    int filterThresholdDark;
-//    int greenThresholdDark;
-//    int filterThresholdBrite;
-//    int greenThresholdBrite;
-//#else
+#ifdef OFFLINE
+    bool debugBall;
+    bool debugSpots;
+    int filterThresholdDark;
+    int greenThresholdDark;
+    int filterThresholdBrite;
+    int greenThresholdBrite;
+#else
 
     static const bool debugBall = false;
     static const bool debugSpots = false;
     static const int filterThresholdDark = 104;
     static const int greenThresholdDark = 12;
-    static const int filterThresholdBrite = 130;
+    static const int filterThresholdBrite = 200;
     static const int greenThresholdBrite = 80;
-//#endif
+#endif
 
     
     

@@ -75,6 +75,7 @@ public:
     messages::YUVImage* imageToSubtract;
     std::vector<Spot>subtractedBlackSpots;
     std::vector<Spot>subtractedWhiteSpots;
+    std::vector<int>params;
 
 
     bool topCamera;

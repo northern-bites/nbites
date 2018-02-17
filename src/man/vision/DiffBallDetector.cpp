@@ -114,6 +114,13 @@ namespace man {
                 spots.push_back(*i);
             }
         }
+        void DiffBallDetector::setParams(std::vector<int>&params) {
+            filterThresholdDark = params[0];
+            greenThresholdDark = params[1];
+            filterThresholdBrite = params[2];
+            greenThresholdBrite = params[3];
+        }
+
         
         void DiffBallDetector::processDarkSpots(SpotList & darkSpots, intPairVector & blackSpots,
                                                 intPairVector & badBlackSpots, spotVector & actualBlackSpots)

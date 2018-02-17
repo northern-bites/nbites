@@ -252,6 +252,17 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
     } else {
     	module.imageToSubtract = NULL;
     }
+//    int arg0 =theLog->topLevelDictionary["param0"].asNumber().asInt();
+//    int arg1=theLog->topLevelDictionary["param1"].asNumber().asInt();
+//    int arg2 = theLog->topLevelDictionary["param2"].asNumber().asInt();
+//    int arg3=theLog->topLevelDictionary["param3"].asNumber().asInt();
+//    std::cout<<"PARAMS:"<<arg0<<" "<<arg1<<" "<<arg2<<" "<<arg3<<std::endl;
+//
+    module.params.push_back(theLog->topLevelDictionary["param0"].asNumber().asInt());
+    module.params.push_back(theLog->topLevelDictionary["param1"].asNumber().asInt());
+    module.params.push_back(theLog->topLevelDictionary["param2"].asNumber().asInt());
+    module.params.push_back(theLog->topLevelDictionary["param3"].asNumber().asInt());
+
     // Run it!
     module.run();
 
