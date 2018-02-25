@@ -26,7 +26,7 @@ public:
     bool findBallYImage(ImageLiteU16 diffImage,double cameraHeight, EdgeList& edges);
 
     void processDarkSpots(SpotList& darkSpots,spotVector& blackSpots);
-    bool processWhiteSpots(SpotList& brightSpots,spotVector& whiteSpots);
+    void processWhiteSpots(SpotList& brightSpots,spotVector& whiteSpots);
     bool filterBlackSpots(Spot currentSpot);
     bool filterWhiteSpots(Spot spot);
     void setImages(ImageLiteU16 yImg,EdgeDetector * edgeD);

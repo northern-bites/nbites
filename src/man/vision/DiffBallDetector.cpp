@@ -57,9 +57,8 @@ namespace vision {
                                   topCamera, filterThresholdBrite, greenThresholdBrite,0.5);
         if(whiteSpotDetector.spotDetect(diffImage, *homography, NULL)) {
             brightSpots = whiteSpotDetector.spots();
-            if(processWhiteSpots(brightSpots, whiteSpots)) {
-                return true;
-            }
+            processWhiteSpots(brightSpots, whiteSpots);
+            
         }
     }
     
@@ -83,13 +82,14 @@ namespace vision {
     void DiffBallDetector::processDarkSpots(SpotList & darkSpots,spotVector & blackSpots) {
         for (auto i = darkSpots.begin(); i != darkSpots.end(); i++) {
             // convert back to raw coordinates
+//            blackSpots.push_back((*i));
             int midX = (*i).ix() + width / 2;
             int midY = -(*i).iy() + height / 2;
             if (midX < width - 5 && midX > 5 && midY > 5 && midY < height - 5) {
                 (*i).rawX = midX;
                 (*i).rawY = midY;
                 // if the middle of the spot is white or green, ignore it
-                if ((!topCamera || midY > field->horizonAt(midX))) {
+                if ((midY > field->horizonAt(midX))) {
                     if (filterBlackSpots((*i))) {
                         blackSpots.push_back((*i));
                         (*i).spotType = SpotType::DARK_CANDIDATE;
@@ -102,9 +102,11 @@ namespace vision {
         }
     }
     
-    bool DiffBallDetector::processWhiteSpots(SpotList & brightSpots,
+    void DiffBallDetector::processWhiteSpots(SpotList & brightSpots,
                                              spotVector & whiteSpots) {
-        for (auto i = whiteSpots.begin(); i != whiteSpots.end(); i++) {
+        for (auto i = brightSpots.begin(); i != brightSpots.end(); i++) {
+//            whiteSpots.push_back((*i));
+
             int midX = (*i).ix() + width / 2;
             int midY = -(*i).iy() + height / 2;
             (*i).rawX = midX;
@@ -132,7 +134,7 @@ namespace vision {
         int midY = -spot.iy() + height / 2;
         
         // don't  bother if off the field
-        if (topCamera && midY < field->horizonAt(midX)) {
+        if (midY < field->horizonAt(midX)) {
             return false;
         }
         return true;
@@ -144,12 +146,12 @@ namespace vision {
     }
     
     void DiffBallDetector::getDarkSpots(std::vector<Spot >&spots)  {
-        for (auto i = darkSpots.begin(); i != darkSpots.end(); i++) {
+        for (auto i = blackSpots.begin(); i != blackSpots.end(); i++) {
             spots.push_back(*i);
         }
     }
     void DiffBallDetector::getBrightSpots(std::vector<Spot >&spots)  {
-        for (auto i = brightSpots.begin(); i != brightSpots.end(); i++) {
+        for (auto i = whiteSpots.begin(); i != whiteSpots.end(); i++) {
             spots.push_back(*i);
         }
     }
