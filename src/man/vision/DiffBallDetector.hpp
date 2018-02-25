@@ -19,18 +19,18 @@ public:
     ~DiffBallDetector();
     
     
-    void setImages(ImageLiteU16 yImg,EdgeDetector * edgeD);
     void initializeSpotterSettings(SpotDetector &s, bool darkSpot,
                                                      float innerDiam, float altInnerDiam,
                                                      bool topCamera, int filterThreshold,
                                    int greenThreshold, float filterGain);
     bool findBallYImage(ImageLiteU16 diffImage,double cameraHeight, EdgeList& edges);
 
-    void processDarkSpots(SpotList & darkSpots, intPairVector & blackSpots,
-                          intPairVector & badBlackSpots, spotVector & actualBlackSpots);
-    bool processWhiteSpots(SpotList & whiteSpots, intPairVector & blackSpots,
-                           intPairVector & badBlackSpots, spotVector & actualWhiteSpots,
-                           double cameraHeight, bool & foundBall);
+    void processDarkSpots(SpotList& darkSpots,spotVector& blackSpots);
+    bool processWhiteSpots(SpotList& brightSpots,spotVector& whiteSpots);
+    bool filterBlackSpots(Spot currentSpot);
+    bool filterWhiteSpots(Spot spot);
+    void setImages(ImageLiteU16 yImg,EdgeDetector * edgeD);
+
     void getDarkSpots(std::vector<Spot >&spots);
     void getBrightSpots(std::vector<Spot >&spots);
     void setParams(std::vector<int>&params);
@@ -52,7 +52,14 @@ private:
     ImageLiteU16 yImage;
     EdgeDetector * edgeDetector;
     EdgeList * edgeList;
-
+    enum SpotType {
+        WHITE_CANDIDATE = 1,
+        WHITE_REJECT,
+        DARK_CANDIDATE,
+        DARK_REJECT,
+        WHITE_BLOB,
+        WHITE_BLOB_BAD
+    };
 #ifdef OFFLINE
     bool debugBall;
     bool debugSpots;

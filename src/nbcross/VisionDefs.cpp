@@ -271,21 +271,20 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
  	// -----------
     //   Y IMAGE SUBTRACT
     // -----------
-    if(arguments.size() > 1){//do subtracting stuff
-	    man::vision::ImageFrontEnd* frontEndSubtract = module.getFrontEndSubtract(topCamera);
-	    // Create temp buffer and fill with yImage from FrontEnd
-	    int yLengthSubtract = (width / 4) * (height / 2) * 2;
-	    uint8_t yBufSubtract[yLengthSubtract];
-	    memcpy(yBufSubtract, frontEndSubtract->yImage().pixelAddr(), yLengthSubtract);
-	    // Convert to string and set log
-	    std::string yBufferSub((const char*)yBufSubtract, yLengthSubtract);
-//        json::Object blackAttributes;
-//        json::Object whiteAttributes;
+    if(arguments.size() > 1) {//do subtracting stuff
+        man::vision::ImageFrontEnd* frontEndSubtract = module.getFrontEndSubtract(topCamera);
+        
+        // Create temp buffer and fill with yImage from FrontEnd
+        int yLengthSubtract = (width / 4) * (height / 2) * 2;
+        uint8_t yBufSubtract[yLengthSubtract];
+        memcpy(yBufSubtract, frontEndSubtract->yImage().pixelAddr(), yLengthSubtract);
+        // Convert to string and set log
+        std::string yBufferSub((const char*)yBufSubtract, yLengthSubtract);
+        
         json::Object attributes;
-
         json::Array blackspots;
         json::Array whitespots;
-
+        
         std::cout<<"NUM BLACK SPOTS "<< module.subtractedBlackSpots.size()<<std::endl;
         for (int i = 0; i < module.subtractedBlackSpots.size(); ++i) {
             json::Object spotAttrs;
@@ -293,16 +292,11 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
             spotAttrs["x"] = json::Number(module.subtractedBlackSpots[i].ix());
             spotAttrs["y"] = json::Number(module.subtractedBlackSpots[i].iy());
             spotAttrs["innerDiam"] = json::Number(module.subtractedBlackSpots[i].innerDiam);
-
+            
             blackspots.push_back(spotAttrs);
         }
-
-
-//        blackAttributes["blackspots"] = blackspots;
-//                retVec.push_back(Block{yBufferSub, blackAttributes, "yBufferSub", "nbcross", 0, 0});
-
         attributes["blackspots"] = blackspots;
-
+        
         
         std::cout<<"NUM WHITE SPOTS "<< module.subtractedWhiteSpots.size()<<std::endl;
         for (int i = 0; i < module.subtractedWhiteSpots.size(); ++i) {
@@ -316,14 +310,8 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
         }
         attributes["whitespots"] = whitespots;
         retVec.push_back(Block{yBufferSub, attributes, "yBufferSub", "nbcross", 0, 0});
-
-//        whiteAttributes["whitespots"] = whitespots;
-//        retVec.push_back(Block{yBufferSub, whiteAttributes, "yBufferSub", "nbcross", 0, 0});
-
-	}
-
-
-
+        
+    }
 
 
     // -----------

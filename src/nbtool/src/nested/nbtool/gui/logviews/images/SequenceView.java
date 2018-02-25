@@ -121,8 +121,13 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             if(diffImage != null){
                 
                 int offX = (int)frame_width/3-300;
+                if(offX< 0){
+                    offX = 0;
+                }
                 int offY = offsetY+(int)frame_width/3-30;
-                
+                if(offY<offsetY){
+                    offY =offsetY+ 20;
+                }
                 diff_img_width = (int)frame_width/2;
                 diff_img_height= (int)frame_height/2;
                 

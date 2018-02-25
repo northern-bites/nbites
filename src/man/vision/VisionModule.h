@@ -97,6 +97,7 @@ private:
     float sdev(ImageLiteU16* image);
     void testNoise(ImageLiteU16* image);
 
+
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];
     EdgeList* edges[2];
