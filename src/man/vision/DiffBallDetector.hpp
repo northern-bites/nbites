@@ -19,21 +19,21 @@ public:
     ~DiffBallDetector();
     
     
-    void setImages(ImageLiteU16 yImg,EdgeDetector * edgeD);
     void initializeSpotterSettings(SpotDetector &s, bool darkSpot,
                                                      float innerDiam, float altInnerDiam,
                                                      bool topCamera, int filterThreshold,
                                    int greenThreshold, float filterGain);
     bool findBallYImage(ImageLiteU16 diffImage,double cameraHeight, EdgeList& edges);
 
-    void processDarkSpots(SpotList & darkSpots, intPairVector & blackSpots,
-                          intPairVector & badBlackSpots, spotVector & actualBlackSpots);
-    bool processWhiteSpots(SpotList & whiteSpots, intPairVector & blackSpots,
-                           intPairVector & badBlackSpots, spotVector & actualWhiteSpots,
-                           double cameraHeight, bool & foundBall);
+    void processDarkSpots(SpotList& darkSpots,spotVector& blackSpots);
+    void processWhiteSpots(SpotList& brightSpots,spotVector& whiteSpots);
+    bool filterBlackSpots(Spot currentSpot);
+    bool filterWhiteSpots(Spot spot);
+    void setImages(ImageLiteU16 yImg,EdgeDetector * edgeD);
+
     void getDarkSpots(std::vector<Spot >&spots);
     void getBrightSpots(std::vector<Spot >&spots);
-
+    void setParams(std::vector<int>&params);
 
 private:
     
@@ -52,23 +52,30 @@ private:
     ImageLiteU16 yImage;
     EdgeDetector * edgeDetector;
     EdgeList * edgeList;
-
-//#ifdef OFFLINE
-//    bool debugBall;
-//    bool debugSpots;
-//    int filterThresholdDark;
-//    int greenThresholdDark;
-//    int filterThresholdBrite;
-//    int greenThresholdBrite;
-//#else
+    enum SpotType {
+        WHITE_CANDIDATE = 1,
+        WHITE_REJECT,
+        DARK_CANDIDATE,
+        DARK_REJECT,
+        WHITE_BLOB,
+        WHITE_BLOB_BAD
+    };
+#ifdef OFFLINE
+    bool debugBall;
+    bool debugSpots;
+    int filterThresholdDark;
+    int greenThresholdDark;
+    int filterThresholdBrite;
+    int greenThresholdBrite;
+#else
 
     static const bool debugBall = false;
     static const bool debugSpots = false;
     static const int filterThresholdDark = 104;
     static const int greenThresholdDark = 12;
-    static const int filterThresholdBrite = 130;
+    static const int filterThresholdBrite = 200;
     static const int greenThresholdBrite = 80;
-//#endif
+#endif
 
     
     

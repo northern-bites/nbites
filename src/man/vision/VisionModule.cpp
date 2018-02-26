@@ -157,7 +157,7 @@ void VisionModule::run_()
 {
     subtractedBlackSpots.clear();
     subtractedWhiteSpots.clear();
-
+    params.clear();
     PROF_ENTER(P_VISION)
     // Get messages from inPortals
     topIn.latch();
@@ -354,6 +354,7 @@ void VisionModule::run_()
             frontEndSubtract[i]->run(yuvLiteSubtract, colorParams[i]);
 #endif
             //do the subtraction to get the differential image
+//
             ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
             if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
                 int max = 0;
@@ -361,14 +362,14 @@ void VisionModule::run_()
                     for (int h = 0; h < yImage.height(); h++) {
                         *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h)) - *(YSubtraction.pixelAddr(w,h)));
                         const int THRESHOLD = 51.57;
-//                        const int THRESHOLD = 60; //50;
-
+                        //                        const int THRESHOLD = 60; //50;
+                        
                         if(*(YSubtraction.pixelAddr(w,h)) <= THRESHOLD) {
                             *(YSubtraction.pixelAddr(w,h)) = 0;
                         } else {// for testing
                             //*(YSubtraction.pixelAddr(w,h)) = 255;
                             *(YSubtraction.pixelAddr(w,h)) = 511;
-
+                            
                         }
                     }
                 }
@@ -383,12 +384,12 @@ void VisionModule::run_()
             bool diffBallDetected = false;
              //run diff image through ball detection
              PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
+             diffBallDetector[i]->setParams(params);
              diffBallDetector[i]->setImages(YSubtraction, edgeDetector[i]);
              diffBallDetected |= diffBallDetector[i]->findBallYImage(YSubtraction,kinematics[i]->wz0(), *(edges[i]));
             
              diffBallDetector[i]->getDarkSpots(subtractedBlackSpots);
              diffBallDetector[i]->getBrightSpots(subtractedWhiteSpots);
-
              PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
             
 //            std::cout<<"Did I detect a ball? "<<diffBallDetected<<std::endl;
@@ -660,7 +661,7 @@ void VisionModule::reloadCameraOffsets() {
         setCalibrationParams(calibration::getSavedOffsets( name, i==0, serializedOffsets) , i==0);
     }
 }
-float VisionModule::sdev(ImageLiteU16* image) {
+    float VisionModule::sdev(ImageLiteU16* image) {
         // assert(image.length>0 && image[0].length>0);
         float mean = 0;
         std::cout<<"Width: "<<image->width()<<" Height: "<<image->height()<<std::endl;
@@ -668,69 +669,69 @@ float VisionModule::sdev(ImageLiteU16* image) {
             for (int h = 0; h < image->height(); h++) {
                 //use with no abs image
                 int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
-
+                
                 mean += actual;
             }
         }
         std::cout<<"Sum of all pixelAddr "<< mean<<std::endl;
         mean /= (image->width() * image->height());
         std::cout<<"mean "<< mean<<std::endl;
-
+        
         float dev = 0;
-
+        
         for (int w = 0; w < image->width(); w++) {
             for (int h = 0; h < image->height(); h++) {
-                 //use with no abs image
+                //use with no abs image
                 int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
                 dev += (actual - mean) * (actual - mean);
             }
         }
-
+        
         return (float) sqrt(dev / (image->width() * image->height()));
-}
-
-
-void VisionModule::testNoise(ImageLiteU16* image) {
-    int totalSize = image->width() * image->height();
-    int vec[totalSize];
-    bzero(vec, totalSize * sizeof(int));
-
-    std::default_random_engine generator;
-    std::uniform_int_distribution<int> distribution(0,255);
-    //create random differential image
-    int same = 0;
-    for (int w = 0; w < image->width(); w++) {
-        for (int h = 0; h < image->height(); h++) {
-            int _n1 = distribution(generator);
-            int _n2 = distribution(generator);
-            // if(_n1 == _n2) { //for testing this code
-            //     same++;
+    }
+    
+    
+    void VisionModule::testNoise(ImageLiteU16* image) {
+        int totalSize = image->width() * image->height();
+        int vec[totalSize];
+        bzero(vec, totalSize * sizeof(int));
+        
+        std::default_random_engine generator;
+        std::uniform_int_distribution<int> distribution(0,255);
+        //create random differential image
+        int same = 0;
+        for (int w = 0; w < image->width(); w++) {
+            for (int h = 0; h < image->height(); h++) {
+                int _n1 = distribution(generator);
+                int _n2 = distribution(generator);
+                // if(_n1 == _n2) { //for testing this code
+                //     same++;
+                // }
+                int subtractionNum = _n1-_n2;
+                *(image->pixelAddr(w,h)) = subtractionNum;
+                int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
+                
+                vec[w*image->height()+h] = (int)actual;
+            }
+        }
+        //put numbers into a histogram & print it
+        int arraysize = 512;
+        int array[512] = {0};
+        //int * array = (int*) malloc(256);
+        int sumcheck = 0;
+        
+        for (int i = 0; i < totalSize; i++) {
+            sumcheck +=vec[i];
+            int val = vec[i]+arraysize/2;
+            array[val]++;
+        }
+        for (int range = 0; range < arraysize; range++) {
+            // for(int i = 0; i < array[range];i++){
+            //     std::cout<<range-256<< ",";
             // }
-            int subtractionNum = _n1-_n2;
-            *(image->pixelAddr(w,h)) = subtractionNum;
-            int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
-
-            vec[w*image->height()+h] = (int)actual;
+            std::cout<< range-256<<": "<<array[range]<< std::endl;
         }
     }
-    //put numbers into a histogram & print it
-    int arraysize = 512;
-    int array[512] = {0};
-    //int * array = (int*) malloc(256);
-    int sumcheck = 0;
-
-    for (int i = 0; i < totalSize; i++) {
-        sumcheck +=vec[i];
-        int val = vec[i]+arraysize/2;
-        array[val]++;
-    }
-    for (int range = 0; range < arraysize; range++) {
-        // for(int i = 0; i < array[range];i++){
-        //     std::cout<<range-256<< ",";
-        // }
-        std::cout<< range-256<<": "<<array[range]<< std::endl;  
-    }  
-}
 
 void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
 {

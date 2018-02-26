@@ -626,6 +626,7 @@ public class DebugImageView extends VisionView implements
 		}
 
 		public void stateChanged(ChangeEvent e) {
+            System.out.println("DID YOU GET CALLED?");
 			parent.displayParams[6] = ((Integer)filterDark.getValue()).intValue();
 			parent.displayParams[7] = ((Integer)greenDark.getValue()).intValue();
 			parent.displayParams[8] = ((Integer)filterBrite.getValue()).intValue();

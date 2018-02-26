@@ -75,6 +75,7 @@ public:
     messages::YUVImage* imageToSubtract;
     std::vector<Spot>subtractedBlackSpots;
     std::vector<Spot>subtractedWhiteSpots;
+    std::vector<int>params;
 
 
     bool topCamera;
@@ -95,6 +96,7 @@ private:
     void reloadCameraOffsets();
     float sdev(ImageLiteU16* image);
     void testNoise(ImageLiteU16* image);
+
 
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];
