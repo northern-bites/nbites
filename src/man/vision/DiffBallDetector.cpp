@@ -142,7 +142,8 @@ namespace vision {
     void DiffBallDetector::setImages(ImageLiteU16 yImg,EdgeDetector * edgeD) {
         yImage = yImg;
         edgeDetector = edgeD;
-        //blackSpots.clear();
+        blackSpots.clear();
+        whiteSpots.clear();
     }
     
     void DiffBallDetector::getDarkSpots(std::vector<Spot >&spots)  {
