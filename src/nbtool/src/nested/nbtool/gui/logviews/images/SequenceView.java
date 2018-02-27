@@ -128,7 +128,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
 //                if(offY<offsetY){
 //                    offY =offsetY+ 20;
 //                }
-                Debug.warn("X %d %d Y: %d %d %d", offX, offsetX,(int)frame_width/3, offY, offsetY);
                 diff_img_width = (int)frame_width/2;
                 diff_img_height= (int)frame_height/2;
                 
