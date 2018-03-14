@@ -9,6 +9,7 @@
 
 #ifndef DiffBallDetector_hpp
 #define DiffBallDetector_hpp
+#include <algorithm>    // std::max
 
 #include "BallDetector.h"
 namespace man {
@@ -26,7 +27,7 @@ public:
     bool findBallYImage(ImageLiteU16 diffImage,double cameraHeight, EdgeList& edges);
 
     void processDarkSpots(SpotList& darkSpots,spotVector& blackSpots);
-    void processWhiteSpots(SpotList& brightSpots,spotVector& whiteSpots);
+    void processWhiteSpots(SpotList & brightSpots, spotVector& whiteSpots,ImageLiteU16* diffImage);
     bool filterBlackSpots(Spot currentSpot);
     bool filterWhiteSpots(Spot spot);
     void setImages(ImageLiteU16 yImg,EdgeDetector * edgeD);
@@ -34,6 +35,8 @@ public:
     void getDarkSpots(std::vector<Spot >&spots);
     void getBrightSpots(std::vector<Spot >&spots);
     void setParams(std::vector<int>&params);
+    void spotHistogram(Spot spot,ImageLiteU16* diffImage);
+
 
 private:
     

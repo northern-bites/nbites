@@ -97,7 +97,18 @@ private:
     float sdev(ImageLiteU16* image);
     void testNoise(ImageLiteU16* image);
 
-
+    //Thresholding
+    void binaryThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h);
+    void squaredThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h);
+    void linearThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h,int max);
+    
+//    double scaleValues(int x, int a, int b, int min, int max);
+//    double scaleValues(int Input, int InputLow, int InputHigh, int OutputLow, int OutputHigh);
+    void minmaxFunc(int* min, int* max,ImageLiteU16* YSubtraction);
+    void scaleValues(ImageLiteU16* YSubtraction,int min, int max);
+    void shiftValues(ImageLiteU16* YSubtraction,int shift);
+    
+    
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];
     EdgeList* edges[2];

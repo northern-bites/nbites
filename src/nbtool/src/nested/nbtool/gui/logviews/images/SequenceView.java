@@ -134,11 +134,22 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
                 checkBoxPanel.setBounds(offX+diff_img_width+50,offY, 200, 50);
                 paramPanel.setBounds(offX+diff_img_width+50,offY+50, 300, 100);
                 if(showBlackSpots.isSelected()){
-                    drawSpots(blackSpotCoordinates, Color.RED);
+                    drawSpots(blackSpotCoordinates, Color.RED,false);
                 }
                 if(showWhiteSpots.isSelected()) {
-                    drawSpots(whiteSpotCoordinates,Color.YELLOW);
+                    drawSpots(whiteSpotCoordinates,Color.YELLOW,true);
                 }
+                
+                
+//               for (int x = 0; x < diffImage.getWidth(); ++x) {
+//                    for (int y = 0; y < diffImage.getHeight(); ++y){
+//                        Color c = new Color(diffImage.getRGB(x, y));
+//                        if (c.getGreen() > 0) {
+//                            diffImage.setRGB(x, y, Color.PINK.getRGB());
+//                        }
+//                    }
+//                }
+                
                 g.drawImage(diffImage,offX, offY,diff_img_width ,diff_img_height , null);
                 
             }
@@ -338,28 +349,33 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         c.add(spinner);
         return spinner;
     }
-    private void drawSpots(ArrayList<Integer[]> spotCoordinates, Color color) {
+    private void drawSpots(ArrayList<Integer[]> spotCoordinates, Color color,boolean drawNumbers) {
         Graphics2D graph = diffImage.createGraphics();
         
         int width = diffImage.getWidth();
         int height = diffImage.getHeight();
         
-        //        Graphics2D graph = (Graphics2D)g;
-        graph.setColor(color);
         
         for(int i = 0; i < spotCoordinates.size(); i++) {
+            graph.setColor(color);
+
             Integer coordinate[] = new Integer[3];
             coordinate = spotCoordinates.get(i);
             int midX = coordinate[0] + width/2;
             int midY = -coordinate[1] + height/2;
             int len =coordinate[2];
-            int x = (midX-len);//+offsetX;
-            int y = (midY-len);//+offsetY;
+            int x = (midX-len/2);//+offsetX;
+            int y = (midY-len/2);//+offsetY;
             
-            Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,len*2, len*2);
+//            Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,len*2, len*2);
+            Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,len, len);
             graph.draw(ellipse);
+            if(drawNumbers){
+                graph.setColor(Color.RED);
+                graph.drawString(Integer.toString(i),x,y);
+            }
+            
         }
-        
         graph.dispose();
     }
     
