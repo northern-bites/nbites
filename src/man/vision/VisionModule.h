@@ -94,13 +94,22 @@ private:
     nbl::io::FileMonitor camOffsetsMonitor;
     void reloadColorParams();
     void reloadCameraOffsets();
-    float sdev(ImageLiteU16* image);
+    float findavg(ImageLiteU16* image);
+    float sdev(ImageLiteU16* image,float mean);
     void testNoise(ImageLiteU16* image);
 
     //Thresholding
     void binaryThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h);
-    void squaredThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h);
-    void linearThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h,int max);
+    void fuzzySquaredThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h);
+//    void linearThreshold(ImageLiteU16* YSubtraction,int w,int h,int x1,int y1,int x2,int y2);
+    void quadraticThreshold(ImageLiteU16* YSubtraction,int w,int h,int shift);
+
+    
+    void linearThreshold(ImageLiteU16* YSubtraction,int w,int h,int lowThreshold,int slope);
+//    void linearThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h,int max);
+    void fuzzyLinearThreshold(ImageLiteU16* YSubtraction,double fuzzy_low, double fuzzy_high, double out_low, double out_high,int w, int h);
+
+    
     
 //    double scaleValues(int x, int a, int b, int min, int max);
 //    double scaleValues(int Input, int InputLow, int InputHigh, int OutputLow, int OutputHigh);

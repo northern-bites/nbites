@@ -18,6 +18,9 @@
 #include <random>
 #include "VisionCalibration.hpp"
 
+
+#define alwaysAssert(value) { if (!(value)) { printf("failed! %s : %d\n", __FILE__, __LINE__); exit(1); } }
+
 namespace man {
 namespace vision {
 
@@ -356,65 +359,63 @@ void VisionModule::run_()
             //do the subtraction to get the differential image
             
             
-            float maxBefore = 0;
-            float maxAfter = 0;
             ImageLiteU16 YSubtraction(frontEndSubtract[i]->yImage());
-            if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
-                int max = 0;
-                for (int w = 0; w < yImage.width(); w++) {
-                    for (int h = 0; h < yImage.height(); h++) {
-                        if( *(YSubtraction.pixelAddr(w,h))>maxBefore){
-                            maxBefore =  *(YSubtraction.pixelAddr(w,h));
-                        }
-                        *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h))
-                                                            - *(YSubtraction.pixelAddr(w,h)));
-                        if( *(YSubtraction.pixelAddr(w,h))>maxAfter){
-                            maxAfter = *(YSubtraction.pixelAddr(w,h));
-                        }
-                    }
-                }
-            }
-            std::cout<<"MaxBefore: "<<maxBefore<<" MaxAfter: "<<maxAfter<<std::endl;
+            
             //find the sd & get rid of noise
             
             // testNoise(&YSubtraction);
-            float sd = sdev(&YSubtraction);
-            std::cout<<"Sd: "<< sd<<std::endl;
-            int min =*(YSubtraction.pixelAddr(0,0));
-            int max = *(YSubtraction.pixelAddr(0,0));
-            minmaxFunc(&min,&max,&YSubtraction);
-
+            //(fuzzy_low, out_low)->(fuzzy_high, out_high)
+            //            double fuzzy_low = ;
+            //            double out_low = ;
+            //            double fuzzy_high = ;
+            //            double out_high = ;
             if (yImage.width() == YSubtraction.width() && yImage.height() == YSubtraction.height()){
                 for (int w = 0; w < yImage.width(); w++) {
                     for (int h = 0; h < yImage.height(); h++) {
-                        linearThreshold(&YSubtraction,sd,w,h,max);
-//                        binaryThreshold(&YSubtraction,3*sd,w,h);
-//                        squaredThreshold(&YSubtraction,sd,w,h);
+                        *(YSubtraction.pixelAddr(w,h))= abs(*(yImage.pixelAddr(w,h))
+                                                            - *(YSubtraction.pixelAddr(w,h)));
+                        
+                    }
+                }
+                float mean = findavg(&YSubtraction);
+                float sd = sdev(&YSubtraction,mean);
+                std::cout<<"Sd: "<< sd<<std::endl;
+                int min =*(YSubtraction.pixelAddr(0,0));
+                int max = *(YSubtraction.pixelAddr(0,0));
+                minmaxFunc(&min,&max,&YSubtraction);
+                for (int w = 0; w < yImage.width(); w++) {
+                    for (int h = 0; h < yImage.height(); h++) {
+//                        fuzzySquaredThreshold(&YSubtraction,sd,w,h);
+                        linearThreshold(&YSubtraction,w,h,3*sd,50);
+//                        binaryThreshold(&YSubtraction,sd,w,h);
 
                     }
                 }
                 minmaxFunc(&min,&max,&YSubtraction);
                 std::cout<<"MAX: "<<max<<" MIN: "<<min<<std::endl;
-//                shiftValues(&YSubtraction, 1022-max);
-                //scale the values.
                 scaleValues(&YSubtraction, min,max);
                 
-
+                //scale the values.
+                //                minmaxFunc(&min,&max,&YSubtraction);
+                //                shiftValues(&YSubtraction, 1022-max);
+                
+                
+                
+                
+                bool diffBallDetected = false;
+                //run diff image through ball detection
+                PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
+                diffBallDetector[i]->setParams(params);
+                diffBallDetector[i]->setImages(YSubtraction, edgeDetector[i]);
+                diffBallDetected |= diffBallDetector[i]->findBallYImage(YSubtraction,kinematics[i]->wz0(), *(edges[i]));
+                
+                diffBallDetector[i]->getDarkSpots(subtractedBlackSpots);
+                diffBallDetector[i]->getBrightSpots(subtractedWhiteSpots);
+                PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
+                
+                //            std::cout<<"Did I detect a ball? "<<diffBallDetected<<std::endl;
+                
             }
-            
-            bool diffBallDetected = false;
-            //run diff image through ball detection
-            PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
-            diffBallDetector[i]->setParams(params);
-            diffBallDetector[i]->setImages(YSubtraction, edgeDetector[i]);
-            diffBallDetected |= diffBallDetector[i]->findBallYImage(YSubtraction,kinematics[i]->wz0(), *(edges[i]));
-            
-            diffBallDetector[i]->getDarkSpots(subtractedBlackSpots);
-            diffBallDetector[i]->getBrightSpots(subtractedWhiteSpots);
-            PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
-            
-            //            std::cout<<"Did I detect a ball? "<<diffBallDetected<<std::endl;
-            
         }
         
         PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
@@ -704,7 +705,7 @@ void VisionModule::binaryThreshold(ImageLiteU16* YSubtraction,int threshold,int 
         *(YSubtraction->pixelAddr(w,h)) = 1023;
     }
 }
-void VisionModule::squaredThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h){
+void VisionModule::fuzzySquaredThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h){
     double test =*(YSubtraction->pixelAddr(w,h))/threshold;
     double squared = test * test;
     //    std::cout<<"test: "<<test<<" squared: "<<squared<<" int: "<<(int)squared<<std::endl;
@@ -712,41 +713,88 @@ void VisionModule::squaredThreshold(ImageLiteU16* YSubtraction,int threshold,int
     *(YSubtraction->pixelAddr(w,h)) = (int)squared;
 }
 
-
-
-
-void VisionModule::linearThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h,int max){
-    if(*(YSubtraction->pixelAddr(w,h))< threshold){
-        *(YSubtraction->pixelAddr(w,h)) = 0;
+void VisionModule::fuzzyLinearThreshold(ImageLiteU16* YSubtraction,double fuzzy_low, double fuzzy_high, double out_low, double out_high,int w, int h) {
+    const double fuzzy_range = fuzzy_high - fuzzy_low;
+    const double out_range = out_high - out_low;
+    
+    //    alwaysAssert(fuzzy_range > 0)
+    //    alwaysAssert(out_range > 0)
+    if (*(YSubtraction->pixelAddr(w,h)) < fuzzy_low) {
+        *(YSubtraction->pixelAddr(w,h)) = out_low;
+        return;
         
-    } else {
-        double slope= 1023/(max-threshold);
-        double y_int =(threshold*1023)/(max-threshold);
-        //with 1023 as x1
-        //        double slope= 1/(max-threshold);
-        //        double y_int =(max-threshold)/max;
-        //        //with 1023 as x1
-        //        double slope= 1/(1023+threshold);
-        //        double y_int =threshold/(1023+threshold);
-        
-        //       // with 1023-t as x1
-        //        int slope =(1023-2*threshold);
-        //        int y_int = 2*threshold*threshold + 1023*threshold;
-        double val =(double) *(YSubtraction->pixelAddr(w,h));
-        double result = val * slope + y_int;
-        std::cout<< "result "<<result<<std::endl;
-        *(YSubtraction->pixelAddr(w,h))= (int)result;
     }
-    
-    
+    if (*(YSubtraction->pixelAddr(w,h)) > fuzzy_high) {
+        *(YSubtraction->pixelAddr(w,h))= out_high;
+        return;
+    }
+    double num = *(YSubtraction->pixelAddr(w,h))  - fuzzy_low;
+    //    std::cout<<num<<std::endl;
+    //    alwaysAssert(num >= 0)
+    *(YSubtraction->pixelAddr(w,h))= (num / fuzzy_range) * out_range + out_low;
 }
+void VisionModule::quadraticThreshold(ImageLiteU16* YSubtraction,int w,int h,int shift){
+    
+    int rawInput = *(YSubtraction->pixelAddr(w,h));
+    int calculated =(rawInput* rawInput)>>shift;
+    *(YSubtraction->pixelAddr(w,h)) = std::min(calculated,1023);
+}
+void VisionModule::linearThreshold(ImageLiteU16* YSubtraction,int w,int h,int lowThreshold,int slope){
+//    confidence = slope * max(rawInput – lowThreshold, 0)
+    int rawInput = *(YSubtraction->pixelAddr(w,h));
+    int subtraction = rawInput-lowThreshold;
+    int calculated = slope * std::max(subtraction,0);
+    
+    *(YSubtraction->pixelAddr(w,h)) = calculated;
+}
+
+
+//void VisionModule::linearThreshold(ImageLiteU16* YSubtraction,int w,int h,int x1,int y1,int x2,int y2){
+//
+//
+//    double slope=((double)y2- (double)y1)/( (double)x2- (double)x1);
+//
+////    double y_int =(threshold*1023)/(max-threshold);
+//    int val =*(YSubtraction->pixelAddr(w,h));
+//    double result = slope * (val - x2);
+//    result -=y2;
+//
+//    std::cout<<"slope :"<<slope<< " result "<<result<<std::endl;
+//    *(YSubtraction->pixelAddr(w,h))= (int)result;
+//
+//}
+
+
+//void VisionModule::linearThreshold(ImageLiteU16* YSubtraction,int threshold,int w,int h,int max){
+//    if(*(YSubtraction->pixelAddr(w,h))< threshold){
+//        *(YSubtraction->pixelAddr(w,h)) = 0;
+//
+//    } else {
+//        double slope= 1023/(max-threshold);
+//        double y_int =(threshold*1023)/(max-threshold);
+//        //with 1023 as x1
+//        //        double slope= 1/(max-threshold);
+//        //        double y_int =(max-threshold)/max;
+//        //        //with 1023 as x1
+//        //        double slope= 1/(1023+threshold);
+//        //        double y_int =threshold/(1023+threshold);
+//
+//        //       // with 1023-t as x1
+//        //        int slope =(1023-2*threshold);
+//        //        int y_int = 2*threshold*threshold + 1023*threshold;
+//        double val =(double) *(YSubtraction->pixelAddr(w,h));
+//        double result = val * slope + y_int;
+//        std::cout<< "result "<<result<<std::endl;
+//        *(YSubtraction->pixelAddr(w,h))= (int)result;
+//    }
+//
+//}
 void VisionModule::shiftValues(ImageLiteU16* YSubtraction,int shift) {
     
     for (int w = 0; w < YSubtraction->width(); w++) {
         for (int h = 0; h < YSubtraction->height(); h++) {
             if(*(YSubtraction->pixelAddr(w,h)) > 1){
                 *(YSubtraction->pixelAddr(w,h)) += shift;
-
             }
             if ( ! (*(YSubtraction->pixelAddr(w,h)) <= 1023) ) {
                 printf("ahhhhhhhh! %u (%u, %u)\n", *(YSubtraction->pixelAddr(w,h)),w,h);
@@ -754,14 +802,14 @@ void VisionModule::shiftValues(ImageLiteU16* YSubtraction,int shift) {
             }
         }
     }
-
+    
 }
 void VisionModule::scaleValues(ImageLiteU16* YSubtraction,int min, int max) {
     
     for (int w = 0; w < YSubtraction->width(); w++) {
         for (int h = 0; h < YSubtraction->height(); h++) {
             
-            if(*(YSubtraction->pixelAddr(w,h)) != 0){
+            if(*(YSubtraction->pixelAddr(w,h)) > 10){
                 int Input =(int) *(YSubtraction->pixelAddr(w,h));
                 double InputLow = min;
                 double InputHigh = max;
@@ -769,10 +817,7 @@ void VisionModule::scaleValues(ImageLiteU16* YSubtraction,int min, int max) {
                 double OutputHigh = 1023;
                 double result =  ((double)(Input - InputLow) / (double)(InputHigh - InputLow)) * (double)(OutputHigh - OutputLow) + OutputLow;
                 
-                //                double result =  scaleValues(value,min, max,0, 1023);
-                std::cout<<*(YSubtraction->pixelAddr(w,h))<<" -> "<<result<<" = ";
                 *(YSubtraction->pixelAddr(w,h)) = (int)result;
-                std::cout<<*(YSubtraction->pixelAddr(w,h))<<std::endl;
             }
             if ( ! (*(YSubtraction->pixelAddr(w,h)) <= 1023) ) {
                 printf("ahhhhhhhh! %u (%u, %u)\n", *(YSubtraction->pixelAddr(w,h)),w,h);
@@ -785,8 +830,7 @@ void VisionModule::scaleValues(ImageLiteU16* YSubtraction,int min, int max) {
     //    double result =  ((double)Input / (double)InputHigh) * (double)OutputHigh;
     
 }
-float VisionModule::sdev(ImageLiteU16* image) {
-    // assert(image.length>0 && image[0].length>0);
+float VisionModule::findavg(ImageLiteU16* image) {
     float mean = 0;
     for (int w = 0; w < image->width(); w++) {
         for (int h = 0; h < image->height(); h++) {
@@ -796,10 +840,25 @@ float VisionModule::sdev(ImageLiteU16* image) {
             mean += actual;
         }
     }
-    std::cout<<"Sum of all pixelAddr "<< mean<<std::endl;
     mean /= (image->width() * image->height());
-    std::cout<<"mean "<< mean<<std::endl;
-    
+    return mean;
+}
+
+float VisionModule::sdev(ImageLiteU16* image,float mean) {
+    // assert(image.length>0 && image[0].length>0);
+    //    float mean = 0;
+    //    for (int w = 0; w < image->width(); w++) {
+    //        for (int h = 0; h < image->height(); h++) {
+    //            //use with no abs image
+    //            int16_t actual  = * ( (int16_t *) image->pixelAddr(w,h) );
+    //
+    //            mean += actual;
+    //        }
+    //    }
+    //    std::cout<<"Sum of all pixelAddr "<< mean<<std::endl;
+    //    mean /= (image->width() * image->height());
+    //    std::cout<<"mean "<< mean<<std::endl;
+    //
     float dev = 0;
     
     for (int w = 0; w < image->width(); w++) {
@@ -975,5 +1034,4 @@ void VisionModule::logImage(int i)
 #endif
 
 }
-
 }
