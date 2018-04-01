@@ -3,18 +3,23 @@ package nbtool.gui.logviews.images;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Container;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import java.awt.event.ItemListener;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
 import java.awt.GridLayout;
 import javax.swing.JSpinner;
 import javax.swing.JLabel;
@@ -37,10 +42,10 @@ import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 
 
-public class SequenceView extends ViewParent implements MouseMotionListener, ChangeListener,ItemListener {
+public class SequenceView extends ViewParent implements ChangeListener,ItemListener {
     private ArrayList<Integer[]> blackSpotCoordinates = new ArrayList<Integer[]>();
     private ArrayList<Integer[]> whiteSpotCoordinates = new ArrayList<Integer[]>();
-    static final int NUM_PARAMS = 4; // update as new params are added
+    static final int NUM_PARAMS = 7; // update as new params are added
     static int displayParams[] = new int[NUM_PARAMS];
     static boolean firstLoad = true;
     static boolean diffImageExists = true;
@@ -54,12 +59,23 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
     private int diff_img_height;
     private JPanel checkBoxPanel;
     private JPanel paramPanel;
+    private JPanel radioPanel;
     private JCheckBox showBlackSpots;
     private JCheckBox showWhiteSpots;
     private JSpinner filterDark;
     private JSpinner greenDark;
     private JSpinner filterBrite;
     private JSpinner greenBrite;
+    private int currentThreshold;
+    private int NOTHRESH = 0, BINARY= 1,LINEAR= 2,QUADRATIC= 3;
+    private JSpinner slopeLinear;
+    private JSpinner divideQuadratic;
+    private JRadioButton none;
+    private JRadioButton binary;
+    private JRadioButton linear;
+    private JRadioButton quadratic;;
+    
+    
     
     private boolean showBlack;
     private boolean showWhite;
@@ -85,12 +101,16 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             displayParams[1]  = 12;
             displayParams[2] = 130;
             displayParams[3] = 80;
+            displayParams[4] = 0;
+            displayParams[5] =7;
+            displayParams[6] = 7;
             firstLoad = false;
             
         }
+        
+        currentThreshold = 0;
         createAdjusters();
     }
-    
     
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -107,7 +127,7 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
                 if (img != null) {
                     int imageWidth = (int)frame_width/3;
                     int imageHeight = (int)frame_height/3;
-
+                    
                     g.drawImage(img,offsetX, offsetY,imageWidth ,imageHeight , null);
                     
                     if (offsetX+imageWidth >= frame_width) {
@@ -120,35 +140,27 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             }
             if(diffImage != null){
                 int offX =  (int)frame_width/3/3;
-//                int offX = (int)frame_width/3-350;
-//                if(offX< 0){
-//                    offX = 0;
-//                }
+                //                int offX = (int)frame_width/3-350;
+                //                if(offX< 0){
+                //                    offX = 0;
+                //                }
                 int offY = offsetY+(int)frame_height/3+ 10;
-//                if(offY<offsetY){
-//                    offY =offsetY+ 20;
-//                }
+                //                if(offY<offsetY){
+                //                    offY =offsetY+ 20;
+                //                }
                 diff_img_width = (int)frame_width/2;
                 diff_img_height= (int)frame_height/2;
                 
                 checkBoxPanel.setBounds(offX+diff_img_width+50,offY, 200, 50);
                 paramPanel.setBounds(offX+diff_img_width+50,offY+50, 300, 100);
+                radioPanel.setBounds(offX+diff_img_width+50,offY+150, 300, 100);
+                
                 if(showBlackSpots.isSelected()){
                     drawSpots(blackSpotCoordinates, Color.RED,false);
                 }
                 if(showWhiteSpots.isSelected()) {
                     drawSpots(whiteSpotCoordinates,Color.YELLOW,true);
                 }
-                
-                
-//               for (int x = 0; x < diffImage.getWidth(); ++x) {
-//                    for (int y = 0; y < diffImage.getHeight(); ++y){
-//                        Color c = new Color(diffImage.getRGB(x, y));
-//                        if (c.getGreen() > 0) {
-//                            diffImage.setRGB(x, y, Color.PINK.getRGB());
-//                        }
-//                    }
-//                }
                 
                 g.drawImage(diffImage,offX, offY,diff_img_width ,diff_img_height , null);
                 
@@ -179,10 +191,6 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             Debug.warn("NO MORE THAN 16 PHOTOS DUDE!");
         }
     }
-    @Override
-    public void mouseDragged(MouseEvent e) {}
-    @Override
-    public void mouseMoved(MouseEvent e) {}
     
     private void setDiffImage() {
         if (originalDiffImage == null) {
@@ -275,8 +283,11 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
     }
     
     private void createAdjusters() {
+        //CHECKBOXES
         checkBoxPanel = new JPanel();
         checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
+        checkBoxPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+        
         showBlackSpots = new JCheckBox();
         showWhiteSpots = new JCheckBox();
         
@@ -289,7 +300,82 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         
         showBlackSpots.setSelected(false);
         showWhiteSpots.setSelected(false);
+        
         add(checkBoxPanel);
+        
+        
+        //RADIO BUTTONS
+        radioPanel = new JPanel();
+        radioPanel.setLayout(new GridLayout(4, 2)); // 0 rows, 1 column
+        radioPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+        
+        
+        none = new JRadioButton("No Thresholding");
+        none.setSelected(true);
+        binary = new JRadioButton("Binary");
+        linear = new JRadioButton("Linear");
+        quadratic = new JRadioButton("Quadratic");
+        
+        
+        none.addItemListener(this);
+        binary.addItemListener(this);
+        linear.addItemListener(this);
+        quadratic.addItemListener(this);
+        
+        none.addChangeListener(this);
+        binary.addChangeListener(this);
+        linear.addChangeListener(this);
+        quadratic.addChangeListener(this);
+        
+        none.setRolloverEnabled(false);
+        binary.setRolloverEnabled(false);
+        linear.setRolloverEnabled(false);
+        quadratic.setRolloverEnabled(false);
+        
+        
+        
+        ButtonGroup bG = new ButtonGroup();
+        bG.add(none);
+        bG.add(binary);
+        bG.add(linear);
+        bG.add(quadratic);
+        
+        radioPanel.add(none);
+        radioPanel.add(new JLabel(""));  // for empty cell
+        
+        radioPanel.add(binary);
+        radioPanel.add(new JLabel(""));  // for empty cell
+        
+        
+        
+        radioPanel.add(linear);
+        JPanel linearSpinner = new JPanel();
+        linearSpinner.setLayout(new GridLayout(1, 0));
+        SpinnerModel slopeLinearModel = new SpinnerNumberModel(7, 0, 100, 1);
+        slopeLinear = addLabeledSpinner(linearSpinner, "slope:",
+                                        slopeLinearModel);
+        slopeLinear.addChangeListener(this);
+        radioPanel.add(linearSpinner);
+        
+        
+        radioPanel.add(quadratic);
+        
+        JPanel quadraticSpinner = new JPanel();
+        quadraticSpinner.setLayout(new GridLayout(1, 0));
+        SpinnerModel divideQuadraticModel = new SpinnerNumberModel(7, 0, 100, 1);
+        divideQuadratic = addLabeledSpinner(quadraticSpinner, "divide:",
+                                            divideQuadraticModel);
+        divideQuadratic.addChangeListener(this);
+        radioPanel.add(quadraticSpinner);
+        
+        add(radioPanel);
+        
+        
+        
+        //PARAM PANEL
+        paramPanel = new JPanel();
+        paramPanel.setLayout(new GridLayout(0, 2));
+        paramPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         
         SpinnerModel filterDarkModel = new
         SpinnerNumberModel(104, 0, 512, 4);
@@ -301,8 +387,7 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         SpinnerNumberModel(80, 0, 255, 4);
         
         
-        paramPanel = new JPanel();
-        paramPanel.setLayout(new GridLayout(0, 2));
+        
         filterDark = addLabeledSpinner(paramPanel, "filterThresholdDark",
                                        filterDarkModel);
         greenDark = addLabeledSpinner(paramPanel, "greenThresholdDark",
@@ -323,8 +408,22 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             showBlack = !showBlack;
         } else if (source == showWhiteSpots) {
             showWhite = !showWhite;
-        } else if(source == filterDark||source == greenDark||source == filterBrite||source == greenBrite) {
-            System.out.println("There was a change in"+source);
+        } else if(source == none) {
+            currentThreshold = NOTHRESH;
+            //            System.out.println("Threshold is now "+source);
+        } else if(source == binary) {
+            currentThreshold = BINARY;
+            //            System.out.println("Threshold is now "+source);
+        } else if (source == linear) {
+            currentThreshold = LINEAR;
+            //            System.out.println("Threshold is now "+source);
+        }else if (source == quadratic) {
+            currentThreshold = QUADRATIC;
+            //            System.out.println("Threshold is now "+source);
+        }   else if(source == filterDark||source == greenDark||source == filterBrite||source == greenBrite) {
+            //            System.out.println("There was a change in"+source);
+        } else if(source == slopeLinear||source == divideQuadratic) {
+            //            System.out.println("There was a change in"+source);
             
         } else {
             Debug.error("Error: item state listener: %s!", source);
@@ -334,10 +433,14 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         repaint();
     }
     public void stateChanged(ChangeEvent e) {
+        System.out.println("LALALLALLALALLALALLALALALLA "+e);
         displayParams[0] = ((Integer)filterDark.getValue()).intValue();
         displayParams[1] = ((Integer)greenDark.getValue()).intValue();
         displayParams[2] = ((Integer)filterBrite.getValue()).intValue();
         displayParams[3] = ((Integer)greenBrite.getValue()).intValue();
+        displayParams[4] = currentThreshold;
+        displayParams[5] = ((Integer)slopeLinear.getValue()).intValue();
+        displayParams[6] = ((Integer)divideQuadratic.getValue()).intValue();
         sendToNbCross();
     }
     protected JSpinner addLabeledSpinner(Container c, String label,
@@ -358,7 +461,7 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
         
         for(int i = 0; i < spotCoordinates.size(); i++) {
             graph.setColor(color);
-
+            
             Integer coordinate[] = new Integer[3];
             coordinate = spotCoordinates.get(i);
             int midX = coordinate[0] + width/2;
@@ -367,7 +470,7 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             int x = (midX-len/2);//+offsetX;
             int y = (midY-len/2);//+offsetY;
             
-//            Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,len*2, len*2);
+            //            Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,len*2, len*2);
             Ellipse2D.Double ellipse = new Ellipse2D.Double(x, y,len, len);
             graph.draw(ellipse);
             if(drawNumbers){
@@ -403,3 +506,4 @@ public class SequenceView extends ViewParent implements MouseMotionListener, Cha
             SharedConstants.LogClass_YUVImage()};
     }
 }
+

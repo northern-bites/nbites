@@ -377,23 +377,63 @@ void VisionModule::run_()
                         
                     }
                 }
+                
+                int currentThreshold = params[4];
+                const int NOTHRESH = 0, BINARY= 1,LINEAR= 2,QUADRATIC= 3;
+
                 float mean = findavg(&YSubtraction);
                 float sd = sdev(&YSubtraction,mean);
                 std::cout<<"Sd: "<< sd<<std::endl;
                 int min =*(YSubtraction.pixelAddr(0,0));
                 int max = *(YSubtraction.pixelAddr(0,0));
                 minmaxFunc(&min,&max,&YSubtraction);
+                switch (currentThreshold) {
+                    case NOTHRESH:
+                        std::cout<<"No threshold"<<std::endl;
+                        break;
+                    case BINARY:
+                        std::cout<<"Binary threshold"<<std::endl;
+                        break;
+                    case LINEAR: {
+                        std::cout<<"Linear threshold"<<std::endl;
+                    }break;
+                    case QUADRATIC: {
+                        std::cout<<"Quadratic threshold"<<std::endl;
+                    }break;
+                    default:
+                    std::cout<<"default wtf dude"<<std::endl;
+                        break;
+                }
                 for (int w = 0; w < yImage.width(); w++) {
                     for (int h = 0; h < yImage.height(); h++) {
+                        switch (currentThreshold) {
+                            case NOTHRESH:
+//                                std::cout<<"No Threshold"<<std::endl;
+                                break;
+                            case BINARY:
+                                binaryThreshold(&YSubtraction,sd,w,h);
+                                break;
+                            case LINEAR: {
+                                int slope = params[5];
+                                linearThreshold(&YSubtraction,w,h,sd,slope);
+                            }break;
+                            case QUADRATIC: {
+                                int divide = params[6];
+                                quadraticThreshold(&YSubtraction,w,h,divide);
+
+                            }break;
+                            default:
+                                break;
+                        }
 //                        fuzzySquaredThreshold(&YSubtraction,sd,w,h);
-                        linearThreshold(&YSubtraction,w,h,3*sd,50);
+//                        linearThreshold(&YSubtraction,w,h,3*sd,50);
 //                        binaryThreshold(&YSubtraction,sd,w,h);
 
                     }
                 }
                 minmaxFunc(&min,&max,&YSubtraction);
                 std::cout<<"MAX: "<<max<<" MIN: "<<min<<std::endl;
-                scaleValues(&YSubtraction, min,max);
+//                scaleValues(&YSubtraction, min,max);
                 
                 //scale the values.
                 //                minmaxFunc(&min,&max,&YSubtraction);
@@ -937,6 +977,9 @@ void VisionModule::setDebugDrawingParameters(nbl::SExpr* params) {
     int greenDark = params->get(1)->find("GreenDark")->get(1)->valueAsInt();
     int filterBrite = params->get(1)->find("FilterBrite")->get(1)->valueAsInt();
     int greenBrite = params->get(1)->find("GreenBrite")->get(1)->valueAsInt();
+    
+
+    
     field->setDrawCameraHorizon(cameraHorizon);
     field->setDrawFieldHorizon(fieldHorizon);
     field->setDebugHorizon(debugHorizon);

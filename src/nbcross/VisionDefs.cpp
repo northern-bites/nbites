@@ -252,17 +252,26 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
     } else {
     	module.imageToSubtract = NULL;
     }
-//    int arg0 =theLog->topLevelDictionary["param0"].asNumber().asInt();
-//    int arg1=theLog->topLevelDictionary["param1"].asNumber().asInt();
-//    int arg2 = theLog->topLevelDictionary["param2"].asNumber().asInt();
+    int arg0 =theLog->topLevelDictionary["param4"].asNumber().asInt();
+    int arg1=theLog->topLevelDictionary["param5"].asNumber().asInt();
+    int arg2 = theLog->topLevelDictionary["param6"].asNumber().asInt();
 //    int arg3=theLog->topLevelDictionary["param3"].asNumber().asInt();
-//    std::cout<<"PARAMS:"<<arg0<<" "<<arg1<<" "<<arg2<<" "<<arg3<<std::endl;
+    std::cout<<"PARAMS:"<<arg0<<" "<<arg1<<" "<<arg2<<std::endl;
+//    std::cout<<"PARAMS:"<<arg0<<" "<<arg1<<" "<<arg2<<" "<<arg3<<" "<<arg4<<" "<<arg5" "<<arg6<<<<std::endl;
+
 //
     module.params.push_back(theLog->topLevelDictionary["param0"].asNumber().asInt());
     module.params.push_back(theLog->topLevelDictionary["param1"].asNumber().asInt());
     module.params.push_back(theLog->topLevelDictionary["param2"].asNumber().asInt());
     module.params.push_back(theLog->topLevelDictionary["param3"].asNumber().asInt());
+    module.params.push_back(theLog->topLevelDictionary["param4"].asNumber().asInt());
+    module.params.push_back(theLog->topLevelDictionary["param5"].asNumber().asInt());
+    module.params.push_back(theLog->topLevelDictionary["param6"].asNumber().asInt());
 
+            
+//    std::cout<<"PARAMS:"<<arg0<<" "<<arg1<<" "<<arg2<<" "<<arg3<<" "<<arg4<<" "<<arg5" "<<arg6<<<<std::endl;
+
+            
     // Run it!
     module.run();
 
