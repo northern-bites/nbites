@@ -401,7 +401,7 @@ void VisionModule::run_()
                         std::cout<<"Quadratic threshold"<<std::endl;
                     }break;
                     default:
-                    std::cout<<"default wtf dude"<<std::endl;
+                        std::cout<<"default wtf dude"<<std::endl;
                         break;
                 }
                 for (int w = 0; w < yImage.width(); w++) {
@@ -415,12 +415,20 @@ void VisionModule::run_()
                                 break;
                             case LINEAR: {
                                 int slope = params[5];
-                                linearThreshold(&YSubtraction,w,h,sd,slope);
+                                int lowerThreshold = params[6];
+                                if (lowerThreshold == 9999) {
+                                    lowerThreshold = sd;
+                                }
+                                linearThreshold(&YSubtraction,w,h,lowerThreshold,slope);
+                                if(*(YSubtraction.pixelAddr(w,h))>= 1024) {
+                                    std::cout<<"WARNING: A PIXEL WAS GREATER THAN 1023"<<std::endl;
+                                    *(YSubtraction.pixelAddr(w,h))= 1023;
+                                }
+                                
                             }break;
                             case QUADRATIC: {
-                                int divide = params[6];
+                                int divide = params[7];
                                 quadraticThreshold(&YSubtraction,w,h,divide);
-
                             }break;
                             default:
                                 break;

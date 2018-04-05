@@ -45,7 +45,7 @@ import nbtool.util.SharedConstants;
 public class SequenceView extends ViewParent implements ChangeListener,ItemListener {
     private ArrayList<Integer[]> blackSpotCoordinates = new ArrayList<Integer[]>();
     private ArrayList<Integer[]> whiteSpotCoordinates = new ArrayList<Integer[]>();
-    static final int NUM_PARAMS = 7; // update as new params are added
+    static final int NUM_PARAMS = 8; // update as new params are added
     static int displayParams[] = new int[NUM_PARAMS];
     static boolean firstLoad = true;
     static boolean diffImageExists = true;
@@ -69,7 +69,9 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
     private int currentThreshold;
     private int NOTHRESH = 0, BINARY= 1,LINEAR= 2,QUADRATIC= 3;
     private JSpinner slopeLinear;
+    private JSpinner lowerThreshold;
     private JSpinner divideQuadratic;
+    
     private JRadioButton none;
     private JRadioButton binary;
     private JRadioButton linear;
@@ -103,7 +105,8 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
             displayParams[3] = 80;
             displayParams[4] = 0;
             displayParams[5] =7;
-            displayParams[6] = 7;
+            displayParams[6] = 9999;
+            displayParams[7] = 7;
             firstLoad = false;
             
         }
@@ -153,7 +156,7 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
                 
                 checkBoxPanel.setBounds(offX+diff_img_width+50,offY, 200, 50);
                 paramPanel.setBounds(offX+diff_img_width+50,offY+50, 300, 100);
-                radioPanel.setBounds(offX+diff_img_width+50,offY+150, 300, 100);
+                radioPanel.setBounds(offX+diff_img_width+50,offY+150, 300, 150);
                 
                 if(showBlackSpots.isSelected()){
                     drawSpots(blackSpotCoordinates, Color.RED,false);
@@ -306,7 +309,7 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         
         //RADIO BUTTONS
         radioPanel = new JPanel();
-        radioPanel.setLayout(new GridLayout(4, 2)); // 0 rows, 1 column
+        radioPanel.setLayout(new GridLayout(4, 3)); // 0 rows, 1 column
         radioPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         
         
@@ -342,10 +345,11 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         
         radioPanel.add(none);
         radioPanel.add(new JLabel(""));  // for empty cell
+        radioPanel.add(new JLabel(""));  // for empty cell
         
         radioPanel.add(binary);
         radioPanel.add(new JLabel(""));  // for empty cell
-        
+        radioPanel.add(new JLabel(""));  // for empty cell
         
         
         radioPanel.add(linear);
@@ -358,6 +362,17 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         radioPanel.add(linearSpinner);
         
         
+        JPanel lowerThreshSpinner = new JPanel();
+        lowerThreshSpinner.setLayout(new GridLayout(1, 0));
+        SpinnerModel lowerThreshModel = new SpinnerNumberModel(9999, 0, 9999, 1);
+        lowerThreshold = addLabeledSpinner(lowerThreshSpinner, "lower threshold:",
+                                           lowerThreshModel);
+        lowerThreshold.addChangeListener(this);
+        radioPanel.add(lowerThreshSpinner);
+        
+        
+        
+        
         radioPanel.add(quadratic);
         
         JPanel quadraticSpinner = new JPanel();
@@ -367,6 +382,9 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
                                             divideQuadraticModel);
         divideQuadratic.addChangeListener(this);
         radioPanel.add(quadraticSpinner);
+        
+        radioPanel.add(new JLabel(""));  // for empty cell
+        
         
         add(radioPanel);
         
@@ -422,7 +440,7 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
             //            System.out.println("Threshold is now "+source);
         }   else if(source == filterDark||source == greenDark||source == filterBrite||source == greenBrite) {
             //            System.out.println("There was a change in"+source);
-        } else if(source == slopeLinear||source == divideQuadratic) {
+        } else if(source == slopeLinear||source == divideQuadratic||source == lowerThreshold) {
             //            System.out.println("There was a change in"+source);
             
         } else {
@@ -433,14 +451,15 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         repaint();
     }
     public void stateChanged(ChangeEvent e) {
-        System.out.println("LALALLALLALALLALALLALALALLA "+e);
         displayParams[0] = ((Integer)filterDark.getValue()).intValue();
         displayParams[1] = ((Integer)greenDark.getValue()).intValue();
         displayParams[2] = ((Integer)filterBrite.getValue()).intValue();
         displayParams[3] = ((Integer)greenBrite.getValue()).intValue();
         displayParams[4] = currentThreshold;
         displayParams[5] = ((Integer)slopeLinear.getValue()).intValue();
-        displayParams[6] = ((Integer)divideQuadratic.getValue()).intValue();
+        displayParams[6] = ((Integer)lowerThreshold.getValue()).intValue();
+        displayParams[7] = ((Integer)divideQuadratic.getValue()).intValue();
+        
         sendToNbCross();
     }
     protected JSpinner addLabeledSpinner(Container c, String label,

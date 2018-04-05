@@ -267,6 +267,7 @@ NBCROSS_FUNCTION(Vision, true, nbl::SharedConstants::LogClass_Tripoint())
     module.params.push_back(theLog->topLevelDictionary["param4"].asNumber().asInt());
     module.params.push_back(theLog->topLevelDictionary["param5"].asNumber().asInt());
     module.params.push_back(theLog->topLevelDictionary["param6"].asNumber().asInt());
+    module.params.push_back(theLog->topLevelDictionary["param7"].asNumber().asInt());
 
             
 //    std::cout<<"PARAMS:"<<arg0<<" "<<arg1<<" "<<arg2<<" "<<arg3<<" "<<arg4<<" "<<arg5" "<<arg6<<<<std::endl;
