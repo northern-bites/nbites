@@ -15,6 +15,9 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import javax.swing.JPanel;
@@ -27,6 +30,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 
 import nbtool.data.log.Log;
 import nbtool.data.json.JsonArray;
@@ -42,13 +46,18 @@ import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 
 
-public class SequenceView extends ViewParent implements ChangeListener,ItemListener {
+public class SequenceView extends ViewParent implements ChangeListener,ItemListener, KeyListener {
     private ArrayList<Integer[]> blackSpotCoordinates = new ArrayList<Integer[]>();
     private ArrayList<Integer[]> whiteSpotCoordinates = new ArrayList<Integer[]>();
     static final int NUM_PARAMS = 8; // update as new params are added
     static int displayParams[] = new int[NUM_PARAMS];
     static boolean firstLoad = true;
     static boolean diffImageExists = true;
+    
+    private static int static_success_count = 0;
+    private static int static_failure_count = 0;
+    private static int static_total_count = 0;
+    
     private BufferedImage images[];
     private BufferedImage diffImage;
     private BufferedImage originalDiffImage = null;
@@ -62,6 +71,7 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
     private JPanel radioPanel;
     private JCheckBox showBlackSpots;
     private JCheckBox showWhiteSpots;
+    private JCheckBox showColor;
     private JSpinner filterDark;
     private JSpinner greenDark;
     private JSpinner filterBrite;
@@ -81,19 +91,23 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
     
     private boolean showBlack;
     private boolean showWhite;
+    private boolean showColorBool;
+    
     
     static final int DEFAULT_WIDTH = 320;
     static final int DEFAULT_HEIGHT = 240;
-    
+    float color = 0f;
+    float colorIncr = .00036f;
     
     public SequenceView() {
         super();
         setLayout(null);
-        
+        addKeyListener((java.awt.event.KeyListener) this);
         this.images = null;
         
         showBlack = false;
         showWhite = false;
+        showColorBool = false;
         if (firstLoad) {
             for (int i = 0; i < NUM_PARAMS; i++) {
                 displayParams[i] = 0;
@@ -114,6 +128,66 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         currentThreshold = 0;
         createAdjusters();
     }
+    
+    
+    
+    
+    private static final Color[] angleMap = initColorMap();
+    
+    private static Color[] initColorMap(){
+        
+        Color[] ret = new Color[256];
+        
+        
+        
+        Color[] top = {Color.MAGENTA,
+            Color.BLUE,
+            Color.CYAN,
+            Color.GREEN,
+            Color.YELLOW,
+            Color.ORANGE,
+            Color.RED,
+            Color.WHITE,
+        };
+        
+        assert(top.length == 8);
+        
+        for (int i = 0; i < 256; ++i) {
+            int bi = i / 32;
+            int ni = (bi + 1) % 8;
+            
+            int dist = i % 32;
+            
+            Color bc = top[bi];
+            Color nc = top[ni];
+            
+            int dr = nc.getRed() - bc.getRed();
+            int dg = nc.getGreen() - bc.getGreen();
+            int db = nc.getBlue() - bc.getBlue();
+            
+            Color tc = new Color(
+                                 bc.getRed() + (dist * dr) / 32,
+                                 bc.getGreen() + (dist * dg) / 32,
+                                 bc.getBlue() + (dist * db) / 32
+                                 );
+            ret[i] = tc;
+        }
+        
+        return ret;
+    };
+    
+    private Color gradientColorFor(Color pixel) {
+        if (pixel.getBlue() != pixel.getGreen() || pixel.getGreen() != pixel.getRed()) {
+            throw new RuntimeException("ahhhhhh!");
+        }
+        
+        final int brightness = pixel.getBlue();
+        
+        assert(brightness < 256);
+        return angleMap[brightness];
+    }
+    
+    
     
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -157,7 +231,24 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
                 checkBoxPanel.setBounds(offX+diff_img_width+50,offY, 200, 50);
                 paramPanel.setBounds(offX+diff_img_width+50,offY+50, 300, 100);
                 radioPanel.setBounds(offX+diff_img_width+50,offY+150, 300, 150);
-                
+                if(showColor.isSelected()){
+                    System.out.println("HERE");
+                    for (int x = 0; x < diffImage.getWidth(); ++x) {
+                        for (int y = 0; y < diffImage.getHeight(); ++y){
+                            Color c = new Color(diffImage.getRGB(x, y));
+                            
+                            //                            if(diffImage.getRGB(x,y) != 0x000000) {
+                            //                                diffImage.setRGB(x, y, Color.RED.getRGB());
+                            //                            }
+                            
+                            diffImage.setRGB(x, y, this.gradientColorFor(c).getRGB());
+                            //
+                            //                            if(c.getGreen() != 0x000000) {
+                            //                                diffImage.setRGB(x, y, Color.RED.getRGB());
+                            //                            }
+                        }
+                    }
+                }
                 if(showBlackSpots.isSelected()){
                     drawSpots(blackSpotCoordinates, Color.RED,false);
                 }
@@ -270,6 +361,7 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
                         coordinate[2]=innerDiam;
                         whiteSpotCoordinates.add(coordinate);
                     }
+                    showColor.setText("Show gradient colors");
                     showBlackSpots.setText("Show Black Spots: "+blackSpotCoordinates.size());
                     showWhiteSpots.setText("Show White Spots: "+ whiteSpotCoordinates.size());
                 }
@@ -293,16 +385,20 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         
         showBlackSpots = new JCheckBox();
         showWhiteSpots = new JCheckBox();
+        showColor = new JCheckBox();
         
         // add their listeners
         showBlackSpots.addItemListener(this);
         showWhiteSpots.addItemListener(this);
+        showColor.addItemListener(this);
         
         checkBoxPanel.add(showBlackSpots);
         checkBoxPanel.add(showWhiteSpots);
+        checkBoxPanel.add(showColor);
         
+        showColor.setSelected(true);
         showBlackSpots.setSelected(false);
-        showWhiteSpots.setSelected(false);
+        showWhiteSpots.setSelected(true);
         
         add(checkBoxPanel);
         
@@ -426,6 +522,8 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
             showBlack = !showBlack;
         } else if (source == showWhiteSpots) {
             showWhite = !showWhite;
+        } else if (source == showColor){
+            showColorBool = !showColorBool;
         } else if(source == none) {
             currentThreshold = NOTHRESH;
             //            System.out.println("Threshold is now "+source);
@@ -480,7 +578,6 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         
         for(int i = 0; i < spotCoordinates.size(); i++) {
             graph.setColor(color);
-            
             Integer coordinate[] = new Integer[3];
             coordinate = spotCoordinates.get(i);
             int midX = coordinate[0] + width/2;
@@ -516,6 +613,7 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         if(alsoSelected.size() == 16){
             Debug.warn("This view can only can display 16 images at a time.");
         }
+        
         repaint();
     }
     
@@ -523,6 +621,31 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
     public String[] displayableTypes() {
         return new String[]{SharedConstants.LogClass_Tripoint(),
             SharedConstants.LogClass_YUVImage()};
+    }
+    //    public void keyPressed(KeyEvent e){
+    
+    
+    //    }
+    //    @Override
+    public void keyPressed(KeyEvent arg0) {
+        // TODO Auto-generated method stub
+        int keyCode = arg0.getKeyCode();
+        if(keyCode == KeyEvent.VK_MINUS){
+            static_success_count++;
+            static_total_count++;
+            System.out.println("+: "+static_success_count+" -:"+static_failure_count+" total: "+ static_total_count);
+        } else if(keyCode == KeyEvent.VK_PLUS){
+            static_failure_count++;
+            static_total_count++;
+            System.out.println("+: "+static_success_count+" -:"+static_failure_count+" total: "+ static_total_count);
+            
+        }
+    }
+    
+    //    @Override
+    public void keyReleased(com.jogamp.newt.event.KeyEvent arg0) {
+        // TODO Auto-generated method stub
+        
     }
 }
 
