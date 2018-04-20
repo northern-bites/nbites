@@ -11,13 +11,16 @@ import java.util.ArrayList;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import javax.swing.JPanel;
@@ -25,6 +28,7 @@ import javax.swing.JRadioButton;
 
 import java.awt.GridLayout;
 import javax.swing.JSpinner;
+import javax.swing.KeyStroke;
 import javax.swing.JLabel;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
@@ -102,7 +106,20 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
     public SequenceView() {
         super();
         setLayout(null);
-        addKeyListener((java.awt.event.KeyListener) this);
+        //        addKeyListener((java.awt.event.KeyListener) this);
+        
+        
+        AbstractAction onKeyPressAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Debug.info("herere!!!!");
+            }
+        };
+        
+        this.getActionMap().put("onKeyPressAction", onKeyPressAction);
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("]"),
+                                                                "onKeyPressAction");
+        
         this.images = null;
         
         showBlack = false;
@@ -140,7 +157,7 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
         
         
         
-        Color[] top = {Color.MAGENTA,
+        Color[] top = {Color.BLACK,
             Color.BLUE,
             Color.CYAN,
             Color.GREEN,
@@ -232,7 +249,6 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
                 paramPanel.setBounds(offX+diff_img_width+50,offY+50, 300, 100);
                 radioPanel.setBounds(offX+diff_img_width+50,offY+150, 300, 150);
                 if(showColor.isSelected()){
-                    System.out.println("HERE");
                     for (int x = 0; x < diffImage.getWidth(); ++x) {
                         for (int y = 0; y < diffImage.getHeight(); ++y){
                             Color c = new Color(diffImage.getRGB(x, y));
@@ -629,23 +645,30 @@ public class SequenceView extends ViewParent implements ChangeListener,ItemListe
     //    @Override
     public void keyPressed(KeyEvent arg0) {
         // TODO Auto-generated method stub
+        Debug.info("Got here");
         int keyCode = arg0.getKeyCode();
-        if(keyCode == KeyEvent.VK_MINUS){
+        if(keyCode == KeyEvent.VK_Z){
             static_success_count++;
             static_total_count++;
-            System.out.println("+: "+static_success_count+" -:"+static_failure_count+" total: "+ static_total_count);
-        } else if(keyCode == KeyEvent.VK_PLUS){
+            Debug.info("+: "+static_success_count+" -:"+static_failure_count+" total: "+ static_total_count);
+        } else if(keyCode == KeyEvent.VK_A){
             static_failure_count++;
             static_total_count++;
-            System.out.println("+: "+static_success_count+" -:"+static_failure_count+" total: "+ static_total_count);
+            Debug.info("+: "+static_success_count+" -:"+static_failure_count+" total: "+ static_total_count);
             
         }
     }
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // TODO Auto-generated method stub
+        Debug.info("sos1");
+        
+    }
     
     //    @Override
-    public void keyReleased(com.jogamp.newt.event.KeyEvent arg0) {
+    public void keyReleased(KeyEvent arg0) {
         // TODO Auto-generated method stub
-        
+        Debug.info("sos");
     }
 }
 
